@@ -45,9 +45,9 @@ fun <T, R> Prefs<T>.map(
  */
 internal class MappedPrefs<T, R>(
     private val prefs: Prefs<T>,
-    private val defaultValue: R,
+    override val defaultValue: R,
     private val convert: (T) -> R,
-    private val reverse: (R) -> T
+    private val reverse: (R) -> T,
 ) : Prefs<R> {
     override suspend fun getValue(thisRef: Any, property: KProperty<*>) = get()
     override fun key(): String = prefs.key()
@@ -59,7 +59,7 @@ internal class MappedPrefs<T, R>(
     override suspend fun setValue(thisRef: Any, property: KProperty<*>, value: R) = set(value)
 
     override suspend fun delete() = prefs.delete()
-    override fun defaultValue(): R = defaultValue
+
 
     override fun asFlow(): Flow<R> = prefs.asFlow().map { convert(it) }
 

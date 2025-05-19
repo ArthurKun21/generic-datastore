@@ -12,7 +12,6 @@ import io.github.arthurkun.generic.datastore.GenericPreference.BooleanPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.FloatPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.IntPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.LongPrimitive
-import io.github.arthurkun.generic.datastore.GenericPreference.ObjectPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.StringPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.StringSetPrimitive
 
@@ -156,7 +155,7 @@ class GenericPreferenceDatastore(
             ObjectPrimitive(
                 datastore = datastore,
                 key = key,
-                defaultValue = defaultValue,
+                default = defaultValue,
                 serializer = serializer,
                 deserializer = deserializer,
             )

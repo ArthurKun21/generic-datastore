@@ -42,7 +42,7 @@ interface Preference<T> {
     /**
      * Returns the default value of the preference.
      */
-    fun defaultValue(): T
+    val defaultValue: T
 
     /**
      * Returns a [Flow] that emits the preference value whenever it changes.

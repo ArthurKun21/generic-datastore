@@ -3,10 +3,7 @@ package io.github.arthurkun.generic.datastore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -27,38 +24,11 @@ import kotlinx.coroutines.flow.stateIn
  * @property preferences The Preferences.Key used to access the preference in DataStore.
  */
 sealed class GenericPreference<T>(
-    private val datastore: DataStore<Preferences>,
+    internal val datastore: DataStore<Preferences>,
     private val key: String,
-    private val defaultValue: T,
-    private val preferences: Preferences.Key<T> = preferencesKey(key, defaultValue),
+    override val defaultValue: T,
+    private val preferences: Preferences.Key<T>,
 ): Preference<T> {
-    /**
-     * Reads the preference value from DataStore.
-     *
-     * @param datastore The DataStore instance.
-     * @param key The preference key.
-     * @param defaultValue The default value to return if the key is not found.
-     * @return The preference value.
-     */
-    abstract suspend fun read(
-        datastore: DataStore<Preferences>,
-        key: String,
-        defaultValue: T,
-    ): T
-
-    /**
-     * Writes the preference value to DataStore.
-     *
-     * @param datastore The DataStore instance.
-     * @param key The preference key.
-     * @param value The value to write.
-     */
-    abstract suspend fun write(
-        datastore: DataStore<Preferences>,
-        key: String,
-        value: T
-    )
-
     /**
      * Returns the key of the preference.
      */
@@ -96,13 +66,6 @@ sealed class GenericPreference<T>(
         datastore.edit { ds ->
             ds.remove(preferences)
         }
-    }
-
-    /**
-     * Returns the default value of the preference.
-     */
-    override fun defaultValue(): T {
-        return defaultValue
     }
 
     /**
@@ -146,31 +109,7 @@ sealed class GenericPreference<T>(
         key = key,
         defaultValue = defaultValue,
         preferences = preferencesKey,
-    ) {
-        /**
-         * Reads the String preference value.
-         *
-         * @param defaultValue The default value (unused, uses class property).
-         * @return The String preference value.
-         */
-        override suspend fun read(
-            datastore: DataStore<Preferences>,
-            key: String,
-            defaultValue: String
-        ): String = get()
-
-        /**
-         * Writes the String preference value.
-         *
-         * @param value The String value to write.
-         */
-        override suspend fun write(
-            datastore: DataStore<Preferences>,
-            key: String,
-            value: String
-        ) = set(value)
-
-    }
+    )
 
     /**
      * A GenericPreference for Long values.
@@ -188,30 +127,7 @@ sealed class GenericPreference<T>(
         key = key,
         preferences = preferencesKey,
         defaultValue = defaultValue,
-    ) {
-        /**
-         * Reads the Long preference value.
-         *
-         * @param defaultValue The default value (unused, uses class property).
-         * @return The Long preference value.
-         */
-        override suspend fun read(
-            datastore: DataStore<Preferences>,
-            key: String,
-            defaultValue: Long
-        ): Long = get()
-
-        /**
-         * Writes the Long preference value.
-         *
-         * @param value The Long value to write.
-         */
-        override suspend fun write(
-            datastore: DataStore<Preferences>,
-            key: String,
-            value: Long
-        ) = set(value)
-    }
+    )
 
     /**
      * A GenericPreference for Int values.
@@ -228,30 +144,7 @@ sealed class GenericPreference<T>(
         key = key,
         preferences = preferencesKey,
         defaultValue = defaultValue,
-    ) {
-        /**
-         * Reads the Int preference value.
-         *
-         * @param defaultValue The default value (unused, uses class property).
-         * @return The Int preference value.
-         */
-        override suspend fun read(
-            datastore: DataStore<Preferences>,
-            key: String,
-            defaultValue: Int
-        ): Int = get()
-
-        /**
-         * Writes the Int preference value.
-         *
-         * @param value The Int value to write.
-         */
-        override suspend fun write(
-            datastore: DataStore<Preferences>,
-            key: String,
-            value: Int
-        ) = set(value)
-    }
+    )
 
     /**
      * A GenericPreference for Float values.
@@ -268,30 +161,7 @@ sealed class GenericPreference<T>(
         key = key,
         preferences = preferencesKey,
         defaultValue = defaultValue,
-    ) {
-        /**
-         * Reads the Float preference value.
-         *
-         * @param defaultValue The default value (unused, uses class property).
-         * @return The Float preference value.
-         */
-        override suspend fun read(
-            datastore: DataStore<Preferences>,
-            key: String,
-            defaultValue: Float
-        ): Float = get()
-
-        /**
-         * Writes the Float preference value.
-         *
-         * @param value The Float value to write.
-         */
-        override suspend fun write(
-            datastore: DataStore<Preferences>,
-            key: String,
-            value: Float
-        ) = set(value)
-    }
+    )
 
     /**
      * A GenericPreference for Boolean values.
@@ -308,30 +178,7 @@ sealed class GenericPreference<T>(
         key = key,
         preferences = preferencesKey,
         defaultValue = defaultValue,
-    ) {
-        /**
-         * Reads the Boolean preference value.
-         *
-         * @param defaultValue The default value (unused, uses class property).
-         * @return The Boolean preference value.
-         */
-        override suspend fun read(
-            datastore: DataStore<Preferences>,
-            key: String,
-            defaultValue: Boolean
-        ): Boolean = get()
-
-        /**
-         * Writes the Boolean preference value.
-         *
-         * @param value The Boolean value to write.
-         */
-        override suspend fun write(
-            datastore: DataStore<Preferences>,
-            key: String,
-            value: Boolean
-        ) = set(value)
-    }
+    )
 
     /**
      * A GenericPreference for Set<String> values.
@@ -348,80 +195,5 @@ sealed class GenericPreference<T>(
         key = key,
         preferences = preferencesKey,
         defaultValue = defaultValue,
-    ) {
-        /**
-         * Reads the Set<String> preference value.
-         *
-         * @param defaultValue The default value (unused, uses class property).
-         * @return The Set<String> preference value.
-         */
-        override suspend fun read(
-            datastore: DataStore<Preferences>,
-            key: String,
-            defaultValue: Set<String>
-        ): Set<String> = get()
-
-        /**
-         * Writes the Set<String> preference value.
-         *
-         * @param value The Set<String> value to write.
-         */
-        override suspend fun write(
-            datastore: DataStore<Preferences>,
-            key: String,
-            value: Set<String>
-        ) = set(value)
-    }
-
-    /**
-     * A GenericPreference for custom Object values.
-     *
-     * @param T The type of the custom object.
-     * @param deserializer A function to deserialize the String representation back to the object.
-     */
-    class ObjectPrimitive<T>(
-        datastore: DataStore<Preferences>,
-        key: String,
-        defaultValue: T,
-        val serializer: (T) -> String,
-        val deserializer: (String) -> T,
-    ) : GenericPreference<T>(
-        datastore = datastore,
-        key = key,
-        defaultValue = defaultValue,
-    ) {
-        /**
-         * Reads the custom Object preference value.
-         *
-         * @param defaultValue The default value to return if the key is not found.
-         * @return The custom Object preference value.
-         */
-        override suspend fun read(
-            datastore: DataStore<Preferences>,
-            key: String,
-            defaultValue: T
-        ): T = datastore
-            .data
-            .map { ds ->
-                val prefs = stringPreferencesKey(key)
-                ds[prefs]?.let { deserializer(it) } ?: defaultValue
-            }
-            .first()
-
-        /**
-         * Writes the custom Object preference value.
-         *
-         * @param value The custom Object value to write.
-         */
-        override suspend fun write(
-            datastore: DataStore<Preferences>,
-            key: String,
-            value: T
-        ) {
-            datastore.edit { ds ->
-                val prefs = stringPreferencesKey(key)
-                ds[prefs] = serializer(value)
-            }
-        }
-    }
+    )
 }
