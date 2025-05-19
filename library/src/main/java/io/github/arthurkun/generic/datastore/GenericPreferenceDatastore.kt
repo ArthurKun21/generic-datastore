@@ -16,10 +16,26 @@ import io.github.arthurkun.generic.datastore.GenericPreference.ObjectPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.StringPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.StringSetPrimitive
 
+/**
+ * A DataStore implementation that provides methods for creating and managing various types of preferences.
+ *
+ * This class wraps a [DataStore<Preferences>] instance and offers convenient functions
+ * to define preferences for common data types like String, Long, Int, Float, Boolean,
+ * and Set<String>, as well as custom serialized objects.
+ *
+ * @property datastore The underlying [DataStore<Preferences>] instance.
+ */
 @Suppress("unused")
 class GenericPreferenceDatastore(
     private val datastore: DataStore<Preferences>
 ) : PreferenceDatastore {
+    /**
+     * Creates a String preference.
+     *
+     * @param key The preference key.
+     * @param defaultValue The default String value.
+     * @return A [Prefs] instance for the String preference.
+     */
     override fun string(key: String, defaultValue: String): Prefs<String> =
         PrefsImpl(
             StringPrimitive(
@@ -30,6 +46,13 @@ class GenericPreferenceDatastore(
             )
         )
 
+    /**
+     * Creates a Long preference.
+     *
+     * @param key The preference key.
+     * @param defaultValue The default Long value.
+     * @return A [Prefs] instance for the Long preference.
+     */
     override fun long(key: String, defaultValue: Long) : Prefs<Long> =
         PrefsImpl(
             LongPrimitive(
@@ -40,6 +63,13 @@ class GenericPreferenceDatastore(
             )
         )
 
+    /**
+     * Creates an Int preference.
+     *
+     * @param key The preference key.
+     * @param defaultValue The default Int value.
+     * @return A [Prefs] instance for the Int preference.
+     */
     override fun int(key: String, defaultValue: Int): Prefs<Int> =
         PrefsImpl(
             IntPrimitive(
@@ -51,6 +81,13 @@ class GenericPreferenceDatastore(
         )
 
 
+    /**
+     * Creates a Float preference.
+     *
+     * @param key The preference key.
+     * @param defaultValue The default Float value.
+     * @return A [Prefs] instance for the Float preference.
+     */
     override fun float(key: String, defaultValue: Float) : Prefs<Float> =
         PrefsImpl(
             FloatPrimitive(
@@ -61,6 +98,13 @@ class GenericPreferenceDatastore(
             )
         )
 
+    /**
+     * Creates a Boolean preference.
+     *
+     * @param key The preference key.
+     * @param defaultValue The default Boolean value.
+     * @return A [Prefs] instance for the Boolean preference.
+     */
     override fun bool(key: String, defaultValue: Boolean) : Prefs<Boolean> =
         PrefsImpl(
             BooleanPrimitive(
@@ -71,6 +115,13 @@ class GenericPreferenceDatastore(
             )
         )
 
+    /**
+     * Creates a Set<String> preference.
+     *
+     * @param key The preference key.
+     * @param defaultValue The default Set<String> value.
+     * @return A [Prefs] instance for the Set<String> preference.
+     */
     override fun stringSet(
         key: String,
         defaultValue: Set<String>,
@@ -85,6 +136,16 @@ class GenericPreferenceDatastore(
         )
 
 
+    /**
+     * Creates a preference for a custom object that can be serialized to and deserialized from a String.
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The default value for the custom object.
+     * @param serializer A function to serialize the object to a String.
+     * @param deserializer A function to deserialize the String back to the object.
+     * @return A [Prefs] instance for the custom object preference.
+     */
     override fun <T> serialized(
         key: String,
         defaultValue: T,
