@@ -14,6 +14,7 @@ import android.util.Log
  * @param defaultValue The default enum value to use if the key is not found or
  * deserialization fails.
  */
+@Suppress("unused")
 inline fun <reified T : Enum<T>> PreferenceDatastore.enum(
     key: String,
     defaultValue: T,

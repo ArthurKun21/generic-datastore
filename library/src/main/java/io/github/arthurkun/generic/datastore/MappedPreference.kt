@@ -21,6 +21,7 @@ import kotlin.reflect.KProperty
  * @param reverse A function to convert from type [R] back to type [T] for storage.
  * @return A new [Prefs] instance that handles the type conversion.
  */
+@Suppress("unused")
 fun <T, R> Prefs<T>.map(
     defaultValue: R,
     convert: (T) -> R,

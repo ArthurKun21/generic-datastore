@@ -70,6 +70,7 @@ interface Preference<T> {
          * @param key The preference key to check.
          * @return `true` if the key starts with the private prefix, `false` otherwise.
          */
+        @Suppress("unused")
         fun isPrivate(key: String): Boolean {
             return key.startsWith(PRIVATE_PREFIX)
         }
@@ -80,6 +81,7 @@ interface Preference<T> {
          * @param key The original key.
          * @return The key with the private prefix.
          */
+        @Suppress("unused")
         fun privateKey(key: String): String {
             return "$PRIVATE_PREFIX$key"
         }
@@ -91,6 +93,7 @@ interface Preference<T> {
          * @param key The preference key to check.
          * @return `true` if the key starts with the app state prefix, `false` otherwise.
          */
+        @Suppress("unused")
         fun isAppState(key: String): Boolean {
             return key.startsWith(APP_STATE_PREFIX)
         }
@@ -101,6 +104,7 @@ interface Preference<T> {
          * @param key The original key.
          * @return The key with the app state prefix.
          */
+        @Suppress("unused")
         fun appStateKey(key: String): String {
             return "$APP_STATE_PREFIX$key"
         }
