@@ -52,5 +52,5 @@ internal class PrefsImpl<T>(private val pref: Preference<T>) :
     override suspend fun setValue(thisRef: Any, property: KProperty<*>, value: T) =
         pref.set(value)
 
-    override suspend fun resetToDefault() = pref.set(pref.defaultValue())
+    override suspend fun resetToDefault() = pref.set(pref.defaultValue)
 }
