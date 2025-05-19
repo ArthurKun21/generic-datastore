@@ -1,0 +1,45 @@
+name: build app
+
+on:
+  pull_request:
+    paths-ignore:
+      - '.idea/**'
+      - 'preview/**'
+      - 'jitpack.yml'
+      - '**/*.md'
+      - '.gitignore'
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: 17
+  JAVA_DISTRO: 'temurin'
+
+jobs:
+  build-app:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [app]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v4
+    
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
+
+      - name: Set up gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+    
+      - name: Build ${{ matrix.module }} module
+        run: |
+          ./gradlew :${{ matrix.module }}:assembleRelease --parallel
