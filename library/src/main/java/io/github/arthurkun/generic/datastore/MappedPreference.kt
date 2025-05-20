@@ -1,5 +1,6 @@
 package io.github.arthurkun.generic.datastore
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,7 +26,7 @@ import kotlin.reflect.KProperty
 fun <T, R> Prefs<T>.map(
     defaultValue: R,
     convert: (T) -> R,
-    reverse: (R) -> T
+    reverse: (R) -> T,
 ): Prefs<R> =
     MappedPrefs(
         this,
@@ -52,21 +53,39 @@ internal class MappedPrefs<T, R>(
 ) : Prefs<R> {
     override fun key(): String = prefs.key()
 
-    override suspend fun get(): R = convert(prefs.get())
+    private fun convertFallback(value: T): R {
+        return try {
+            convert(value)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error converting preference value $e")
+            defaultValue
+        }
+    }
 
-    override suspend fun set(value: R) = prefs.set(reverse(value))
+    private fun reverseFallback(value: R): T {
+        return try {
+            reverse(value)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error converting preference value $e")
+            prefs.defaultValue
+        }
+    }
+
+    override suspend fun get(): R = convertFallback(prefs.get())
+
+    override suspend fun set(value: R) = prefs.set(reverseFallback(value))
 
     override suspend fun delete() = prefs.delete()
 
 
-    override fun asFlow(): Flow<R> = prefs.asFlow().map { convert(it) }
+    override fun asFlow(): Flow<R> = prefs.asFlow().map { convertFallback(it) }
 
     override fun stateIn(scope: CoroutineScope): StateFlow<R> =
         asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
 
-    override fun getValue(): R = convert(prefs.getValue())
+    override fun getValue(): R = convertFallback(prefs.getValue())
 
-    override fun setValue(value: R) = prefs.setValue(reverse(value))
+    override fun setValue(value: R) = prefs.setValue(reverseFallback(value))
 
     override suspend fun resetToDefault() = prefs.resetToDefault()
 
