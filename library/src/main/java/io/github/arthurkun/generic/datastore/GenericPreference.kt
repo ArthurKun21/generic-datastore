@@ -102,8 +102,20 @@ sealed class GenericPreference<T>(
     override fun stateIn(scope: CoroutineScope): StateFlow<T> =
         asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
 
+    /**
+     * Gets the current value of the preference.
+     * This is a synchronous call and will return the latest value from the StateFlow.
+     *
+     * @return The current preference value.
+     */
     override fun getValue(): T = stateIn(scope).value
 
+    /**
+     * Sets the value of the preference.
+     * This is an asynchronous call that launches a coroutine to update the value in DataStore.
+     *
+     * @param value The new value for the preference.
+     */
     override fun setValue(value: T) {
         scope.launch {
             set(value)
