@@ -48,7 +48,7 @@ version = 1.0
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll(
-            "-opt-in=kotlin.uuid.ExperimentalUuidApi"
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
         )
     }
 }
@@ -58,6 +58,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
+
+    androidTestImplementation(libs.coroutines.test)
+    androidTestImplementation(libs.kotlin.test)
 }
 
 publishing {

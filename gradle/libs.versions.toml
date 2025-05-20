@@ -22,6 +22,7 @@ leakcanary = "2.14"
 
 datastore = "1.1.6"
 
+coroutines = "1.10.2"
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "android-core-ktx" }
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -50,6 +51,10 @@ leak-canary = { module = "com.squareup.leakcanary:leakcanary-android", version.r
 
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 [plugins]
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
