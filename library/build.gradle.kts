@@ -2,7 +2,6 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     `maven-publish`
-    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -31,9 +30,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
-    }
-    buildFeatures {
-        compose = true
     }
     publishing {
         singleVariant("release") {
