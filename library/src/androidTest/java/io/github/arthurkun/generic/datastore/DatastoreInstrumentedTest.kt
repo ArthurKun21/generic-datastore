@@ -397,4 +397,66 @@ class DatastoreInstrumentedTest {
         assertEquals(intPref.get(), 75) // Base pref should be reset to its default
     }
 
+    @Test
+    fun mappedPreference_handlesConversionErrorGracefully() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("baseForMapConvertError", 10)
+        val mappedPref = intPref.map(
+            defaultValue = "MappedDefaultError",
+            convert = { throw RuntimeException("Conversion Error") },
+            reverse = { it.toInt() } // Not used in this path, but required
+        )
+
+        // Set a value in the base preference so there's something to convert
+        intPref.set(123)
+        assertEquals(123, intPref.get())
+
+        // When getting the mapped value, the conversion error should occur,
+        // and the mapped default value should be returned.
+        assertEquals("MappedDefaultError", mappedPref.get())
+    }
+
+    @Test
+    fun mappedPreference_handlesReverseErrorGracefully() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("baseForMapReverseError", 20)
+        val mappedPref = intPref.map(
+            defaultValue = "MappedDefaultReverseError",
+            convert = { "Converted_$it" },
+            reverse = { throw RuntimeException("Reverse Conversion Error") }
+        )
+
+        // Attempt to set a value that will cause a reverse conversion error
+        mappedPref.set("AttemptSet")
+
+        // The underlying intPref should not have changed from its initial or default value
+        // because the reverse conversion failed.
+        assertEquals(20, intPref.get()) // Remains initial default
+
+        // When getting the mapped value, since set failed to update the underlying pref,
+        // it should try to convert the current underlying value (20)
+        // or, if the set operation cleared the underlying due to error (implementation dependent),
+        // it might convert the underlying default.
+        // Given MappedPrefs.reverseFallback returns prefs.defaultValue,
+        // the set operation on prefs would use prefs.defaultValue.
+        // However, the current MappedPrefs implementation of reverseFallback in set
+        // means prefs.set(prefs.defaultValue) would be called.
+        // Let's refine the assertion based on MappedPrefs logic.
+        // When reverse fails, prefs.set(prefs.defaultValue) is called.
+        // So intPref would be set to its own default (20).
+        // Then, mappedPref.get() will convert this underlying default.
+        assertEquals("Converted_20", mappedPref.get())
+
+        // Let's also test the scenario where the underlying preference *was* different
+        // and then a set operation with a reverse error occurs.
+        intPref.set(25) // Set underlying to a different value
+        assertEquals(25, intPref.get())
+        assertEquals("Converted_25", mappedPref.get())
+
+        mappedPref.set("AttemptSetAgain") // This will cause reverse error
+
+        // intPref should be set to its default (20) due to reverseFallback behavior
+        assertEquals(20, intPref.get())
+        // mappedPref should reflect the conversion of the underlying's new state (default)
+        assertEquals("Converted_20", mappedPref.get())
+    }
+
 }
