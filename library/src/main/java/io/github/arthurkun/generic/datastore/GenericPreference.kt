@@ -2,7 +2,13 @@ package io.github.arthurkun.generic.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,28 +35,30 @@ sealed class GenericPreference<T>(
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
     override val scope: CoroutineScope,
-): Preference<T> {
+) : Preference<T> {
     /**
      * Returns the key of the preference.
+     * @return The preference key as a String.
      */
     override fun key(): String = key
 
     /**
-     * Gets the current value of the preference.
+     * Gets the current value of the preference from the DataStore.
+     * If the value is not found, it returns the `defaultValue`.
      *
      * @return The current preference value.
      */
     override suspend fun get(): T {
         return datastore
             .data
-            .map { ds ->
-                ds[preferences] ?: defaultValue
+            .map { preferences ->
+                preferences[this.preferences] ?: defaultValue
             }
             .first()
     }
 
     /**
-     * Sets the value of the preference.
+     * Sets the value of the preference in the DataStore.
      *
      * @param value The new value for the preference.
      */
@@ -71,38 +79,37 @@ sealed class GenericPreference<T>(
 
     /**
      * Returns a Flow that emits the preference value whenever it changes.
+     * If the value is not found, it emits the `defaultValue`.
      *
      * @return A Flow of the preference value.
      */
     override fun asFlow(): Flow<T> {
-        return return datastore
+        return datastore
             .data
-            .map { ds ->
-                ds[preferences] ?: defaultValue
+            .map { preferences ->
+                preferences[this.preferences] ?: defaultValue
             }
     }
 
     /**
      * Converts the preference Flow into a StateFlow.
+     * The StateFlow is started eagerly and shares the latest value.
      *
      * @param scope The CoroutineScope to use for the StateFlow.
      * @return A StateFlow of the preference value.
      */
-    override fun stateIn(scope: CoroutineScope): StateFlow<T> {
-        return asFlow().stateIn(scope, SharingStarted.Companion.Eagerly, defaultValue)
-    }
+    override fun stateIn(scope: CoroutineScope): StateFlow<T> =
+        asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
 
     /**
-     * A GenericPreference for String values.
-     *
+     * A [GenericPreference] for String values.
      * @param datastore The DataStore instance.
-     * @param preferencesKey The Preferences.Key for the String preference.
      * @param key The preference key.
      * @param defaultValue The default String value.
+     * @param scope The CoroutineScope for managing coroutines.
      */
     class StringPrimitive(
         datastore: DataStore<Preferences>,
-        preferencesKey: Preferences.Key<String>,
         key: String,
         defaultValue: String,
         scope: CoroutineScope,
@@ -110,103 +117,107 @@ sealed class GenericPreference<T>(
         datastore = datastore,
         key = key,
         defaultValue = defaultValue,
-        preferences = preferencesKey,
+        preferences = stringPreferencesKey(key),
         scope = scope
     )
 
     /**
-     * A GenericPreference for Long values.
-     *
+     * A [GenericPreference] for Long values.
      * @param datastore The DataStore instance.
+     * @param key The preference key.
      * @param defaultValue The default Long value.
+     * @param scope The CoroutineScope for managing coroutines.
      */
     class LongPrimitive(
         datastore: DataStore<Preferences>,
-        preferencesKey: Preferences.Key<Long>,
         key: String,
         defaultValue: Long,
         scope: CoroutineScope,
     ) : GenericPreference<Long>(
         datastore = datastore,
         key = key,
-        preferences = preferencesKey,
         defaultValue = defaultValue,
+        preferences = longPreferencesKey(key),
         scope = scope
     )
 
     /**
-     * A GenericPreference for Int values.
-     *
+     * A [GenericPreference] for Int values.
+     * @param datastore The DataStore instance.
+     * @param key The preference key.
      * @param defaultValue The default Int value.
+     * @param scope The CoroutineScope for managing coroutines.
      */
     class IntPrimitive(
         datastore: DataStore<Preferences>,
-        preferencesKey: Preferences.Key<Int>,
         key: String,
         defaultValue: Int,
         scope: CoroutineScope,
     ) : GenericPreference<Int>(
         datastore = datastore,
         key = key,
-        preferences = preferencesKey,
         defaultValue = defaultValue,
+        preferences = intPreferencesKey(key),
         scope = scope
     )
 
     /**
-     * A GenericPreference for Float values.
-     *
+     * A [GenericPreference] for Float values.
+     * @param datastore The DataStore instance.
+     * @param key The preference key.
      * @param defaultValue The default Float value.
+     * @param scope The CoroutineScope for managing coroutines.
      */
     class FloatPrimitive(
         datastore: DataStore<Preferences>,
-        preferencesKey: Preferences.Key<Float>,
         key: String,
         defaultValue: Float,
         scope: CoroutineScope,
     ) : GenericPreference<Float>(
         datastore = datastore,
         key = key,
-        preferences = preferencesKey,
         defaultValue = defaultValue,
+        preferences = floatPreferencesKey(key),
         scope = scope
     )
 
     /**
-     * A GenericPreference for Boolean values.
-     *
+     * A [GenericPreference] for Boolean values.
+     * @param datastore The DataStore instance.
+     * @param key The preference key.
      * @param defaultValue The default Boolean value.
+     * @param scope The CoroutineScope for managing coroutines.
      */
     class BooleanPrimitive(
         datastore: DataStore<Preferences>,
-        preferencesKey: Preferences.Key<Boolean>,
         key: String,
         defaultValue: Boolean,
         scope: CoroutineScope,
     ) : GenericPreference<Boolean>(
         datastore = datastore,
         key = key,
-        preferences = preferencesKey,
         defaultValue = defaultValue,
+        preferences = booleanPreferencesKey(key),
         scope = scope
     )
 
     /**
-     * A GenericPreference for Set<String> values.
-     *
+     * A [GenericPreference] for Set<String> values.
+     * @param datastore The DataStore instance.
+     * @param key The preference key.
      * @param defaultValue The default Set<String> value.
+     * @param scope The CoroutineScope for managing coroutines.
      */
     class StringSetPrimitive(
         datastore: DataStore<Preferences>,
-        preferencesKey: Preferences.Key<Set<String>>,
         key: String,
         defaultValue: Set<String>,
         scope: CoroutineScope,
     ) : GenericPreference<Set<String>>(
         datastore = datastore,
         key = key,
-        preferences = preferencesKey,
         defaultValue = defaultValue,
+        preferences = stringSetPreferencesKey(key),
         scope = scope
     )
 }

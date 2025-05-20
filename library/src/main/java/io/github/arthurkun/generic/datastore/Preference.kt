@@ -110,9 +110,7 @@ interface Preference<T> {
          * @return The key with the app state prefix.
          */
         @Suppress("unused")
-        fun appStateKey(key: String): String {
-            return "$APP_STATE_PREFIX$key"
-        }
+        fun appStateKey(key: String): String = "$APP_STATE_PREFIX$key"
 
         private const val APP_STATE_PREFIX = "__APP_STATE_"
         private const val PRIVATE_PREFIX = "__PRIVATE_"

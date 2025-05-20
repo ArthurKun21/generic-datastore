@@ -2,12 +2,6 @@ package io.github.arthurkun.generic.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.floatPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.GenericPreference.BooleanPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.FloatPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.IntPrimitive
@@ -44,7 +38,6 @@ class GenericPreferenceDatastore(
         PrefsImpl(
             StringPrimitive(
                 datastore = datastore,
-                preferencesKey = stringPreferencesKey(key),
                 key = key,
                 defaultValue = defaultValue,
                 scope = scope
@@ -62,7 +55,6 @@ class GenericPreferenceDatastore(
         PrefsImpl(
             LongPrimitive(
                 datastore = datastore,
-                preferencesKey = longPreferencesKey(key),
                 key = key,
                 defaultValue = defaultValue,
                 scope = scope
@@ -80,7 +72,6 @@ class GenericPreferenceDatastore(
         PrefsImpl(
             IntPrimitive(
                 datastore = datastore,
-                preferencesKey = intPreferencesKey(key),
                 key = key,
                 defaultValue = defaultValue,
                 scope = scope
@@ -99,7 +90,6 @@ class GenericPreferenceDatastore(
         PrefsImpl(
             FloatPrimitive(
                 datastore = datastore,
-                preferencesKey = floatPreferencesKey(key),
                 key = key,
                 defaultValue = defaultValue,
                 scope = scope
@@ -117,7 +107,6 @@ class GenericPreferenceDatastore(
         PrefsImpl(
             BooleanPrimitive(
                 datastore = datastore,
-                preferencesKey = booleanPreferencesKey(key),
                 key = key,
                 defaultValue = defaultValue,
                 scope = scope
@@ -138,13 +127,11 @@ class GenericPreferenceDatastore(
         PrefsImpl(
             StringSetPrimitive(
                 datastore = datastore,
-                preferencesKey = stringSetPreferencesKey(key),
                 key = key,
                 defaultValue = defaultValue,
                 scope = scope
             )
         )
-
 
     /**
      * Creates a preference for a custom object that can be serialized to and deserialized from a String.
@@ -161,17 +148,15 @@ class GenericPreferenceDatastore(
         defaultValue: T,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ) : Prefs<T> {
-        return PrefsImpl(
-            ObjectPrimitive(
-                datastore = datastore,
-                key = key,
-                default = defaultValue,
-                serializer = serializer,
-                deserializer = deserializer,
-                scope = scope
-            ),
+    ): Prefs<T> = PrefsImpl(
+        ObjectPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+            scope = scope
         )
-    }
+    )
 
 }
