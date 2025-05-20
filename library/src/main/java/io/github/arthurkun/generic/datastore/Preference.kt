@@ -57,7 +57,12 @@ interface Preference<T> {
      * @param scope The [CoroutineScope] to use for the [StateFlow].
      * @return A [StateFlow] of the preference value.
      */
-    suspend fun stateIn(scope: CoroutineScope): StateFlow<T>
+    fun stateIn(scope: CoroutineScope): StateFlow<T>
+
+    /**
+     * The [CoroutineScope] used for launching coroutines.
+     */
+    val scope: CoroutineScope
 
     /**
      * Companion object for [Preference] related utility functions.

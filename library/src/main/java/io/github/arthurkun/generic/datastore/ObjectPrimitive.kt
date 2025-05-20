@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -21,11 +22,13 @@ class ObjectPrimitive<T>(
     default: T,
     val serializer: (T) -> String,
     val deserializer: (String) -> T,
+    scope: CoroutineScope,
 ) : GenericPreference<T>(
     datastore = datastore,
     key = key,
     defaultValue = default,
     preferences = stringPreferencesKey(key) as Preferences.Key<T>,
+    scope = scope
 ) {
     private val stringPrefKey = stringPreferencesKey(key)
 

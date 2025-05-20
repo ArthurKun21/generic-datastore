@@ -28,6 +28,7 @@ sealed class GenericPreference<T>(
     private val key: String,
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
+    override val scope: CoroutineScope,
 ): Preference<T> {
     /**
      * Returns the key of the preference.
@@ -87,8 +88,8 @@ sealed class GenericPreference<T>(
      * @param scope The CoroutineScope to use for the StateFlow.
      * @return A StateFlow of the preference value.
      */
-    override suspend fun stateIn(scope: CoroutineScope): StateFlow<T> {
-        return asFlow().stateIn(scope, SharingStarted.Companion.Eagerly, get())
+    override fun stateIn(scope: CoroutineScope): StateFlow<T> {
+        return asFlow().stateIn(scope, SharingStarted.Companion.Eagerly, defaultValue)
     }
 
     /**
@@ -104,11 +105,13 @@ sealed class GenericPreference<T>(
         preferencesKey: Preferences.Key<String>,
         key: String,
         defaultValue: String,
+        scope: CoroutineScope,
     ) : GenericPreference<String>(
         datastore = datastore,
         key = key,
         defaultValue = defaultValue,
         preferences = preferencesKey,
+        scope = scope
     )
 
     /**
@@ -122,11 +125,13 @@ sealed class GenericPreference<T>(
         preferencesKey: Preferences.Key<Long>,
         key: String,
         defaultValue: Long,
+        scope: CoroutineScope,
     ) : GenericPreference<Long>(
         datastore = datastore,
         key = key,
         preferences = preferencesKey,
         defaultValue = defaultValue,
+        scope = scope
     )
 
     /**
@@ -139,11 +144,13 @@ sealed class GenericPreference<T>(
         preferencesKey: Preferences.Key<Int>,
         key: String,
         defaultValue: Int,
+        scope: CoroutineScope,
     ) : GenericPreference<Int>(
         datastore = datastore,
         key = key,
         preferences = preferencesKey,
         defaultValue = defaultValue,
+        scope = scope
     )
 
     /**
@@ -156,11 +163,13 @@ sealed class GenericPreference<T>(
         preferencesKey: Preferences.Key<Float>,
         key: String,
         defaultValue: Float,
+        scope: CoroutineScope,
     ) : GenericPreference<Float>(
         datastore = datastore,
         key = key,
         preferences = preferencesKey,
         defaultValue = defaultValue,
+        scope = scope
     )
 
     /**
@@ -173,11 +182,13 @@ sealed class GenericPreference<T>(
         preferencesKey: Preferences.Key<Boolean>,
         key: String,
         defaultValue: Boolean,
+        scope: CoroutineScope,
     ) : GenericPreference<Boolean>(
         datastore = datastore,
         key = key,
         preferences = preferencesKey,
         defaultValue = defaultValue,
+        scope = scope
     )
 
     /**
@@ -190,10 +201,12 @@ sealed class GenericPreference<T>(
         preferencesKey: Preferences.Key<Set<String>>,
         key: String,
         defaultValue: Set<String>,
+        scope: CoroutineScope,
     ) : GenericPreference<Set<String>>(
         datastore = datastore,
         key = key,
         preferences = preferencesKey,
         defaultValue = defaultValue,
+        scope = scope
     )
 }

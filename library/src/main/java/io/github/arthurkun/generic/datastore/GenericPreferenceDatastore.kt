@@ -14,6 +14,8 @@ import io.github.arthurkun.generic.datastore.GenericPreference.IntPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.LongPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.StringPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.StringSetPrimitive
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 /**
  * A DataStore implementation that provides methods for creating and managing various types of preferences.
@@ -28,6 +30,9 @@ import io.github.arthurkun.generic.datastore.GenericPreference.StringSetPrimitiv
 class GenericPreferenceDatastore(
     private val datastore: DataStore<Preferences>
 ) : PreferenceDatastore {
+
+    private val scope = CoroutineScope(Dispatchers.IO)
+
     /**
      * Creates a String preference.
      *
@@ -41,7 +46,8 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 preferencesKey = stringPreferencesKey(key),
                 key = key,
-                defaultValue = defaultValue
+                defaultValue = defaultValue,
+                scope = scope
             )
         )
 
@@ -58,7 +64,8 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 preferencesKey = longPreferencesKey(key),
                 key = key,
-                defaultValue = defaultValue
+                defaultValue = defaultValue,
+                scope = scope
             )
         )
 
@@ -75,7 +82,8 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 preferencesKey = intPreferencesKey(key),
                 key = key,
-                defaultValue = defaultValue
+                defaultValue = defaultValue,
+                scope = scope
             )
         )
 
@@ -93,7 +101,8 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 preferencesKey = floatPreferencesKey(key),
                 key = key,
-                defaultValue = defaultValue
+                defaultValue = defaultValue,
+                scope = scope
             )
         )
 
@@ -110,7 +119,8 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 preferencesKey = booleanPreferencesKey(key),
                 key = key,
-                defaultValue = defaultValue
+                defaultValue = defaultValue,
+                scope = scope
             )
         )
 
@@ -130,7 +140,8 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 preferencesKey = stringSetPreferencesKey(key),
                 key = key,
-                defaultValue = defaultValue
+                defaultValue = defaultValue,
+                scope = scope
             )
         )
 
@@ -158,7 +169,8 @@ class GenericPreferenceDatastore(
                 default = defaultValue,
                 serializer = serializer,
                 deserializer = deserializer,
-            )
+                scope = scope
+            ),
         )
     }
 

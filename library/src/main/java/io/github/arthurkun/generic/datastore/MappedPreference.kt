@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlin.reflect.KProperty
 
 /**
@@ -50,23 +51,33 @@ internal class MappedPrefs<T, R>(
     private val convert: (T) -> R,
     private val reverse: (R) -> T,
 ) : Prefs<R> {
-    override suspend fun getValue(thisRef: Any, property: KProperty<*>) = get()
     override fun key(): String = prefs.key()
 
     override suspend fun get(): R = convert(prefs.get())
 
     override suspend fun set(value: R) = prefs.set(reverse(value))
 
-    override suspend fun setValue(thisRef: Any, property: KProperty<*>, value: R) = set(value)
-
     override suspend fun delete() = prefs.delete()
 
 
     override fun asFlow(): Flow<R> = prefs.asFlow().map { convert(it) }
 
-    override suspend fun stateIn(scope: CoroutineScope): StateFlow<R> =
-        asFlow().stateIn(scope, SharingStarted.Eagerly, get())
+    override fun stateIn(scope: CoroutineScope): StateFlow<R> =
+        asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
+
+    override val scope: CoroutineScope
+        get() = prefs.scope
 
     override suspend fun resetToDefault() = prefs.resetToDefault()
+
+    override fun getValue(thisRef: Any, property: KProperty<*>): R {
+        return stateIn(scope).value
+    }
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: R) {
+        scope.launch {
+            set(value)
+        }
+    }
 
 }
