@@ -1,47 +1,74 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.kotlin.multiplatform)
     `maven-publish`
+    id("com.android.library") // Keep this for Android target
 }
-
-android {
-    namespace = "io.github.arthurkun.generic.datastore"
-    compileSdk = libs.versions.compile.sdk.get().toInt()
-
-    defaultConfig {
-        minSdk = libs.versions.min.sdk.get().toInt()
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-            withJavadocJar()
-        }
-    }
-}
-
-version = 1.0
 
 kotlin {
+    androidTarget {
+        compilations.all {
+            kotlinOptions.jvmTarget = "17"
+        }
+        // Configure Android specific options if needed, e.g., publishLibraryVariants
+        publishLibraryVariants("release")
+    }
+
+    jvm("desktop") { // Example JVM target, you can name it as you like
+        compilations.all {
+            kotlinOptions.jvmTarget = "17"
+        }
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+        }
+    }
+    // Add other targets like iOS, JS, etc.
+    // e.g., iosX64("ios") { // Renaming to "ios" for simplicity in common code
+    // binaries.framework {
+    // baseName = "shared" // Name of the framework
+    // }
+    // }
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation(libs.bundles.datastore)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.junit)
+                implementation(libs.coroutines.test)
+            }
+        }
+
+        val androidMain by getting {
+            dependencies {
+                // Android-specific dependencies can go here if not covered by commonMain
+            }
+        }
+        val androidInstrumentedTest by getting {
+            dependsOn(commonTest)
+            dependencies {
+                implementation(libs.androidx.test.junit)
+                implementation(libs.androidx.test.espresso)
+            }
+        }
+
+        val desktopMain by getting {
+            dependencies {
+                // JVM-specific dependencies
+            }
+        }
+        val desktopTest by getting {
+            dependencies {
+                // JVM-specific test dependencies
+                implementation(libs.junit) // For JVM tests
+            }
+        }
+        // Add source sets for other targets (e.g., iosMain, iosTest)
+    }
+
     compilerOptions {
         freeCompilerArgs.addAll(
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
@@ -49,24 +76,87 @@ kotlin {
     }
 }
 
-dependencies {
-    implementation(libs.bundles.datastore)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.junit)
-    androidTestImplementation(libs.androidx.test.espresso)
-
-    androidTestImplementation(libs.coroutines.test)
-    androidTestImplementation(libs.kotlin.test)
+android {
+    namespace = "io.github.arthurkun.generic.datastore"
+    compileSdk = libs.versions.compile.sdk.get().toInt()
+    defaultConfig {
+        minSdk = libs.versions.min.sdk.get().toInt()
+        consumerProguardFiles("consumer-rules.pro") // Restored for consumers of the library
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            isMinifyEnabled = false // As per original config
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        // Add other build types if you have them (e.g., debug)
+        // debug {
+        //     // Debug specific settings
+        // }
+    }
+    sourceSets {
+        getByName("androidTest") {
+            // Android test source set
+            java.srcDir("src/androidInstrumentedTest/kotlin")
+        }
+    }
+    // publishing within android block is removed, use the top-level one for multiplatform
 }
+
+version = "1.0.0" // It's good practice to use a full version string
 
 publishing {
     publications {
-        create<MavenPublication>("release") {
-            groupId = "io.github.arthurkun"
-            artifactId = "generic-datastore"
-            afterEvaluate {
-                from(components["release"])
-            }
-        }
+        // Remove the old Android-specific publication
+        // create<MavenPublication>("release") { ... }
+
+        // Publications will be created automatically for each target by the KMP plugin.
+        // You might need to configure them further, e.g., for Maven Central.
+        // Example:
+        // withType<MavenPublication> {
+        //     groupId = "io.github.arthurkun"
+        //     artifactId = "generic-datastore-${project.name.toLowerCase()}" // Or a fixed artifactId if preferred
+        //     version = project.version.toString()
+
+        //     pom {
+        //         name.set("Generic Datastore Library")
+        //         description.set("A generic datastore library for Kotlin Multiplatform.")
+        //         url.set("https://github.com/arthurkun/generic-datastore")
+        //         licenses {
+        //             license {
+        //                 name.set("The Apache License, Version 2.0")
+        //                 url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+        //             }
+        //         }
+        //         developers {
+        //             developer {
+        //                 id.set("arthurkun")
+        //                 name.set("Arthur Kun")
+        //                 email.set("your-email@example.com")
+        //             }
+        //         }
+        //         scm {
+        //             connection.set("scm:git:git://github.com/arthurkun/generic-datastore.git")
+        //             developerConnection.set("scm:git:ssh://github.com/arthurkun/generic-datastore.git")
+        //             url.set("https://github.com/arthurkun/generic-datastore")
+        //         }
+        //     }
+        // }
     }
+    // repositories { // Configure repositories if you publish to a custom one
+    //     maven {
+    //         name = "GitHubPackages"
+    //         url = uri("https://maven.pkg.github.com/YOUR_USERNAME/YOUR_REPOSITORY")
+    //         credentials {
+    //             username = System.getenv("GITHUB_ACTOR")
+    //             password = System.getenv("GITHUB_TOKEN")
+    //         }
+    //     }
+    // }
 }
+
+// The old kotlin block for compilerOptions is now inside the new kotlin { ... } multiplatform block.
+// The old dependencies block is replaced by dependencies within sourceSets.
