@@ -1,6 +1,5 @@
 package io.github.arthurkun.generic.datastore
 
-import kotlinx.coroutines.launch
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -33,15 +32,10 @@ internal class PrefsImpl<T>(
 ) : Prefs<T>,
     Preference<T> by pref {
 
-    private val state = pref.stateIn(scope)
 
-    override fun getValue(thisRef: Any, property: KProperty<*>): T = state.value
+    override fun getValue(thisRef: Any, property: KProperty<*>): T = pref.getValue()
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
-        scope.launch {
-            pref.set(value)
-        }
-    }
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: T) = setValue(value)
 
     override suspend fun resetToDefault() = pref.set(pref.defaultValue)
 }
