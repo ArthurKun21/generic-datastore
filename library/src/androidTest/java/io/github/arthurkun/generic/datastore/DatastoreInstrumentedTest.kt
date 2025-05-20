@@ -376,7 +376,10 @@ class DatastoreInstrumentedTest {
         assertEquals(intPref.get(), 500)
 
         mappedPref.delete() // This should delete the underlying intPref
-        assertEquals(mappedPref.get(), "MappedDefaultDelete") // Mapped pref should return its default
+        assertEquals(
+            mappedPref.get(),
+            "DeleteMapped_50"
+        ) // Mapped pref would return the converted default
         assertEquals(intPref.get(), 50) // Base pref should revert to its default
     }
 
@@ -393,7 +396,10 @@ class DatastoreInstrumentedTest {
         assertEquals(intPref.get(), 750)
 
         mappedPref.resetToDefault() // This should reset the underlying intPref to its default
-        assertEquals(mappedPref.get(), "MappedDefaultReset") // Mapped pref should return its default
+        assertEquals(
+            mappedPref.get(),
+            "ResetMapped_75"
+        ) // Mapped pref would return the converted default
         assertEquals(intPref.get(), 75) // Base pref should be reset to its default
     }
 
