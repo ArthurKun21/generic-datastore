@@ -22,10 +22,9 @@ import kotlinx.coroutines.Dispatchers
  */
 @Suppress("unused")
 class GenericPreferenceDatastore(
-    private val datastore: DataStore<Preferences>
+    private val datastore: DataStore<Preferences>,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO),
 ) : PreferenceDatastore {
-
-    private val scope = CoroutineScope(Dispatchers.IO)
 
     /**
      * Creates a String preference.
@@ -51,7 +50,7 @@ class GenericPreferenceDatastore(
      * @param defaultValue The default Long value.
      * @return A [Prefs] instance for the Long preference.
      */
-    override fun long(key: String, defaultValue: Long) : Prefs<Long> =
+    override fun long(key: String, defaultValue: Long): Prefs<Long> =
         PrefsImpl(
             LongPrimitive(
                 datastore = datastore,
@@ -86,7 +85,7 @@ class GenericPreferenceDatastore(
      * @param defaultValue The default Float value.
      * @return A [Prefs] instance for the Float preference.
      */
-    override fun float(key: String, defaultValue: Float) : Prefs<Float> =
+    override fun float(key: String, defaultValue: Float): Prefs<Float> =
         PrefsImpl(
             FloatPrimitive(
                 datastore = datastore,
@@ -103,7 +102,7 @@ class GenericPreferenceDatastore(
      * @param defaultValue The default Boolean value.
      * @return A [Prefs] instance for the Boolean preference.
      */
-    override fun bool(key: String, defaultValue: Boolean) : Prefs<Boolean> =
+    override fun bool(key: String, defaultValue: Boolean): Prefs<Boolean> =
         PrefsImpl(
             BooleanPrimitive(
                 datastore = datastore,
@@ -123,7 +122,7 @@ class GenericPreferenceDatastore(
     override fun stringSet(
         key: String,
         defaultValue: Set<String>,
-    ) : Prefs<Set<String>> =
+    ): Prefs<Set<String>> =
         PrefsImpl(
             StringSetPrimitive(
                 datastore = datastore,
