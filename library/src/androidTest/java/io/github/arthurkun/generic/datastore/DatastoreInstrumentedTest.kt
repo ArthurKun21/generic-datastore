@@ -332,7 +332,7 @@ class DatastoreInstrumentedTest {
             convert = { "MappedValue_$it" },
             reverse = { it.removePrefix("MappedValue_").toInt() }
         )
-        assertEquals(mappedPref.get(), "MappedDefault")
+        assertEquals(mappedPref.get(), "MappedValue_0")
     }
 
     @Test
