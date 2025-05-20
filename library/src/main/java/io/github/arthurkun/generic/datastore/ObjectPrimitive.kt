@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.map
  * @param deserializer A function to deserialize the String representation back to the object.
  * @param scope The CoroutineScope for managing coroutines related to this preference.
  */
+@Suppress("Unchecked_cast")
 class ObjectPrimitive<T>(
     datastore: DataStore<Preferences>,
     key: String,
