@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * Represents a generic preference that can be stored in and retrieved from a DataStore.
@@ -34,7 +35,7 @@ sealed class GenericPreference<T>(
     private val key: String,
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
-    override val scope: CoroutineScope,
+    private val scope: CoroutineScope,
 ) : Preference<T> {
     /**
      * Returns the key of the preference.
@@ -100,6 +101,14 @@ sealed class GenericPreference<T>(
      */
     override fun stateIn(scope: CoroutineScope): StateFlow<T> =
         asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
+
+    override fun getValue(): T = stateIn(scope).value
+
+    override fun setValue(value: T) {
+        scope.launch {
+            set(value)
+        }
+    }
 
     /**
      * A [GenericPreference] for String values.

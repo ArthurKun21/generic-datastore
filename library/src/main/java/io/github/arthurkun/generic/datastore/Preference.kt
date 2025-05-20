@@ -60,9 +60,24 @@ interface Preference<T> {
     fun stateIn(scope: CoroutineScope): StateFlow<T>
 
     /**
-     * The [CoroutineScope] used for launching coroutines.
+     * Gets the current value of the preference.
+     * This is a synchronous alternative to [get] for use cases where suspension is not possible
+     * or desired, such as property delegation.
+     * Note: This might block the calling thread if the underlying DataStore operation is slow.
+     *
+     * @return The current preference value.
      */
-    val scope: CoroutineScope
+    fun getValue(): T
+
+    /**
+     * Sets the value of the preference.
+     * This is a synchronous alternative to [set] for use cases where suspension is not possible
+     * or desired, such as property delegation.
+     * Note: This might block the calling thread if the underlying DataStore operation is slow.
+     *
+     * @param value The new value for the preference.
+     */
+    fun setValue(value: T)
 
     /**
      * Companion object for [Preference] related utility functions.
