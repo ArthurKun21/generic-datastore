@@ -20,7 +20,7 @@ test-espresso = "3.6.1"
 
 leakcanary = "2.14"
 
-datastore = "1.1.6"
+datastore = "1.1.7"
 
 coroutines = "1.10.2"
 [libraries]
