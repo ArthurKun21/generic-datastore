@@ -31,7 +31,7 @@ private enum class TestEnum { VALUE_A, VALUE_B, VALUE_C }
 private data class SerializableObject(val id: Int, val name: String)
 
 @RunWith(AndroidJUnit4::class)
-class DatastoreInstrumentedTest {
+class AndroidDatastoreInstrumentedTest {
 
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var preferenceDatastore: GenericPreferenceDatastore
@@ -56,7 +56,8 @@ class DatastoreInstrumentedTest {
     fun tearDown() {
         Dispatchers.resetMain()
         // Clean up DataStore file
-        val dataStoreFile = File(testContext.filesDir, "datastore/${TEST_DATASTORE_NAME}.preferences_pb")
+        val dataStoreFile =
+            File(testContext.filesDir, "datastore/${TEST_DATASTORE_NAME}.preferences_pb")
         if (dataStoreFile.exists()) {
             dataStoreFile.delete()
         }

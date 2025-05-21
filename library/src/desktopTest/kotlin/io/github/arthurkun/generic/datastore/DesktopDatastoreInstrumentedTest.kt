@@ -27,7 +27,7 @@ private enum class TestEnum { VALUE_A, VALUE_B, VALUE_C }
 private data class SerializableObject(val id: Int, val name: String)
 
 
-class DatastoreInstrumentedTest {
+class DesktopDatastoreInstrumentedTest {
 
     @TempDir
     lateinit var tempFolder: File
