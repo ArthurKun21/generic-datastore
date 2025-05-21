@@ -16,8 +16,8 @@ kotlin {
     }
 
     jvm("desktop") { // Example JVM target, you can name it as you like
-        compilations.all {
-            kotlinOptions.jvmTarget = "17"
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
         }
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
