@@ -13,11 +13,11 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
+import java.io.File
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 
 private const val TEST_DATASTORE_NAME = "test_datastore"
@@ -26,29 +26,32 @@ private enum class TestEnum { VALUE_A, VALUE_B, VALUE_C }
 
 private data class SerializableObject(val id: Int, val name: String)
 
+
 class DatastoreInstrumentedTest {
 
-    @get:Rule
-    val tempFolder: TemporaryFolder = TemporaryFolder()
+    @TempDir
+    lateinit var tempFolder: File
 
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var preferenceDatastore: GenericPreferenceDatastore
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var testScope: CoroutineScope
 
-    @Before
+    @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         testScope = CoroutineScope(Job() + testDispatcher)
         dataStore = PreferenceDataStoreFactory.create(
             scope = testScope,
-            produceFile = { tempFolder.newFile("${TEST_DATASTORE_NAME}.preferences_pb") }
+            produceFile = {
+                File(tempFolder, "${TEST_DATASTORE_NAME}.preferences_pb")
+            }
         )
         // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
         preferenceDatastore = GenericPreferenceDatastore(dataStore, testScope)
     }
 
-    @After
+    @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
         // TemporaryFolder will clean up the DataStore file

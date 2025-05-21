@@ -38,7 +38,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)
-                implementation(libs.junit)
+                implementation(libs.junit4)
                 implementation(libs.coroutines.test)
             }
         }
@@ -56,7 +56,7 @@ kotlin {
         val desktopTest by getting {
             dependencies {
                 // JVM-specific test dependencies
-                implementation(libs.junit) // For JVM tests
+                implementation(libs.junit5) // For JVM tests
             }
         }
     }
