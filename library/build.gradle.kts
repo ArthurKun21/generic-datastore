@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     `maven-publish`
-    id("com.android.library") // Keep this for Android target
+    id("com.android.library")
 }
 
 kotlin {
@@ -11,11 +11,10 @@ kotlin {
         compilerOptions {
             jvmTarget = JvmTarget.JVM_17
         }
-        // Configure Android specific options if needed, e.g., publishLibraryVariants
         publishLibraryVariants("release")
     }
 
-    jvm("desktop") { // Example JVM target, you can name it as you like
+    jvm("desktop") {
         compilerOptions {
             jvmTarget = JvmTarget.JVM_17
         }
@@ -44,11 +43,7 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
-            dependencies {
-                // Android-specific dependencies can go here if not covered by commonMain
-            }
-        }
+        val androidMain by getting
         val androidInstrumentedTest by getting {
             dependsOn(commonTest)
             dependencies {
@@ -57,18 +52,13 @@ kotlin {
             }
         }
 
-        val desktopMain by getting {
-            dependencies {
-                // JVM-specific dependencies
-            }
-        }
+        val desktopMain by getting
         val desktopTest by getting {
             dependencies {
                 // JVM-specific test dependencies
                 implementation(libs.junit) // For JVM tests
             }
         }
-        // Add source sets for other targets (e.g., iosMain, iosTest)
     }
 
     compilerOptions {
@@ -159,6 +149,3 @@ publishing {
     //     }
     // }
 }
-
-// The old kotlin block for compilerOptions is now inside the new kotlin { ... } multiplatform block.
-// The old dependencies block is replaced by dependencies within sourceSets.
