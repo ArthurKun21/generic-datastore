@@ -22,12 +22,12 @@ kotlin {
             useJUnitPlatform()
         }
     }
-    // Add other targets like iOS, JS, etc.
-    // e.g., iosX64("ios") { // Renaming to "ios" for simplicity in common code
-    // binaries.framework {
-    // baseName = "shared" // Name of the framework
-    // }
-    // }
+    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
+        target.binaries.framework {
+            baseName = project.name
+            isStatic = true
+        }
+    }
 
     sourceSets {
         val commonMain by getting {
