@@ -1,7 +1,5 @@
 package io.github.arthurkun.generic.datastore
 
-import android.util.Log
-
 /**
  * Defines a preference for storing enum values.
  *
@@ -26,10 +24,9 @@ inline fun <reified T : Enum<T>> PreferenceDatastore.enum(
         try {
             enumValueOf(it)
         } catch (e: IllegalArgumentException) {
-            Log.e(
-                TAG,
-                "Enum value $it not found for key $key, returning default value $defaultValue",
-                e
+            println(
+                "${TAG}: Enum value $it not found for key $key, " +
+                        "returning default value $defaultValue ${e.message}"
             )
             defaultValue
         }

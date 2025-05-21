@@ -1,6 +1,5 @@
 package io.github.arthurkun.generic.datastore
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -73,7 +72,7 @@ internal class MappedPrefs<T, R>(
         return try {
             convert(value)
         } catch (e: Exception) {
-            Log.e(TAG, "Error converting preference value $e")
+            println("${TAG}: Error converting preference value $e")
             defaultValue
         }
     }
@@ -90,7 +89,7 @@ internal class MappedPrefs<T, R>(
         return try {
             reverse(value)
         } catch (e: Exception) {
-            Log.e(TAG, "Error converting preference value $e")
+            println("${TAG}: Error converting preference value $e")
             prefs.defaultValue
         }
     }
