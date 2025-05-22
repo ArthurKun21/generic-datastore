@@ -10,6 +10,7 @@ import okio.Path.Companion.toPath
 
 class AppContainer(context: Context) {
 
+    // https://developer.android.com/kotlin/multiplatform/datastore#common
     fun createDataStore(producePath: () -> String): DataStore<Preferences> =
         PreferenceDataStoreFactory.createWithPath(
             produceFile = { producePath().toPath() }
@@ -17,6 +18,7 @@ class AppContainer(context: Context) {
 
     private val dataStoreFileName = "dice.preferences_pb"
 
+    // https://developer.android.com/kotlin/multiplatform/datastore#android
     private fun createDataStore(context: Context): DataStore<Preferences> = createDataStore(
         producePath = { context.filesDir.resolve(dataStoreFileName).absolutePath }
     )
