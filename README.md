@@ -34,14 +34,22 @@ val userNamePref: Prefs<String> = genericDatastore.string("user_name", "Guest")
 val userScorePref: Prefs<Int> = genericDatastore.int("user_score", 0)
 
 // Example for a custom object
+@Serializable // Add Kotlinx Serialization annotation
 data class UserProfile(val id: Int, val email: String)
+
 val userProfilePref: Prefs<UserProfile> = genericDatastore.serialized(
     key = "user_profile",
     defaultValue = UserProfile(0, ""),
-    serializer = { profile -> gson.toJson(profile) }, // Replace with your serialization logic
-    deserializer = { json -> gson.fromJson(json, UserProfile::class.java) } // Replace with your deserialization logic
+    serializer = { profile -> Json.encodeToString(UserProfile.serializer(), profile) }, 
+    deserializer = { json -> Json.decodeFromString(UserProfile.serializer(), json) }
 )
+```
 
+Or you can check this example with sealed class
+
+[Example Serialization](app/src/main/java/io/github/arthurkun/generic/datastore/app/domain/Animal.kt)
+
+```kotlin
 // Using the preferences
 CoroutineScope(Dispatchers.IO).launch {
     // Get a value
