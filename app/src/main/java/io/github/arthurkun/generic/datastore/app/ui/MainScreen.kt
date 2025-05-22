@@ -23,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,9 +56,9 @@ fun MainScreen(
         }
         item {
             OutlinedTextField(
-                value = text,
+                value = TextFieldValue(text, TextRange(text.length)),
                 onValueChange = {
-                    text = it
+                    text = it.text
                 },
                 label = {
                     Text("text")
