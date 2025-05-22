@@ -15,7 +15,7 @@ class AppContainer(context: Context) {
             produceFile = { producePath().toPath() }
         )
 
-    internal val dataStoreFileName = "dice.preferences_pb"
+    private val dataStoreFileName = "dice.preferences_pb"
 
     private fun createDataStore(context: Context): DataStore<Preferences> = createDataStore(
         producePath = { context.filesDir.resolve(dataStoreFileName).absolutePath }
