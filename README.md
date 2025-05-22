@@ -68,7 +68,7 @@ CoroutineScope(Dispatchers.IO).launch {
 
 Or you can check this example with sealed class
 
-[Example Serialization](app/src/main/java/io/github/arthurkun/generic/datastore/app/domain/Animal.kt)
+[Animal.kt](app/src/main/java/io/github/arthurkun/generic/datastore/app/domain/Animal.kt)
 
 ```kotlin
 sealed class Animal(val name: String) {
