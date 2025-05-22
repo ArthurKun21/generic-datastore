@@ -47,8 +47,10 @@ kotlin {
 
         val androidMain by getting
         val androidInstrumentedTest by getting {
-            dependsOn(commonTest)
             dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.junit4)
+                implementation(libs.coroutines.test)
                 implementation(libs.androidx.test.junit)
                 implementation(libs.androidx.test.espresso)
             }
