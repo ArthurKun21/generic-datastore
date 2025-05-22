@@ -110,4 +110,34 @@ val customObject = datastore.serialized(
 )
 ```
 
+## Usage in Jetpack Compose
+
+You can easily integrate these preferences into your Jetpack Compose UI using the `.remember()` extension function. This function observes the preference value and provides a `MutableState` that recomposes your UI when the preference changes.
+
+Under the hood, `.remember()` utilizes `collectAsStateWithLifecycle` to ensure that the preference value is collected in a lifecycle-aware manner, preventing unnecessary work.
+
+Here's an example of how you might use it in a Composable function:
+
+```kotlin
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+
+// In your Composable function
+@Composable
+fun MyScreen(viewModel: MyViewModel = viewModel()) {
+    // Assuming preferenceStore is an instance of GenericPreferenceDatastore
+    // and 'userNamePref' is a Prefs<String> defined as shown previously.
+    var userName by viewModel.preferenceStore.userNamePref.remember()
+
+    Column {
+        Text("Current User: $userName")
+        OutlinedTextField(
+            value = userName,
+            onValueChange = { userName = it },
+            label = { Text("Enter username") }
+        )
+    }
+}
+```
+
 This library aims to reduce boilerplate code when working with Jetpack DataStore for common preference types and custom objects.
