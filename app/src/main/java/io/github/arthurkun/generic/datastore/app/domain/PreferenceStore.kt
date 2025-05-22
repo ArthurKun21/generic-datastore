@@ -26,4 +26,11 @@ class PreferenceStore(
         "bool",
         defaultValue = false,
     )
+
+    val customObject = datastore.serialized(
+        key = "animal",
+        defaultValue = Animal.Dog,
+        serializer = { Animal.to(it) },
+        deserializer = { Animal.from(it) },
+    )
 }

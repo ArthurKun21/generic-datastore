@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.arthurkun.generic.datastore.app.domain.Animal
 import io.github.arthurkun.generic.datastore.app.domain.Theme
 import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
 import io.github.arthurkun.generic.datastore.remember
@@ -38,6 +39,7 @@ fun MainScreen(
     var theme by vm.preferenceStore.theme.remember()
     var num by vm.preferenceStore.num.remember()
     var bool by vm.preferenceStore.bool.remember()
+    var animal by vm.preferenceStore.customObject.remember()
 
     LazyColumn(
         modifier = Modifier
@@ -172,6 +174,35 @@ fun MainScreen(
                         onClick = {
                             theme = entry
                             setAppCompatDelegateThemeMode(entry)
+                        }
+                    )
+            )
+        }
+
+        item {
+            Text(
+                "Serializer",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
+
+        items(Animal.entries) { entry ->
+            ListItem(
+                headlineContent = {
+                    Text(entry.toString())
+                },
+                leadingContent = {
+                    RadioButton(
+                        selected = entry == animal,
+                        onClick = null
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .selectable(
+                        selected = entry == animal,
+                        onClick = {
+                            animal = entry
                         }
                     )
             )
