@@ -6,6 +6,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+/**
+ * Remembers the value of this preference and returns a [MutableState] that can be used to
+ * observe and update the preference value.
+ *
+ * @return A [MutableState] representing the preference value.
+ *
+ */
 @Composable
 fun <T> Prefs<T>.remember(): MutableState<T> {
     val state = this.asFlow().collectAsStateWithLifecycle(defaultValue)
