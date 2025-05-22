@@ -15,4 +15,22 @@ class MainViewModel(
     fun updateTheme(theme: Theme) = viewModelScope.launch {
         preferenceStore.theme.set(theme)
     }
+
+    val text = preferenceStore.text.stateIn(viewModelScope)
+
+    fun updateText(text: String) = viewModelScope.launch {
+        preferenceStore.text.set(text)
+    }
+
+    val num = preferenceStore.num.stateIn(viewModelScope)
+
+    fun updateNum(num: Int) = viewModelScope.launch {
+        preferenceStore.num.set(num)
+    }
+
+    val bool = preferenceStore.bool.stateIn(viewModelScope)
+
+    fun updateBool(bool: Boolean) = viewModelScope.launch {
+        preferenceStore.bool.set(bool)
+    }
 }
