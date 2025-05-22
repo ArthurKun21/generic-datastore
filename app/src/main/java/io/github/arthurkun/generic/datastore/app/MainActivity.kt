@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
 import io.github.arthurkun.generic.datastore.app.theme.GenericDataStoreAppTheme
 import io.github.arthurkun.generic.datastore.app.ui.MainScreen
 import io.github.arthurkun.generic.datastore.app.ui.MainViewModel
@@ -22,10 +21,6 @@ class MainActivity : AppCompatActivity() {
         val appContainer = (application as MainApplication).appContainer
 
         mainViewModel = MainViewModel(appContainer.preferenceStore)
-
-        // to fix the getValue
-        val theme = mainViewModel.preferenceStore.theme.getValue()
-        setAppCompatDelegateThemeMode(theme)
 
         setContent {
             GenericDataStoreAppTheme {
