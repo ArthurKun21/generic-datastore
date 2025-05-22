@@ -104,13 +104,13 @@ internal class MappedPrefs<T, R>(
     override fun asFlow(): Flow<R> = prefs.asFlow().map { convertFallback(it) }
 
     override fun stateIn(scope: CoroutineScope): StateFlow<R> =
-        asFlow().stateIn(scope, SharingStarted.Lazily, defaultValue)
+        asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
 
     override fun getValue(): R = convertFallback(prefs.getValue())
 
     override fun setValue(value: R) = prefs.setValue(reverseFallback(value))
 
-    override suspend fun resetToDefault() = prefs.resetToDefault()
+    override fun resetToDefault() = prefs.resetToDefault()
 
     override fun getValue(thisRef: Any, property: KProperty<*>): R {
         return getValue()
