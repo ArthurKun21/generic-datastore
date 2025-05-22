@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * Represents a generic preference that can be stored in and retrieved from a DataStore.
@@ -111,17 +112,19 @@ sealed class GenericPreference<T>(
      * @return A [StateFlow] representing the current value of the preference.
      */
     override fun stateIn(scope: CoroutineScope): StateFlow<T> =
-        asFlow().stateIn(scope, SharingStarted.Lazily, defaultValue)
+        asFlow().stateIn(scope, SharingStarted.Lazily, getValue())
 
     /**
-     * Synchronously gets the current value of the preference.
-     * This method accesses the `value` property of the [StateFlow] created by [stateIn],
-     * providing immediate access to the latest known preference value.
-     * Note: This relies on the [StateFlow] being initialized and actively collecting updates.
+     * Synchronously gets the current value of the preference by blocking the current thread
+     * until the value is retrieved from the DataStore.
+     * This method directly calls the suspending `get()` function within `runBlocking`.
+     * Use with caution, especially on the main thread, as it can lead to UI unresponsiveness
+     * if the DataStore operation is slow.
+     * For non-blocking alternatives, consider using `asFlow()`, `stateIn()`, or `get()` within a coroutine.
      *
      * @return The current value of the preference.
      */
-    override fun getValue(): T = stateIn(scope).value
+    override fun getValue(): T = runBlocking { get() }
 
     /**
      * Asynchronously sets the value of the preference.

@@ -138,9 +138,11 @@ currentUserName = "Jane Doe"
 You can also access values synchronously or set them from non-suspending contexts using `getValue()` and `setValue()`:
 
 ```kotlin
-// Assuming userScorePref is a Prefs<Int> and its underlying StateFlow is active.
+// Assuming userScorePref is a Prefs<Int>
 
-// Synchronous read
+// Synchronous read - BE CAUTIOUS
+// This blocks the current thread until the value is retrieved.
+// Avoid on the main thread to prevent UI unresponsiveness.
 val currentScore = userScorePref.getValue()
 println("Current score via getValue(): $currentScore")
 
@@ -155,7 +157,14 @@ userScorePref.setValue(100)
 //     println("Score after setValue: ${userScorePref.get()}")
 // }
 ```
-**Note:** When using `getValue()` for synchronous reads, be cautious as this method relies on the underlying `StateFlow` being initialized and actively collecting updates. Property delegation (`by userNamePref`) also relies on this mechanism for reads. Writes via delegation or `setValue` are generally safe fire-and-forget operations.
+
+**Note:** When using `getValue()` for synchronous reads, be cautious. This method blocks the current
+thread by calling the suspending `get()` function within `runBlocking`. This can lead to UI
+unresponsiveness if the DataStore operation is slow, especially if called on the main thread. For
+non-blocking alternatives, consider using `asFlow()`, `stateIn()`, or calling `get()` from within a
+coroutine. Property delegation (`by userNamePref`) for reads also relies on this synchronous
+`getValue()` mechanism. Writes via delegation or `setValue` are generally safe fire-and-forget
+operations.
 
 ## Usage in Jetpack Compose
 
