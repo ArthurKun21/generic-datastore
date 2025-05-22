@@ -25,7 +25,7 @@ The library offers a `PreferenceDatastore` interface and its implementation `Gen
 *   **Asynchronous Operations:** Use the `get()` suspend function to retrieve values and `set(value: T)` suspend function to store values within coroutines.
 *   **Flow-based Observation:** Use `asFlow()` to get a `Flow<T>` that emits updates whenever the preference changes, or `stateIn(scope)` to get a `StateFlow<T>`.
 *   **Synchronous Access & Fire-and-Forget Update:**
-    *   `getValue()`: Synchronously retrieves the most recent value. This is useful for immediate access, but note that it relies on the underlying `StateFlow` being initialized and actively collecting updates.
+    *   `getValue()`: Synchronously retrieves the current value from DataStore. It blocks the calling thread (using `runBlocking`) until the value is available. While useful for immediate access, it should be used cautiously, especially on UI threads, to prevent unresponsiveness.
     *   `setValue(value: T)`: Sets the preference value from a non-suspending context. This method launches a fire-and-forget coroutine internally to perform the update.
 
 ## Example Usage (Conceptual)
