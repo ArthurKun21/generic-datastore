@@ -82,16 +82,12 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = false // As per original config
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
-        // Add other build types if you have them (e.g., debug)
-        // debug {
-        //     // Debug specific settings
-        // }
     }
     sourceSets {
         getByName("androidTest") {
@@ -99,10 +95,9 @@ android {
             java.srcDir("src/androidInstrumentedTest/kotlin")
         }
     }
-    // publishing within android block is removed, use the top-level one for multiplatform
 }
 
-version = "1.0.0" // It's good practice to use a full version string
+version = "1.0.0"
 
 publishing {
     publications {
