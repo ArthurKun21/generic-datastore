@@ -116,6 +116,8 @@ You can easily integrate these preferences into your Jetpack Compose UI using th
 
 Under the hood, `.remember()` utilizes `collectAsStateWithLifecycle` to ensure that the preference value is collected in a lifecycle-aware manner, preventing unnecessary work.
 
+For the implementation you can take a look here in [Remember.kt](library/src/commonMain/kotlin/io/github/arthurkun/generic/datastore/Remember.kt).
+
 Here's an example of how you might use it in a Composable function:
 
 ```kotlin
