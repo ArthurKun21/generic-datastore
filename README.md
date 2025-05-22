@@ -32,7 +32,9 @@ val genericDatastore = GenericPreferenceDatastore(context.myDataStore)
 // Define preferences
 val userNamePref: Prefs<String> = genericDatastore.string("user_name", "Guest")
 val userScorePref: Prefs<Int> = genericDatastore.int("user_score", 0)
+```
 
+```kotlin
 // Example for a custom object
 @Serializable // Add Kotlinx Serialization annotation
 data class UserProfile(val id: Int, val email: String)
@@ -43,22 +45,7 @@ val userProfilePref: Prefs<UserProfile> = genericDatastore.serialized(
     serializer = { profile -> Json.encodeToString(UserProfile.serializer(), profile) }, 
     deserializer = { json -> Json.decodeFromString(UserProfile.serializer(), json) }
 )
-```
 
-Or you can check this example with sealed class
-
-[Example Serialization](app/src/main/java/io/github/arthurkun/generic/datastore/app/domain/Animal.kt)
-
-```kotlin
-val customObject = datastore.serialized(
-    key = "animal",
-    defaultValue = Animal.Dog,
-    serializer = { Animal.to(it) },
-    deserializer = { Animal.from(it) },
-)
-```
-
-```kotlin
 // Using the preferences
 CoroutineScope(Dispatchers.IO).launch {
     // Get a value
@@ -75,6 +62,19 @@ CoroutineScope(Dispatchers.IO).launch {
     // Set a custom object
     userProfilePref.set(UserProfile(1, "john.doe@example.com"))
 }
+```
+
+Or you can check this example with sealed class
+
+[Example Serialization](app/src/main/java/io/github/arthurkun/generic/datastore/app/domain/Animal.kt)
+
+```kotlin
+val customObject = datastore.serialized(
+    key = "animal",
+    defaultValue = Animal.Dog,
+    serializer = { Animal.to(it) },
+    deserializer = { Animal.from(it) },
+)
 ```
 
 This library aims to reduce boilerplate code when working with Jetpack DataStore for common preference types and custom objects.
