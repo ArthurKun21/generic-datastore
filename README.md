@@ -1,4 +1,6 @@
-# Generic Datastore Library
+# Generic Preference Datastore Library
+
+Inspired by the [flow-preferences](https://github.com/tfcporciuncula/flow-preferences) library for shared-preferences. I wanted to create a preference datastore version of it.
 
 This library provides a convenient way to work with AndroidX Jetpack DataStore by offering a `GenericPreferenceDatastore` class. This class simplifies the creation and management of various preference types.
 
