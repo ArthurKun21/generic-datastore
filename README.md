@@ -20,7 +20,13 @@ The `GenericPreferenceDatastore` wraps a `DataStore<Preferences>` instance and p
 
 ## How it Works
 
-The library offers a `PreferenceDatastore` interface and its implementation `GenericPreferenceDatastore`. You initialize `GenericPreferenceDatastore` with your `DataStore<Preferences>` instance. Then, you can use its methods like `string()`, `long()`, `int()`, `float()`, `bool()`, `stringSet()`, and `serialized()` to create `Prefs<T>` objects. These `Prefs<T>` objects allow you to easily get (as a Flow) and set preference values.
+The library offers a `PreferenceDatastore` interface and its implementation `GenericPreferenceDatastore`. You initialize `GenericPreferenceDatastore` with your `DataStore<Preferences>` instance. Then, you can use its methods like `string()`, `long()`, `int()`, `float()`, `bool()`, `stringSet()`, and `serialized()` to create `Prefs<T>` objects. These `Prefs<T>` objects provide flexible ways to interact with your preferences:
+
+*   **Asynchronous Operations:** Use the `get()` suspend function to retrieve values and `set(value: T)` suspend function to store values within coroutines.
+*   **Flow-based Observation:** Use `asFlow()` to get a `Flow<T>` that emits updates whenever the preference changes, or `stateIn(scope)` to get a `StateFlow<T>`.
+*   **Synchronous Access & Fire-and-Forget Update:**
+    *   `getValue()`: Synchronously retrieves the most recent value. This is useful for immediate access, but note that it relies on the underlying `StateFlow` being initialized and actively collecting updates.
+    *   `setValue(value: T)`: Sets the preference value from a non-suspending context. This method launches a fire-and-forget coroutine internally to perform the update.
 
 ## Example Usage (Conceptual)
 
@@ -109,6 +115,47 @@ val customObject = datastore.serialized(
     deserializer = { Animal.from(it) },
 )
 ```
+
+## Synchronous Access & Property Delegation
+The library provides multiple ways to access and modify preference values synchronously or from non-suspending contexts.
+
+### Delegated Properties
+`Prefs<T>` implements the `ReadWriteProperty` interface, allowing you to use preferences as delegated properties. This is a concise way to work with preference values directly as if they were regular variables.
+
+```kotlin
+// Assuming userNamePref is a Prefs<String> (e.g., genericDatastore.string("user_name", "Guest"))
+var currentUserName: String by userNamePref
+
+// Read the value
+println("Current user name: $currentUserName")
+
+// Update the value
+currentUserName = "Jane Doe" 
+// This will internally call setValue and update the DataStore
+```
+
+### Direct Synchronous Access
+You can also access values synchronously or set them from non-suspending contexts using `getValue()` and `setValue()`:
+
+```kotlin
+// Assuming userScorePref is a Prefs<Int> and its underlying StateFlow is active.
+
+// Synchronous read
+val currentScore = userScorePref.getValue()
+println("Current score via getValue(): $currentScore")
+
+// Fire-and-forget write from a non-suspending context
+userScorePref.setValue(100)
+
+// The value is updated in the DataStore.
+// You can observe this change via its Flow or by calling get()/getValue() later.
+// For example, in a coroutine:
+// CoroutineScope(Dispatchers.Main).launch {
+//     delay(100) // give a moment for the background write
+//     println("Score after setValue: ${userScorePref.get()}")
+// }
+```
+**Note:** When using `getValue()` for synchronous reads, be cautious as this method relies on the underlying `StateFlow` being initialized and actively collecting updates. Property delegation (`by userNamePref`) also relies on this mechanism for reads. Writes via delegation or `setValue` are generally safe fire-and-forget operations.
 
 ## Usage in Jetpack Compose
 
