@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     `maven-publish`
     id("com.android.library")
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
@@ -22,17 +23,18 @@ kotlin {
             useJUnitPlatform()
         }
     }
-    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
-        target.binaries.framework {
-            baseName = project.name
-            isStatic = true
-        }
-    }
+//    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
+//        target.binaries.framework {
+//            baseName = project.name
+//            isStatic = true
+//        }
+//    }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(libs.bundles.datastore)
+                implementation(libs.bundles.library.compose)
             }
         }
         val commonTest by getting {

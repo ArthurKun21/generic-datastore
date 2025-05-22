@@ -1,0 +1,25 @@
+package io.github.arthurkun.generic.datastore
+
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
+@Composable
+fun <T> Prefs<T>.remember(): MutableState<T> {
+    val state = this.asFlow().collectAsStateWithLifecycle(defaultValue)
+    return remember(this) {
+        object : MutableState<T> {
+            override var value: T
+                get() = state.value
+                set(value) {
+                    setValue(value)
+                }
+
+            override fun component1(): T = value
+
+            override fun component2(): (T) -> Unit = { value = it }
+        }
+    }
+}

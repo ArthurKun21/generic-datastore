@@ -21,22 +21,23 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.arthurkun.generic.datastore.app.domain.Theme
 import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
+import io.github.arthurkun.generic.datastore.remember
 
 @Composable
 fun MainScreen(
     vm: MainViewModel = viewModel(),
 ) {
-    val text by vm.text.collectAsStateWithLifecycle()
-    val theme by vm.theme.collectAsStateWithLifecycle()
-    val num by vm.num.collectAsStateWithLifecycle()
-    val bool by vm.bool.collectAsStateWithLifecycle()
+    var text by vm.preferenceStore.text.remember()
+    var theme by vm.preferenceStore.theme.remember()
+    var num by vm.preferenceStore.num.remember()
+    var bool by vm.preferenceStore.bool.remember()
 
     LazyColumn(
         modifier = Modifier
@@ -53,7 +54,7 @@ fun MainScreen(
             OutlinedTextField(
                 value = text,
                 onValueChange = {
-                    vm.updateText(it)
+                    text = it
                 },
                 label = {
                     Text("text")
@@ -83,7 +84,7 @@ fun MainScreen(
                 },
                 leadingContent = {
                     Button(onClick = {
-                        vm.updateNum(num - 1)
+                        num -= 1
                     }
                     ) {
                         Icon(Icons.Default.Remove, contentDescription = "Decrement")
@@ -91,7 +92,7 @@ fun MainScreen(
                 },
                 trailingContent = {
                     Button(onClick = {
-                        vm.updateNum(num + 1)
+                        num += 1
                     }
                     ) {
                         Icon(Icons.Default.Add, contentDescription = "Increment")
@@ -121,7 +122,7 @@ fun MainScreen(
             ) {
                 Button(
                     onClick = {
-                        vm.updateBool(true)
+                        bool = true
                     },
                     enabled = !bool,
                     modifier = Modifier
@@ -131,7 +132,7 @@ fun MainScreen(
                 }
                 Button(
                     onClick = {
-                        vm.updateBool(false)
+                        bool = false
                     },
                     enabled = bool,
                     modifier = Modifier
@@ -169,7 +170,7 @@ fun MainScreen(
                     .selectable(
                         selected = entry == theme,
                         onClick = {
-                            vm.updateTheme(entry)
+                            theme = entry
                             setAppCompatDelegateThemeMode(entry)
                         }
                     )
