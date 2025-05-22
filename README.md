@@ -62,14 +62,14 @@ val customObject = datastore.serialized(
 // Using the preferences
 CoroutineScope(Dispatchers.IO).launch {
     // Get a value
-    val currentUserName = userNamePref.get().first()
+    val currentUserName = userNamePref.get()
     println("Current user: $currentUserName")
 
     // Set a value
     userNamePref.set("John Doe")
 
     // Get a custom object
-    val profile = userProfilePref.get().first()
+    val profile = userProfilePref.get()
     println("User email: ${profile.email}")
 
     // Set a custom object
