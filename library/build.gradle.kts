@@ -137,14 +137,4 @@ publishing {
         //     }
         // }
     }
-    // repositories { // Configure repositories if you publish to a custom one
-    //     maven {
-    //         name = "GitHubPackages"
-    //         url = uri("https://maven.pkg.github.com/YOUR_USERNAME/YOUR_REPOSITORY")
-    //         credentials {
-    //             username = System.getenv("GITHUB_ACTOR")
-    //             password = System.getenv("GITHUB_TOKEN")
-    //         }
-    //     }
-    // }
 }
