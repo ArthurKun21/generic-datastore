@@ -8,6 +8,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Remembers the value of this preference and returns a [MutableState] that can be used to
@@ -17,8 +19,10 @@ import kotlinx.coroutines.launch
  *
  */
 @Composable
-fun <T> Prefs<T>.remember(): MutableState<T> {
-    val state = this.asFlow().collectAsStateWithLifecycle(defaultValue)
+fun <T> Prefs<T>.remember(
+    context: CoroutineContext = EmptyCoroutineContext,
+): MutableState<T> {
+    val state = this.asFlow().collectAsStateWithLifecycle(defaultValue, context = context)
     val scope = rememberCoroutineScope()
     return remember(this) {
         object : MutableState<T> {
