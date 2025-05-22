@@ -50,6 +50,15 @@ Or you can check this example with sealed class
 [Example Serialization](app/src/main/java/io/github/arthurkun/generic/datastore/app/domain/Animal.kt)
 
 ```kotlin
+val customObject = datastore.serialized(
+    key = "animal",
+    defaultValue = Animal.Dog,
+    serializer = { Animal.to(it) },
+    deserializer = { Animal.from(it) },
+)
+```
+
+```kotlin
 // Using the preferences
 CoroutineScope(Dispatchers.IO).launch {
     // Get a value
