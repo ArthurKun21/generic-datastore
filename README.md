@@ -71,6 +71,37 @@ Or you can check this example with sealed class
 [Example Serialization](app/src/main/java/io/github/arthurkun/generic/datastore/app/domain/Animal.kt)
 
 ```kotlin
+sealed class Animal(val name: String) {
+
+    data object Dog : Animal("Dog")
+
+    data object Cat : Animal("Cat")
+
+    override fun toString(): String = name
+
+    companion object {
+        fun from(value: String): Animal {
+            return when (value) {
+                "Dog" -> Dog
+                "Cat" -> Cat
+                else -> throw Exception("Unknown animal type: $value")
+            }
+        }
+
+        fun to(animal: Animal): String {
+            return animal.name
+        }
+
+        val entries by lazy {
+            listOf(
+                Dog,
+                Cat,
+            )
+        }
+    }
+}
+
+
 val customObject = datastore.serialized(
     key = "animal",
     defaultValue = Animal.Dog,
