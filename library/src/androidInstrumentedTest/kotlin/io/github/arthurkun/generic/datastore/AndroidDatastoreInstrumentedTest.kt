@@ -228,9 +228,7 @@ class AndroidDatastoreInstrumentedTest {
         }
 
         // Now, try to get the value. It should return the default value.
-        // The EnumPreference logs an error in this case, which we can't directly assert here
-        // without a more complex log capture setup.
-        assertEquals(enumPref.get(), TestEnum.VALUE_A)
+        assertEquals(TestEnum.VALUE_A, enumPref.get())
     }
 
     // Tests for Serialized (ObjectPrimitive)
