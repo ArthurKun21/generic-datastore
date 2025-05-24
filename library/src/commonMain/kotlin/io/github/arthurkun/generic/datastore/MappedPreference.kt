@@ -110,7 +110,7 @@ internal class MappedPrefs<T, R>(
 
     override fun setValue(value: R) = prefs.setValue(reverseFallback(value))
 
-    override fun resetToDefault() = prefs.resetToDefault()
+    override suspend fun resetToDefault() = prefs.resetToDefault()
 
     override fun getValue(thisRef: Any, property: KProperty<*>): R {
         return getValue()
