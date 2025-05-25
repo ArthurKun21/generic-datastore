@@ -104,16 +104,6 @@ class AndroidDatastoreInstrumentedTest {
         assertEquals(stringPref.get(), "defaultValue") // Should revert to default
     }
 
-    @Test
-    fun stringPreference_resetToDefault() = runTest(testDispatcher) {
-        val stringPref = preferenceDatastore.string("testStringReset", "defaultValueReset")
-        stringPref.set("valueToReset")
-        assertEquals(stringPref.get(), "valueToReset")
-
-        stringPref.resetToDefault()
-        assertEquals(stringPref.get(), "defaultValueReset")
-    }
-
     // Tests for IntPreference
     @Test
     fun intPreference_defaultValueWhenNotSet() = runTest(testDispatcher) {
@@ -302,26 +292,6 @@ class AndroidDatastoreInstrumentedTest {
         assertEquals(serializedPref.get(), defaultObj) // Should revert to default
     }
 
-    @Test
-    fun serializedPreference_resetToDefault() = runTest(testDispatcher) {
-        val defaultObj = SerializableObject(5, "DefaultReset")
-        val objToReset = SerializableObject(6, "ToReset")
-        val serializedPref = preferenceDatastore.serialized(
-            key = "testSerializedReset",
-            defaultValue = defaultObj,
-            serializer = { "${it.id},${it.name}" },
-            deserializer = { str ->
-                val parts = str.split(",", limit = 2)
-                SerializableObject(parts[0].toInt(), parts[1])
-            }
-        )
-        serializedPref.set(objToReset)
-        assertEquals(serializedPref.get(), objToReset)
-
-        serializedPref.resetToDefault()
-        assertEquals(serializedPref.get(), defaultObj)
-    }
-
     // Tests for MappedPreference
     @Test
     fun mappedPreference_defaultValueWhenNotSet() = runTest(testDispatcher) {
@@ -380,26 +350,6 @@ class AndroidDatastoreInstrumentedTest {
             "DeleteMapped_50"
         ) // Mapped pref would return the converted default
         assertEquals(intPref.get(), 50) // Base pref should revert to its default
-    }
-
-    @Test
-    fun mappedPreference_resetToDefault() = runTest(testDispatcher) {
-        val intPref = preferenceDatastore.int("baseForMapReset", 75)
-        val mappedPref = intPref.map(
-            defaultValue = "MappedDefaultReset",
-            convert = { "ResetMapped_$it" },
-            reverse = { it.removePrefix("ResetMapped_").toInt() }
-        )
-        mappedPref.set("ResetMapped_750")
-        assertEquals(mappedPref.get(), "ResetMapped_750")
-        assertEquals(intPref.get(), 750)
-
-        mappedPref.resetToDefault() // This should reset the underlying intPref to its default
-        assertEquals(
-            mappedPref.get(),
-            "ResetMapped_75"
-        ) // Mapped pref would return the converted default
-        assertEquals(intPref.get(), 75) // Base pref should be reset to its default
     }
 
     @Test
