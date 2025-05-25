@@ -20,7 +20,7 @@ The `GenericPreferenceDatastore` wraps a `DataStore<Preferences>` instance and p
 
 ## How it Works
 
-The library offers a `PreferenceDatastore` interface and its implementation `GenericPreferenceDatastore`. You initialize `GenericPreferenceDatastore` with your `DataStore<Preferences>` instance. Then, you can use its methods like `string()`, `long()`, `int()`, `float()`, `bool()`, `stringSet()`, and `serialized()` to create `Prefs<T>` objects. These `Prefs<T>` objects provide flexible ways to interact with your preferences:
+The library offers a `PreferenceDatastore` interface and its implementation `GenericPreferenceDatastore`. You initialize `GenericPreferenceDatastore` with your `DataStore<Preferences>` instance. Then, you can use its methods like `string()`, `long()`, `int()`, `float()`, `bool()`, `stringSet()`, and `serialized()` to create `Prefs<T>` objects. Each `Prefs<T>` object is initialized with a key and a default value. This default value is automatically used during retrieval operations (like `get()`, `getValue()`, or when its `Flow` emits) if the preference key is not found in the DataStore or if an error occurs. These `Prefs<T>` objects provide flexible ways to interact with your preferences:
 
 *   **Asynchronous Operations:** Use the `get()` suspend function to retrieve values and `set(value: T)` suspend function to store values within coroutines.
 *   **Flow-based Observation:** Use `asFlow()` to get a `Flow<T>` that emits updates whenever the preference changes, or `stateIn(scope)` to get a `StateFlow<T>`.
@@ -120,18 +120,21 @@ val customObject = datastore.serialized(
 The library provides multiple ways to access and modify preference values synchronously or from non-suspending contexts.
 
 ### Delegated Properties
-`Prefs<T>` implements the `ReadWriteProperty` interface, allowing you to use preferences as delegated properties. This is a concise way to work with preference values directly as if they were regular variables.
+`Prefs<T>` implements the `ReadWriteProperty` interface, allowing you to use preferences as delegated properties. This offers a concise way to work with preference values as if they were regular variables.
+
+When you read a delegated property (e.g., `val name = userNamePref`), it internally calls `getValue()`. This is a synchronous operation that blocks the current thread until the value is retrieved from DataStore. Be cautious with this on performance-sensitive threads like the UI thread.
+
+When you assign a value to a delegated property (e.g., `userNamePref = "Jane Doe"`), it internally calls `setValue(value)`. This performs a fire-and-forget update to the DataStore.
 
 ```kotlin
 // Assuming userNamePref is a Prefs<String> (e.g., genericDatastore.string("user_name", "Guest"))
 var currentUserName: String by userNamePref
 
-// Read the value
+// Read the value (synchronous, internally uses getValue())
 println("Current user name: $currentUserName")
 
-// Update the value
-currentUserName = "Jane Doe" 
-// This will internally call setValue and update the DataStore
+// Update the value (fire-and-forget, internally uses setValue())
+currentUserName = "Jane Doe"
 ```
 
 ### Direct Synchronous Access
@@ -158,13 +161,11 @@ userScorePref.setValue(100)
 // }
 ```
 
-**Note:** When using `getValue()` for synchronous reads, be cautious. This method blocks the current
+**Note on Synchronous Reads (`getValue()`):** When using `getValue()` directly for synchronous reads, be cautious. This method blocks the current
 thread by calling the suspending `get()` function within `runBlocking`. This can lead to UI
 unresponsiveness if the DataStore operation is slow, especially if called on the main thread. For
 non-blocking alternatives, consider using `asFlow()`, `stateIn()`, or calling `get()` from within a
-coroutine. Property delegation (`by userNamePref`) for reads also relies on this synchronous
-`getValue()` mechanism. Writes via delegation or `setValue` are generally safe fire-and-forget
-operations.
+coroutine. (The same caution for reads applies when using property delegation, as detailed in its dedicated section). Writes via `setValue` (and by extension, property delegation) are generally safe fire-and-forget operations.
 
 ## Usage in Jetpack Compose
 

@@ -95,6 +95,12 @@ android {
             java.srcDir("src/androidInstrumentedTest/kotlin")
         }
     }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 version = "1.0.0"
