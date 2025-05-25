@@ -112,7 +112,7 @@ sealed class GenericPreference<T>(
      * @return A [StateFlow] representing the current value of the preference.
      */
     override fun stateIn(scope: CoroutineScope): StateFlow<T> =
-        asFlow().stateIn(scope, SharingStarted.Lazily, getValue())
+        asFlow().stateIn(scope, SharingStarted.Lazily, defaultValue)
 
     /**
      * Synchronously gets the current value of the preference by blocking the current thread
