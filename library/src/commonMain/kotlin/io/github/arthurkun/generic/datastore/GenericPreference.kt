@@ -42,7 +42,6 @@ sealed class GenericPreference<T>(
     private val key: String,
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
-    private val scope: CoroutineScope,
 ) : Preference<T> {
     /**
      * Returns the key of the preference.
@@ -159,13 +158,11 @@ sealed class GenericPreference<T>(
         datastore: DataStore<Preferences>,
         key: String,
         defaultValue: String,
-        scope: CoroutineScope,
     ) : GenericPreference<String>(
         datastore = datastore,
         key = key,
         defaultValue = defaultValue,
         preferences = stringPreferencesKey(key),
-        scope = scope
     )
 
     /**
@@ -180,13 +177,11 @@ sealed class GenericPreference<T>(
         datastore: DataStore<Preferences>,
         key: String,
         defaultValue: Long,
-        scope: CoroutineScope,
     ) : GenericPreference<Long>(
         datastore = datastore,
         key = key,
         defaultValue = defaultValue,
         preferences = longPreferencesKey(key),
-        scope = scope
     )
 
     /**
@@ -201,13 +196,11 @@ sealed class GenericPreference<T>(
         datastore: DataStore<Preferences>,
         key: String,
         defaultValue: Int,
-        scope: CoroutineScope,
     ) : GenericPreference<Int>(
         datastore = datastore,
         key = key,
         defaultValue = defaultValue,
         preferences = intPreferencesKey(key),
-        scope = scope
     )
 
     /**
@@ -222,13 +215,11 @@ sealed class GenericPreference<T>(
         datastore: DataStore<Preferences>,
         key: String,
         defaultValue: Float,
-        scope: CoroutineScope,
     ) : GenericPreference<Float>(
         datastore = datastore,
         key = key,
         defaultValue = defaultValue,
         preferences = floatPreferencesKey(key),
-        scope = scope
     )
 
     /**
@@ -243,13 +234,11 @@ sealed class GenericPreference<T>(
         datastore: DataStore<Preferences>,
         key: String,
         defaultValue: Boolean,
-        scope: CoroutineScope,
     ) : GenericPreference<Boolean>(
         datastore = datastore,
         key = key,
         defaultValue = defaultValue,
         preferences = booleanPreferencesKey(key),
-        scope = scope
     )
 
     /**
@@ -264,12 +253,10 @@ sealed class GenericPreference<T>(
         datastore: DataStore<Preferences>,
         key: String,
         defaultValue: Set<String>,
-        scope: CoroutineScope,
     ) : GenericPreference<Set<String>>(
         datastore = datastore,
         key = key,
         defaultValue = defaultValue,
         preferences = stringSetPreferencesKey(key),
-        scope = scope
     )
 }
