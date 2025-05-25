@@ -14,7 +14,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 
-private const val TEST_DATASTORE_NAME = "test_datastore_blocking"
+private const val TEST_DATASTORE_BLOCKING_NAME = "test_datastore_blocking"
 
 private enum class TestEnumBlocking { VALUE_A, VALUE_B }
 
@@ -35,7 +35,7 @@ class DesktopDatastoreBlockingTest {
         Dispatchers.setMain(testDispatcher)
         dataStore = PreferenceDataStoreFactory.create(
             produceFile = {
-                File(tempFolder, "${TEST_DATASTORE_NAME}.preferences_pb")
+                File(tempFolder, "${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb")
             }
         )
         // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl

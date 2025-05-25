@@ -18,7 +18,7 @@ import org.junit.runner.RunWith
 import java.io.File
 import kotlin.test.assertEquals
 
-private const val TEST_DATASTORE_NAME = "test_datastore_blocking"
+private const val TEST_DATASTORE_BLOCKING_NAME = "test_datastore_blocking"
 
 private enum class TestEnumBlocking { VALUE_A, VALUE_B }
 
@@ -37,7 +37,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         Dispatchers.setMain(testDispatcher)
         testContext = ApplicationProvider.getApplicationContext()
         dataStore = PreferenceDataStoreFactory.create(
-            produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_NAME) }
+            produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_BLOCKING_NAME) }
         )
         // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
         preferenceDatastore = GenericPreferenceDatastore(dataStore)
@@ -48,7 +48,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         Dispatchers.resetMain()
         // Clean up DataStore file
         val dataStoreFile =
-            File(testContext.filesDir, "datastore/${TEST_DATASTORE_NAME}.preferences_pb")
+            File(testContext.filesDir, "datastore/${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb")
         if (dataStoreFile.exists()) {
             dataStoreFile.delete()
         }
