@@ -3,10 +3,7 @@ package io.github.arthurkun.generic.datastore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -32,14 +29,11 @@ class DesktopDatastoreBlockingTest {
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var preferenceDatastore: GenericPreferenceDatastore
     private val testDispatcher = UnconfinedTestDispatcher()
-    private lateinit var testScope: CoroutineScope
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        testScope = CoroutineScope(Job() + testDispatcher)
         dataStore = PreferenceDataStoreFactory.create(
-            scope = testScope,
             produceFile = {
                 File(tempFolder, "${TEST_DATASTORE_NAME}.preferences_pb")
             }
@@ -51,9 +45,6 @@ class DesktopDatastoreBlockingTest {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        // TemporaryFolder will clean up the DataStore file
-        // Cancel the scope to cancel any ongoing coroutines
-        testScope.cancel()
     }
 
 
@@ -174,5 +165,180 @@ class DesktopDatastoreBlockingTest {
             "ResetMapped_75"
         ) // Mapped pref would return the converted default
         assertEquals(intPref.getValue(), 75) // Base pref should be reset to its default
+    }
+
+    // Test for StringPreference delegation
+    @Test
+    fun stringPreference_delegation() {
+        val stringPref =
+            preferenceDatastore.string("testStringDelegateDesktop", "defaultDelegateValueDesktop")
+        var delegatedValue: String by stringPref
+
+        // Set value via delegation
+        delegatedValue = "newDelegateValueDesktop"
+        assertEquals("newDelegateValueDesktop", delegatedValue)
+        assertEquals("newDelegateValueDesktop", stringPref.getValue())
+
+        // Reset to default
+        stringPref.resetToDefault()
+        assertEquals("defaultDelegateValueDesktop", delegatedValue)
+        assertEquals("defaultDelegateValueDesktop", stringPref.getValue())
+    }
+
+    // Test for IntPreference delegation
+    @Test
+    fun intPreference_delegation() {
+        val intPref = preferenceDatastore.int("testIntDelegateDesktop", 789)
+        var delegatedValue: Int by intPref
+
+        // Set value via delegation
+        delegatedValue = 101
+        assertEquals(101, delegatedValue)
+        assertEquals(101, intPref.getValue())
+
+        // Reset to default
+        intPref.resetToDefault()
+        assertEquals(789, delegatedValue)
+        assertEquals(789, intPref.getValue())
+    }
+
+    // Test for LongPreference delegation
+    @Test
+    fun longPreference_delegation() {
+        val longPref = preferenceDatastore.long("testLongDelegateDesktop", 789L)
+        var delegatedValue: Long by longPref
+
+        // Set value via delegation
+        delegatedValue = 101L
+        assertEquals(101L, delegatedValue)
+        assertEquals(101L, longPref.getValue())
+
+        // Reset to default
+        longPref.resetToDefault()
+        assertEquals(789L, delegatedValue)
+        assertEquals(789L, longPref.getValue())
+    }
+
+    // Test for FloatPreference delegation
+    @Test
+    fun floatPreference_delegation() {
+        val floatPref = preferenceDatastore.float("testFloatDelegateDesktop", 7.89f)
+        var delegatedValue: Float by floatPref
+
+        // Set value via delegation
+        delegatedValue = 1.01f
+        assertEquals(1.01f, delegatedValue)
+        assertEquals(1.01f, floatPref.getValue())
+
+        // Reset to default
+        floatPref.resetToDefault()
+        assertEquals(7.89f, delegatedValue)
+        assertEquals(7.89f, floatPref.getValue())
+    }
+
+    // Test for BooleanPreference delegation
+    @Test
+    fun booleanPreference_delegation() {
+        val boolPref = preferenceDatastore.bool("testBooleanDelegateDesktop", true)
+        var delegatedValue: Boolean by boolPref
+
+        // Set value via delegation
+        delegatedValue = false
+        assertEquals(false, delegatedValue)
+        assertEquals(false, boolPref.getValue())
+
+        // Reset to default
+        boolPref.resetToDefault()
+        assertEquals(true, delegatedValue)
+        assertEquals(true, boolPref.getValue())
+    }
+
+    // Test for StringSetPreference delegation
+    @Test
+    fun stringSetPreference_delegation() {
+        val stringSetPref =
+            preferenceDatastore.stringSet("testStringSetDelegateDesktop", setOf("x", "y"))
+        var delegatedValue: Set<String> by stringSetPref
+
+        // Set value via delegation
+        delegatedValue = setOf("z", "w")
+        assertEquals(setOf("z", "w"), delegatedValue)
+        assertEquals(setOf("z", "w"), stringSetPref.getValue())
+
+        // Reset to default
+        stringSetPref.resetToDefault()
+        assertEquals(setOf("x", "y"), delegatedValue)
+        assertEquals(setOf("x", "y"), stringSetPref.getValue())
+    }
+
+    // Test for EnumPreference delegation
+    @Test
+    fun enumPreference_delegation() {
+        val enumPref = preferenceDatastore.enum("testEnumDelegateDesktop", TestEnumBlocking.VALUE_A)
+        var delegatedValue: TestEnumBlocking by enumPref
+
+        // Set value via delegation
+        delegatedValue = TestEnumBlocking.VALUE_B
+        assertEquals(TestEnumBlocking.VALUE_B, delegatedValue)
+        assertEquals(TestEnumBlocking.VALUE_B, enumPref.getValue())
+
+        // Reset to default
+        enumPref.resetToDefault()
+        assertEquals(TestEnumBlocking.VALUE_A, delegatedValue)
+        assertEquals(TestEnumBlocking.VALUE_A, enumPref.getValue())
+    }
+
+    // Test for SerializedPreference delegation
+    @Test
+    fun serializedPreference_delegation() {
+        val defaultObj = SerializableObjectBlocking(3, "DefaultDelegateDesktop")
+        val newObj = SerializableObjectBlocking(4, "NewDelegateDesktop")
+        val serializedPref = preferenceDatastore.serialized(
+            key = "testSerializedDelegateDesktop",
+            defaultValue = defaultObj,
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObjectBlocking(parts[0].toInt(), parts[1])
+            }
+        )
+        var delegatedValue: SerializableObjectBlocking by serializedPref
+
+        // Set value via delegation
+        delegatedValue = newObj
+        assertEquals(newObj, delegatedValue)
+        assertEquals(newObj, serializedPref.getValue())
+
+        // Reset to default
+        serializedPref.resetToDefault()
+        assertEquals(defaultObj, delegatedValue)
+        assertEquals(defaultObj, serializedPref.getValue())
+    }
+
+    // Test for MappedPreference delegation
+    @Test
+    fun mappedPreference_delegation() {
+        val intPref = preferenceDatastore.int("baseForMapDelegateDesktop", 300)
+        val mappedPref = intPref.map(
+            defaultValue = "MappedDelegateDefaultDesktop",
+            convert = { "DelegateMappedDesktop_$it" },
+            reverse = { it.removePrefix("DelegateMappedDesktop_").toInt() }
+        )
+        var delegatedValue: String by mappedPref
+
+        // Set value via delegation
+        delegatedValue = "DelegateMappedDesktop_400"
+        assertEquals("DelegateMappedDesktop_400", delegatedValue)
+        assertEquals("DelegateMappedDesktop_400", mappedPref.getValue())
+        assertEquals(400, intPref.getValue()) // Check underlying preference
+
+        // Reset to default
+        mappedPref.resetToDefault() // This should reset the underlying intPref to its default
+        assertEquals(
+            "DelegateMappedDesktop_300",
+            delegatedValue
+        ) // Mapped pref would return the converted default
+        assertEquals("DelegateMappedDesktop_300", mappedPref.getValue())
+        assertEquals(300, intPref.getValue()) // Base pref should be reset to its default
     }
 }
