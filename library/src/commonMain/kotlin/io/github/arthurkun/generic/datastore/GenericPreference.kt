@@ -10,14 +10,15 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 /**
  * Represents a generic preference that can be stored in and retrieved from a DataStore.
@@ -124,7 +125,11 @@ sealed class GenericPreference<T>(
      *
      * @return The current value of the preference.
      */
-    override fun getValue(): T = runBlocking { get() }
+    override fun getValue(): T = runBlocking {
+        withContext(Dispatchers.IO) {
+            get()
+        }
+    }
 
     /**
      * Asynchronously sets the value of the preference.
@@ -135,8 +140,10 @@ sealed class GenericPreference<T>(
      * @param value The new value to be stored for the preference.
      */
     override fun setValue(value: T) {
-        scope.launch {
-            set(value)
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                set(value)
+            }
         }
     }
 
