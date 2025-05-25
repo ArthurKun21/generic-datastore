@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -33,7 +33,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var preferenceDatastore: GenericPreferenceDatastore
     private lateinit var testContext: Context
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var testScope: CoroutineScope
 
     @Before
@@ -46,7 +46,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
             produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_NAME) }
         )
         // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
-        preferenceDatastore = GenericPreferenceDatastore(dataStore, testScope)
+        preferenceDatastore = GenericPreferenceDatastore(dataStore)
     }
 
     @After

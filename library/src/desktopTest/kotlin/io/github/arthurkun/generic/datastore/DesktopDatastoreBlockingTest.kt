@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.Test
@@ -31,7 +31,7 @@ class DesktopDatastoreBlockingTest {
 
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var preferenceDatastore: GenericPreferenceDatastore
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var testScope: CoroutineScope
 
     @BeforeTest
@@ -45,7 +45,7 @@ class DesktopDatastoreBlockingTest {
             }
         )
         // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
-        preferenceDatastore = GenericPreferenceDatastore(dataStore, testScope)
+        preferenceDatastore = GenericPreferenceDatastore(dataStore)
     }
 
     @AfterTest
