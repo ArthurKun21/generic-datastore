@@ -12,7 +12,7 @@ import kotlin.reflect.KProperty
  *
  * @param T The type of the preference value.
  */
-interface Prefs<T> : ReadWriteProperty<Any, T>, Preference<T> {
+interface Prefs<T> : ReadWriteProperty<Any?, T>, Preference<T> {
     /**
      * Resets the preference value to its default.
      */
@@ -33,9 +33,9 @@ internal class PrefsImpl<T>(
 ) : Prefs<T>,
     Preference<T> by pref {
 
-    override fun getValue(thisRef: Any, property: KProperty<*>): T = pref.getValue()
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = pref.getValue()
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: T) = pref.setValue(value)
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = pref.setValue(value)
 
     override fun resetToDefault() = runBlocking { pref.set(pref.defaultValue) }
 }
