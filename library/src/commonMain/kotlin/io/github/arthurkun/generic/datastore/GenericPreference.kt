@@ -105,14 +105,14 @@ sealed class GenericPreference<T>(
 
     /**
      * Converts the preference [Flow] into a [StateFlow].
-     * The [StateFlow] is started lazily ([SharingStarted.Lazily]) and shares the latest emitted
+     * The [StateFlow] is started eagerly ([SharingStarted.Eagerly]) and shares the latest emitted
      * value with all collectors. It is initialized with the `defaultValue`.
      *
      * @param scope The [CoroutineScope] in which the sharing of the [StateFlow] is started.
      * @return A [StateFlow] representing the current value of the preference.
      */
     override fun stateIn(scope: CoroutineScope): StateFlow<T> =
-        asFlow().stateIn(scope, SharingStarted.Lazily, defaultValue)
+        asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
 
     /**
      * Synchronously gets the current value of the preference by blocking the current thread
