@@ -48,7 +48,7 @@ class DesktopDatastoreInstrumentedTest {
             }
         )
         // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
-        preferenceDatastore = GenericPreferenceDatastore(dataStore, testScope)
+        preferenceDatastore = GenericPreferenceDatastore(dataStore)
     }
 
     @AfterTest
