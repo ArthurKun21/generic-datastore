@@ -33,7 +33,6 @@ internal class PrefsImpl<T>(
 ) : Prefs<T>,
     Preference<T> by pref {
 
-
     override fun getValue(thisRef: Any, property: KProperty<*>): T = pref.getValue()
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: T) = pref.setValue(value)

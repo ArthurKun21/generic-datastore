@@ -10,7 +10,6 @@ import io.github.arthurkun.generic.datastore.GenericPreference.StringPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.StringSetPrimitive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 
 /**
  * A DataStore implementation that provides methods for creating and managing various types of preferences.

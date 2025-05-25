@@ -9,7 +9,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -60,84 +59,84 @@ class DesktopDatastoreBlockingTest {
 
     // Tests for StringPreference
     @Test
-    fun stringPreference_resetToDefault() = runTest(testDispatcher) {
+    fun stringPreference_resetToDefault() {
         val stringPref = preferenceDatastore.string("testStringReset", "defaultValueReset")
-        stringPref.set("valueToReset")
-        assertEquals(stringPref.get(), "valueToReset")
+        stringPref.setValue("valueToReset")
+        assertEquals(stringPref.getValue(), "valueToReset")
 
         stringPref.resetToDefault()
-        assertEquals(stringPref.get(), "defaultValueReset")
+        assertEquals(stringPref.getValue(), "defaultValueReset")
     }
 
     // Tests for IntPreference
     @Test
-    fun intPreference_resetToDefault() = runTest(testDispatcher) {
+    fun intPreference_resetToDefault() {
         val intPref = preferenceDatastore.int("testInt", 10)
-        intPref.set(20)
-        assertEquals(intPref.get(), 20)
+        intPref.setValue(20)
+        assertEquals(intPref.getValue(), 20)
 
         intPref.resetToDefault()
-        assertEquals(intPref.get(), 10)
+        assertEquals(intPref.getValue(), 10)
     }
 
     // Tests for LongPreference
     @Test
-    fun longPreference_resetToDefault() = runTest(testDispatcher) {
+    fun longPreference_resetToDefault() {
         val longPref = preferenceDatastore.long("testLong", 100L)
-        longPref.set(200L)
-        assertEquals(longPref.get(), 200L)
+        longPref.setValue(200L)
+        assertEquals(longPref.getValue(), 200L)
 
         longPref.resetToDefault()
-        assertEquals(longPref.get(), 100L)
+        assertEquals(longPref.getValue(), 100L)
     }
 
     // Tests for FloatPreference
     @Test
-    fun floatPreference_resetToDefault() = runTest(testDispatcher) {
+    fun floatPreference_resetToDefault() {
         val floatPref = preferenceDatastore.float("testFloat", 1.0f)
-        floatPref.set(2.0f)
-        assertEquals(floatPref.get(), 2.0f)
+        floatPref.setValue(2.0f)
+        assertEquals(floatPref.getValue(), 2.0f)
 
         floatPref.resetToDefault()
-        assertEquals(floatPref.get(), 1.0f)
+        assertEquals(floatPref.getValue(), 1.0f)
     }
 
     // Tests for BooleanPreference
     @Test
-    fun booleanPreference_resetToDefault() = runTest(testDispatcher) {
+    fun booleanPreference_resetToDefault() {
         val boolPref = preferenceDatastore.bool("testBoolean", false)
-        boolPref.set(true)
-        assertEquals(boolPref.get(), true)
+        boolPref.setValue(true)
+        assertEquals(boolPref.getValue(), true)
 
         boolPref.resetToDefault()
-        assertEquals(boolPref.get(), false)
+        assertEquals(boolPref.getValue(), false)
     }
 
     // Tests for StringSetPreference
     @Test
-    fun stringSetPreference_resetToDefault() = runTest(testDispatcher) {
+    fun stringSetPreference_resetToDefault() {
         val stringSetPref = preferenceDatastore.stringSet("testStringSet", setOf("a", "b"))
-        stringSetPref.set(setOf("c", "d", "e"))
-        assertEquals(stringSetPref.get(), setOf("c", "d", "e"))
+        stringSetPref.setValue(setOf("c", "d", "e"))
+        assertEquals(stringSetPref.getValue(), setOf("c", "d", "e"))
 
         stringSetPref.resetToDefault()
-        assertEquals(stringSetPref.get(), setOf("a", "b"))
+        assertEquals(stringSetPref.getValue(), setOf("a", "b"))
     }
 
     // Tests for EnumPreference
     @Test
-    fun enumPreference_setAndGetValue() = runTest(testDispatcher) {
+    fun enumPreference_setAndGetValue() {
         val enumPref = preferenceDatastore.enum("testEnum", TestEnumBlocking.VALUE_A)
-        enumPref.set(TestEnumBlocking.VALUE_B)
-        assertEquals(enumPref.get(), TestEnumBlocking.VALUE_B)
+        enumPref.setValue(TestEnumBlocking.VALUE_B)
+        assertEquals(enumPref.getValue(), TestEnumBlocking.VALUE_B)
 
         enumPref.resetToDefault()
-        assertEquals(enumPref.get(), TestEnumBlocking.VALUE_A)
+        assertEquals(enumPref.getValue(), TestEnumBlocking.VALUE_A)
     }
 
     // Tests for Serialized (ObjectPrimitive)
     @Test
-    fun serializedPreference_resetToDefault() = runTest(testDispatcher) {
+    fun serializedPreference_resetToDefault() {
         val defaultObj = SerializableObjectBlocking(5, "DefaultReset")
         val objToReset = SerializableObjectBlocking(6, "ToReset")
         val serializedPref = preferenceDatastore.serialized(
@@ -149,32 +148,31 @@ class DesktopDatastoreBlockingTest {
                 SerializableObjectBlocking(parts[0].toInt(), parts[1])
             }
         )
-        serializedPref.set(objToReset)
-        assertEquals(serializedPref.get(), objToReset)
+        serializedPref.setValue(objToReset)
+        assertEquals(serializedPref.getValue(), objToReset)
 
         serializedPref.resetToDefault()
-        assertEquals(serializedPref.get(), defaultObj)
+        assertEquals(serializedPref.getValue(), defaultObj)
     }
 
     // Tests for MappedPreference
     @Test
-    fun mappedPreference_resetToDefault() = runTest(testDispatcher) {
+    fun mappedPreference_resetToDefault() {
         val intPref = preferenceDatastore.int("baseForMapReset", 75)
         val mappedPref = intPref.map(
             defaultValue = "MappedDefaultReset",
             convert = { "ResetMapped_$it" },
             reverse = { it.removePrefix("ResetMapped_").toInt() }
         )
-        mappedPref.set("ResetMapped_750")
-        assertEquals(mappedPref.get(), "ResetMapped_750")
-        assertEquals(intPref.get(), 750)
+        mappedPref.setValue("ResetMapped_750")
+        assertEquals(mappedPref.getValue(), "ResetMapped_750")
+        assertEquals(intPref.getValue(), 750)
 
         mappedPref.resetToDefault() // This should reset the underlying intPref to its default
         assertEquals(
-            mappedPref.get(),
+            mappedPref.getValue(),
             "ResetMapped_75"
         ) // Mapped pref would return the converted default
-        assertEquals(intPref.get(), 75) // Base pref should be reset to its default
+        assertEquals(intPref.getValue(), 75) // Base pref should be reset to its default
     }
-
 }
