@@ -11,8 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Before
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -27,30 +27,33 @@ private data class SerializableObjectBlocking(val id: Int, val name: String)
 @RunWith(AndroidJUnit4::class)
 class AndroidDatastoreBlockingInstrumentedTest {
 
-    private lateinit var dataStore: DataStore<Preferences>
-    private lateinit var preferenceDatastore: GenericPreferenceDatastore
-    private lateinit var testContext: Context
-    private val testDispatcher = UnconfinedTestDispatcher()
+    companion object {
+        private lateinit var dataStore: DataStore<Preferences>
+        private lateinit var preferenceDatastore: GenericPreferenceDatastore
+        private lateinit var testContext: Context
+        private val testDispatcher = UnconfinedTestDispatcher()
 
-    @Before
-    fun setup() {
-        Dispatchers.setMain(testDispatcher)
-        testContext = ApplicationProvider.getApplicationContext()
-        dataStore = PreferenceDataStoreFactory.create(
-            produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_BLOCKING_NAME) }
-        )
-        // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
-        preferenceDatastore = GenericPreferenceDatastore(dataStore)
-    }
+        @JvmStatic
+        @BeforeClass
+        fun setupClass() {
+            Dispatchers.setMain(testDispatcher)
+            testContext = ApplicationProvider.getApplicationContext()
+            dataStore = PreferenceDataStoreFactory.create(
+                produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_BLOCKING_NAME) }
+            )
+            preferenceDatastore = GenericPreferenceDatastore(dataStore)
+        }
 
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-        // Clean up DataStore file
-        val dataStoreFile =
-            File(testContext.filesDir, "datastore/${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb")
-        if (dataStoreFile.exists()) {
-            dataStoreFile.delete()
+        @JvmStatic
+        @AfterClass
+        fun tearDownClass() {
+            Dispatchers.resetMain()
+            // Clean up DataStore file
+            val dataStoreFile =
+                File(testContext.filesDir, "datastore/${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb")
+            if (dataStoreFile.exists()) {
+                dataStoreFile.delete()
+            }
         }
     }
 
