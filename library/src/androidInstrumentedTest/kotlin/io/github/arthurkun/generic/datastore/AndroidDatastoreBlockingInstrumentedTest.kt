@@ -50,7 +50,10 @@ class AndroidDatastoreBlockingInstrumentedTest {
             Dispatchers.resetMain()
             // Clean up DataStore file
             val dataStoreFile =
-                File(testContext.filesDir, "datastore/${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb")
+                File(
+                    testContext.filesDir,
+                    "datastore/${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb"
+                )
             if (dataStoreFile.exists()) {
                 dataStoreFile.delete()
             }
@@ -60,7 +63,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
     // Tests for StringPreference
     @Test
     fun stringPreference_resetToDefault() {
-        val stringPref = preferenceDatastore.string("testStringReset", "defaultValueReset")
+        val stringPref = preferenceDatastore.string("testString", "defaultValueReset")
         stringPref.setValue("valueToReset")
         assertEquals(stringPref.getValue(), "valueToReset")
 
