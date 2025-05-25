@@ -51,7 +51,7 @@ class DesktopDatastoreBlockingTest {
     // Tests for StringPreference
     @Test
     fun stringPreference_resetToDefault() {
-        val stringPref = preferenceDatastore.string("testStringReset", "defaultValueReset")
+        val stringPref = preferenceDatastore.string("testString", "defaultValueReset")
         stringPref.setValue("valueToReset")
         assertEquals(stringPref.getValue(), "valueToReset")
 
