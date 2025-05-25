@@ -49,7 +49,7 @@ class AndroidDatastoreInstrumentedTest {
             produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_NAME) }
         )
         // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
-        preferenceDatastore = GenericPreferenceDatastore(dataStore, testScope)
+        preferenceDatastore = GenericPreferenceDatastore(dataStore)
     }
 
     @After
