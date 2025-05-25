@@ -4,7 +4,9 @@ package io.github.arthurkun.generic.datastore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -20,12 +22,15 @@ fun <T> Prefs<T>.remember(
     context: CoroutineContext = EmptyCoroutineContext,
 ): MutableState<T> {
     val state = this.asFlow().collectAsStateWithLifecycle(defaultValue, context = context)
+    val scope = rememberCoroutineScope()
     return remember(this) {
         object : MutableState<T> {
             override var value: T
                 get() = state.value
                 set(value) {
-                    setValue(value)
+                    scope.launch {
+                        set(value)
+                    }
                 }
 
             override fun component1(): T = value
