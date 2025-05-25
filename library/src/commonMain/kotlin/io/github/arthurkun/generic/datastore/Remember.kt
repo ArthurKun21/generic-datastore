@@ -6,6 +6,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -28,7 +29,7 @@ fun <T> Prefs<T>.remember(
             override var value: T
                 get() = state.value
                 set(value) {
-                    scope.launch {
+                    scope.launch(Dispatchers.IO) {
                         set(value)
                     }
                 }
