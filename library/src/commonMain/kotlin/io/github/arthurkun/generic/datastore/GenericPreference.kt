@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +42,7 @@ sealed class GenericPreference<T>(
     private val key: String,
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<T> {
     /**
      * Returns the unique String key used to identify this preference within the DataStore.
@@ -53,12 +55,14 @@ sealed class GenericPreference<T>(
      * this function returns the [defaultValue]. This is a suspending function.
      */
     override suspend fun get(): T {
-        return datastore
-            .data
-            .map { preferences ->
-                preferences[this.preferences] ?: defaultValue
-            }
-            .first()
+        return withContext(ioDispatcher) {
+            datastore
+                .data
+                .map { preferences ->
+                    preferences[this@GenericPreference.preferences] ?: defaultValue
+                }
+                .first()
+        }
     }
 
     /**
@@ -67,8 +71,10 @@ sealed class GenericPreference<T>(
      * @param value The new value to store for this preference.
      */
     override suspend fun set(value: T) {
-        datastore.edit { ds ->
-            ds[preferences] = value
+        withContext(ioDispatcher) {
+            datastore.edit { ds ->
+                ds[preferences] = value
+            }
         }
     }
 
@@ -77,8 +83,10 @@ sealed class GenericPreference<T>(
      * This is a suspending function.
      */
     override suspend fun delete() {
-        datastore.edit { ds ->
-            ds.remove(preferences)
+        withContext(ioDispatcher) {
+            datastore.edit { ds ->
+                ds.remove(preferences)
+            }
         }
     }
 
@@ -112,9 +120,7 @@ sealed class GenericPreference<T>(
      * Use with caution due to potential blocking.
      */
     override fun getValue(): T = runBlocking {
-        withContext(Dispatchers.IO) {
-            get()
-        }
+        get()
     }
 
     /**
@@ -125,9 +131,7 @@ sealed class GenericPreference<T>(
      */
     override fun setValue(value: T) {
         runBlocking {
-            withContext(Dispatchers.IO) {
-                set(value)
-            }
+            set(value)
         }
     }
 

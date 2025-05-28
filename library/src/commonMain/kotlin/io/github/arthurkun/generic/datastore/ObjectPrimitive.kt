@@ -4,9 +4,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 
 /**
@@ -36,22 +38,33 @@ class ObjectPrimitive<T>(
 ) {
     private val stringPrefKey = stringPreferencesKey(key)
 
-    override suspend fun get(): T = datastore
-        .data
-        .map { prefs ->
-            prefs[stringPrefKey]?.let { deserializer(it) } ?: this@ObjectPrimitive.defaultValue
+    private val ioDispatcher = Dispatchers.IO
+
+    override suspend fun get(): T {
+        return withContext(ioDispatcher) {
+            datastore
+                .data
+                .map { prefs ->
+                    prefs[stringPrefKey]?.let { deserializer(it) }
+                        ?: this@ObjectPrimitive.defaultValue
+                }
+                .first()
         }
-        .first()
+    }
 
     override suspend fun set(value: T) {
-        datastore.edit { prefs ->
-            prefs[stringPrefKey] = serializer(value)
+        withContext(ioDispatcher) {
+            datastore.edit { prefs ->
+                prefs[stringPrefKey] = serializer(value)
+            }
         }
     }
 
     override suspend fun delete() {
-        datastore.edit { prefs ->
-            prefs.remove(stringPrefKey)
+        withContext(ioDispatcher) {
+            datastore.edit { prefs ->
+                prefs.remove(stringPrefKey)
+            }
         }
     }
 
