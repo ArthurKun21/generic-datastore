@@ -107,40 +107,34 @@ version = "1.0.0"
 
 publishing {
     publications {
-        // Remove the old Android-specific publication
-        // create<MavenPublication>("release") { ... }
+        withType<MavenPublication> {
+            groupId = "com.github.arthurkun" 
+            artifactId = "generic-datastore"
+            version = project.version.toString()
 
-        // Publications will be created automatically for each target by the KMP plugin.
-        // You might need to configure them further, e.g., for Maven Central.
-        // Example:
-        // withType<MavenPublication> {
-        //     groupId = "io.github.arthurkun"
-        //     artifactId = "generic-datastore-${project.name.toLowerCase()}" // Or a fixed artifactId if preferred
-        //     version = project.version.toString()
-
-        //     pom {
-        //         name.set("Generic Datastore Library")
-        //         description.set("A generic datastore library for Kotlin Multiplatform.")
-        //         url.set("https://github.com/arthurkun/generic-datastore")
-        //         licenses {
-        //             license {
-        //                 name.set("The Apache License, Version 2.0")
-        //                 url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-        //             }
-        //         }
-        //         developers {
-        //             developer {
-        //                 id.set("arthurkun")
-        //                 name.set("Arthur Kun")
-        //                 email.set("your-email@example.com")
-        //             }
-        //         }
-        //         scm {
-        //             connection.set("scm:git:git://github.com/arthurkun/generic-datastore.git")
-        //             developerConnection.set("scm:git:ssh://github.com/arthurkun/generic-datastore.git")
-        //             url.set("https://github.com/arthurkun/generic-datastore")
-        //         }
-        //     }
-        // }
+            pom {
+                name.set("Generic Datastore Library")
+                description.set("A generic datastore library for Kotlin Multiplatform.")
+                url.set("https://github.com/arthurkun/generic-datastore")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("arthurkun")
+                        name.set("Arthur")
+                        email.set("16458204+ArthurKun21@users.noreply.github.com")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/arthurkun/generic-datastore.git")
+                    developerConnection.set("scm:git:ssh://github.com/arthurkun/generic-datastore.git")
+                    url.set("https://github.com/arthurkun/generic-datastore")
+                }
+            }
+        }
     }
 }
