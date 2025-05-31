@@ -33,7 +33,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(libs.bundles.datastore)
+                implementation(libs.datastore.preferences.core)
                 implementation(libs.bundles.library.compose)
             }
         }
@@ -48,6 +48,7 @@ kotlin {
         val androidMain by getting
         val androidInstrumentedTest by getting {
             dependencies {
+                implementation(libs.datastore.preferences)
                 implementation(libs.kotlin.test)
                 implementation(libs.junit4)
                 implementation(libs.coroutines.test)
