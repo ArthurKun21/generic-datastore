@@ -86,9 +86,7 @@ fun MainScreen(
             scope.launch(Dispatchers.IO) {
                 try {
                     val values = vm.exportPreferences()
-                    val jsonConfig = Json {
-                        prettyPrint = true
-                    }
+                    val jsonConfig = Json { prettyPrint = true }
 
                     val json = jsonConfig.encodeToString(
                         values.toJsonElement(),
