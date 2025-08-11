@@ -5,4 +5,7 @@ import io.github.arthurkun.generic.datastore.app.domain.PreferenceStore
 
 class MainViewModel(
     val preferenceStore: PreferenceStore,
-) : ViewModel()
+) : ViewModel() {
+
+    suspend fun exportPreferences() = preferenceStore.exportPreferences()
+}

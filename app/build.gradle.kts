@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.activity.compose)
 
     implementation(libs.bundles.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.test.junit)

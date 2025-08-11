@@ -1,5 +1,9 @@
 package io.github.arthurkun.generic.datastore.app.ui
 
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,8 +25,10 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +38,10 @@ import io.github.arthurkun.generic.datastore.app.domain.Animal
 import io.github.arthurkun.generic.datastore.app.domain.Theme
 import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
 import io.github.arthurkun.generic.datastore.remember
+import io.github.arthurkun.generic.datastore.toJsonElement
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import kotlin.time.Clock
 
 @Composable
@@ -44,6 +54,40 @@ fun MainScreen(
     var bool by vm.preferenceStore.bool.remember()
     var animal by vm.preferenceStore.customObject.remember()
     var duration by vm.preferenceStore.duration.remember()
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    val exportPreference = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        uri?.let { uriString ->
+            scope.launch(Dispatchers.IO) {
+                try {
+                    val values = vm.exportPreferences()
+                    val jsonConfig = Json {
+                        prettyPrint = true
+                    }
+
+                    val json = jsonConfig.encodeToString(
+                        values.toJsonElement(),
+                    )
+                    context.contentResolver
+                        .openOutputStream(uriString)
+                        ?.use {
+                            it.write(json.toByteArray())
+                        }
+                } catch (e: Exception) {
+                    Log.e("MainScreen", "Error exporting preferences", e)
+                    Toast.makeText(
+                        context,
+                        "Error exporting preferences",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
+        }
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -244,6 +288,42 @@ fun MainScreen(
                     "Update Duration",
                     style = MaterialTheme.typography.headlineSmall,
                 )
+            }
+        }
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
+
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            ) {
+                Button(
+                    onClick = {
+                        exportPreference.launch("preferences.json")
+                    },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        "Export",
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                }
+                Button(
+                    onClick = {
+
+                    },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        "Import",
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                }
             }
         }
     }
