@@ -1,5 +1,9 @@
 package io.github.arthurkun.generic.datastore.app.ui
 
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,8 +25,10 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +38,9 @@ import io.github.arthurkun.generic.datastore.app.domain.Animal
 import io.github.arthurkun.generic.datastore.app.domain.Theme
 import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
 import io.github.arthurkun.generic.datastore.remember
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 
 @Composable
@@ -44,6 +53,65 @@ fun MainScreen(
     var bool by vm.preferenceStore.bool.remember()
     var animal by vm.preferenceStore.customObject.remember()
     var duration by vm.preferenceStore.duration.remember()
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    val importPreference = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        uri?.let { selectedUri ->
+            scope.launch(Dispatchers.IO) {
+                try {
+                    val jsonString = context
+                        .contentResolver
+                        .openInputStream(selectedUri)
+                        ?.use { inputSteam ->
+                            inputSteam.reader().readText()
+                        }
+                    jsonString?.let {
+                        vm.importPreferences(it)
+                    }
+                } catch (e: Exception) {
+                    Log.e("MainScreen", "Error importing preferences", e)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            "Error importing preferences",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
+
+    val exportPreference = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        uri?.let { selectedUri ->
+            scope.launch(Dispatchers.IO) {
+                try {
+                    val json = vm.exportPreferences()
+
+                    context.contentResolver
+                        .openOutputStream(selectedUri)
+                        ?.use {
+                            it.write(json.toByteArray())
+                        }
+                } catch (e: Exception) {
+                    Log.e("MainScreen", "Error exporting preferences", e)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            "Error exporting preferences",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -244,6 +312,45 @@ fun MainScreen(
                     "Update Duration",
                     style = MaterialTheme.typography.headlineSmall,
                 )
+            }
+        }
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
+
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            ) {
+                Button(
+                    onClick = {
+                        exportPreference.launch("preferences.json")
+                    },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        "Export",
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                }
+                Button(
+                    onClick = {
+                        importPreference.launch(
+                            // octet-stream as backup in case Android doesn't detect json
+                            arrayOf("application/json", "application/octet-stream"),
+                        )
+                    },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        "Import",
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                }
             }
         }
     }

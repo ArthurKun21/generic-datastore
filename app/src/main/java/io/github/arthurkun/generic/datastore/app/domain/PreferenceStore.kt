@@ -6,7 +6,7 @@ import io.github.arthurkun.generic.datastore.mapIO
 import kotlin.time.Instant
 
 class PreferenceStore(
-    datastore: GenericPreferenceDatastore,
+    private val datastore: GenericPreferenceDatastore,
 ) {
 
     val theme = datastore.enum(
@@ -47,4 +47,8 @@ class PreferenceStore(
             it.toEpochMilliseconds()
         },
     )
+
+    suspend fun exportPreferences() = datastore.export()
+
+    suspend fun importPreferences(data: Map<String, Any>) = datastore.import(data)
 }

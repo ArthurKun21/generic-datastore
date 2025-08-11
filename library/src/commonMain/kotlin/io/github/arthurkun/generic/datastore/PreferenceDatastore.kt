@@ -1,5 +1,7 @@
 package io.github.arthurkun.generic.datastore
 
+import kotlinx.serialization.json.JsonElement
+
 /**
  * Defines the contract for a preference data store.
  *
@@ -76,4 +78,13 @@ interface PreferenceDatastore {
         serializer: (T) -> String,
         deserializer: (String) -> T,
     ): Prefs<T>
+
+    suspend fun export(
+        exportPrivate: Boolean = false,
+        exportAppState: Boolean = false,
+    ): Map<String, JsonElement>
+
+    suspend fun import(
+        data: Map<String, Any>,
+    )
 }
