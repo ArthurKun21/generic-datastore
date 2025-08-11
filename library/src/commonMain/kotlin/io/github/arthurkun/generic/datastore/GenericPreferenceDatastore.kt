@@ -187,7 +187,7 @@ class GenericPreferenceDatastore(
                     is Boolean -> mutablePreferences[booleanPreferencesKey(key)] = value
                     is Collection<*> -> {
                         @Suppress("UNCHECKED_CAST")
-                        mutablePreferences[stringSetPreferencesKey(key)] = (value as Collection<String>).toSet()
+                        mutablePreferences[stringSetPreferencesKey(key)] = value.map { "$it" }.toSet()
                     }
 
                     else -> {
