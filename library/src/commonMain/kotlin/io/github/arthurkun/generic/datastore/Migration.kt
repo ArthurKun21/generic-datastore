@@ -48,7 +48,7 @@ private fun parseJsonValue(element: JsonElement): Any {
  */
 fun String.toJsonMap(): Map<String, Any> = Json.parseToJsonElement(this)
     .jsonObject
-    .map { (k, v) ->
-        k to parseJsonValue(v)
+    .mapNotNull { (k, v) ->
+        if (v is JsonNull) null else k to parseJsonValue(v)
     }
     .toMap()
