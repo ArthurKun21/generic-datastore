@@ -178,7 +178,7 @@ class GenericPreferenceDatastore(
     override suspend fun import(data: Map<String, Any>) {
         datastore.updateData { currentPreferences ->
             val mutablePreferences = currentPreferences.toMutablePreferences()
-            data.map { (key, value) ->
+            data.forEach { (key, value) ->
                 when (value) {
                     is String -> mutablePreferences[stringPreferencesKey(key)] = value
                     is Long -> mutablePreferences[longPreferencesKey(key)] = value
