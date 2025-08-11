@@ -7,18 +7,33 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
 import io.github.arthurkun.generic.datastore.app.theme.GenericDataStoreAppTheme
 import io.github.arthurkun.generic.datastore.app.ui.MainScreen
 import io.github.arthurkun.generic.datastore.app.ui.MainViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainViewModel: MainViewModel
 
+    private val scope = CoroutineScope(Dispatchers.IO)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val appContainer = (application as MainApplication).appContainer
+
+        scope.launch {
+            appContainer.preferenceStore.theme.asFlow().collect { theme ->
+                withContext(Dispatchers.Main) {
+                    setAppCompatDelegateThemeMode(theme)
+                }
+            }
+        }
 
         mainViewModel = MainViewModel(appContainer.preferenceStore)
 
