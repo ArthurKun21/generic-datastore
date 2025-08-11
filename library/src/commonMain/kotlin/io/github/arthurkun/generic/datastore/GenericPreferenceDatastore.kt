@@ -185,14 +185,18 @@ class GenericPreferenceDatastore(
                     is Int -> mutablePreferences[intPreferencesKey(key)] = value
                     is Float -> mutablePreferences[floatPreferencesKey(key)] = value
                     is Boolean -> mutablePreferences[booleanPreferencesKey(key)] = value
-                    is Set<*> -> {
+                    is Collection<*> -> {
                         @Suppress("UNCHECKED_CAST")
-                        mutablePreferences[stringSetPreferencesKey(key)] = value as Set<String>
+                        mutablePreferences[stringSetPreferencesKey(key)] = (value as Collection<String>).toSet()
                     }
 
                     else -> {
-                        // Handle custom objects or unsupported types
-                        mutablePreferences[stringPreferencesKey(key)] = "$value"
+                        // Handle custom objects or unsupported types by serializing them back to a JSON string.
+                        val stringValue = when (value) {
+                            is Map<*, *>, is Collection<*> -> value.toJsonElement().toString()
+                            else -> value.toString()
+                        }
+                        mutablePreferences[stringPreferencesKey(key)] = stringValue
                     }
                 }
             }
