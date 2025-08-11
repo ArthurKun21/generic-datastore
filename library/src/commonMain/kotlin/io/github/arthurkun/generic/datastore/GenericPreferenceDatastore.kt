@@ -2,12 +2,22 @@ package io.github.arthurkun.generic.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.GenericPreference.BooleanPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.FloatPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.IntPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.LongPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.StringPrimitive
 import io.github.arthurkun.generic.datastore.GenericPreference.StringSetPrimitive
+import io.github.arthurkun.generic.datastore.Preference.Companion.isAppState
+import io.github.arthurkun.generic.datastore.Preference.Companion.isPrivate
+import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.JsonElement
 
 /**
  * A DataStore implementation that provides methods for creating and managing various types of preferences.
@@ -146,4 +156,47 @@ class GenericPreferenceDatastore(
             deserializer = deserializer,
         ),
     )
+
+    override suspend fun export(exportPrivate: Boolean, exportAppState: Boolean): Map<String, JsonElement> {
+        return datastore
+            .data
+            .first()
+            .toPreferences()
+            .asMap()
+            .mapNotNull { (key, values) ->
+                if (!exportPrivate && isPrivate(key.name)) {
+                    null
+                } else if (!exportAppState && isAppState(key.name)) {
+                    null
+                } else {
+                    key.name to values.toJsonElement()
+                }
+            }
+            .toMap()
+    }
+
+    override suspend fun import(data: Map<String, Any>) {
+        datastore.updateData { currentPreferences ->
+            val mutablePreferences = currentPreferences.toMutablePreferences()
+            data.map { (key, value) ->
+                when (value) {
+                    is String -> mutablePreferences[stringPreferencesKey(key)] = value
+                    is Long -> mutablePreferences[longPreferencesKey(key)] = value
+                    is Int -> mutablePreferences[intPreferencesKey(key)] = value
+                    is Float -> mutablePreferences[floatPreferencesKey(key)] = value
+                    is Boolean -> mutablePreferences[booleanPreferencesKey(key)] = value
+                    is Set<*> -> {
+                        @Suppress("UNCHECKED_CAST")
+                        mutablePreferences[stringSetPreferencesKey(key)] = value as Set<String>
+                    }
+
+                    else -> {
+                        // Handle custom objects or unsupported types
+                        mutablePreferences[stringPreferencesKey(key)] = "$value"
+                    }
+                }
+            }
+            mutablePreferences.toPreferences()
+        }
+    }
 }

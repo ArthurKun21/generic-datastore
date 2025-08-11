@@ -23,6 +23,7 @@ test-espresso = "3.7.0"
 leakcanary = "2.14"
 
 datastore = "1.1.7"
+kotlinx_serialization = "1.9.0"
 
 coroutines = "1.10.2"
 
@@ -60,8 +61,8 @@ compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", ve
 leak-canary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
-
 datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx_serialization" }
 
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
