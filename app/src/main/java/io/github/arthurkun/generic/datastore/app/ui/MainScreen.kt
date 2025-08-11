@@ -38,11 +38,9 @@ import io.github.arthurkun.generic.datastore.app.domain.Animal
 import io.github.arthurkun.generic.datastore.app.domain.Theme
 import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
 import io.github.arthurkun.generic.datastore.remember
-import io.github.arthurkun.generic.datastore.toJsonElement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import kotlin.time.Clock
 
 @Composable
@@ -94,12 +92,8 @@ fun MainScreen(
         uri?.let { uriString ->
             scope.launch(Dispatchers.IO) {
                 try {
-                    val values = vm.exportPreferences()
-                    val jsonConfig = Json { prettyPrint = true }
+                    val json = vm.exportPreferences()
 
-                    val json = jsonConfig.encodeToString(
-                        values.toJsonElement(),
-                    )
                     context.contentResolver
                         .openOutputStream(uriString)
                         ?.use {
