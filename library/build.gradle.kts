@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     `maven-publish`
@@ -9,16 +7,10 @@ plugins {
 
 kotlin {
     androidTarget {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_17
-        }
         publishLibraryVariants("release")
     }
 
     jvm("desktop") {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_17
-        }
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }
