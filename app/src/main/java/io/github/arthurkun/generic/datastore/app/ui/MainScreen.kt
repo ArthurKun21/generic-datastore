@@ -60,12 +60,12 @@ fun MainScreen(
     val importPreference = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument(),
     ) { uri ->
-        uri?.let { uriString ->
+        uri?.let { selectedUri ->
             scope.launch(Dispatchers.IO) {
                 try {
                     val jsonString = context
                         .contentResolver
-                        .openInputStream(uriString)
+                        .openInputStream(selectedUri)
                         ?.use { inputSteam ->
                             inputSteam.reader().readText()
                         }
@@ -89,13 +89,13 @@ fun MainScreen(
     val exportPreference = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/json"),
     ) { uri ->
-        uri?.let { uriString ->
+        uri?.let { selectedUri ->
             scope.launch(Dispatchers.IO) {
                 try {
                     val json = vm.exportPreferences()
 
                     context.contentResolver
-                        .openOutputStream(uriString)
+                        .openOutputStream(selectedUri)
                         ?.use {
                             it.write(json.toByteArray())
                         }
