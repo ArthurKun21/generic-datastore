@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.spotless)
 }
 
 android {
@@ -73,4 +74,21 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
     debugImplementation(libs.leak.canary)
+}
+
+spotless {
+    kotlin {
+        target("**/*.kt", "**/*.kts")
+        targetExclude("**/build/**/*.kt")
+        ktlint(libs.ktlint.core.get().version).editorConfigOverride(
+            mapOf("ktlint_standard_annotation" to "disabled"),
+        )
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    format("xml") {
+        target("**/*.xml")
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
 }

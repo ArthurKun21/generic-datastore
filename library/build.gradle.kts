@@ -3,6 +3,7 @@ plugins {
     `maven-publish`
     id("com.android.library")
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.spotless)
 }
 
 kotlin {
@@ -101,7 +102,7 @@ version = "1.0.0"
 publishing {
     publications {
         withType<MavenPublication> {
-            groupId = "com.github.arthurkun" 
+            groupId = "com.github.arthurkun"
             artifactId = "generic-datastore"
             version = project.version.toString()
 
