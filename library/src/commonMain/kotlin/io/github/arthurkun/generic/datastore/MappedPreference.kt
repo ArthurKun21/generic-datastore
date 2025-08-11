@@ -8,6 +8,25 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlin.reflect.KProperty
 
+/**
+ * Maps a [Prefs] of type [T] to a [Prefs] of type [R], inferring the default value by converting
+ * the default value of the original preference.
+ *
+ * This is a convenience function for cases where the conversion of the default value is guaranteed
+ * to be safe.
+ *
+ * **Warning:** This function will throw an exception during initialization if the `convert`
+ * function fails on the original preference's default value. For a safer version where you can
+ * provide an explicit default value of type [R], see [map].
+ *
+ * @param T The original type of the preference value in storage.
+ * @param R The target type for the preference value in the application.
+ * @param convert A lambda function `(T) -> R` for converting the stored value from type [T] to [R].
+ * @param reverse A lambda function `(R) -> T` for converting an application value from type [R]
+ *   back to type [T] for storage.
+ * @return A new [Prefs] instance of type [R].
+ * @throws Exception if `convert(this.defaultValue)` fails.
+ */
 @Suppress("unused")
 fun <T, R> Prefs<T>.mapIO(
     convert: (T) -> R,
