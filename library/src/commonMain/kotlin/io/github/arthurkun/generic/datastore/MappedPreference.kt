@@ -8,6 +8,19 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlin.reflect.KProperty
 
+@Suppress("unused")
+fun <T, R> Prefs<T>.mapIO(
+    convert: (T) -> R,
+    reverse: (R) -> T,
+): Prefs<R> =
+    MappedPrefs(
+        prefs = this,
+        defaultValue = convert(this.defaultValue),
+        convert = convert,
+        reverse = reverse
+    )
+
+
 /**
  * Maps a [Prefs] of type [T] to a [Prefs] of type [R] using provided converter functions.
  *

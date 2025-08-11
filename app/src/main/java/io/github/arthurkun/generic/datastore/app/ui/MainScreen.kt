@@ -32,6 +32,7 @@ import io.github.arthurkun.generic.datastore.app.domain.Animal
 import io.github.arthurkun.generic.datastore.app.domain.Theme
 import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
 import io.github.arthurkun.generic.datastore.remember
+import kotlin.time.Clock
 
 @Composable
 fun MainScreen(
@@ -42,6 +43,7 @@ fun MainScreen(
     var num by vm.preferenceStore.num.remember()
     var bool by vm.preferenceStore.bool.remember()
     var animal by vm.preferenceStore.customObject.remember()
+    var duration by vm.preferenceStore.duration.remember()
 
     LazyColumn(
         modifier = Modifier
@@ -208,6 +210,40 @@ fun MainScreen(
                         }
                     )
             )
+        }
+
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+        item {
+            Text(
+                "Duration",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
+
+        item {
+            Text(
+                "$duration",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
+        item {
+            Button(
+                onClick = {
+                    duration = Clock.System.now()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    "Update Duration",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
         }
     }
 }
