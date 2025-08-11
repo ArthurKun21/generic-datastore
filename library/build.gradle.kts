@@ -3,7 +3,6 @@ plugins {
     `maven-publish`
     id("com.android.library")
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.spotless)
 }
 
 kotlin {
@@ -79,7 +78,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }

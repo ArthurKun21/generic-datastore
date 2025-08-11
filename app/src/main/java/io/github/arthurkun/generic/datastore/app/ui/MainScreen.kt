@@ -48,12 +48,12 @@ fun MainScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         item {
             Text(
                 "String",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
         }
         item {
@@ -65,18 +65,18 @@ fun MainScreen(
                 label = {
                     Text("text")
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
         item {
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 8.dp),
             )
         }
         item {
             Text(
                 "Integer",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
         }
         item {
@@ -85,37 +85,39 @@ fun MainScreen(
                     Text(
                         "$num",
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 },
                 leadingContent = {
-                    Button(onClick = {
-                        num -= 1
-                    }
+                    Button(
+                        onClick = {
+                            num -= 1
+                        },
                     ) {
                         Icon(Icons.Default.Remove, contentDescription = "Decrement")
                     }
                 },
                 trailingContent = {
-                    Button(onClick = {
-                        num += 1
-                    }
+                    Button(
+                        onClick = {
+                            num += 1
+                        },
                     ) {
                         Icon(Icons.Default.Add, contentDescription = "Increment")
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
         item {
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 8.dp),
             )
         }
         item {
             Text(
                 "Boolean",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
         }
         item {
@@ -124,7 +126,7 @@ fun MainScreen(
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Button(
                     onClick = {
@@ -132,7 +134,7 @@ fun MainScreen(
                     },
                     enabled = !bool,
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(1f),
                 ) {
                     Text("true")
                 }
@@ -142,22 +144,21 @@ fun MainScreen(
                     },
                     enabled = bool,
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(1f),
                 ) {
                     Text("false")
                 }
-
             }
         }
         item {
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 8.dp),
             )
         }
         item {
             Text(
                 "Enum",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
         }
         items(Theme.entries) { entry ->
@@ -168,7 +169,7 @@ fun MainScreen(
                 leadingContent = {
                     RadioButton(
                         selected = entry == theme,
-                        onClick = null
+                        onClick = null,
                     )
                 },
                 modifier = Modifier
@@ -178,15 +179,15 @@ fun MainScreen(
                         onClick = {
                             theme = entry
                             setAppCompatDelegateThemeMode(entry)
-                        }
-                    )
+                        },
+                    ),
             )
         }
 
         item {
             Text(
                 "Serializer",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
         }
 
@@ -198,7 +199,7 @@ fun MainScreen(
                 leadingContent = {
                     RadioButton(
                         selected = entry == animal,
-                        onClick = null
+                        onClick = null,
                     )
                 },
                 modifier = Modifier
@@ -207,27 +208,27 @@ fun MainScreen(
                         selected = entry == animal,
                         onClick = {
                             animal = entry
-                        }
-                    )
+                        },
+                    ),
             )
         }
 
         item {
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 8.dp),
             )
         }
         item {
             Text(
                 "Duration",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
         }
 
         item {
             Text(
                 "$duration",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
         }
         item {
@@ -237,11 +238,11 @@ fun MainScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
             ) {
                 Text(
                     "Update Duration",
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
                 )
             }
         }

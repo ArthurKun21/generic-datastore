@@ -45,6 +45,6 @@ class PreferenceStore(
         },
         reverse = {
             it.toEpochMilliseconds()
-        }
+        },
     )
 }

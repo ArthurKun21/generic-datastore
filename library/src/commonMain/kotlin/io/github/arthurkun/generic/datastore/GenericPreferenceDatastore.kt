@@ -36,7 +36,7 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
-            )
+            ),
         )
 
     /**
@@ -52,7 +52,7 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
-            )
+            ),
         )
 
     /**
@@ -68,9 +68,8 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
-            )
+            ),
         )
-
 
     /**
      * Creates a Float preference.
@@ -85,7 +84,7 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
-            )
+            ),
         )
 
     /**
@@ -101,7 +100,7 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
-            )
+            ),
         )
 
     /**
@@ -120,7 +119,7 @@ class GenericPreferenceDatastore(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
-            )
+            ),
         )
 
     /**
@@ -145,7 +144,6 @@ class GenericPreferenceDatastore(
             defaultValue = defaultValue,
             serializer = serializer,
             deserializer = deserializer,
-        )
+        ),
     )
-
 }

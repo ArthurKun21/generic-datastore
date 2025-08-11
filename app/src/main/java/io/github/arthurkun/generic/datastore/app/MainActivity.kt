@@ -26,14 +26,13 @@ class MainActivity : AppCompatActivity() {
             GenericDataStoreAppTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.surface
+                    color = MaterialTheme.colorScheme.surface,
                 ) {
                     MainScreen(
-                        vm = mainViewModel
+                        vm = mainViewModel,
                     )
                 }
             }
         }
     }
 }
-
