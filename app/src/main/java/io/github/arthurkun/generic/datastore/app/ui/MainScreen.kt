@@ -41,6 +41,7 @@ import io.github.arthurkun.generic.datastore.remember
 import io.github.arthurkun.generic.datastore.toJsonElement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlin.time.Clock
 
@@ -99,11 +100,13 @@ fun MainScreen(
                         }
                 } catch (e: Exception) {
                     Log.e("MainScreen", "Error exporting preferences", e)
-                    Toast.makeText(
-                        context,
-                        "Error exporting preferences",
-                        Toast.LENGTH_SHORT,
-                    ).show()
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            "Error exporting preferences",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    }
                 }
             }
         }
