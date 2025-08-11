@@ -68,9 +68,7 @@ fun MainScreen(
                     .contentResolver
                     .openInputStream(uriString)
                     ?.use { inputSteam ->
-                        inputSteam.use {
-                            it.reader().readText()
-                        }
+                        inputSteam.reader().readText()
                     }
                 jsonString?.let {
                     vm.importPreferences(it)
