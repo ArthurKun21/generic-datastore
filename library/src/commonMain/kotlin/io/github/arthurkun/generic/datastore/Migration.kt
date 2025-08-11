@@ -1,5 +1,6 @@
 package io.github.arthurkun.generic.datastore
 
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -46,9 +47,15 @@ private fun parseJsonValue(element: JsonElement): Any {
 /**
  * Parse a JSON string to a Map<String, Any>
  */
-fun String.toJsonMap(): Map<String, Any> = Json.parseToJsonElement(this)
-    .jsonObject
-    .mapNotNull { (k, v) ->
-        if (v is JsonNull) null else k to parseJsonValue(v)
-    }
-    .toMap()
+fun String.toJsonMap(): Map<String, Any> = try {
+    Json.parseToJsonElement(this)
+        .jsonObject
+        .mapNotNull { (k, v) ->
+            if (v is JsonNull) null else k to parseJsonValue(v)
+        }
+        .toMap()
+} catch (e: SerializationException) {
+    throw IllegalArgumentException("Failed to parse JSON string in toJsonMap: ${e.message}", e)
+} catch (e: IllegalArgumentException) {
+    throw IllegalArgumentException("Failed to parse JSON string in toJsonMap: ${e.message}", e)
+}
