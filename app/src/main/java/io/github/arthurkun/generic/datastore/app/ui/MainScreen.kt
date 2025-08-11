@@ -58,6 +58,26 @@ fun MainScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    val importPreference = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        uri?.let { uriString ->
+            scope.launch(Dispatchers.IO) {
+                val jsonString = context
+                    .contentResolver
+                    .openInputStream(uriString)
+                    ?.use { inputSteam ->
+                        inputSteam.use {
+                            it.reader().readText()
+                        }
+                    }
+                jsonString?.let {
+                    vm.importPreferences(it)
+                }
+            }
+        }
+    }
+
     val exportPreference = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/json"),
     ) { uri ->
@@ -315,7 +335,10 @@ fun MainScreen(
                 }
                 Button(
                     onClick = {
-
+                        importPreference.launch(
+                            // octet-stream as backup in case Android doesn't detect json
+                            arrayOf("application/json", "application/octet-stream"),
+                        )
                     },
                     modifier = Modifier.weight(1f),
                 ) {

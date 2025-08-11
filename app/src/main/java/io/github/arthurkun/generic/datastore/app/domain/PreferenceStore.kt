@@ -49,4 +49,6 @@ class PreferenceStore(
     )
 
     suspend fun exportPreferences() = datastore.export()
+
+    suspend fun importPreferences(data: Map<String, Any>) = datastore.import(data)
 }
