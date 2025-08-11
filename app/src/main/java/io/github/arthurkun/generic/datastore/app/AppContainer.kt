@@ -13,21 +13,21 @@ class AppContainer(context: Context) {
     // https://developer.android.com/kotlin/multiplatform/datastore#common
     fun createDataStore(producePath: () -> String): DataStore<Preferences> =
         PreferenceDataStoreFactory.createWithPath(
-            produceFile = { producePath().toPath() }
+            produceFile = { producePath().toPath() },
         )
 
     private val dataStoreFileName = "dice.preferences_pb"
 
     // https://developer.android.com/kotlin/multiplatform/datastore#android
     private fun createDataStore(context: Context): DataStore<Preferences> = createDataStore(
-        producePath = { context.filesDir.resolve(dataStoreFileName).absolutePath }
+        producePath = { context.filesDir.resolve(dataStoreFileName).absolutePath },
     )
 
     private val genericPreferenceDatastore = GenericPreferenceDatastore(
-        datastore = createDataStore(context)
+        datastore = createDataStore(context),
     )
 
     val preferenceStore = PreferenceStore(
-        genericPreferenceDatastore
+        genericPreferenceDatastore,
     )
 }

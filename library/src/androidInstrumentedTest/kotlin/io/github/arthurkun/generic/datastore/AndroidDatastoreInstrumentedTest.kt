@@ -46,7 +46,7 @@ class AndroidDatastoreInstrumentedTest {
         testScope = CoroutineScope(Job() + testDispatcher)
         dataStore = PreferenceDataStoreFactory.create(
             scope = testScope,
-            produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_NAME) }
+            produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_NAME) },
         )
         // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
         preferenceDatastore = GenericPreferenceDatastore(dataStore)
@@ -232,7 +232,7 @@ class AndroidDatastoreInstrumentedTest {
             deserializer = { str ->
                 val parts = str.split(",", limit = 2)
                 SerializableObject(parts[0].toInt(), parts[1])
-            }
+            },
         )
         assertEquals(serializedPref.get(), defaultObj)
     }
@@ -248,7 +248,7 @@ class AndroidDatastoreInstrumentedTest {
             deserializer = { str ->
                 val parts = str.split(",", limit = 2)
                 SerializableObject(parts[0].toInt(), parts[1])
-            }
+            },
         )
         serializedPref.set(newObj)
         assertEquals(serializedPref.get(), newObj)
@@ -265,7 +265,7 @@ class AndroidDatastoreInstrumentedTest {
             deserializer = { str ->
                 val parts = str.split(",", limit = 2)
                 SerializableObject(parts[0].toInt(), parts[1])
-            }
+            },
         )
         serializedPref.set(newObj)
         val value = serializedPref.asFlow().first()
@@ -283,7 +283,7 @@ class AndroidDatastoreInstrumentedTest {
             deserializer = { str ->
                 val parts = str.split(",", limit = 2)
                 SerializableObject(parts[0].toInt(), parts[1])
-            }
+            },
         )
         serializedPref.set(objToDelete)
         assertEquals(serializedPref.get(), objToDelete)
@@ -299,7 +299,7 @@ class AndroidDatastoreInstrumentedTest {
         val mappedPref = intPref.map(
             defaultValue = "MappedDefault",
             convert = { "MappedValue_$it" },
-            reverse = { it.removePrefix("MappedValue_").toInt() }
+            reverse = { it.removePrefix("MappedValue_").toInt() },
         )
         assertEquals(mappedPref.get(), "MappedValue_0")
     }
@@ -310,7 +310,7 @@ class AndroidDatastoreInstrumentedTest {
         val mappedPref = intPref.map(
             defaultValue = "MappedDefault",
             convert = { "MappedValue_$it" },
-            reverse = { it.removePrefix("MappedValue_").toInt() }
+            reverse = { it.removePrefix("MappedValue_").toInt() },
         )
         mappedPref.set("MappedValue_100")
         assertEquals(mappedPref.get(), "MappedValue_100")
@@ -324,7 +324,7 @@ class AndroidDatastoreInstrumentedTest {
         val mappedPref = intPref.map(
             defaultValue = "MappedDefaultFlow",
             convert = { "FlowMapped_$it" },
-            reverse = { it.removePrefix("FlowMapped_").toInt() }
+            reverse = { it.removePrefix("FlowMapped_").toInt() },
         )
         mappedPref.set("FlowMapped_200")
         val value = mappedPref.asFlow().first()
@@ -338,7 +338,7 @@ class AndroidDatastoreInstrumentedTest {
         val mappedPref = intPref.map(
             defaultValue = "MappedDefaultDelete",
             convert = { "DeleteMapped_$it" },
-            reverse = { it.removePrefix("DeleteMapped_").toInt() }
+            reverse = { it.removePrefix("DeleteMapped_").toInt() },
         )
         mappedPref.set("DeleteMapped_500")
         assertEquals(mappedPref.get(), "DeleteMapped_500")
@@ -347,7 +347,7 @@ class AndroidDatastoreInstrumentedTest {
         mappedPref.delete() // This should delete the underlying intPref
         assertEquals(
             mappedPref.get(),
-            "DeleteMapped_50"
+            "DeleteMapped_50",
         ) // Mapped pref would return the converted default
         assertEquals(intPref.get(), 50) // Base pref should revert to its default
     }
@@ -358,7 +358,7 @@ class AndroidDatastoreInstrumentedTest {
         val mappedPref = intPref.map(
             defaultValue = "MappedDefaultError",
             convert = { throw RuntimeException("Conversion Error") },
-            reverse = { it.toInt() } // Not used in this path, but required
+            reverse = { it.toInt() }, // Not used in this path, but required
         )
 
         // Set a value in the base preference so there's something to convert
@@ -376,7 +376,7 @@ class AndroidDatastoreInstrumentedTest {
         val mappedPref = intPref.map(
             defaultValue = "MappedDefaultReverseError",
             convert = { "Converted_$it" },
-            reverse = { throw RuntimeException("Reverse Conversion Error") }
+            reverse = { throw RuntimeException("Reverse Conversion Error") },
         )
 
         // Attempt to set a value that will cause a reverse conversion error
@@ -413,5 +413,4 @@ class AndroidDatastoreInstrumentedTest {
         // mappedPref should reflect the conversion of the underlying's new state (default)
         assertEquals("Converted_20", mappedPref.get())
     }
-
 }

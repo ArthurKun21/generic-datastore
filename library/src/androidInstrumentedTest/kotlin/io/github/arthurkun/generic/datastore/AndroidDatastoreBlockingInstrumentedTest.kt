@@ -39,7 +39,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
             Dispatchers.setMain(testDispatcher)
             testContext = ApplicationProvider.getApplicationContext()
             dataStore = PreferenceDataStoreFactory.create(
-                produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_BLOCKING_NAME) }
+                produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_BLOCKING_NAME) },
             )
             preferenceDatastore = GenericPreferenceDatastore(dataStore)
         }
@@ -52,7 +52,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
             val dataStoreFile =
                 File(
                     testContext.filesDir,
-                    "datastore/${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb"
+                    "datastore/${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb",
                 )
             if (dataStoreFile.exists()) {
                 dataStoreFile.delete()
@@ -149,7 +149,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
             deserializer = { str ->
                 val parts = str.split(",", limit = 2)
                 SerializableObjectBlocking(parts[0].toInt(), parts[1])
-            }
+            },
         )
         serializedPref.setValue(objToReset)
         assertEquals(serializedPref.getValue(), objToReset)
@@ -165,7 +165,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         val mappedPref = intPref.map(
             defaultValue = "MappedDefaultReset",
             convert = { "ResetMapped_$it" },
-            reverse = { it.removePrefix("ResetMapped_").toInt() }
+            reverse = { it.removePrefix("ResetMapped_").toInt() },
         )
         mappedPref.setValue("ResetMapped_750")
         assertEquals(mappedPref.getValue(), "ResetMapped_750")
@@ -174,7 +174,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         mappedPref.resetToDefault() // This should reset the underlying intPref to its default
         assertEquals(
             mappedPref.getValue(),
-            "ResetMapped_75"
+            "ResetMapped_75",
         ) // Mapped pref would return the converted default
         assertEquals(intPref.getValue(), 75) // Base pref should be reset to its default
     }
@@ -310,7 +310,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
             deserializer = { str ->
                 val parts = str.split(",", limit = 2)
                 SerializableObjectBlocking(parts[0].toInt(), parts[1])
-            }
+            },
         )
         var delegatedValue: SerializableObjectBlocking by serializedPref
 
@@ -332,7 +332,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         val mappedPref = intPref.map(
             defaultValue = "MappedDelegateDefault",
             convert = { "DelegateMapped_$it" },
-            reverse = { it.removePrefix("DelegateMapped_").toInt() }
+            reverse = { it.removePrefix("DelegateMapped_").toInt() },
         )
         var delegatedValue: String by mappedPref
 
@@ -346,7 +346,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         mappedPref.resetToDefault() // This should reset the underlying intPref to its default
         assertEquals(
             "DelegateMapped_100",
-            delegatedValue
+            delegatedValue,
         ) // Mapped pref would return the converted default
         assertEquals("DelegateMapped_100", mappedPref.getValue())
         assertEquals(100, intPref.getValue()) // Base pref should be reset to its default

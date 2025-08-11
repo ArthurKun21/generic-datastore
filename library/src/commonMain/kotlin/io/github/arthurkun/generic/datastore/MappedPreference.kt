@@ -36,9 +36,8 @@ fun <T, R> Prefs<T>.mapIO(
         prefs = this,
         defaultValue = convert(this.defaultValue),
         convert = convert,
-        reverse = reverse
+        reverse = reverse,
     )
-
 
 /**
  * Maps a [Prefs] of type [T] to a [Prefs] of type [R] using provided converter functions.
@@ -72,7 +71,7 @@ fun <T, R> Prefs<T>.map(
         this,
         defaultValue,
         convert,
-        reverse
+        reverse,
     )
 
 /**
@@ -104,7 +103,7 @@ internal class MappedPrefs<T, R>(
         return try {
             convert(value)
         } catch (e: Exception) {
-            println("${TAG}: Error converting preference value $e")
+            println("$TAG: Error converting preference value $e")
             defaultValue
         }
     }
@@ -121,7 +120,7 @@ internal class MappedPrefs<T, R>(
         return try {
             reverse(value)
         } catch (e: Exception) {
-            println("${TAG}: Error converting preference value $e")
+            println("$TAG: Error converting preference value $e")
             prefs.defaultValue
         }
     }
@@ -131,7 +130,6 @@ internal class MappedPrefs<T, R>(
     override suspend fun set(value: R) = prefs.set(reverseFallback(value))
 
     override suspend fun delete() = prefs.delete()
-
 
     override fun asFlow(): Flow<R> = prefs.asFlow().map { convertFallback(it) }
 
@@ -151,5 +149,4 @@ internal class MappedPrefs<T, R>(
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: R) {
         setValue(value)
     }
-
 }

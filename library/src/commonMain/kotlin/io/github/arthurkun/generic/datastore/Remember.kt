@@ -1,6 +1,5 @@
 package io.github.arthurkun.generic.datastore
 
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember

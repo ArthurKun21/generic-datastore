@@ -78,7 +78,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -101,7 +101,7 @@ version = "1.0.0"
 publishing {
     publications {
         withType<MavenPublication> {
-            groupId = "com.github.arthurkun" 
+            groupId = "com.github.arthurkun"
             artifactId = "generic-datastore"
             version = project.version.toString()
 

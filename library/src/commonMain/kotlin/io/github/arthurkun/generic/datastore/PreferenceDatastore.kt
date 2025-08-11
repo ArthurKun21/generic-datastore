@@ -22,7 +22,7 @@ interface PreferenceDatastore {
      * @param defaultValue The default Long value (defaults to 0).
      * @return A [Prefs] instance for the Long preference.
      */
-    fun long(key: String, defaultValue: Long = 0) : Prefs<Long>
+    fun long(key: String, defaultValue: Long = 0): Prefs<Long>
 
     /**
      * Creates an Int preference.
@@ -31,7 +31,7 @@ interface PreferenceDatastore {
      * @param defaultValue The default Int value (defaults to 0).
      * @return A [Prefs] instance for the Int preference.
      */
-    fun int(key: String, defaultValue: Int = 0) : Prefs<Int>
+    fun int(key: String, defaultValue: Int = 0): Prefs<Int>
 
     /**
      * Creates a Float preference.
@@ -40,7 +40,7 @@ interface PreferenceDatastore {
      * @param defaultValue The default Float value (defaults to 0f).
      * @return A [Prefs] instance for the Float preference.
      */
-    fun float(key: String, defaultValue: Float = 0f) : Prefs<Float>
+    fun float(key: String, defaultValue: Float = 0f): Prefs<Float>
 
     /**
      * Creates a Boolean preference.
@@ -49,7 +49,7 @@ interface PreferenceDatastore {
      * @param defaultValue The default Boolean value (defaults to false).
      * @return A [Prefs] instance for the Boolean preference.
      */
-    fun bool(key: String, defaultValue: Boolean = false) : Prefs<Boolean>
+    fun bool(key: String, defaultValue: Boolean = false): Prefs<Boolean>
 
     /**
      * Creates a Set<String> preference.
@@ -58,7 +58,7 @@ interface PreferenceDatastore {
      * @param defaultValue The default Set<String> value (defaults to an empty set).
      * @return A [Prefs] instance for the Set<String> preference.
      */
-    fun stringSet(key: String, defaultValue: Set<String> = emptySet()) : Prefs<Set<String>>
+    fun stringSet(key: String, defaultValue: Set<String> = emptySet()): Prefs<Set<String>>
 
     /**
      * Creates a preference for a custom object that can be serialized to and deserialized from a String.
@@ -75,5 +75,5 @@ interface PreferenceDatastore {
         defaultValue: T,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ) : Prefs<T>
+    ): Prefs<T>
 }

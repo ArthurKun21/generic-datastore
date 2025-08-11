@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-
 /**
  * A [GenericPreference] for storing custom [Object] values.
  * This class handles the serialization of the object to a String for storage

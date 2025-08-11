@@ -25,8 +25,8 @@ inline fun <reified T : Enum<T>> PreferenceDatastore.enum(
             enumValueOf(it)
         } catch (e: IllegalArgumentException) {
             println(
-                "${TAG}: Enum value $it not found for key $key, " +
-                        "returning default value $defaultValue ${e.message}"
+                "$TAG: Enum value $it not found for key $key, " +
+                    "returning default value $defaultValue ${e.message}",
             )
             defaultValue
         }

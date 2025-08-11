@@ -20,7 +20,6 @@ private enum class TestEnumBlocking { VALUE_A, VALUE_B }
 
 private data class SerializableObjectBlocking(val id: Int, val name: String)
 
-
 class DesktopDatastoreBlockingTest {
 
     @TempDir
@@ -36,7 +35,7 @@ class DesktopDatastoreBlockingTest {
         dataStore = PreferenceDataStoreFactory.create(
             produceFile = {
                 File(tempFolder, "${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb")
-            }
+            },
         )
         // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
         preferenceDatastore = GenericPreferenceDatastore(dataStore)
@@ -46,7 +45,6 @@ class DesktopDatastoreBlockingTest {
     fun tearDown() {
         Dispatchers.resetMain()
     }
-
 
     // Tests for StringPreference
     @Test
@@ -137,7 +135,7 @@ class DesktopDatastoreBlockingTest {
             deserializer = { str ->
                 val parts = str.split(",", limit = 2)
                 SerializableObjectBlocking(parts[0].toInt(), parts[1])
-            }
+            },
         )
         serializedPref.setValue(objToReset)
         assertEquals(serializedPref.getValue(), objToReset)
@@ -153,7 +151,7 @@ class DesktopDatastoreBlockingTest {
         val mappedPref = intPref.map(
             defaultValue = "MappedDefaultReset",
             convert = { "ResetMapped_$it" },
-            reverse = { it.removePrefix("ResetMapped_").toInt() }
+            reverse = { it.removePrefix("ResetMapped_").toInt() },
         )
         mappedPref.setValue("ResetMapped_750")
         assertEquals(mappedPref.getValue(), "ResetMapped_750")
@@ -162,7 +160,7 @@ class DesktopDatastoreBlockingTest {
         mappedPref.resetToDefault() // This should reset the underlying intPref to its default
         assertEquals(
             mappedPref.getValue(),
-            "ResetMapped_75"
+            "ResetMapped_75",
         ) // Mapped pref would return the converted default
         assertEquals(intPref.getValue(), 75) // Base pref should be reset to its default
     }
@@ -300,7 +298,7 @@ class DesktopDatastoreBlockingTest {
             deserializer = { str ->
                 val parts = str.split(",", limit = 2)
                 SerializableObjectBlocking(parts[0].toInt(), parts[1])
-            }
+            },
         )
         var delegatedValue: SerializableObjectBlocking by serializedPref
 
@@ -322,7 +320,7 @@ class DesktopDatastoreBlockingTest {
         val mappedPref = intPref.map(
             defaultValue = "MappedDelegateDefaultDesktop",
             convert = { "DelegateMappedDesktop_$it" },
-            reverse = { it.removePrefix("DelegateMappedDesktop_").toInt() }
+            reverse = { it.removePrefix("DelegateMappedDesktop_").toInt() },
         )
         var delegatedValue: String by mappedPref
 
@@ -336,7 +334,7 @@ class DesktopDatastoreBlockingTest {
         mappedPref.resetToDefault() // This should reset the underlying intPref to its default
         assertEquals(
             "DelegateMappedDesktop_300",
-            delegatedValue
+            delegatedValue,
         ) // Mapped pref would return the converted default
         assertEquals("DelegateMappedDesktop_300", mappedPref.getValue())
         assertEquals(300, intPref.getValue()) // Base pref should be reset to its default
