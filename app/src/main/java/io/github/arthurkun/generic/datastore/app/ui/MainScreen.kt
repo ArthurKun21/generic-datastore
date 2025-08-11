@@ -64,14 +64,25 @@ fun MainScreen(
     ) { uri ->
         uri?.let { uriString ->
             scope.launch(Dispatchers.IO) {
-                val jsonString = context
-                    .contentResolver
-                    .openInputStream(uriString)
-                    ?.use { inputSteam ->
-                        inputSteam.reader().readText()
+                try {
+                    val jsonString = context
+                        .contentResolver
+                        .openInputStream(uriString)
+                        ?.use { inputSteam ->
+                            inputSteam.reader().readText()
+                        }
+                    jsonString?.let {
+                        vm.importPreferences(it)
                     }
-                jsonString?.let {
-                    vm.importPreferences(it)
+                } catch (e: Exception) {
+                    Log.e("MainScreen", "Error importing preferences", e)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            "Error importing preferences",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    }
                 }
             }
         }
