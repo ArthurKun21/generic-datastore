@@ -33,7 +33,6 @@ class MainViewModel(
             preferenceStore.importPreferences(newData)
         } catch (e: Exception) {
             Log.e("MainViewModel", "Failed to import preferences", e)
-            throw e
         }
     }
 }
