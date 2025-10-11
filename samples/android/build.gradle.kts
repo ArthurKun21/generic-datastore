@@ -73,6 +73,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso)
     androidTestImplementation(libs.compose.multiplatform.ui.test.junit4)
     debugImplementation(libs.compose.multiplatform.ui.tooling)
-    debugImplementation(libs.compose.multiplatform.ui.test.manifest)
+    debugImplementation(libs.compose.ui.test.manifest)
     debugImplementation(libs.leak.canary)
 }
