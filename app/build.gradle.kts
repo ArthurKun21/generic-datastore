@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -70,8 +71,8 @@ dependencies {
     testImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
-    androidTestImplementation(libs.compose.ui.test.junit4)
-    debugImplementation(libs.compose.ui.tooling)
-    debugImplementation(libs.compose.ui.test.manifest)
+    androidTestImplementation(libs.compose.multiplatform.ui.test.junit4)
+    debugImplementation(libs.compose.multiplatform.ui.tooling)
+    debugImplementation(libs.compose.multiplatform.ui.test.manifest)
     debugImplementation(libs.leak.canary)
 }
