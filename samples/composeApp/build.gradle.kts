@@ -1,10 +1,42 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    kotlin("multiplatform")
     alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
+}
+
+kotlin {
+    androidTarget()
+
+    jvm("desktop")
+
+    sourceSets {
+        val desktopMain by getting
+
+        commonMain.dependencies {
+            implementation(project(":library"))
+            implementation(libs.datastore.preferences)
+            implementation(libs.lifecycle.multiplatform.viewmodel.compose)
+
+            implementation(libs.bundles.compose)
+            implementation(libs.kotlinx.serialization.json)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.appcompat)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.lifecycle.runtime.ktx)
+            implementation(libs.activity.compose)
+        }
+
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+        }
+    }
 }
 
 android {
@@ -56,23 +88,30 @@ tasks {
     }
 }
 
-dependencies {
-    implementation(project(":library"))
-    implementation(libs.appcompat)
-    implementation(libs.datastore.preferences)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.activity.compose)
+//dependencies {
+//    testImplementation(libs.junit4)
+//    androidTestImplementation(libs.androidx.test.junit)
+//    androidTestImplementation(libs.androidx.test.espresso)
+//    androidTestImplementation(libs.compose.multiplatform.ui.test.junit4)
+//    debugImplementation(libs.compose.multiplatform.ui.tooling)
+//    debugImplementation(libs.compose.ui.test.manifest)
+//    debugImplementation(libs.leak.canary)
+//}
 
-    implementation(libs.bundles.compose)
-    implementation(libs.kotlinx.serialization.json)
+compose.desktop {
+    application {
+        mainClass = "arthurkun.datastore.desktop.MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "arthurkun.datastore.desktop"
+            packageVersion = "1.0.0"
+        }
+    }
+}
 
-    testImplementation(libs.junit4)
-    androidTestImplementation(libs.androidx.test.junit)
-    androidTestImplementation(libs.androidx.test.espresso)
-    androidTestImplementation(libs.compose.multiplatform.ui.test.junit4)
-    debugImplementation(libs.compose.multiplatform.ui.tooling)
-    debugImplementation(libs.compose.ui.test.manifest)
-    debugImplementation(libs.leak.canary)
+configurations {
+    getByName("desktopMainApi").exclude(
+        group = "org.jetbrains.kotlinx",
+        module = "kotlinx-coroutines-android",
+    )
 }
