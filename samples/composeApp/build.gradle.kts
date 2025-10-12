@@ -31,6 +31,8 @@ kotlin {
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.lifecycle.runtime.ktx)
             implementation(libs.activity.compose)
+
+            implementation(libs.compose.material.icons.core)
         }
 
         desktopMain.dependencies {

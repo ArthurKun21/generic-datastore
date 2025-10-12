@@ -13,6 +13,7 @@ activity-compose = "1.11.0"
 
 compose-multiplatform = "1.9.0"
 compose-multiplatform-material3 = "1.8.2"
+compose-icons = "1.7.3"
 
 junit4 = "4.13.2"
 junit5 = "6.0.0"
@@ -45,8 +46,8 @@ compose-multiplatform-ui = { module = "org.jetbrains.compose.ui:ui", version.ref
 compose-multiplatform-ui-graphics = { module = "org.jetbrains.compose.ui:ui-graphics", version.ref = "compose-multiplatform" }
 compose-multiplatform-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-multiplatform" }
 compose-multiplatform-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-multiplatform-material3" }
-compose-multiplatform-material-icons-core = { module = "org.jetbrains.compose.material:material-icons-core", version = "1.7.8" }
-compose-multiplatform-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version = "1.7.8" }
+compose-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "compose-icons" }
+compose-multiplatform-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "compose-icons" }
 
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 junit5 = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
@@ -88,7 +89,6 @@ compose = [
     "compose-multiplatform-ui-graphics",
     "compose-multiplatform-ui-tooling-preview",
     "compose-multiplatform-material3",
-    "compose-multiplatform-material-icons-core",
     "compose-multiplatform-material-icons-extended"]
 library-compose = [
     "compose-multiplatform-runtime",
