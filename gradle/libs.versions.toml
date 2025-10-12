@@ -15,6 +15,8 @@ compose-multiplatform = "1.9.0"
 compose-multiplatform-material3 = "1.8.2"
 compose-icons = "1.7.3"
 
+compose-hot-reload = "1.0.0-rc02"
+
 junit4 = "4.13.2"
 junit5 = "6.0.0"
 
@@ -78,6 +80,8 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+compose-hot-reload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hot-reload" }
 
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 
