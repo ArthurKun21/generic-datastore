@@ -4,6 +4,47 @@ Inspired by the [flow-preferences](https://github.com/tfcporciuncula/flow-prefer
 
 This library provides a convenient way to work with AndroidX Jetpack DataStore by offering a `GenericPreferenceDatastore` class. This class simplifies the creation and management of various preference types.
 
+## Installation
+
+### Gradle (Kotlin DSL)
+
+```kotlin
+repositories {
+    maven { url = uri("https://jitpack.io") }
+}
+
+dependencies {
+    // Core library (required)
+    implementation("com.github.ArthurKun21:generic-datastore:1.0.0")
+    
+    // Optional: Compose extensions (only if you need Jetpack Compose integration)
+    implementation("com.github.ArthurKun21:generic-datastore-compose:1.0.0")
+}
+```
+
+### Modules
+
+This library is split into two modules to keep dependencies minimal and reduce library size:
+
+- **`generic-datastore`** (Core Module) - The main library with all core features:
+  - Primitive preference types (String, Int, Long, Float, Boolean, Set<String>)
+  - Custom object serialization support
+  - KSerializer-based preferences (kotlinx.serialization)
+  - Enum preferences
+  - Mapped preferences
+  - In-memory caching with Caffeine-inspired implementation
+  - Batch operations (get/set/delete)
+  - Version migrations
+  - AES-256-GCM encryption support
+  - Thread-safe concurrent access
+  - Flow-based observation
+  
+- **`generic-datastore-compose`** (Optional Compose Extensions) - Jetpack Compose integration:
+  - `Prefs<T>.remember()` - Compose state integration for preferences
+  - Only needed if you use Jetpack Compose in your project
+
+**Why separate modules?** Users who don't need Compose integration can use just the core library without including Compose dependencies, significantly reducing APK size and dependency overhead.
+
 ## Features
 
 The `GenericPreferenceDatastore` wraps a `DataStore<Preferences>` instance and provides methods to easily define and use preferences for:
