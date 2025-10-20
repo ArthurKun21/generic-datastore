@@ -18,6 +18,8 @@ import io.github.arthurkun.generic.datastore.GenericPreference.StringSetPrimitiv
 import io.github.arthurkun.generic.datastore.Preference.Companion.isAppState
 import io.github.arthurkun.generic.datastore.Preference.Companion.isPrivate
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
 /**
@@ -180,6 +182,66 @@ class GenericPreferenceDatastore(
         )
     }
 
+    /**
+     * Creates a preference for a custom object using kotlinx.serialization KSerializer.
+     * The object is serialized to JSON and stored as a String in DataStore.
+     *
+     * @param T The type of the custom object (must be serializable with kotlinx.serialization).
+     * @param key The preference key.
+     * @param defaultValue The default value for the custom object.
+     * @param serializer The [KSerializer] for type T.
+     * @param json Optional [Json] instance for customizing serialization (defaults to Json.Default).
+     * @return A [Prefs] instance for the custom object preference.
+     * @throws IllegalArgumentException if key is blank
+     */
+    override fun <T> kserializer(
+        key: String,
+        defaultValue: T,
+        serializer: KSerializer<T>,
+        json: Json,
+    ): Prefs<T> {
+        require(key.isNotBlank()) { "Preference key must not be blank" }
+        return PrefsImpl(
+            KSerializerPreference(
+                datastore = datastore,
+                key = key,
+                defaultValue = defaultValue,
+                serializer = serializer,
+                json = json,
+            ),
+        )
+    }
+
+    /**
+     * Creates a preference for a list/collection of custom objects using kotlinx.serialization KSerializer.
+     * Each element is serialized to JSON individually and stored as a Set<String> in DataStore.
+     *
+     * @param T The type of elements in the collection (must be serializable with kotlinx.serialization).
+     * @param key The preference key.
+     * @param defaultValue The default list value.
+     * @param serializer The [KSerializer] for type T.
+     * @param json Optional [Json] instance for customizing serialization (defaults to Json.Default).
+     * @return A [Prefs] instance for the list preference.
+     * @throws IllegalArgumentException if key is blank
+     */
+    override fun <T> kserializerList(
+        key: String,
+        defaultValue: List<T>,
+        serializer: KSerializer<T>,
+        json: Json,
+    ): Prefs<List<T>> {
+        require(key.isNotBlank()) { "Preference key must not be blank" }
+        return PrefsImpl(
+            KSerializerListPreference(
+                datastore = datastore,
+                key = key,
+                defaultValue = defaultValue,
+                serializer = serializer,
+                json = json,
+            ),
+        )
+    }
+
     override suspend fun export(exportPrivate: Boolean, exportAppState: Boolean): Map<String, JsonElement> {
         return try {
             datastore
@@ -323,6 +385,30 @@ class GenericPreferenceDatastore(
                                 val serializer = (genericPref as ObjectPrimitive<Any?>).serializer
                                 mutablePreferences[stringPreferencesKey(pref.key())] = serializer(value)
                             }
+                            is KSerializerPreference<*> -> {
+                                // For KSerializer objects, we need to serialize
+                                @Suppress("UNCHECKED_CAST")
+                                val kserializer = (genericPref as KSerializerPreference<Any?>).serializer
+                                val json = (genericPref as KSerializerPreference<Any?>).json
+                                mutablePreferences[stringPreferencesKey(pref.key())] =
+                                    json.encodeToString(kserializer, value)
+                            }
+                            is KSerializerListPreference<*> -> {
+                                // For KSerializer lists, serialize each element
+                                @Suppress("UNCHECKED_CAST")
+                                val list = value as List<Any?>
+                                val kserializer = (genericPref as KSerializerListPreference<Any?>).serializer
+                                val json = (genericPref as KSerializerListPreference<Any?>).json
+                                val serializedSet = list.mapNotNull { item ->
+                                    try {
+                                        json.encodeToString(kserializer, item)
+                                    } catch (e: Exception) {
+                                        ConsoleLogger.error("Failed to serialize list item in batch", e)
+                                        null
+                                    }
+                                }.toSet()
+                                mutablePreferences[stringSetPreferencesKey(pref.key())] = serializedSet
+                            }
                             else -> {
                                 ConsoleLogger.error(
                                     "Unsupported preference type in batch set: ${genericPref::class.simpleName}",
@@ -371,6 +457,10 @@ class GenericPreferenceDatastore(
                             is BooleanPrimitive -> mutablePreferences.remove(booleanPreferencesKey(pref.key()))
                             is StringSetPrimitive -> mutablePreferences.remove(stringSetPreferencesKey(pref.key()))
                             is ObjectPrimitive<*> -> mutablePreferences.remove(stringPreferencesKey(pref.key()))
+                            is KSerializerPreference<*> -> mutablePreferences.remove(stringPreferencesKey(pref.key()))
+                            is KSerializerListPreference<*> -> mutablePreferences.remove(
+                                stringSetPreferencesKey(pref.key()),
+                            )
                             else -> {
                                 ConsoleLogger.error(
                                     "Unsupported preference type in batch delete: ${genericPref::class.simpleName}",
