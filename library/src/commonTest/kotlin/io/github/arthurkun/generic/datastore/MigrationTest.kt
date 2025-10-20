@@ -150,7 +150,8 @@ class MigrationTest {
 
     @Test
     fun toJsonMap_parsesComplexTypes() {
-        val json = """{"string":"test","int":42,"long":999,"double":3.14,"bool":true,"array":[1,2,3],"object":{"nested":"value"}}"""
+        val json =
+            """{"string":"test","int":42,"long":999,"double":3.14,"bool":true,"array":[1,2,3],"object":{"nested":"value"}}"""
         val result = json.toJsonMap()
 
         assertEquals("test", result["string"])
