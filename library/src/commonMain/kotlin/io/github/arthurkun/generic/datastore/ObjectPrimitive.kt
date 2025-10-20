@@ -44,8 +44,17 @@ class ObjectPrimitive<T>(
             datastore
                 .data
                 .map { prefs ->
-                    prefs[stringPrefKey]?.let { deserializer(it) }
-                        ?: this@ObjectPrimitive.defaultValue
+                    prefs[stringPrefKey]?.let { storedValue ->
+                        try {
+                            deserializer(storedValue)
+                        } catch (e: Exception) {
+                            ConsoleLogger.error(
+                                "Failed to deserialize value for key '$key'",
+                                e,
+                            )
+                            this@ObjectPrimitive.defaultValue
+                        }
+                    } ?: this@ObjectPrimitive.defaultValue
                 }
                 .first()
         }
@@ -53,8 +62,14 @@ class ObjectPrimitive<T>(
 
     override suspend fun set(value: T) {
         withContext(ioDispatcher) {
-            datastore.edit { prefs ->
-                prefs[stringPrefKey] = serializer(value)
+            try {
+                val serializedValue = serializer(value)
+                datastore.edit { prefs ->
+                    prefs[stringPrefKey] = serializedValue
+                }
+            } catch (e: Exception) {
+                ConsoleLogger.error("Failed to serialize value for key '$key'", e)
+                // Don't update the preference if serialization fails
             }
         }
     }
@@ -69,7 +84,17 @@ class ObjectPrimitive<T>(
 
     override fun asFlow(): Flow<T> {
         return datastore.data.map { prefs ->
-            prefs[stringPrefKey]?.let { deserializer(it) } ?: this@ObjectPrimitive.defaultValue
+            prefs[stringPrefKey]?.let { storedValue ->
+                try {
+                    deserializer(storedValue)
+                } catch (e: Exception) {
+                    ConsoleLogger.error(
+                        "Failed to deserialize value for key '$key' in flow",
+                        e,
+                    )
+                    this@ObjectPrimitive.defaultValue
+                }
+            } ?: this@ObjectPrimitive.defaultValue
         }
     }
 }

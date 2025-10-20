@@ -103,7 +103,7 @@ internal class MappedPrefs<T, R>(
         return try {
             convert(value)
         } catch (e: Exception) {
-            println("$TAG: Error converting preference value $e")
+            ConsoleLogger.error("Error converting preference value", e)
             defaultValue
         }
     }
@@ -120,7 +120,7 @@ internal class MappedPrefs<T, R>(
         return try {
             reverse(value)
         } catch (e: Exception) {
-            println("$TAG: Error converting preference value $e")
+            ConsoleLogger.error("Error converting preference value", e)
             prefs.defaultValue
         }
     }

@@ -39,15 +39,18 @@ class GenericPreferenceDatastore(
      * @param key The preference key.
      * @param defaultValue The default String value.
      * @return A [Prefs] instance for the String preference.
+     * @throws IllegalArgumentException if key is blank
      */
-    override fun string(key: String, defaultValue: String): Prefs<String> =
-        PrefsImpl(
+    override fun string(key: String, defaultValue: String): Prefs<String> {
+        require(key.isNotBlank()) { "Preference key must not be blank" }
+        return PrefsImpl(
             StringPrimitive(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
             ),
         )
+    }
 
     /**
      * Creates a Long preference.
@@ -55,15 +58,18 @@ class GenericPreferenceDatastore(
      * @param key The preference key.
      * @param defaultValue The default Long value.
      * @return A [Prefs] instance for the Long preference.
+     * @throws IllegalArgumentException if key is blank
      */
-    override fun long(key: String, defaultValue: Long): Prefs<Long> =
-        PrefsImpl(
+    override fun long(key: String, defaultValue: Long): Prefs<Long> {
+        require(key.isNotBlank()) { "Preference key must not be blank" }
+        return PrefsImpl(
             LongPrimitive(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
             ),
         )
+    }
 
     /**
      * Creates an Int preference.
@@ -71,15 +77,18 @@ class GenericPreferenceDatastore(
      * @param key The preference key.
      * @param defaultValue The default Int value.
      * @return A [Prefs] instance for the Int preference.
+     * @throws IllegalArgumentException if key is blank
      */
-    override fun int(key: String, defaultValue: Int): Prefs<Int> =
-        PrefsImpl(
+    override fun int(key: String, defaultValue: Int): Prefs<Int> {
+        require(key.isNotBlank()) { "Preference key must not be blank" }
+        return PrefsImpl(
             IntPrimitive(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
             ),
         )
+    }
 
     /**
      * Creates a Float preference.
@@ -87,15 +96,18 @@ class GenericPreferenceDatastore(
      * @param key The preference key.
      * @param defaultValue The default Float value.
      * @return A [Prefs] instance for the Float preference.
+     * @throws IllegalArgumentException if key is blank
      */
-    override fun float(key: String, defaultValue: Float): Prefs<Float> =
-        PrefsImpl(
+    override fun float(key: String, defaultValue: Float): Prefs<Float> {
+        require(key.isNotBlank()) { "Preference key must not be blank" }
+        return PrefsImpl(
             FloatPrimitive(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
             ),
         )
+    }
 
     /**
      * Creates a Boolean preference.
@@ -103,15 +115,18 @@ class GenericPreferenceDatastore(
      * @param key The preference key.
      * @param defaultValue The default Boolean value.
      * @return A [Prefs] instance for the Boolean preference.
+     * @throws IllegalArgumentException if key is blank
      */
-    override fun bool(key: String, defaultValue: Boolean): Prefs<Boolean> =
-        PrefsImpl(
+    override fun bool(key: String, defaultValue: Boolean): Prefs<Boolean> {
+        require(key.isNotBlank()) { "Preference key must not be blank" }
+        return PrefsImpl(
             BooleanPrimitive(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
             ),
         )
+    }
 
     /**
      * Creates a Set<String> preference.
@@ -119,18 +134,21 @@ class GenericPreferenceDatastore(
      * @param key The preference key.
      * @param defaultValue The default Set<String> value.
      * @return A [Prefs] instance for the Set<String> preference.
+     * @throws IllegalArgumentException if key is blank
      */
     override fun stringSet(
         key: String,
         defaultValue: Set<String>,
-    ): Prefs<Set<String>> =
-        PrefsImpl(
+    ): Prefs<Set<String>> {
+        require(key.isNotBlank()) { "Preference key must not be blank" }
+        return PrefsImpl(
             StringSetPrimitive(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
             ),
         )
+    }
 
     /**
      * Creates a preference for a custom object that can be serialized to and deserialized from a String.
@@ -141,72 +159,88 @@ class GenericPreferenceDatastore(
      * @param serializer A function to serialize the object to a String.
      * @param deserializer A function to deserialize the String back to the object.
      * @return A [Prefs] instance for the custom object preference.
+     * @throws IllegalArgumentException if key is blank
      */
     override fun <T> serialized(
         key: String,
         defaultValue: T,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): Prefs<T> = PrefsImpl(
-        ObjectPrimitive(
-            datastore = datastore,
-            key = key,
-            defaultValue = defaultValue,
-            serializer = serializer,
-            deserializer = deserializer,
-        ),
-    )
+    ): Prefs<T> {
+        require(key.isNotBlank()) { "Preference key must not be blank" }
+        return PrefsImpl(
+            ObjectPrimitive(
+                datastore = datastore,
+                key = key,
+                defaultValue = defaultValue,
+                serializer = serializer,
+                deserializer = deserializer,
+            ),
+        )
+    }
 
     override suspend fun export(exportPrivate: Boolean, exportAppState: Boolean): Map<String, JsonElement> {
-        return datastore
-            .data
-            .first()
-            .toPreferences()
-            .asMap()
-            .mapNotNull { (key, values) ->
-                if (!exportPrivate && isPrivate(key.name)) {
-                    null
-                } else if (!exportAppState && isAppState(key.name)) {
-                    null
-                } else {
-                    key.name to values.toJsonElement()
+        return try {
+            datastore
+                .data
+                .first()
+                .toPreferences()
+                .asMap()
+                .mapNotNull { (key, values) ->
+                    when {
+                        !exportPrivate && isPrivate(key.name) -> null
+                        !exportAppState && isAppState(key.name) -> null
+                        else -> key.name to values.toJsonElement()
+                    }
                 }
-            }
-            .toMap()
+                .toMap()
+        } catch (e: Exception) {
+            ConsoleLogger.error("Failed to export preferences", e)
+            emptyMap()
+        }
     }
 
     override suspend fun import(data: Map<String, Any>) {
-        datastore.updateData { currentPreferences ->
-            val mutablePreferences = currentPreferences.toMutablePreferences()
-            data.forEach { (key, value) ->
-                when (value) {
-                    is String -> mutablePreferences[stringPreferencesKey(key)] = value
-                    is Long -> mutablePreferences[longPreferencesKey(key)] = value
-                    is Int -> mutablePreferences[intPreferencesKey(key)] = value
-                    is Float -> mutablePreferences[floatPreferencesKey(key)] = value
-                    is Boolean -> mutablePreferences[booleanPreferencesKey(key)] = value
-                    is Collection<*> -> {
-                        if (value.all { it is String }) {
-                            @Suppress("UNCHECKED_CAST")
-                            mutablePreferences[stringSetPreferencesKey(key)] = (value as Collection<String>).toSet()
-                        } else {
-                            // Fallback for mixed-type or non-string collections
-                            val stringValue = value.toJsonElement().toString()
-                            mutablePreferences[stringPreferencesKey(key)] = stringValue
-                        }
-                    }
+        try {
+            datastore.updateData { currentPreferences ->
+                val mutablePreferences = currentPreferences.toMutablePreferences()
+                data.forEach { (key, value) ->
+                    try {
+                        when (value) {
+                            is String -> mutablePreferences[stringPreferencesKey(key)] = value
+                            is Long -> mutablePreferences[longPreferencesKey(key)] = value
+                            is Int -> mutablePreferences[intPreferencesKey(key)] = value
+                            is Float -> mutablePreferences[floatPreferencesKey(key)] = value
+                            is Boolean -> mutablePreferences[booleanPreferencesKey(key)] = value
+                            is Collection<*> -> {
+                                if (value.all { it is String }) {
+                                    @Suppress("UNCHECKED_CAST")
+                                    mutablePreferences[stringSetPreferencesKey(key)] =
+                                        (value as Collection<String>).toSet()
+                                } else {
+                                    // Fallback for mixed-type or non-string collections
+                                    val stringValue = value.toJsonElement().toString()
+                                    mutablePreferences[stringPreferencesKey(key)] = stringValue
+                                }
+                            }
 
-                    else -> {
-                        // Handle custom objects or unsupported types by serializing them back to a JSON string.
-                        val stringValue = when (value) {
-                            is Map<*, *>, is Collection<*> -> value.toJsonElement().toString()
-                            else -> value.toString()
+                            else -> {
+                                // Handle custom objects or unsupported types by serializing them back to a JSON string.
+                                val stringValue = when (value) {
+                                    is Map<*, *>, is Collection<*> -> value.toJsonElement().toString()
+                                    else -> value.toString()
+                                }
+                                mutablePreferences[stringPreferencesKey(key)] = stringValue
+                            }
                         }
-                        mutablePreferences[stringPreferencesKey(key)] = stringValue
+                    } catch (e: Exception) {
+                        ConsoleLogger.error("Failed to import preference key: $key", e)
                     }
                 }
+                mutablePreferences.toPreferences()
             }
-            mutablePreferences.toPreferences()
+        } catch (e: Exception) {
+            ConsoleLogger.error("Failed to import preferences", e)
         }
     }
 }

@@ -11,24 +11,29 @@ package io.github.arthurkun.generic.datastore
  * @param key The key for the preference.
  * @param defaultValue The default enum value to use if the key is not found or
  * deserialization fails.
+ * @throws IllegalArgumentException if key is blank
  */
 @Suppress("unused")
 inline fun <reified T : Enum<T>> PreferenceDatastore.enum(
     key: String,
     defaultValue: T,
-): Prefs<T> = serialized(
-    key = key,
-    defaultValue = defaultValue,
-    serializer = { it.name },
-    deserializer = {
-        try {
-            enumValueOf(it)
-        } catch (e: IllegalArgumentException) {
-            println(
-                "$TAG: Enum value $it not found for key $key, " +
-                    "returning default value $defaultValue ${e.message}",
-            )
-            defaultValue
-        }
-    },
-)
+): Prefs<T> {
+    require(key.isNotBlank()) { "Preference key must not be blank" }
+
+    return serialized(
+        key = key,
+        defaultValue = defaultValue,
+        serializer = { it.name },
+        deserializer = {
+            try {
+                enumValueOf(it)
+            } catch (e: IllegalArgumentException) {
+                ConsoleLogger.error(
+                    "Enum value '$it' not found for key '$key', returning default value",
+                    e,
+                )
+                defaultValue
+            }
+        },
+    )
+}

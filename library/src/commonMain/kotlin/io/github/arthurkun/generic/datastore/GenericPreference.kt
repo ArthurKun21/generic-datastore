@@ -39,7 +39,7 @@ import kotlinx.coroutines.withContext
  */
 sealed class GenericPreference<T>(
     internal val datastore: DataStore<Preferences>,
-    private val key: String,
+    protected val key: String,
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -56,12 +56,17 @@ sealed class GenericPreference<T>(
      */
     override suspend fun get(): T {
         return withContext(ioDispatcher) {
-            datastore
-                .data
-                .map { preferences ->
-                    preferences[this@GenericPreference.preferences] ?: defaultValue
-                }
-                .first()
+            try {
+                datastore
+                    .data
+                    .map { preferences ->
+                        preferences[this@GenericPreference.preferences] ?: defaultValue
+                    }
+                    .first()
+            } catch (e: Exception) {
+                ConsoleLogger.error("Failed to get value for key '$key'", e)
+                defaultValue
+            }
         }
     }
 
@@ -72,8 +77,12 @@ sealed class GenericPreference<T>(
      */
     override suspend fun set(value: T) {
         withContext(ioDispatcher) {
-            datastore.edit { ds ->
-                ds[preferences] = value
+            try {
+                datastore.edit { ds ->
+                    ds[preferences] = value
+                }
+            } catch (e: Exception) {
+                ConsoleLogger.error("Failed to set value for key '$key'", e)
             }
         }
     }
@@ -84,8 +93,12 @@ sealed class GenericPreference<T>(
      */
     override suspend fun delete() {
         withContext(ioDispatcher) {
-            datastore.edit { ds ->
-                ds.remove(preferences)
+            try {
+                datastore.edit { ds ->
+                    ds.remove(preferences)
+                }
+            } catch (e: Exception) {
+                ConsoleLogger.error("Failed to delete value for key '$key'", e)
             }
         }
     }
