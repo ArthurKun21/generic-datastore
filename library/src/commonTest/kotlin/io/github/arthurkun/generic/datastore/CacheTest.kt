@@ -183,4 +183,102 @@ class CacheTest {
         // (This is tested implicitly in the get() implementation)
         assertEquals("cached_value", pref.get())
     }
+
+    @Test
+    fun cache_statisticsTracking() = runTest(testDispatcher) {
+        val pref1 = preferenceDatastore.string("cache_stats_1", "")
+        val pref2 = preferenceDatastore.string("cache_stats_2", "")
+
+        pref1.set("value1")
+        pref2.set("value2")
+
+        // Generate some hits
+        pref1.get() // Hit
+        pref1.get() // Hit
+        pref2.get() // Hit
+
+        val stats = GenericPreference.cacheStats()
+        assertEquals(3, stats.hitCount)
+    }
+
+    @Test
+    fun cache_maxSizeEviction() = runTest(testDispatcher) {
+        // Set small cache size
+        GenericPreference.cacheMaxSize = 2
+
+        val pref1 = preferenceDatastore.string("cache_max_1", "")
+        val pref2 = preferenceDatastore.string("cache_max_2", "")
+        val pref3 = preferenceDatastore.string("cache_max_3", "")
+
+        pref1.set("value1")
+        pref2.set("value2")
+        pref3.set("value3") // Should trigger eviction
+
+        // All should still be accessible (though some from DataStore)
+        assertEquals("value1", pref1.get())
+        assertEquals("value2", pref2.get())
+        assertEquals("value3", pref3.get())
+    }
+
+    @Test
+    fun cache_idleTimeout() = runTest(testDispatcher) {
+        // Configure idle timeout
+        GenericPreference.cacheIdleTimeout = 100.milliseconds
+        GenericPreference.cacheTTL = 10.seconds // Long TTL
+
+        val pref = preferenceDatastore.string("cache_idle", "default")
+        pref.set("value")
+
+        // Read and keep accessing
+        pref.get()
+        delay(50.milliseconds)
+        pref.get() // Should reset idle timer
+
+        // Wait for idle timeout
+        delay(150.milliseconds)
+
+        // Should still work (reads from DataStore)
+        assertEquals("value", pref.get())
+
+        // Reset idle timeout config
+        GenericPreference.cacheIdleTimeout = null
+    }
+
+    @Test
+    fun cache_globalInvalidation() = runTest(testDispatcher) {
+        val pref1 = preferenceDatastore.string("cache_global_1", "")
+        val pref2 = preferenceDatastore.string("cache_global_2", "")
+
+        pref1.set("value1")
+        pref2.set("value2")
+
+        // Populate cache
+        pref1.get()
+        pref2.get()
+
+        // Invalidate all
+        GenericPreference.invalidateAllCaches()
+
+        // Should still work (reads from DataStore)
+        assertEquals("value1", pref1.get())
+        assertEquals("value2", pref2.get())
+    }
+
+    @Test
+    fun cache_cleanup() = runTest(testDispatcher) {
+        GenericPreference.cacheTTL = 100.milliseconds
+
+        val pref = preferenceDatastore.string("cache_cleanup", "default")
+        pref.set("value")
+        pref.get() // Populate cache
+
+        // Wait for expiration
+        delay(150.milliseconds)
+
+        // Run cleanup
+        GenericPreference.cleanUpCache()
+
+        // Should still work
+        assertEquals("value", pref.get())
+    }
 }
