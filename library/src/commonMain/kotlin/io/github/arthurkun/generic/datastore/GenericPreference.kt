@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 /**
@@ -44,6 +46,13 @@ sealed class GenericPreference<T>(
     private val preferences: Preferences.Key<T>,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<T> {
+
+    /**
+     * Mutex for synchronizing concurrent access to blocking getValue/setValue operations.
+     * This ensures thread-safety when multiple threads access the same preference simultaneously.
+     */
+    private val accessMutex = Mutex()
+
     /**
      * Returns the unique String key used to identify this preference within the DataStore.
      */
@@ -130,21 +139,27 @@ sealed class GenericPreference<T>(
      * Synchronously retrieves the current value of the preference.
      * This operation may block the calling thread while accessing DataStore.
      * If the key is not found or an error occurs, this function returns the [defaultValue].
+     * Thread-safe: Uses mutex to synchronize concurrent access from multiple threads.
      * Use with caution due to potential blocking.
      */
     override fun getValue(): T = runBlocking {
-        get()
+        accessMutex.withLock {
+            get()
+        }
     }
 
     /**
      * Synchronously sets the value of the preference.
      * This operation may block the calling thread while accessing DataStore.
+     * Thread-safe: Uses mutex to synchronize concurrent access from multiple threads.
      * Use with caution due to potential blocking.
      * @param value The new value to store for this preference.
      */
     override fun setValue(value: T) {
         runBlocking {
-            set(value)
+            accessMutex.withLock {
+                set(value)
+            }
         }
     }
 

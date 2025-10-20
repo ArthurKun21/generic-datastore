@@ -23,18 +23,39 @@
   - `MappedPreference.kt`: conversion operations
 - **Benefits**: Better user experience, no crashes from edge cases
 
-### 4. Code Quality
+### 4. Thread Safety & Synchronization
+- **Added Mutex synchronization**: Protected concurrent access to blocking operations
+- **Locations**:
+  - `GenericPreference.kt`: getValue(), setValue() with accessMutex
+  - `Prefs.kt`: resetToDefault() with resetMutex
+- **Benefits**: 
+  - Thread-safe concurrent access from multiple threads
+  - Prevents race conditions in getValue/setValue operations
+  - Ensures data consistency when multiple threads access the same preference
+- **Implementation**:
+  ```kotlin
+  private val accessMutex = Mutex()
+  
+  override fun getValue(): T = runBlocking {
+      accessMutex.withLock {
+          get()
+      }
+  }
+  ```
+
+### 5. Code Quality
 - **Protected key field**: Changed from private to protected to allow subclass access
 - **Location**: `GenericPreference.kt`
 - **Benefits**: Follows proper encapsulation while allowing necessary access
 
-### 5. Test Coverage
+### 6. Test Coverage
 Added comprehensive tests covering:
 - Input validation (blank keys, whitespace)
 - Error handling (serialization, deserialization, conversion errors)
 - Export/Import functionality with privacy controls
 - JSON migration utilities
 - Performance benchmarks
+- **Concurrent access patterns** (NEW)
 
 ## SOLID Principles Applied
 
@@ -70,6 +91,7 @@ Added comprehensive tests covering:
 - Dispatcher control: All DataStore operations use IO dispatcher
 - Flow-based observation: Efficient reactive updates
 - Lazy evaluation: State flows only created when needed
+- **Mutex synchronization**: Minimal overhead, only for blocking operations
 
 ### Tests Added
 - Write performance: 100 writes benchmark
@@ -79,6 +101,7 @@ Added comprehensive tests covering:
 - Mapped preference performance
 - Serialized preference performance
 - Concurrent reads performance
+- **Concurrent access safety** (NEW)
 
 ## Best Practices
 
@@ -89,7 +112,8 @@ Added comprehensive tests covering:
 5. **Documentation**: Clear KDoc comments
 6. **Type Safety**: Strong typing throughout
 7. **Immutability**: Preferences are immutable once created
-8. **Thread Safety**: Proper use of dispatchers and coroutines
+8. **Thread Safety**: Proper use of dispatchers, coroutines, and mutexes
+9. **Concurrent Access**: Safe synchronization for blocking operations
 
 ## Security Improvements
 
@@ -98,9 +122,24 @@ Added comprehensive tests covering:
 3. **Validation**: Keys validated to prevent injection attacks
 4. **Error Messages**: Don't expose sensitive information
 
+## Thread Safety Details
+
+### Synchronization Strategy
+- **Suspending operations** (get, set, delete): Already thread-safe via DataStore's internal mechanisms
+- **Blocking operations** (getValue, setValue, resetToDefault): Protected by Mutex to prevent race conditions
+- **Flow operations**: Inherently thread-safe via Kotlin Flow's design
+
+### Concurrent Access Patterns Tested
+1. Multiple threads reading simultaneously
+2. Multiple threads writing simultaneously  
+3. Mixed read/write operations
+4. Concurrent resetToDefault operations
+5. Property delegation under concurrent access
+6. Independent access to different preferences
+
 ## Remaining Considerations
 
-1. **Thread Safety**: Consider adding synchronization for concurrent access patterns
+1. ~~**Thread Safety**: Consider adding synchronization for concurrent access patterns~~ ✅ COMPLETED
 2. **Caching**: Could add in-memory cache for frequently accessed preferences
 3. **Batch Operations**: Could add batch set/get operations for performance
 4. **Migration**: Consider adding version migration support
