@@ -19,6 +19,12 @@ interface Prefs<T> : ReadWriteProperty<Any?, T>, Preference<T> {
      * Resets the preference value to its default.
      */
     fun resetToDefault()
+
+    /**
+     * Invalidates the in-memory cache for this preference.
+     * Next read will fetch from DataStore instead of cache.
+     */
+    fun invalidateCache()
 }
 
 /**
@@ -32,7 +38,7 @@ interface Prefs<T> : ReadWriteProperty<Any?, T>, Preference<T> {
  * @property pref The underlying [Preference] instance.
  */
 internal class PrefsImpl<T>(
-    private val pref: Preference<T>,
+    internal val pref: Preference<T>,
 ) : Prefs<T>,
     Preference<T> by pref {
 
@@ -49,5 +55,9 @@ internal class PrefsImpl<T>(
         resetMutex.withLock {
             pref.set(pref.defaultValue)
         }
+    }
+
+    override fun invalidateCache() {
+        (pref as? GenericPreference<T>)?.invalidateCache()
     }
 }

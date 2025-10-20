@@ -22,6 +22,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.TimeSource
 
 /**
  * Represents a generic preference that can be stored in and retrieved from a DataStore.
@@ -54,27 +57,94 @@ sealed class GenericPreference<T>(
     private val accessMutex = Mutex()
 
     /**
+     * In-memory cache entry for the preference value.
+     * Includes the cached value and timestamp for TTL-based invalidation.
+     */
+    private data class CacheEntry<T>(
+        val value: T,
+        val timestamp: TimeSource.Monotonic.ValueTimeMark,
+    )
+
+    /**
+     * Cache configuration for controlling cache behavior.
+     */
+    companion object {
+        /**
+         * Time-to-live for cache entries. After this duration, cached values are considered stale
+         * and will be refreshed from DataStore on next access.
+         * Default: 5 minutes
+         */
+        var cacheTTL: Duration = 5.minutes
+
+        /**
+         * Enables or disables the cache. When disabled, all reads go directly to DataStore.
+         * Default: true
+         */
+        var cacheEnabled: Boolean = true
+    }
+
+    /**
+     * The cached value for this preference, protected by accessMutex.
+     */
+    @Volatile
+    private var cachedEntry: CacheEntry<T>? = null
+
+    /**
      * Returns the unique String key used to identify this preference within the DataStore.
      */
     override fun key(): String = key
 
     /**
-     * Retrieves the current value of the preference from DataStore.
+     * Checks if the cached value is still valid based on TTL.
+     */
+    private fun isCacheValid(): Boolean {
+        val entry = cachedEntry ?: return false
+        return entry.timestamp.elapsedNow() < cacheTTL
+    }
+
+    /**
+     * Invalidates the cache for this preference.
+     * Call this method when you know the value has changed externally.
+     */
+    fun invalidateCache() {
+        cachedEntry = null
+    }
+
+    /**
+     * Retrieves the current value of the preference from DataStore or cache.
      * If the key is not found in DataStore or an error occurs during retrieval,
      * this function returns the [defaultValue]. This is a suspending function.
+     *
+     * Caching behavior:
+     * - If cache is enabled and valid, returns cached value without DataStore access
+     * - Otherwise, fetches from DataStore and updates cache
+     * - Cache TTL can be configured via [cacheTTL]
      */
     override suspend fun get(): T {
+        // Check cache first if enabled
+        if (cacheEnabled && isCacheValid()) {
+            cachedEntry?.let { return it.value }
+        }
+
         return withContext(ioDispatcher) {
             try {
-                datastore
+                val value = datastore
                     .data
                     .map { preferences ->
                         preferences[this@GenericPreference.preferences] ?: defaultValue
                     }
                     .first()
+
+                // Update cache
+                if (cacheEnabled) {
+                    cachedEntry = CacheEntry(value, TimeSource.Monotonic.markNow())
+                }
+
+                value
             } catch (e: Exception) {
                 ConsoleLogger.error("Failed to get value for key '$key'", e)
-                defaultValue
+                // Return cached value if available, otherwise default
+                cachedEntry?.value ?: defaultValue
             }
         }
     }
@@ -82,6 +152,7 @@ sealed class GenericPreference<T>(
     /**
      * Sets the value of the preference in the DataStore.
      * This is a suspending function.
+     * Automatically invalidates the cache after successful write.
      * @param value The new value to store for this preference.
      */
     override suspend fun set(value: T) {
@@ -89,6 +160,10 @@ sealed class GenericPreference<T>(
             try {
                 datastore.edit { ds ->
                     ds[preferences] = value
+                }
+                // Update cache immediately after successful write
+                if (cacheEnabled) {
+                    cachedEntry = CacheEntry(value, TimeSource.Monotonic.markNow())
                 }
             } catch (e: Exception) {
                 ConsoleLogger.error("Failed to set value for key '$key'", e)
@@ -99,6 +174,7 @@ sealed class GenericPreference<T>(
     /**
      * Removes the preference from the DataStore.
      * This is a suspending function.
+     * Automatically invalidates the cache after deletion.
      */
     override suspend fun delete() {
         withContext(ioDispatcher) {
@@ -106,6 +182,8 @@ sealed class GenericPreference<T>(
                 datastore.edit { ds ->
                     ds.remove(preferences)
                 }
+                // Invalidate cache after deletion
+                cachedEntry = null
             } catch (e: Exception) {
                 ConsoleLogger.error("Failed to delete value for key '$key'", e)
             }
