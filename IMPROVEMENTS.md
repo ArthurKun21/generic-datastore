@@ -177,7 +177,62 @@
   MigrationHelpers.combineMigrations(operation1, operation2, ...)
   ```
 
-### 9. Test Coverage
+### 9. Encryption Support
+- **Added AES-256-GCM encryption** for sensitive data with Kotlin Multiplatform compatibility
+- **Location**: `Encryption.kt`, `EncryptedPreference.kt`, platform-specific implementations
+- **Benefits**:
+  - Industry-standard AES-256-GCM authenticated encryption
+  - Transparent encryption/decryption
+  - Platform-specific secure implementations (Android, Desktop/JVM)
+  - Works with all existing preference features (caching, batch operations, etc.)
+  - Type-safe with full Kotlin compile-time checks
+- **Components**:
+  ```kotlin
+  // Encryption interface
+  interface DataEncryption {
+      suspend fun encrypt(plainText: String): String
+      suspend fun decrypt(encryptedText: String): String
+      suspend fun generateKey(): String
+  }
+  
+  // Platform-specific factory
+  expect fun createPlatformEncryption(key: String): DataEncryption
+  ```
+- **Example**:
+  ```kotlin
+  // Generate encryption key (once)
+  val encryption = createPlatformEncryption("")
+  val key = encryption.generateKey()
+  // Store key securely (Android Keystore, etc.)
+  
+  // Create encrypted preference
+  val tokenPref = datastore.encrypted("api_token", "", key)
+  
+  // Use like normal preference - encryption is automatic
+  tokenPref.set("sensitive-token-123")
+  val token = tokenPref.get() // Automatically decrypted
+  
+  // Encrypted serialized objects
+  val credsPref = datastore.encryptedSerialized(
+      key = "credentials",
+      defaultValue = Credentials("", ""),
+      encryptionKey = key,
+      serializer = { creds -> Json.encodeToString(creds) },
+      deserializer = { json -> Json.decodeFromString(json) }
+  )
+  ```
+- **Platform Implementations**:
+  - **Android**: Uses `javax.crypto` with AES/GCM/NoPadding
+  - **Desktop/JVM**: Uses Java's `javax.crypto` with AES/GCM/NoPadding
+  - **iOS**: Future - will use CommonCrypto or CryptoKit
+- **Security Features**:
+  - AES-256 key size for strong encryption
+  - GCM mode provides authenticated encryption (confidentiality + integrity)
+  - Random IV per encryption prevents replay attacks
+  - Base64 encoding for safe storage
+  - No IV reuse (fresh random IV every time)
+
+### 10. Test Coverage
 Added comprehensive tests covering:
 - Input validation (blank keys, whitespace)
 - Error handling (serialization, deserialization, conversion errors)
@@ -188,6 +243,7 @@ Added comprehensive tests covering:
 - **In-memory cache functionality** (NEW)
 - **Batch operations (get/set/delete)** (NEW)
 - **Version migrations with helpers** (NEW)
+- **Encryption (basic functionality tests)** (NEW - Platform-specific encryption tests in instrumented tests)
 
 ## SOLID Principles Applied
 
@@ -277,4 +333,4 @@ Added comprehensive tests covering:
 2. ~~**Caching**: Could add in-memory cache for frequently accessed preferences~~ ✅ COMPLETED
 3. ~~**Batch Operations**: Could add batch set/get operations for performance~~ ✅ COMPLETED
 4. ~~**Migration**: Consider adding version migration support~~ ✅ COMPLETED
-5. **Encryption**: Could add encryption support for sensitive data
+5. ~~**Encryption**: Could add encryption support for sensitive data~~ ✅ COMPLETED (Kotlin Multiplatform compatible with platform-specific implementations)
