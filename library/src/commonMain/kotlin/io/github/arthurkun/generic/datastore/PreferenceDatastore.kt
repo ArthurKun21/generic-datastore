@@ -87,4 +87,30 @@ interface PreferenceDatastore {
     suspend fun import(
         data: Map<String, Any>,
     )
+
+    /**
+     * Batch get operation for multiple preferences.
+     * Retrieves values for multiple preferences in a single DataStore read operation.
+     *
+     * @param preferences List of preferences to retrieve values for
+     * @return Map of preference keys to their current values
+     */
+    suspend fun <T> batchGet(preferences: List<Prefs<T>>): Map<String, T>
+
+    /**
+     * Batch set operation for multiple preferences.
+     * Sets values for multiple preferences in a single DataStore write operation.
+     * This is significantly more efficient than calling set() on each preference individually.
+     *
+     * @param updates Map of preferences to their new values
+     */
+    suspend fun batchSet(updates: Map<Prefs<*>, Any?>)
+
+    /**
+     * Batch delete operation for multiple preferences.
+     * Deletes multiple preferences in a single DataStore write operation.
+     *
+     * @param preferences List of preferences to delete
+     */
+    suspend fun batchDelete(preferences: List<Prefs<*>>)
 }

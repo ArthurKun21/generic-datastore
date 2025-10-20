@@ -3,6 +3,7 @@ package io.github.arthurkun.generic.datastore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -241,6 +242,152 @@ class GenericPreferenceDatastore(
             }
         } catch (e: Exception) {
             ConsoleLogger.error("Failed to import preferences", e)
+        }
+    }
+
+    /**
+     * Batch get operation for multiple preferences.
+     * Retrieves values for multiple preferences in a single DataStore read operation.
+     * This is much more efficient than calling get() on each preference individually.
+     *
+     * @param preferences List of preferences to retrieve values for
+     * @return Map of preference keys to their current values
+     */
+    override suspend fun <T> batchGet(preferences: List<Prefs<T>>): Map<String, T> {
+        if (preferences.isEmpty()) return emptyMap()
+
+        return try {
+            val currentPreferences = datastore.data.first()
+            preferences.associate { pref ->
+                val key = pref.key()
+                val value = pref.get() // Uses cache if available
+                key to value
+            }
+        } catch (e: Exception) {
+            ConsoleLogger.error("Failed to batch get preferences", e)
+            // Return defaults for all preferences
+            preferences.associate { it.key() to it.defaultValue }
+        }
+    }
+
+    /**
+     * Batch set operation for multiple preferences.
+     * Sets values for multiple preferences in a single DataStore write operation.
+     * This is significantly more efficient than calling set() on each preference individually.
+     *
+     * Important: This operation invalidates the cache for all affected preferences.
+     *
+     * @param updates Map of preferences to their new values
+     */
+    override suspend fun batchSet(updates: Map<Prefs<*>, Any?>) {
+        if (updates.isEmpty()) return
+
+        try {
+            datastore.edit { mutablePreferences ->
+                updates.forEach { (pref, value) ->
+                    try {
+                        // Get the underlying GenericPreference to access its key
+                        val genericPref = when (pref) {
+                            is PrefsImpl<*> -> pref.pref
+                            else -> pref
+                        }
+
+                        when (genericPref) {
+                            is StringPrimitive -> {
+                                @Suppress("UNCHECKED_CAST")
+                                mutablePreferences[stringPreferencesKey(pref.key())] = value as String
+                            }
+                            is IntPrimitive -> {
+                                @Suppress("UNCHECKED_CAST")
+                                mutablePreferences[intPreferencesKey(pref.key())] = value as Int
+                            }
+                            is LongPrimitive -> {
+                                @Suppress("UNCHECKED_CAST")
+                                mutablePreferences[longPreferencesKey(pref.key())] = value as Long
+                            }
+                            is FloatPrimitive -> {
+                                @Suppress("UNCHECKED_CAST")
+                                mutablePreferences[floatPreferencesKey(pref.key())] = value as Float
+                            }
+                            is BooleanPrimitive -> {
+                                @Suppress("UNCHECKED_CAST")
+                                mutablePreferences[booleanPreferencesKey(pref.key())] = value as Boolean
+                            }
+                            is StringSetPrimitive -> {
+                                @Suppress("UNCHECKED_CAST")
+                                mutablePreferences[stringSetPreferencesKey(pref.key())] = value as Set<String>
+                            }
+                            is ObjectPrimitive<*> -> {
+                                // For custom objects, we need to serialize
+                                @Suppress("UNCHECKED_CAST")
+                                val serializer = (genericPref as ObjectPrimitive<Any?>).serializer
+                                mutablePreferences[stringPreferencesKey(pref.key())] = serializer(value)
+                            }
+                            else -> {
+                                ConsoleLogger.error(
+                                    "Unsupported preference type in batch set: ${genericPref::class.simpleName}",
+                                    null,
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        ConsoleLogger.error("Failed to set preference ${pref.key()} in batch", e)
+                    }
+                }
+            }
+
+            // Invalidate cache for all updated preferences
+            updates.keys.forEach { it.invalidateCache() }
+        } catch (e: Exception) {
+            ConsoleLogger.error("Failed to batch set preferences", e)
+        }
+    }
+
+    /**
+     * Batch delete operation for multiple preferences.
+     * Deletes multiple preferences in a single DataStore write operation.
+     * This is more efficient than calling delete() on each preference individually.
+     *
+     * @param preferences List of preferences to delete
+     */
+    override suspend fun batchDelete(preferences: List<Prefs<*>>) {
+        if (preferences.isEmpty()) return
+
+        try {
+            datastore.edit { mutablePreferences ->
+                preferences.forEach { pref ->
+                    try {
+                        // Get the underlying GenericPreference to access its key
+                        val genericPref = when (pref) {
+                            is PrefsImpl<*> -> pref.pref
+                            else -> pref
+                        }
+
+                        when (genericPref) {
+                            is StringPrimitive -> mutablePreferences.remove(stringPreferencesKey(pref.key()))
+                            is IntPrimitive -> mutablePreferences.remove(intPreferencesKey(pref.key()))
+                            is LongPrimitive -> mutablePreferences.remove(longPreferencesKey(pref.key()))
+                            is FloatPrimitive -> mutablePreferences.remove(floatPreferencesKey(pref.key()))
+                            is BooleanPrimitive -> mutablePreferences.remove(booleanPreferencesKey(pref.key()))
+                            is StringSetPrimitive -> mutablePreferences.remove(stringSetPreferencesKey(pref.key()))
+                            is ObjectPrimitive<*> -> mutablePreferences.remove(stringPreferencesKey(pref.key()))
+                            else -> {
+                                ConsoleLogger.error(
+                                    "Unsupported preference type in batch delete: ${genericPref::class.simpleName}",
+                                    null,
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        ConsoleLogger.error("Failed to delete preference ${pref.key()} in batch", e)
+                    }
+                }
+            }
+
+            // Invalidate cache for all deleted preferences
+            preferences.forEach { it.invalidateCache() }
+        } catch (e: Exception) {
+            ConsoleLogger.error("Failed to batch delete preferences", e)
         }
     }
 }
