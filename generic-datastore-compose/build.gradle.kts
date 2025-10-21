@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     `maven-publish`
     id("com.android.library")
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
@@ -24,8 +25,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(libs.datastore.preferences.core)
-                implementation(libs.kotlinx.serialization.json)
+                api(project(":generic-datastore")) // Core library dependency
+                implementation(libs.bundles.library.compose)
             }
         }
         val commonTest by getting {
@@ -37,24 +38,7 @@ kotlin {
         }
 
         val androidMain by getting
-        val androidInstrumentedTest by getting {
-            dependencies {
-                implementation(libs.datastore.preferences)
-                implementation(libs.kotlin.test)
-                implementation(libs.junit4)
-                implementation(libs.coroutines.test)
-                implementation(libs.androidx.test.junit)
-                implementation(libs.androidx.test.espresso)
-            }
-        }
-
         val desktopMain by getting
-        val desktopTest by getting {
-            dependencies {
-                // JVM-specific test dependencies
-                implementation(libs.junit5) // For JVM tests
-            }
-        }
     }
 
     compilerOptions {
@@ -65,7 +49,7 @@ kotlin {
 }
 
 android {
-    namespace = "io.github.arthurkun.generic.datastore"
+    namespace = "io.github.arthurkun.generic.datastore.compose"
     compileSdk = libs.versions.compile.sdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.min.sdk.get().toInt()
@@ -101,7 +85,7 @@ publishing {
     publications {
         withType<MavenPublication> {
             groupId = "com.github.arthurkun"
-            artifactId = "generic-datastore"
+            artifactId = "generic-datastore-compose"
             version = project.version.toString()
 
             pom {
