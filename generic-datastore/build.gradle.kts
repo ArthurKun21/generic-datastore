@@ -95,8 +95,6 @@ android {
     }
 }
 
-version = "1.0.0"
-
 publishing {
     publications {
         withType<MavenPublication> {

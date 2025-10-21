@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.spotless) apply false
 }
 
+version = "1.0.0"
+
 subprojects {
     apply(plugin = "com.diffplug.spotless")
     tasks.withType<KotlinCompile>().configureEach {
