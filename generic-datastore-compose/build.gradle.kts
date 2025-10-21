@@ -89,8 +89,8 @@ publishing {
             version = project.version.toString()
 
             pom {
-                name.set("Generic Datastore Library")
-                description.set("A generic datastore library for Kotlin Multiplatform.")
+                name.set("Generic Datastore Compose Extensions")
+                description.set("Jetpack Compose extensions for Generic Datastore Library.")
                 url.set("https://github.com/arthurkun/generic-datastore")
                 licenses {
                     license {
