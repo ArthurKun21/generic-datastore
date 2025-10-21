@@ -56,7 +56,7 @@ tasks {
 }
 
 dependencies {
-    implementation(project(":library"))
+    implementation(project(":generic-datastore"))
     implementation(libs.appcompat)
     implementation(libs.datastore.preferences)
     implementation(libs.androidx.core.ktx)
