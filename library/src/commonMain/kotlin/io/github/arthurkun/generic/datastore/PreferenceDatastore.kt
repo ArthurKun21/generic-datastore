@@ -1,5 +1,7 @@
 package io.github.arthurkun.generic.datastore
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
 /**
@@ -79,6 +81,44 @@ interface PreferenceDatastore {
         deserializer: (String) -> T,
     ): Prefs<T>
 
+    /**
+     * Creates a preference for a custom object using kotlinx.serialization KSerializer.
+     * The object is serialized to JSON and stored as a String in DataStore.
+     * This provides type-safe serialization with compile-time validation.
+     *
+     * @param T The type of the custom object (must be serializable with kotlinx.serialization).
+     * @param key The preference key.
+     * @param defaultValue The default value for the custom object.
+     * @param serializer The [KSerializer] for type T.
+     * @param json Optional [Json] instance for customizing serialization (defaults to Json.Default).
+     * @return A [Prefs] instance for the custom object preference.
+     */
+    fun <T> kserializer(
+        key: String,
+        defaultValue: T,
+        serializer: KSerializer<T>,
+        json: Json = Json.Default,
+    ): Prefs<T>
+
+    /**
+     * Creates a preference for a list/collection of custom objects using kotlinx.serialization KSerializer.
+     * Each element is serialized to JSON individually and the collection is stored as a Set<String> in DataStore.
+     * This allows for efficient storage and retrieval of collections.
+     *
+     * @param T The type of elements in the collection (must be serializable with kotlinx.serialization).
+     * @param key The preference key.
+     * @param defaultValue The default list value.
+     * @param serializer The [KSerializer] for type T.
+     * @param json Optional [Json] instance for customizing serialization (defaults to Json.Default).
+     * @return A [Prefs] instance for the list preference.
+     */
+    fun <T> kserializerList(
+        key: String,
+        defaultValue: List<T>,
+        serializer: KSerializer<T>,
+        json: Json = Json.Default,
+    ): Prefs<List<T>>
+
     suspend fun export(
         exportPrivate: Boolean = false,
         exportAppState: Boolean = false,
@@ -87,4 +127,30 @@ interface PreferenceDatastore {
     suspend fun import(
         data: Map<String, Any>,
     )
+
+    /**
+     * Batch get operation for multiple preferences.
+     * Retrieves values for multiple preferences in a single DataStore read operation.
+     *
+     * @param preferences List of preferences to retrieve values for
+     * @return Map of preference keys to their current values
+     */
+    suspend fun <T> batchGet(preferences: List<Prefs<T>>): Map<String, T>
+
+    /**
+     * Batch set operation for multiple preferences.
+     * Sets values for multiple preferences in a single DataStore write operation.
+     * This is significantly more efficient than calling set() on each preference individually.
+     *
+     * @param updates Map of preferences to their new values
+     */
+    suspend fun batchSet(updates: Map<Prefs<*>, Any?>)
+
+    /**
+     * Batch delete operation for multiple preferences.
+     * Deletes multiple preferences in a single DataStore write operation.
+     *
+     * @param preferences List of preferences to delete
+     */
+    suspend fun batchDelete(preferences: List<Prefs<*>>)
 }

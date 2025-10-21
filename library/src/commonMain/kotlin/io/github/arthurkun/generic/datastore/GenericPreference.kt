@@ -9,6 +9,8 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import io.github.arthurkun.generic.datastore.cache.CaffeineCache
+import io.github.arthurkun.generic.datastore.cache.caffeineCache
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +21,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * Represents a generic preference that can be stored in and retrieved from a DataStore.
@@ -39,41 +45,188 @@ import kotlinx.coroutines.withContext
  */
 sealed class GenericPreference<T>(
     internal val datastore: DataStore<Preferences>,
-    private val key: String,
+    protected val key: String,
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : Preference<T> {
+
+    /**
+     * Mutex for synchronizing concurrent access to blocking getValue/setValue operations.
+     * This ensures thread-safety when multiple threads access the same preference simultaneously.
+     */
+    private val accessMutex = Mutex()
+
+    /**
+     * Cache configuration for controlling cache behavior.
+     */
+    companion object {
+        /**
+         * Global high-performance Caffeine-inspired cache for all preferences.
+         * Features: LRU eviction, TTL/idle timeout, statistics tracking.
+         */
+        private var globalCache: CaffeineCache<Any>? = null
+
+        /**
+         * Time-to-live for cache entries. After this duration, cached values are considered stale
+         * and will be refreshed from DataStore on next access.
+         * Default: 5 minutes
+         */
+        var cacheTTL: Duration = 5.minutes
+            set(value) {
+                field = value
+                rebuildCache()
+            }
+
+        /**
+         * Maximum number of entries in the cache. When exceeded, LRU entries are evicted.
+         * Default: 10,000
+         */
+        var cacheMaxSize: Long = 10_000
+            set(value) {
+                field = value
+                rebuildCache()
+            }
+
+        /**
+         * Idle timeout after last access. Null for no idle timeout.
+         * Default: null (no idle timeout)
+         */
+        var cacheIdleTimeout: Duration? = null
+            set(value) {
+                field = value
+                rebuildCache()
+            }
+
+        /**
+         * Enables or disables the cache. When disabled, all reads go directly to DataStore.
+         * Default: true
+         */
+        var cacheEnabled: Boolean = true
+
+        /**
+         * Gets cache statistics for monitoring performance.
+         */
+        fun cacheStats(): CaffeineCache.Stats = runBlocking {
+            getCache().stats()
+        }
+
+        /**
+         * Manually triggers cache cleanup to remove expired entries.
+         */
+        fun cleanUpCache() = runBlocking {
+            getCache().cleanUp()
+        }
+
+        /**
+         * Invalidates all cache entries across all preferences.
+         */
+        fun invalidateAllCaches() = runBlocking {
+            getCache().invalidateAll()
+        }
+
+        /**
+         * Gets or creates the global cache instance.
+         */
+        @Suppress("UNCHECKED_CAST")
+        private fun getCache(): CaffeineCache<Any> {
+            if (globalCache == null) {
+                globalCache = caffeineCache<Any>()
+                    .maximumSize(cacheMaxSize)
+                    .expireAfterWrite(cacheTTL)
+                    .apply {
+                        cacheIdleTimeout?.let { expireAfterAccess(it) }
+                    }
+                    .build()
+            }
+            return globalCache!!
+        }
+
+        /**
+         * Rebuilds the cache with new configuration.
+         */
+        private fun rebuildCache() {
+            globalCache = null
+        }
+    }
+
     /**
      * Returns the unique String key used to identify this preference within the DataStore.
      */
     override fun key(): String = key
 
     /**
-     * Retrieves the current value of the preference from DataStore.
+     * Invalidates the cache for this preference.
+     * Call this method when you know the value has changed externally.
+     */
+    fun invalidateCache() = runBlocking {
+        if (cacheEnabled) {
+            getCache().invalidate(key)
+        }
+    }
+
+    /**
+     * Retrieves the current value of the preference from DataStore or cache.
      * If the key is not found in DataStore or an error occurs during retrieval,
      * this function returns the [defaultValue]. This is a suspending function.
+     *
+     * Caching behavior:
+     * - If cache is enabled and valid, returns cached value without DataStore access
+     * - Otherwise, fetches from DataStore and updates cache
+     * - Uses Caffeine-inspired cache with LRU eviction and TTL
      */
+    @Suppress("UNCHECKED_CAST")
     override suspend fun get(): T {
+        // Check cache first if enabled
+        if (cacheEnabled) {
+            val cached = getCache().get(key) as? T
+            if (cached != null) {
+                return cached
+            }
+        }
+
         return withContext(ioDispatcher) {
-            datastore
-                .data
-                .map { preferences ->
-                    preferences[this@GenericPreference.preferences] ?: defaultValue
+            try {
+                val value = datastore
+                    .data
+                    .map { preferences ->
+                        preferences[this@GenericPreference.preferences] ?: defaultValue
+                    }
+                    .first()
+
+                // Update cache
+                if (cacheEnabled) {
+                    getCache().put(key, value as Any)
                 }
-                .first()
+
+                value
+            } catch (e: Exception) {
+                ConsoleLogger.error("Failed to get value for key '$key'", e)
+                // Try to return cached value if available, otherwise default
+                val cached = if (cacheEnabled) getCache().get(key) as? T else null
+                cached ?: defaultValue
+            }
         }
     }
 
     /**
      * Sets the value of the preference in the DataStore.
      * This is a suspending function.
+     * Automatically updates the cache after successful write.
      * @param value The new value to store for this preference.
      */
     override suspend fun set(value: T) {
         withContext(ioDispatcher) {
-            datastore.edit { ds ->
-                ds[preferences] = value
+            try {
+                datastore.edit { ds ->
+                    ds[preferences] = value
+                }
+                // Update cache immediately after successful write
+                if (cacheEnabled) {
+                    getCache().put(key, value as Any)
+                }
+            } catch (e: Exception) {
+                ConsoleLogger.error("Failed to set value for key '$key'", e)
             }
         }
     }
@@ -81,11 +234,20 @@ sealed class GenericPreference<T>(
     /**
      * Removes the preference from the DataStore.
      * This is a suspending function.
+     * Automatically invalidates the cache after deletion.
      */
     override suspend fun delete() {
         withContext(ioDispatcher) {
-            datastore.edit { ds ->
-                ds.remove(preferences)
+            try {
+                datastore.edit { ds ->
+                    ds.remove(preferences)
+                }
+                // Invalidate cache after deletion
+                if (cacheEnabled) {
+                    getCache().invalidate(key)
+                }
+            } catch (e: Exception) {
+                ConsoleLogger.error("Failed to delete value for key '$key'", e)
             }
         }
     }
@@ -117,21 +279,27 @@ sealed class GenericPreference<T>(
      * Synchronously retrieves the current value of the preference.
      * This operation may block the calling thread while accessing DataStore.
      * If the key is not found or an error occurs, this function returns the [defaultValue].
+     * Thread-safe: Uses mutex to synchronize concurrent access from multiple threads.
      * Use with caution due to potential blocking.
      */
     override fun getValue(): T = runBlocking {
-        get()
+        accessMutex.withLock {
+            get()
+        }
     }
 
     /**
      * Synchronously sets the value of the preference.
      * This operation may block the calling thread while accessing DataStore.
+     * Thread-safe: Uses mutex to synchronize concurrent access from multiple threads.
      * Use with caution due to potential blocking.
      * @param value The new value to store for this preference.
      */
     override fun setValue(value: T) {
         runBlocking {
-            set(value)
+            accessMutex.withLock {
+                set(value)
+            }
         }
     }
 

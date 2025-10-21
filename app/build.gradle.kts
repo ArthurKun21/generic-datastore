@@ -57,6 +57,7 @@ tasks {
 
 dependencies {
     implementation(project(":library"))
+    implementation(project(":library-compose")) // Add Compose extensions
     implementation(libs.appcompat)
     implementation(libs.datastore.preferences)
     implementation(libs.androidx.core.ktx)

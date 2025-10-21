@@ -17,3 +17,5 @@ dependencyResolutionManagement {
 rootProject.name = "GenericDataStore"
 include(":app")
 include(":library")
+include(":library-compose")
+include(":desktop-app")

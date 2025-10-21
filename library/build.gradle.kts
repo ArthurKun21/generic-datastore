@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.serialization)
     `maven-publish`
     id("com.android.library")
-    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
@@ -15,18 +15,23 @@ kotlin {
             useJUnitPlatform()
         }
     }
-//    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
-//        target.binaries.framework {
-//            baseName = project.name
-//            isStatic = true
-//        }
-//    }
+
+    // iOS targets
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "GenericDatastore"
+            isStatic = true
+        }
+    }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(libs.datastore.preferences.core)
-                implementation(libs.bundles.library.compose)
                 implementation(libs.kotlinx.serialization.json)
             }
         }
@@ -56,6 +61,26 @@ kotlin {
                 // JVM-specific test dependencies
                 implementation(libs.junit5) // For JVM tests
             }
+        }
+
+        val iosX64Main by getting
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
+        val iosMain by creating {
+            dependsOn(commonMain)
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+        }
+
+        val iosX64Test by getting
+        val iosArm64Test by getting
+        val iosSimulatorArm64Test by getting
+        val iosTest by creating {
+            dependsOn(commonTest)
+            iosX64Test.dependsOn(this)
+            iosArm64Test.dependsOn(this)
+            iosSimulatorArm64Test.dependsOn(this)
         }
     }
 
