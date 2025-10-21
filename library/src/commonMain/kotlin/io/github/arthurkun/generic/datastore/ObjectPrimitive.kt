@@ -37,7 +37,7 @@ class ObjectPrimitive<T>(
 ) {
     private val stringPrefKey = stringPreferencesKey(key)
 
-    private val ioDispatcher = Dispatchers.IO
+    private val ioDispatcher = Dispatchers.Default
 
     override suspend fun get(): T {
         return withContext(ioDispatcher) {

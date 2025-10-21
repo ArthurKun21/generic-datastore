@@ -43,7 +43,7 @@ class KSerializerListPreference<T>(
 ) {
     private val stringSetPrefKey = stringSetPreferencesKey(key)
 
-    private val ioDispatcher = Dispatchers.IO
+    private val ioDispatcher = Dispatchers.Default
 
     override suspend fun get(): List<T> {
         return withContext(ioDispatcher) {

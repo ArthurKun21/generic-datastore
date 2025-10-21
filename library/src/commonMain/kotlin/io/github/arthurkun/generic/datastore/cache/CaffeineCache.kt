@@ -52,10 +52,10 @@ class CaffeineCache<T>(
     }
 
     /**
-     * Internal storage using LinkedHashMap for LRU access order.
-     * LinkedHashMap maintains insertion/access order and allows efficient LRU implementation.
+     * Internal storage using MutableMap for cache entries.
+     * We use a regular HashMap and manually track access order for LRU eviction.
      */
-    private val cache = LinkedHashMap<String, CacheEntry<T>>(16, 0.75f, true)
+    private val cache = mutableMapOf<String, CacheEntry<T>>()
 
     /**
      * Mutex for thread-safe concurrent access.
@@ -64,14 +64,10 @@ class CaffeineCache<T>(
 
     /**
      * Statistics counters.
+     * Note: These are protected by the mutex, so @Volatile is not needed.
      */
-    @Volatile
     private var hitCount = 0L
-
-    @Volatile
     private var missCount = 0L
-
-    @Volatile
     private var evictionCount = 0L
 
     /**

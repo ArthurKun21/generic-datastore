@@ -48,7 +48,7 @@ sealed class GenericPreference<T>(
     protected val key: String,
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : Preference<T> {
 
     /**
