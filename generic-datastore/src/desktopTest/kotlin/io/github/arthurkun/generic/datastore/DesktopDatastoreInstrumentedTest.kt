@@ -318,6 +318,22 @@ class DesktopDatastoreInstrumentedTest {
     }
 
     @Test
+    fun mappedPreference_getAndSetValue() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("baseForMapGetAndSet", 10)
+        val mappedPref = intPref.map(
+            defaultValue = "MappedDefaultGetAndSet",
+            convert = { "MappedValue_$it" },
+            reverse = { it.removePrefix("MappedValue_").toInt() },
+        )
+        mappedPref.getAndSet { currentValue ->
+            "${currentValue}0"
+        }
+        assertEquals(mappedPref.get(), "MappedValue_100")
+        // Also check the underlying preference
+        assertEquals(intPref.get(), 100)
+    }
+
+    @Test
     fun mappedPreference_observeSetValue() = runTest(testDispatcher) {
         val intPref = preferenceDatastore.int("baseForMapObserve", 0)
         val mappedPref = intPref.map(
