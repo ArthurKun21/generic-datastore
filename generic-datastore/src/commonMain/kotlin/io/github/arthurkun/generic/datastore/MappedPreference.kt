@@ -129,6 +129,14 @@ internal class MappedPrefs<T, R>(
 
     override suspend fun set(value: R) = prefs.set(reverseFallback(value))
 
+    override suspend fun getAndSet(transform: (R) -> R) {
+        prefs.getAndSet { currentValue: T ->
+            val mappedCurrent = convertFallback(currentValue)
+            val newMappedValue = transform(mappedCurrent)
+            reverseFallback(newMappedValue)
+        }
+    }
+
     override suspend fun delete() = prefs.delete()
 
     override fun asFlow(): Flow<R> = prefs.asFlow().map { convertFallback(it) }
