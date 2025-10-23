@@ -88,6 +88,13 @@ class DesktopDatastoreInstrumentedTest {
     }
 
     @Test
+    fun stringPreference_getAndSetValue() = runTest(testDispatcher) {
+        val stringPref = preferenceDatastore.string("testStringGetAndSet", "initialValue")
+        stringPref.getAndSet { currentValue -> "$currentValue-Updated" }
+        assertEquals(stringPref.get(), "initialValue-Updated")
+    }
+
+    @Test
     fun stringPreference_deleteValue() = runTest(testDispatcher) {
         val stringPref = preferenceDatastore.string("testStringDelete", "defaultValue")
         stringPref.set("valueToDelete")
