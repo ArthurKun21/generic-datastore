@@ -16,7 +16,7 @@ subprojects {
     apply(plugin = "com.diffplug.spotless")
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
-            freeCompilerArgs.add(
+            freeCompilerArgs.addAll(
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             )
             jvmTarget.set(JvmTarget.JVM_17)
