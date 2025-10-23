@@ -79,6 +79,17 @@ sealed class GenericPreference<T>(
     }
 
     /**
+     * Atomically gets the current value of the preference and sets it to a new value
+     * computed by the provided [transform] function.
+     *
+     * @param transform A function that takes the current value and returns the new value.
+     */
+    override suspend fun getAndSet(transform: (T) -> T) {
+        val newValue = transform(get())
+        set(newValue)
+    }
+
+    /**
      * Removes the preference from the DataStore.
      * This is a suspending function.
      */

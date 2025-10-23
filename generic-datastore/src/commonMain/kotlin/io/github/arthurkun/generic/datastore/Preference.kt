@@ -35,6 +35,14 @@ interface Preference<T> {
     suspend fun set(value: T)
 
     /**
+     * Atomically gets the current value of the preference and sets it to a new value
+     * computed by the provided [transform] function.
+     *
+     * @param transform A function that takes the current value and returns the new value.
+     */
+    suspend fun getAndSet(transform: (T) -> T)
+
+    /**
      * Deletes the preference from the underlying storage.
      */
     suspend fun delete()
