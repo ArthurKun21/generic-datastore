@@ -56,12 +56,6 @@ kotlin {
             }
         }
     }
-
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-opt-in=kotlin.contracts.ExperimentalContracts",
-        )
-    }
 }
 
 android {

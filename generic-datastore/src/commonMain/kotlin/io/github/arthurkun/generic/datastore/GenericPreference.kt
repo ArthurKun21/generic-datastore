@@ -78,6 +78,15 @@ sealed class GenericPreference<T>(
         }
     }
 
+    override suspend fun getAndSet(transform: (T) -> T) {
+        withContext(ioDispatcher) {
+            datastore.edit { ds ->
+                val value = ds[preferences] ?: defaultValue
+                ds[preferences] = transform(value)
+            }
+        }
+    }
+
     /**
      * Removes the preference from the DataStore.
      * This is a suspending function.

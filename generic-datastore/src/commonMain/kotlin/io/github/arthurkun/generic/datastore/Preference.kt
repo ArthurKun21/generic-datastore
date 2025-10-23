@@ -3,8 +3,6 @@ package io.github.arthurkun.generic.datastore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
 /**
  * Represents a single preference item.
@@ -35,6 +33,14 @@ interface Preference<T> {
      * @param value The new value for the preference.
      */
     suspend fun set(value: T)
+
+    /**
+     * Atomically gets the current value of the preference and sets it to a new value
+     * computed by the provided [transform] function.
+     *
+     * @param transform A function that takes the current value and returns the new value.
+     */
+    suspend fun getAndSet(transform: (T) -> T)
 
     /**
      * Deletes the preference from the underlying storage.
@@ -132,19 +138,4 @@ interface Preference<T> {
         private const val APP_STATE_PREFIX = "__APP_STATE_"
         private const val PRIVATE_PREFIX = "__PRIVATE_"
     }
-}
-
-/**
- * Atomically gets the current value of the preference and sets it to a new value
- * computed by the provided [transform] function.
- *
- * @param transform A function that takes the current value and returns the new value.
- */
-suspend inline fun <T> Preference<T>.getAndSet(transform: (T) -> T) {
-    contract {
-        callsInPlace(transform, InvocationKind.EXACTLY_ONCE)
-    }
-    val currentValue = get()
-    val newValue = transform(currentValue)
-    set(newValue)
 }
