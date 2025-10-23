@@ -40,12 +40,6 @@ kotlin {
         val androidMain by getting
         val desktopMain by getting
     }
-
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-        )
-    }
 }
 
 android {
