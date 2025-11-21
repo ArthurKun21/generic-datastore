@@ -181,10 +181,15 @@ class GenericPreferenceDatastore(
             data.forEach { (key, value) ->
                 when (value) {
                     is String -> mutablePreferences[stringPreferencesKey(key)] = value
+
                     is Long -> mutablePreferences[longPreferencesKey(key)] = value
+
                     is Int -> mutablePreferences[intPreferencesKey(key)] = value
+
                     is Float -> mutablePreferences[floatPreferencesKey(key)] = value
+
                     is Boolean -> mutablePreferences[booleanPreferencesKey(key)] = value
+
                     is Collection<*> -> {
                         if (value.all { it is String }) {
                             @Suppress("UNCHECKED_CAST")

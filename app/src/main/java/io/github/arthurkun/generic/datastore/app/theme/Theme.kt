@@ -46,6 +46,7 @@ fun GenericDataStoreAppTheme(
         }
 
         darkTheme -> DarkColorScheme
+
         else -> LightColorScheme
     }
 

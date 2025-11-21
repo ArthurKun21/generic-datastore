@@ -29,6 +29,7 @@ fun Any?.toJsonElement(): JsonElement = when (this) {
 private fun parseJsonValue(element: JsonElement): Any {
     return when (element) {
         is JsonNull -> ""
+
         is JsonPrimitive -> {
             when {
                 element.isString -> element.content
@@ -40,6 +41,7 @@ private fun parseJsonValue(element: JsonElement): Any {
         }
 
         is JsonArray -> element.map { parseJsonValue(it) }
+
         is JsonObject -> element.mapValues { parseJsonValue(it.value) }
     }
 }
