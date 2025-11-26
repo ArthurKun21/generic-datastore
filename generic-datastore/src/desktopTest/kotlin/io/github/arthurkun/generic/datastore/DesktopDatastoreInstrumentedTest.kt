@@ -88,6 +88,13 @@ class DesktopDatastoreInstrumentedTest {
     }
 
     @Test
+    fun stringPreference_getAndSetValue() = runTest(testDispatcher) {
+        val stringPref = preferenceDatastore.string("testStringGetAndSet", "initialValue")
+        stringPref.getAndSet { currentValue -> "$currentValue-Updated" }
+        assertEquals(stringPref.get(), "initialValue-Updated")
+    }
+
+    @Test
     fun stringPreference_deleteValue() = runTest(testDispatcher) {
         val stringPref = preferenceDatastore.string("testStringDelete", "defaultValue")
         stringPref.set("valueToDelete")
@@ -305,6 +312,22 @@ class DesktopDatastoreInstrumentedTest {
             reverse = { it.removePrefix("MappedValue_").toInt() },
         )
         mappedPref.set("MappedValue_100")
+        assertEquals(mappedPref.get(), "MappedValue_100")
+        // Also check the underlying preference
+        assertEquals(intPref.get(), 100)
+    }
+
+    @Test
+    fun mappedPreference_getAndSetValue() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("baseForMapGetAndSet", 10)
+        val mappedPref = intPref.map(
+            defaultValue = "MappedDefaultGetAndSet",
+            convert = { "MappedValue_$it" },
+            reverse = { it.removePrefix("MappedValue_").toInt() },
+        )
+        mappedPref.getAndSet { currentValue ->
+            "${currentValue}0"
+        }
         assertEquals(mappedPref.get(), "MappedValue_100")
         // Also check the underlying preference
         assertEquals(intPref.get(), 100)
