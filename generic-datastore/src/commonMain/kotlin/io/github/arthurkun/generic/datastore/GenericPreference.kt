@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 /**
@@ -39,11 +41,13 @@ import kotlinx.coroutines.withContext
  */
 sealed class GenericPreference<T>(
     internal val datastore: DataStore<Preferences>,
-    private val key: String,
+    internal val key: String,
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<T> {
+    private val mutex = Mutex()
+
     /**
      * Returns the unique String key used to identify this preference within the DataStore.
      */
@@ -71,9 +75,35 @@ sealed class GenericPreference<T>(
      * @param value The new value to store for this preference.
      */
     override suspend fun set(value: T) {
-        withContext(ioDispatcher) {
-            datastore.edit { ds ->
-                ds[preferences] = value
+        mutex.withLock {
+            withContext(ioDispatcher) {
+                datastore.edit { ds ->
+                    ds[preferences] = value
+                }
+            }
+        }
+    }
+
+    /**
+     * Atomically gets the current value and sets a new value.
+     * This operation is thread-safe and ensures no race conditions.
+     *
+     * @param value The new value to set
+     * @return The previous value before the update
+     */
+    override suspend fun getAndSet(value: T): T {
+        return mutex.withLock {
+            withContext(ioDispatcher) {
+                val currentValue = datastore
+                    .data
+                    .map { preferences ->
+                        preferences[this@GenericPreference.preferences] ?: defaultValue
+                    }
+                    .first()
+                datastore.edit { ds ->
+                    ds[preferences] = value
+                }
+                currentValue
             }
         }
     }
@@ -83,9 +113,11 @@ sealed class GenericPreference<T>(
      * This is a suspending function.
      */
     override suspend fun delete() {
-        withContext(ioDispatcher) {
-            datastore.edit { ds ->
-                ds.remove(preferences)
+        mutex.withLock {
+            withContext(ioDispatcher) {
+                datastore.edit { ds ->
+                    ds.remove(preferences)
+                }
             }
         }
     }

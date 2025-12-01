@@ -3,11 +3,12 @@ package io.github.arthurkun.generic.datastore
 import kotlinx.serialization.json.JsonElement
 
 /**
- * Defines the contract for a preference data store.
+ * Defines the contract for a preference data store repository.
  *
- * This interface provides methods to create and access various types of preferences.
+ * This interface provides methods to create and access various types of preferences,
+ * with support for batch operations and advanced features.
  */
-interface PreferenceDatastore {
+interface DatastoreRepository {
     /**
      * Creates a String preference.
      *
@@ -87,4 +88,39 @@ interface PreferenceDatastore {
     suspend fun import(
         data: Map<String, Any>,
     )
+
+    /**
+     * Sets multiple preferences in a single batch operation.
+     * More efficient than calling set on each preference individually.
+     *
+     * @param operations A map of Prefs instances to their new values
+     */
+    suspend fun batchSet(operations: Map<Prefs<*>, Any?>)
+
+    /**
+     * Gets multiple preference values in a single batch operation.
+     * More efficient than calling get on each preference individually.
+     *
+     * @param preferences A list of Prefs instances to retrieve
+     * @return A map of Prefs instances to their current values
+     */
+    suspend fun batchGet(preferences: List<Prefs<*>>): Map<Prefs<*>, Any?>
+
+    /**
+     * Deletes multiple preferences in a single batch operation.
+     * More efficient than calling delete on each preference individually.
+     *
+     * @param preferences A list of Prefs instances to delete
+     */
+    suspend fun batchDelete(preferences: List<Prefs<*>>)
 }
+
+/**
+ * Type alias for backwards compatibility.
+ * @deprecated Use DatastoreRepository instead
+ */
+@Deprecated(
+    "Use DatastoreRepository instead",
+    ReplaceWith("DatastoreRepository", "io.github.arthurkun.generic.datastore.DatastoreRepository"),
+)
+typealias PreferenceDatastore = DatastoreRepository

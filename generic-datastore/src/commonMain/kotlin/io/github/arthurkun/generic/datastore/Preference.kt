@@ -35,6 +35,15 @@ interface Preference<T> {
     suspend fun set(value: T)
 
     /**
+     * Atomically gets the current value and sets a new value.
+     * This operation is thread-safe and ensures no race conditions.
+     *
+     * @param value The new value to set
+     * @return The previous value before the update
+     */
+    suspend fun getAndSet(value: T): T
+
+    /**
      * Deletes the preference from the underlying storage.
      */
     suspend fun delete()

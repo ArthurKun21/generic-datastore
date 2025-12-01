@@ -13,7 +13,7 @@ package io.github.arthurkun.generic.datastore
  * deserialization fails.
  */
 @Suppress("unused")
-inline fun <reified T : Enum<T>> PreferenceDatastore.enum(
+inline fun <reified T : Enum<T>> DatastoreRepository.enum(
     key: String,
     defaultValue: T,
 ): Prefs<T> = serialized(
