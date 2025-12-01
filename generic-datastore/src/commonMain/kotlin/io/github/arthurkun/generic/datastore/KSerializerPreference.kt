@@ -83,11 +83,18 @@ class KSerializerPreference<T>(
                 val currentValue = datastore
                     .data
                     .map { prefs ->
-                        prefs[stringPrefKey]?.let {
+                        prefs[stringPrefKey]?.let { jsonString ->
                             try {
-                                json.decodeFromString(serializer, it)
+                                json.decodeFromString(serializer, jsonString)
                             } catch (e: SerializationException) {
-                                println("$TAG: Error deserializing preference $key: ${e.message}")
+                                val preview = if (jsonString.length > 100) {
+                                    jsonString.substring(0, 100) + "..."
+                                } else {
+                                    jsonString
+                                }
+                                println(
+                                    "$TAG: Error deserializing preference $key: ${e.message}. JSON preview: $preview",
+                                )
                                 this@KSerializerPreference.defaultValue
                             }
                         } ?: this@KSerializerPreference.defaultValue

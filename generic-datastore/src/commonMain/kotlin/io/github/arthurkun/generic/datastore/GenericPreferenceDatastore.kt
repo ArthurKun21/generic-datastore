@@ -275,8 +275,20 @@ class DatastoreManager(
                                     is Boolean -> prefs[booleanPreferencesKey(key)] = value
 
                                     is Set<*> -> {
-                                        @Suppress("UNCHECKED_CAST")
-                                        prefs[stringSetPreferencesKey(key)] = value as Set<String>
+                                        if (value.all { it is String }) {
+                                            @Suppress("UNCHECKED_CAST")
+                                            prefs[stringSetPreferencesKey(key)] = value as Set<String>
+                                        } else {
+                                            println(
+                                                "$TAG: Unsupported Set type in batch set for key $key, expected Set<String>",
+                                            )
+                                        }
+                                    }
+
+                                    else -> {
+                                        println(
+                                            "$TAG: Unsupported value type ${value::class.simpleName} in batch set for key $key",
+                                        )
                                     }
                                 }
                                 // Update cache
@@ -318,13 +330,20 @@ class DatastoreManager(
                         @Suppress("UNCHECKED_CAST")
                         (pref as? Preference<Any?>)?.let { preference ->
                             val key = preference.key()
-                            // Try all possible key types
-                            prefs.remove(stringPreferencesKey(key))
-                            prefs.remove(longPreferencesKey(key))
-                            prefs.remove(intPreferencesKey(key))
-                            prefs.remove(floatPreferencesKey(key))
-                            prefs.remove(booleanPreferencesKey(key))
-                            prefs.remove(stringSetPreferencesKey(key))
+                            // Try the most common types first for efficiency
+                            // Most preferences will be one of these types
+                            if (prefs.remove(stringPreferencesKey(key)) == null) {
+                                if (prefs.remove(intPreferencesKey(key)) == null) {
+                                    if (prefs.remove(longPreferencesKey(key)) == null) {
+                                        if (prefs.remove(booleanPreferencesKey(key)) == null) {
+                                            if (prefs.remove(floatPreferencesKey(key)) == null) {
+                                                prefs.remove(stringSetPreferencesKey(key))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             // Remove from cache
                             cache?.remove(key)
                         }
