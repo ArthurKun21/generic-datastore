@@ -25,12 +25,22 @@ import kotlinx.serialization.json.JsonElement
 /**
  * Configuration for the DatastoreManager in-memory cache.
  *
+ * This cache uses a high-performance, coroutine-first design inspired by Caffeine,
+ * with segmented locking for better concurrency and frequency-based eviction.
+ *
  * @property enabled Whether caching is enabled
- * @property maxSize Maximum number of entries in the cache (LRU eviction)
+ * @property maxSize Maximum number of entries in the cache
+ * @property segmentCount Number of segments for concurrent access (default: 4).
+ *   Higher values improve concurrency but use more memory.
+ * @property expiryMillis Time in milliseconds after which entries expire (0 = no expiry)
+ * @property recordStats Whether to record cache statistics for monitoring (default: false)
  */
 data class CacheConfig(
     val enabled: Boolean = true,
     val maxSize: Int = 100,
+    val segmentCount: Int = 4,
+    val expiryMillis: Long = 0,
+    val recordStats: Boolean = false,
 )
 
 /**
@@ -55,7 +65,12 @@ class DatastoreManager(
     private val cacheConfig: CacheConfig = CacheConfig(),
 ) : DatastoreRepository {
     private val cache = if (cacheConfig.enabled) {
-        LruCache<String, Any?>(cacheConfig.maxSize)
+        LruCache<String, Any?>(
+            maxSize = cacheConfig.maxSize,
+            segmentCount = cacheConfig.segmentCount,
+            expiryMillis = cacheConfig.expiryMillis,
+            recordStats = cacheConfig.recordStats,
+        )
     } else {
         null
     }
@@ -361,6 +376,25 @@ class DatastoreManager(
      */
     suspend fun clearCache() {
         cache?.clear()
+    }
+
+    /**
+     * Gets the current cache statistics.
+     * Returns empty statistics if cache is disabled or stats recording is off.
+     *
+     * @return Current cache statistics including hit/miss rates
+     */
+    suspend fun getCacheStats(): CacheStats {
+        return cache?.getStats() ?: CacheStats()
+    }
+
+    /**
+     * Performs cache maintenance by removing expired entries.
+     * Should be called periodically for caches with expiry enabled.
+     * This is a lightweight operation that runs asynchronously.
+     */
+    suspend fun cleanUpCache() {
+        cache?.cleanUp()
     }
 }
 
