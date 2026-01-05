@@ -34,21 +34,23 @@ kotlin {
 //    }
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(libs.datastore.preferences.core)
                 implementation(libs.kotlinx.serialization.json)
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.junit4)
                 implementation(libs.coroutines.test)
             }
         }
+        androidMain {
 
-        val androidMain by getting
+        }
+
         getByName("androidDeviceTest") {
             dependencies {
                 implementation(libs.datastore.preferences)
