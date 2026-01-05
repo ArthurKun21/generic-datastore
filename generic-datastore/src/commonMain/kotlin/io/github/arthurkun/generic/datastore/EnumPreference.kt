@@ -1,7 +1,5 @@
 package io.github.arthurkun.generic.datastore
 
-import logcat.logcat
-
 /**
  * Defines a preference for storing enum values.
  *
@@ -25,11 +23,7 @@ inline fun <reified T : Enum<T>> PreferenceDatastore.enum(
     deserializer = {
         try {
             enumValueOf(it)
-        } catch (e: IllegalArgumentException) {
-            logcat(TAG) {
-                "Enum value $it not found for key $key, " +
-                    "returning default value $defaultValue ${e.message}"
-            }
+        } catch (_: IllegalArgumentException) {
             defaultValue
         }
     },
