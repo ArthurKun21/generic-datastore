@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     `maven-publish`
@@ -7,6 +9,19 @@ plugins {
 kotlin {
     androidTarget {
         publishLibraryVariants("release")
+    }
+    androidLibrary {
+        namespace = "io.github.arthurkun.generic.datastore"
+        compileSdk = libs.versions.compile.sdk.get().toInt()
+        minSdk = libs.versions.min.sdk.get().toInt()
+
+        optimization {
+            consumerKeepRules.file("consumer-rules.pro")
+        }
+
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
     }
 
     jvm("desktop") {
@@ -37,7 +52,7 @@ kotlin {
         }
 
         val androidMain by getting
-        val androidInstrumentedTest by getting {
+        getByName("androidDeviceTest") {
             dependencies {
                 implementation(libs.datastore.preferences)
                 implementation(libs.kotlin.test)
@@ -65,13 +80,7 @@ kotlin {
 }
 
 android {
-    namespace = "io.github.arthurkun.generic.datastore"
-    compileSdk = libs.versions.compile.sdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.min.sdk.get().toInt()
-        consumerProguardFiles("consumer-rules.pro") // Restored for consumers of the library
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
