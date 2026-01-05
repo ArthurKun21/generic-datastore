@@ -26,7 +26,6 @@ kotlin {
             dependencies {
                 implementation(libs.datastore.preferences.core)
                 implementation(libs.kotlinx.serialization.json)
-                implementation(libs.logcat)
             }
         }
         val commonTest by getting {

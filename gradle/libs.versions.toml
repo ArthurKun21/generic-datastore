@@ -21,7 +21,6 @@ junit5 = "6.0.1"
 test-ext-junit = "1.3.0"
 test-espresso = "3.7.0"
 
-logcat = "0.4"
 leakcanary = "2.14"
 
 datastore = "1.2.0"
@@ -59,7 +58,6 @@ compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", versio
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
 
-logcat = { module = "com.squareup.logcat:logcat", version.ref = "logcat" }
 leak-canary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
