@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.spotless) apply false
+    alias(libs.plugins.vanniktech.mavenPublish) apply false
 }
 
 version = "1.0.0"

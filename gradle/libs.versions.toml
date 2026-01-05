@@ -6,6 +6,8 @@ min-sdk = "24"
 agp = "8.13.2"
 kotlin = "2.3.0"
 
+vanniktechMavenPublish = "0.35.0"
+
 android-core-ktx = "1.17.0"
 appcompat = "1.7.1"
 lifecycle = "2.10.0"
@@ -74,6 +76,8 @@ ktlint-core = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlin
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 agp = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+
+vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktechMavenPublish" }
 
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 

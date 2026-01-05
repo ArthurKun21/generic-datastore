@@ -2,7 +2,7 @@ import com.android.build.api.dsl.androidLibrary
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    `maven-publish`
+    alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.android.library)
 }
 
