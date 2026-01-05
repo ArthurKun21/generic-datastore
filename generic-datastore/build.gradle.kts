@@ -7,9 +7,6 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
-        publishLibraryVariants("release")
-    }
     androidLibrary {
         namespace = "io.github.arthurkun.generic.datastore"
         compileSdk = libs.versions.compile.sdk.get().toInt()
@@ -79,30 +76,30 @@ kotlin {
     }
 }
 
-android {
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-        }
-    }
-    sourceSets {
-        getByName("androidTest") {
-            // Android test source set
-            java.srcDir("src/androidInstrumentedTest/kotlin")
-        }
-    }
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-            withJavadocJar()
-        }
-    }
-}
+//android {
+//
+//    buildTypes {
+//        release {
+//            isMinifyEnabled = false
+//            proguardFiles(
+//                getDefaultProguardFile("proguard-android-optimize.txt"),
+//                "proguard-rules.pro",
+//            )
+//        }
+//    }
+//    sourceSets {
+//        getByName("androidTest") {
+//            // Android test source set
+//            java.srcDir("src/androidInstrumentedTest/kotlin")
+//        }
+//    }
+//    publishing {
+//        singleVariant("release") {
+//            withSourcesJar()
+//            withJavadocJar()
+//        }
+//    }
+//}
 
 publishing {
     publications {
