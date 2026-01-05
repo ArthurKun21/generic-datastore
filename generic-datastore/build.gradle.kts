@@ -28,20 +28,15 @@ kotlin {
     }
 
     sourceSets {
-        commonMain {
-            dependencies {
-                implementation(libs.datastore.preferences.core)
-                implementation(libs.kotlinx.serialization.json)
-            }
+        commonMain.dependencies {
+            implementation(libs.datastore.preferences.core)
+            implementation(libs.kotlinx.serialization.json)
         }
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-                implementation(libs.junit4)
-                implementation(libs.coroutines.test)
-            }
-        }
-        androidMain {
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.junit4)
+            implementation(libs.coroutines.test)
         }
 
         getByName("androidDeviceTest") {
@@ -54,8 +49,6 @@ kotlin {
                 implementation(libs.androidx.test.espresso)
             }
         }
-
-        val desktopMain by getting
         val desktopTest by getting {
             dependencies {
                 // JVM-specific test dependencies
