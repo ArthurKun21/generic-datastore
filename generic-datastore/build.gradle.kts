@@ -64,31 +64,6 @@ kotlin {
     }
 }
 
-// android {
-//
-//    buildTypes {
-//        release {
-//            isMinifyEnabled = false
-//            proguardFiles(
-//                getDefaultProguardFile("proguard-android-optimize.txt"),
-//                "proguard-rules.pro",
-//            )
-//        }
-//    }
-//    sourceSets {
-//        getByName("androidTest") {
-//            // Android test source set
-//            java.srcDir("src/androidInstrumentedTest/kotlin")
-//        }
-//    }
-//    publishing {
-//        singleVariant("release") {
-//            withSourcesJar()
-//            withJavadocJar()
-//        }
-//    }
-// }
-
 publishing {
     publications {
         withType<MavenPublication> {
