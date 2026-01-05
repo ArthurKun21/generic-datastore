@@ -48,7 +48,6 @@ kotlin {
             }
         }
         androidMain {
-
         }
 
         getByName("androidDeviceTest") {
@@ -78,7 +77,7 @@ kotlin {
     }
 }
 
-//android {
+// android {
 //
 //    buildTypes {
 //        release {
@@ -101,7 +100,7 @@ kotlin {
 //            withJavadocJar()
 //        }
 //    }
-//}
+// }
 
 publishing {
     publications {
