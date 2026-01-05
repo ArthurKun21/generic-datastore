@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import logcat.logcat
 import kotlin.reflect.KProperty
 
 /**
@@ -103,7 +104,9 @@ internal class MappedPrefs<T, R>(
         return try {
             convert(value)
         } catch (e: Exception) {
-            println("$TAG: Error converting preference value $e")
+            logcat(TAG) {
+                "Error converting preference value $e"
+            }
             defaultValue
         }
     }
@@ -120,7 +123,9 @@ internal class MappedPrefs<T, R>(
         return try {
             reverse(value)
         } catch (e: Exception) {
-            println("$TAG: Error converting preference value $e")
+            logcat(TAG) {
+                "Error converting preference value $e"
+            }
             prefs.defaultValue
         }
     }
