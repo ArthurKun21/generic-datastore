@@ -12,6 +12,8 @@ kotlin {
         compileSdk = libs.versions.compile.sdk.get().toInt()
         minSdk = libs.versions.min.sdk.get().toInt()
 
+        withJava()
+
         optimization {
             consumerKeepRules.file("consumer-rules.pro")
         }
