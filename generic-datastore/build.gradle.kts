@@ -1,12 +1,26 @@
+import com.android.build.api.dsl.androidLibrary
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    `maven-publish`
-    id("com.android.library")
+    alias(libs.plugins.vanniktech.maven.publish)
+    alias(libs.plugins.android.library)
 }
 
 kotlin {
-    androidTarget {
-        publishLibraryVariants("release")
+    androidLibrary {
+        namespace = "io.github.arthurkun.generic.datastore"
+        compileSdk = libs.versions.compile.sdk.get().toInt()
+        minSdk = libs.versions.min.sdk.get().toInt()
+
+        withJava()
+
+        optimization {
+            consumerKeepRules.file("consumer-rules.pro")
+        }
+
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
     }
 
     jvm("desktop") {
@@ -14,30 +28,20 @@ kotlin {
             useJUnitPlatform()
         }
     }
-//    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
-//        target.binaries.framework {
-//            baseName = project.name
-//            isStatic = true
-//        }
-//    }
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(libs.datastore.preferences.core)
-                implementation(libs.kotlinx.serialization.json)
-            }
-        }
-        val commonTest by getting {
-            dependencies {
-                implementation(libs.kotlin.test)
-                implementation(libs.junit4)
-                implementation(libs.coroutines.test)
-            }
+        commonMain.dependencies {
+            implementation(libs.datastore.preferences.core)
+            implementation(libs.kotlinx.serialization.json)
         }
 
-        val androidMain by getting
-        val androidInstrumentedTest by getting {
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.junit4)
+            implementation(libs.coroutines.test)
+        }
+
+        getByName("androidDeviceTest") {
             dependencies {
                 implementation(libs.datastore.preferences)
                 implementation(libs.kotlin.test)
@@ -47,8 +51,6 @@ kotlin {
                 implementation(libs.androidx.test.espresso)
             }
         }
-
-        val desktopMain by getting
         val desktopTest by getting {
             dependencies {
                 // JVM-specific test dependencies
@@ -61,37 +63,6 @@ kotlin {
         freeCompilerArgs.addAll(
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
         )
-    }
-}
-
-android {
-    namespace = "io.github.arthurkun.generic.datastore"
-    compileSdk = libs.versions.compile.sdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.min.sdk.get().toInt()
-        consumerProguardFiles("consumer-rules.pro") // Restored for consumers of the library
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-        }
-    }
-    sourceSets {
-        getByName("androidTest") {
-            // Android test source set
-            java.srcDir("src/androidInstrumentedTest/kotlin")
-        }
-    }
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-            withJavadocJar()
-        }
     }
 }
 

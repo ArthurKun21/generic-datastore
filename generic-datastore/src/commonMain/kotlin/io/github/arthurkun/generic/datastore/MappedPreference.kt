@@ -102,8 +102,7 @@ internal class MappedPrefs<T, R>(
     private fun convertFallback(value: T): R {
         return try {
             convert(value)
-        } catch (e: Exception) {
-            println("$TAG: Error converting preference value $e")
+        } catch (_: Exception) {
             defaultValue
         }
     }
@@ -119,8 +118,7 @@ internal class MappedPrefs<T, R>(
     private fun reverseFallback(value: R): T {
         return try {
             reverse(value)
-        } catch (e: Exception) {
-            println("$TAG: Error converting preference value $e")
+        } catch (_: Exception) {
             prefs.defaultValue
         }
     }

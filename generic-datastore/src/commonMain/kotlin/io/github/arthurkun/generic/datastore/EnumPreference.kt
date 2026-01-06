@@ -23,11 +23,7 @@ inline fun <reified T : Enum<T>> PreferenceDatastore.enum(
     deserializer = {
         try {
             enumValueOf(it)
-        } catch (e: IllegalArgumentException) {
-            println(
-                "$TAG: Enum value $it not found for key $key, " +
-                    "returning default value $defaultValue ${e.message}",
-            )
+        } catch (_: IllegalArgumentException) {
             defaultValue
         }
     },
