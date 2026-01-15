@@ -73,7 +73,6 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 ktlint-core = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint-core" }
 
 [plugins]
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 agp = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 
