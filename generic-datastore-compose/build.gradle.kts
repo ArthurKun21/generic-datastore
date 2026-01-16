@@ -38,12 +38,6 @@ kotlin {
             implementation(libs.coroutines.test)
         }
     }
-
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-        )
-    }
 }
 
 publishing {
