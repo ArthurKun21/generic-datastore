@@ -8,6 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 /**
@@ -36,8 +38,8 @@ class ObjectPrimitive<T>(
     preferences = stringPreferencesKey(key) as Preferences.Key<T>,
 ) {
     private val stringPrefKey = stringPreferencesKey(key)
-
     private val ioDispatcher = Dispatchers.IO
+    private val mutex = Mutex()
 
     override suspend fun get(): T {
         return withContext(ioDispatcher) {
@@ -52,17 +54,39 @@ class ObjectPrimitive<T>(
     }
 
     override suspend fun set(value: T) {
-        withContext(ioDispatcher) {
-            datastore.edit { prefs ->
-                prefs[stringPrefKey] = serializer(value)
+        mutex.withLock {
+            withContext(ioDispatcher) {
+                datastore.edit { prefs ->
+                    prefs[stringPrefKey] = serializer(value)
+                }
+            }
+        }
+    }
+
+    override suspend fun getAndSet(value: T): T {
+        return mutex.withLock {
+            withContext(ioDispatcher) {
+                val currentValue = datastore
+                    .data
+                    .map { prefs ->
+                        prefs[stringPrefKey]?.let { deserializer(it) }
+                            ?: this@ObjectPrimitive.defaultValue
+                    }
+                    .first()
+                datastore.edit { prefs ->
+                    prefs[stringPrefKey] = serializer(value)
+                }
+                currentValue
             }
         }
     }
 
     override suspend fun delete() {
-        withContext(ioDispatcher) {
-            datastore.edit { prefs ->
-                prefs.remove(stringPrefKey)
+        mutex.withLock {
+            withContext(ioDispatcher) {
+                datastore.edit { prefs ->
+                    prefs.remove(stringPrefKey)
+                }
             }
         }
     }
