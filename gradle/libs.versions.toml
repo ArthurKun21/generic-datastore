@@ -30,7 +30,7 @@ kotlinx_serialization = "1.10.0"
 
 coroutines = "1.10.2"
 
-spotless = "8.2.0"
+spotless = "8.2.1"
 ktlint-core = "1.8.0"
 
 [libraries]
