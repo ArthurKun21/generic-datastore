@@ -24,15 +24,22 @@ sealed class PreferenceValue {
         fun fromAny(value: Any?): PreferenceValue? {
             return when (value) {
                 is Int -> IntPreferenceValue(value)
+
                 is Long -> LongPreferenceValue(value)
+
                 is Float -> FloatPreferenceValue(value)
+
                 is Double -> DoublePreferenceValue(value)
+
                 is String -> StringPreferenceValue(value)
+
                 is Boolean -> BooleanPreferenceValue(value)
+
                 is Set<*> -> {
                     @Suppress("UNCHECKED_CAST")
                     (value as? Set<String>)?.let { StringSetPreferenceValue(it) }
                 }
+
                 else -> null
             }
         }
