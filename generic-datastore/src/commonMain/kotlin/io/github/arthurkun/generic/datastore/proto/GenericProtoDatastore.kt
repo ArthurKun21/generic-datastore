@@ -9,8 +9,8 @@ import io.github.arthurkun.generic.datastore.core.Prefs
  * This class wraps a [DataStore<T>] instance for typed proto messages.
  *
  * @param T The proto message type.
- * @property datastore The underlying [DataStore<T>] instance.
- * @property defaultValue The default value for the proto message.
+ * @param datastore The underlying [DataStore<T>] instance.
+ * @param defaultValue The default value for the proto message.
  */
 @Suppress("unused")
 class GenericProtoDatastore<T>(

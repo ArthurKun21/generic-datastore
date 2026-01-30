@@ -40,7 +40,7 @@ class DesktopDatastoreBlockingTest {
                 File(tempFolder, "${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb")
             },
         )
-        // Assuming GenericPreferencesDatastore takes a scope for its operations and for PrefsImpl
+        // Assuming GenericPreferencesDatastore uses the provided DataStore for its operations
         preferenceDatastore = GenericPreferencesDatastore(dataStore)
     }
 

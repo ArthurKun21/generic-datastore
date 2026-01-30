@@ -18,8 +18,8 @@ import kotlin.reflect.KProperty
  * A [Preference] implementation backed by a Proto DataStore.
  *
  * @param T The proto message type.
- * @property datastore The [DataStore<T>] instance.
- * @property defaultValue The default value for the proto message.
+ * @param datastore The [DataStore<T>] instance.
+ * @param defaultValue The default value for the proto message.
  */
 internal class ProtoPreference<T>(
     private val datastore: DataStore<T>,
