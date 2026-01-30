@@ -134,9 +134,9 @@ internal class MappedPrefs<T, R>(
     override fun stateIn(scope: CoroutineScope): StateFlow<R> =
         asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
 
-    override fun getValue(): R = convertFallback(prefs.getValue())
+    override fun getBlocking(): R = convertFallback(prefs.getValue())
 
-    override fun setValue(value: R) = prefs.setValue(reverseFallback(value))
+    override fun setBlocking(value: R) = prefs.setValue(reverseFallback(value))
 
     override fun resetToDefault() = prefs.resetToDefault()
 
