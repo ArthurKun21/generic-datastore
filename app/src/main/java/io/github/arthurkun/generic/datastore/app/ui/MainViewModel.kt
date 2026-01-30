@@ -4,22 +4,22 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.arthurkun.generic.datastore.app.domain.PreferenceStore
-import io.github.arthurkun.generic.datastore.core.toJsonElement
-import io.github.arthurkun.generic.datastore.core.toJsonMap
+import io.github.arthurkun.generic.datastore.backup.PreferenceBackupCreator
+import io.github.arthurkun.generic.datastore.backup.PreferenceBackupRestorer
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 class MainViewModel(
     val preferenceStore: PreferenceStore,
 ) : ViewModel() {
 
-    private val jsonConfig = Json { prettyPrint = true }
+    private val backupCreator = PreferenceBackupCreator(preferenceStore.datastore)
+    private val backupRestorer = PreferenceBackupRestorer(preferenceStore.datastore)
 
     suspend fun exportPreferences(): String {
         return try {
-            val data = preferenceStore.exportPreferences()
-            jsonConfig.encodeToString(
-                data.toJsonElement(),
+            backupCreator.createBackupJson(
+                includePrivatePreferences = false,
+                includeAppStatePreferences = false,
             )
         } catch (e: Exception) {
             Log.e("MainViewModel", "Failed to export preferences", e)
@@ -29,8 +29,7 @@ class MainViewModel(
 
     fun importPreferences(data: String) = viewModelScope.launch {
         try {
-            val newData = data.toJsonMap()
-            preferenceStore.importPreferences(newData)
+            backupRestorer.restoreFromJson(data)
         } catch (e: Exception) {
             Log.e("MainViewModel", "Failed to import preferences", e)
         }

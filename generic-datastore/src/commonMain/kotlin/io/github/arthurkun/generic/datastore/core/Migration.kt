@@ -15,6 +15,15 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
 
+@Deprecated(
+    message = "Use PreferenceBackupCreator for type-safe backup/restore",
+    replaceWith = ReplaceWith(
+        "PreferenceBackupCreator(datastore).createBackup()",
+        "io.github.arthurkun.generic.datastore.backup.PreferenceBackupCreator",
+    ),
+    level = DeprecationLevel.WARNING,
+)
+@Suppress("DEPRECATION")
 fun Any?.toJsonElement(): JsonElement = when (this) {
     null -> JsonNull
     is JsonElement -> this
@@ -51,6 +60,14 @@ private fun parseJsonValue(element: JsonElement): Any? {
  *
  * Note: null values are preserved in the resulting map.
  */
+@Deprecated(
+    message = "Use PreferenceBackupRestorer for type-safe backup/restore",
+    replaceWith = ReplaceWith(
+        "PreferenceBackupRestorer(datastore).restoreFromJson(jsonString)",
+        "io.github.arthurkun.generic.datastore.backup.PreferenceBackupRestorer",
+    ),
+    level = DeprecationLevel.WARNING,
+)
 fun String.toJsonMap(): Map<String, Any?> = try {
     Json.parseToJsonElement(this)
         .jsonObject

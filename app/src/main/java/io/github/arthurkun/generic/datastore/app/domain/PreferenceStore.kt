@@ -6,7 +6,7 @@ import io.github.arthurkun.generic.datastore.preferences.enum
 import kotlin.time.Instant
 
 class PreferenceStore(
-    private val datastore: GenericPreferencesDatastore,
+    val datastore: GenericPreferencesDatastore,
 ) {
 
     val theme = datastore.enum(

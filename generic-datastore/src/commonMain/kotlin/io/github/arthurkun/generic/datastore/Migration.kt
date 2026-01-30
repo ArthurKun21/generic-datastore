@@ -8,28 +8,30 @@ import io.github.arthurkun.generic.datastore.core.toJsonMap as coreToJsonMap
 
 /**
  * Extension for backwards compatibility.
- * @see io.github.arthurkun.generic.datastore.core.toJsonElement
+ * @see io.github.arthurkun.generic.datastore.backup.PreferenceBackupCreator
  */
 @Deprecated(
-    message = "Moved to core package",
+    message = "Use PreferenceBackupCreator for type-safe backup/restore",
     replaceWith = ReplaceWith(
-        "toJsonElement()",
-        "io.github.arthurkun.generic.datastore.core.toJsonElement",
+        "PreferenceBackupCreator(datastore).createBackup()",
+        "io.github.arthurkun.generic.datastore.backup.PreferenceBackupCreator",
     ),
-    level = DeprecationLevel.WARNING,
+    level = DeprecationLevel.ERROR,
 )
+@Suppress("DEPRECATION")
 fun Any?.toJsonElement(): JsonElement = coreToJsonElement()
 
 /**
  * Extension for backwards compatibility.
- * @see io.github.arthurkun.generic.datastore.core.toJsonMap
+ * @see io.github.arthurkun.generic.datastore.backup.PreferenceBackupRestorer
  */
 @Deprecated(
-    message = "Moved to core package",
+    message = "Use PreferenceBackupRestorer for type-safe backup/restore",
     replaceWith = ReplaceWith(
-        "toJsonMap()",
-        "io.github.arthurkun.generic.datastore.core.toJsonMap",
+        "PreferenceBackupRestorer(datastore).restoreFromJson(jsonString)",
+        "io.github.arthurkun.generic.datastore.backup.PreferenceBackupRestorer",
     ),
-    level = DeprecationLevel.WARNING,
+    level = DeprecationLevel.ERROR,
 )
+@Suppress("DEPRECATION")
 fun String.toJsonMap(): Map<String, Any?> = coreToJsonMap()

@@ -171,6 +171,7 @@ class GenericPreferencesDatastore(
                 } else if (!exportAppState && Preference.isAppState(key.name)) {
                     null
                 } else {
+                    @Suppress("DEPRECATION")
                     key.name to values.toJsonElement()
                 }
             }
@@ -197,12 +198,14 @@ class GenericPreferencesDatastore(
                             @Suppress("UNCHECKED_CAST")
                             mutablePreferences[stringSetPreferencesKey(key)] = (value as Collection<String>).toSet()
                         } else {
+                            @Suppress("DEPRECATION")
                             val stringValue = value.toJsonElement().toString()
                             mutablePreferences[stringPreferencesKey(key)] = stringValue
                         }
                     }
 
                     else -> {
+                        @Suppress("DEPRECATION")
                         val stringValue = when (value) {
                             is Map<*, *>, is Collection<*> -> value.toJsonElement().toString()
                             else -> value.toString()
