@@ -1,5 +1,6 @@
 package io.github.arthurkun.generic.datastore.app.domain
 
+import io.github.arthurkun.generic.datastore.backup.BackupPreference
 import io.github.arthurkun.generic.datastore.core.mapIO
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.enum
@@ -48,9 +49,8 @@ class PreferenceStore(
         },
     )
 
-    suspend fun exportPreferences() = datastore.export()
+    suspend fun exportPreferences(): List<BackupPreference> = datastore.export()
 
-    suspend fun importPreferences(data: Map<String, Any?>) = datastore.import(
-    data.filterValues { it != null }.mapValues { it.value!! }
-)
+    suspend fun importPreferences(backupPreferences: List<BackupPreference>) =
+        datastore.import(backupPreferences)
 }

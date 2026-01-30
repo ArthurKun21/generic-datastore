@@ -8,10 +8,18 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import io.github.arthurkun.generic.datastore.backup.BackupPreference
+import io.github.arthurkun.generic.datastore.backup.BooleanPreferenceValue
+import io.github.arthurkun.generic.datastore.backup.DoublePreferenceValue
+import io.github.arthurkun.generic.datastore.backup.FloatPreferenceValue
+import io.github.arthurkun.generic.datastore.backup.IntPreferenceValue
+import io.github.arthurkun.generic.datastore.backup.LongPreferenceValue
+import io.github.arthurkun.generic.datastore.backup.PreferenceValue
+import io.github.arthurkun.generic.datastore.backup.StringPreferenceValue
+import io.github.arthurkun.generic.datastore.backup.StringSetPreferenceValue
 import io.github.arthurkun.generic.datastore.core.Preference
 import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.core.PrefsImpl
-import io.github.arthurkun.generic.datastore.core.toJsonElement
 import io.github.arthurkun.generic.datastore.preferences.GenericPreference.BooleanPrimitive
 import io.github.arthurkun.generic.datastore.preferences.GenericPreference.FloatPrimitive
 import io.github.arthurkun.generic.datastore.preferences.GenericPreference.IntPrimitive
@@ -19,7 +27,6 @@ import io.github.arthurkun.generic.datastore.preferences.GenericPreference.LongP
 import io.github.arthurkun.generic.datastore.preferences.GenericPreference.StringPrimitive
 import io.github.arthurkun.generic.datastore.preferences.GenericPreference.StringSetPrimitive
 import kotlinx.coroutines.flow.first
-import kotlinx.serialization.json.JsonElement
 
 /**
  * A DataStore implementation that provides methods for creating and managing various types of preferences.
@@ -159,62 +166,47 @@ class GenericPreferencesDatastore(
         ),
     )
 
-    override suspend fun export(exportPrivate: Boolean, exportAppState: Boolean): Map<String, JsonElement> {
+    override suspend fun export(
+        exportPrivate: Boolean,
+        exportAppState: Boolean,
+    ): List<BackupPreference> {
         return datastore
             .data
             .first()
             .toPreferences()
             .asMap()
-            .mapNotNull { (key, values) ->
+            .mapNotNull { (key, value) ->
                 if (!exportPrivate && Preference.isPrivate(key.name)) {
-                    null
-                } else if (!exportAppState && Preference.isAppState(key.name)) {
-                    null
-                } else {
-                    @Suppress("DEPRECATION")
-                    key.name to values.toJsonElement()
+                    return@mapNotNull null
                 }
+                if (!exportAppState && Preference.isAppState(key.name)) {
+                    return@mapNotNull null
+                }
+                val preferenceValue = value.toBackupPreferenceValue() ?: return@mapNotNull null
+                BackupPreference(key = key.name, value = preferenceValue)
             }
-            .toMap()
     }
 
-    override suspend fun import(data: Map<String, Any>) {
+    override suspend fun import(backupPreferences: List<BackupPreference>) {
         datastore.updateData { currentPreferences ->
             val mutablePreferences = currentPreferences.toMutablePreferences()
-            data.forEach { (key, value) ->
-                when (value) {
-                    is String -> mutablePreferences[stringPreferencesKey(key)] = value
-
-                    is Long -> mutablePreferences[longPreferencesKey(key)] = value
-
-                    is Int -> mutablePreferences[intPreferencesKey(key)] = value
-
-                    is Float -> mutablePreferences[floatPreferencesKey(key)] = value
-
-                    is Boolean -> mutablePreferences[booleanPreferencesKey(key)] = value
-
-                    is Collection<*> -> {
-                        if (value.all { it is String }) {
-                            @Suppress("UNCHECKED_CAST")
-                            mutablePreferences[stringSetPreferencesKey(key)] = (value as Collection<String>).toSet()
-                        } else {
-                            @Suppress("DEPRECATION")
-                            val stringValue = value.toJsonElement().toString()
-                            mutablePreferences[stringPreferencesKey(key)] = stringValue
-                        }
-                    }
-
-                    else -> {
-                        @Suppress("DEPRECATION")
-                        val stringValue = when (value) {
-                            is Map<*, *>, is Collection<*> -> value.toJsonElement().toString()
-                            else -> value.toString()
-                        }
-                        mutablePreferences[stringPreferencesKey(key)] = stringValue
-                    }
+            backupPreferences.forEach { backupPref ->
+                val key = backupPref.key
+                when (val value = backupPref.value) {
+                    is IntPreferenceValue -> mutablePreferences[intPreferencesKey(key)] = value.value
+                    is LongPreferenceValue -> mutablePreferences[longPreferencesKey(key)] = value.value
+                    is FloatPreferenceValue -> mutablePreferences[floatPreferencesKey(key)] = value.value
+                    is DoublePreferenceValue -> mutablePreferences[stringPreferencesKey(key)] = value.value.toString()
+                    is StringPreferenceValue -> mutablePreferences[stringPreferencesKey(key)] = value.value
+                    is BooleanPreferenceValue -> mutablePreferences[booleanPreferencesKey(key)] = value.value
+                    is StringSetPreferenceValue -> mutablePreferences[stringSetPreferencesKey(key)] = value.value
                 }
             }
             mutablePreferences.toPreferences()
         }
+    }
+
+    private fun Any?.toBackupPreferenceValue(): PreferenceValue? {
+        return PreferenceValue.fromAny(this)
     }
 }

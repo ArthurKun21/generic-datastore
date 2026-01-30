@@ -1,7 +1,7 @@
 package io.github.arthurkun.generic.datastore.preferences
 
+import io.github.arthurkun.generic.datastore.backup.BackupPreference
 import io.github.arthurkun.generic.datastore.core.Prefs
-import kotlinx.serialization.json.JsonElement
 
 /**
  * Defines the contract for a preference data store.
@@ -80,12 +80,22 @@ interface PreferencesDatastore {
         deserializer: (String) -> T,
     ): Prefs<T>
 
+    /**
+     * Exports all preferences as a list of [BackupPreference] objects.
+     *
+     * @param exportPrivate Whether to include private preferences (keys starting with __PRIVATE_).
+     * @param exportAppState Whether to include app state preferences (keys starting with __APP_STATE_).
+     * @return A list of [BackupPreference] containing all exported preferences.
+     */
     suspend fun export(
         exportPrivate: Boolean = false,
         exportAppState: Boolean = false,
-    ): Map<String, JsonElement>
+    ): List<BackupPreference>
 
-    suspend fun import(
-        data: Map<String, Any>,
-    )
+    /**
+     * Imports preferences from a list of [BackupPreference] objects.
+     *
+     * @param backupPreferences The list of preferences to import.
+     */
+    suspend fun import(backupPreferences: List<BackupPreference>)
 }
