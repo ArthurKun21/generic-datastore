@@ -1,0 +1,64 @@
+# Generic Datastore
+
+This repository contains a Kotlin Multiplatform library that provides a thin wrapper around AndroidX DataStore Preferences. The main module is `generic-datastore`, with optional Jetpack Compose extensions in `generic-datastore-compose`.
+
+## Modules
+
+- `:generic-datastore` core preference wrapper library.
+- `:generic-datastore-compose` Compose helpers built on the core module.
+- `:app` sample app for local development.
+
+## Workflow
+
+- Use Gradle Kotlin DSL (`*.gradle.kts`).
+- Prefer Kotlin Multiplatform idioms and keep shared APIs in `commonMain`.
+- Keep this library as a thin convenience wrapper over `DataStore<Preferences>` and avoid heavy abstractions.
+
+## Code Style
+
+- Follow Spotless + ktlint rules configured in the root `build.gradle.kts`.
+- Keep APIs small, predictable, and documented in README when public behavior changes.
+
+## Testing and Quality Assurance
+
+### Build verification
+
+Ensure the module compiles by running the appropriate Gradle tasks and resolving any failures.
+
+#### KMP modules targeting Android Build
+
+- Compile the Android main source set:
+
+    ```shell
+    ./gradlew :<module-name>:compileAndroidMain
+    ```
+
+- Compile the Android host (unit test) source set:
+
+    ```shell
+    ./gradlew :<module-name>:compileAndroidHostTest
+    ```
+
+- Compile the Android device (instrumentation test) source set:
+
+    ```shell
+    ./gradlew :<module-name>:compileAndroidDeviceTest
+    ```
+
+### Running tests
+
+If no Android device or emulator is available, run unit tests and at least compile the Android instrumentation test source set to verify correctness.
+
+#### KMP modules targeting Android Test
+
+- Run Android unit tests:
+
+    ```shell
+    ./gradlew :<module-name>:testAndroidHostTest
+    ```
+
+- Run Android instrumentation tests (requires device/emulator):
+
+    ```shell
+    ./gradlew :<module-name>:connectedAndroidDeviceTest
+    ```
