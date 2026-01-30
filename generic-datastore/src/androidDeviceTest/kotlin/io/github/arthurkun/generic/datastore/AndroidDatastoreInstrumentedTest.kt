@@ -8,6 +8,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.github.arthurkun.generic.datastore.core.map
+import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.enum
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,7 +37,7 @@ private data class SerializableObject(val id: Int, val name: String)
 class AndroidDatastoreInstrumentedTest {
 
     private lateinit var dataStore: DataStore<Preferences>
-    private lateinit var preferenceDatastore: GenericPreferenceDatastore
+    private lateinit var preferenceDatastore: GenericPreferencesDatastore
     private lateinit var testContext: Context
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var testScope: CoroutineScope
@@ -48,8 +51,8 @@ class AndroidDatastoreInstrumentedTest {
             scope = testScope,
             produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_NAME) },
         )
-        // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
-        preferenceDatastore = GenericPreferenceDatastore(dataStore)
+        // Initialize GenericPreferencesDatastore with the created DataStore
+        preferenceDatastore = GenericPreferencesDatastore(dataStore)
     }
 
     @After

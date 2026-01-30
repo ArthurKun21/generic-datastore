@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import io.github.arthurkun.generic.datastore.GenericPreferenceDatastore
 import io.github.arthurkun.generic.datastore.app.domain.PreferenceStore
+import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import okio.Path.Companion.toPath
 
 class AppContainer(context: Context) {
@@ -23,7 +23,7 @@ class AppContainer(context: Context) {
         producePath = { context.filesDir.resolve(dataStoreFileName).absolutePath },
     )
 
-    private val genericPreferenceDatastore = GenericPreferenceDatastore(
+    private val genericPreferenceDatastore = GenericPreferencesDatastore(
         datastore = createDataStore(context),
     )
 

@@ -1,17 +1,17 @@
 package io.github.arthurkun.generic.datastore.app.domain
 
-import io.github.arthurkun.generic.datastore.GenericPreferenceDatastore
-import io.github.arthurkun.generic.datastore.enum
-import io.github.arthurkun.generic.datastore.mapIO
+import io.github.arthurkun.generic.datastore.core.mapIO
+import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.enum
 import kotlin.time.Instant
 
 class PreferenceStore(
-    private val datastore: GenericPreferenceDatastore,
+    private val datastore: GenericPreferencesDatastore,
 ) {
 
     val theme = datastore.enum(
         "theme",
-        defaultValue = Theme.SYSTEM,
+        Theme.SYSTEM,
     )
 
     val text = datastore.string(

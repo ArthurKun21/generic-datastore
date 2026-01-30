@@ -3,6 +3,9 @@ package io.github.arthurkun.generic.datastore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import io.github.arthurkun.generic.datastore.core.map
+import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.enum
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -26,7 +29,7 @@ class DesktopDatastoreBlockingTest {
     lateinit var tempFolder: File
 
     private lateinit var dataStore: DataStore<Preferences>
-    private lateinit var preferenceDatastore: GenericPreferenceDatastore
+    private lateinit var preferenceDatastore: GenericPreferencesDatastore
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeTest
@@ -37,8 +40,8 @@ class DesktopDatastoreBlockingTest {
                 File(tempFolder, "${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb")
             },
         )
-        // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
-        preferenceDatastore = GenericPreferenceDatastore(dataStore)
+        // Assuming GenericPreferencesDatastore uses the provided DataStore for its operations
+        preferenceDatastore = GenericPreferencesDatastore(dataStore)
     }
 
     @AfterTest
@@ -50,77 +53,77 @@ class DesktopDatastoreBlockingTest {
     @Test
     fun stringPreference_resetToDefault() {
         val stringPref = preferenceDatastore.string("testString", "defaultValueReset")
-        stringPref.setValue("valueToReset")
-        assertEquals(stringPref.getValue(), "valueToReset")
+        stringPref.setBlocking("valueToReset")
+        assertEquals(stringPref.getBlocking(), "valueToReset")
 
         stringPref.resetToDefault()
-        assertEquals(stringPref.getValue(), "defaultValueReset")
+        assertEquals(stringPref.getBlocking(), "defaultValueReset")
     }
 
     // Tests for IntPreference
     @Test
     fun intPreference_resetToDefault() {
         val intPref = preferenceDatastore.int("testInt", 10)
-        intPref.setValue(20)
-        assertEquals(intPref.getValue(), 20)
+        intPref.setBlocking(20)
+        assertEquals(intPref.getBlocking(), 20)
 
         intPref.resetToDefault()
-        assertEquals(intPref.getValue(), 10)
+        assertEquals(intPref.getBlocking(), 10)
     }
 
     // Tests for LongPreference
     @Test
     fun longPreference_resetToDefault() {
         val longPref = preferenceDatastore.long("testLong", 100L)
-        longPref.setValue(200L)
-        assertEquals(longPref.getValue(), 200L)
+        longPref.setBlocking(200L)
+        assertEquals(longPref.getBlocking(), 200L)
 
         longPref.resetToDefault()
-        assertEquals(longPref.getValue(), 100L)
+        assertEquals(longPref.getBlocking(), 100L)
     }
 
     // Tests for FloatPreference
     @Test
     fun floatPreference_resetToDefault() {
         val floatPref = preferenceDatastore.float("testFloat", 1.0f)
-        floatPref.setValue(2.0f)
-        assertEquals(floatPref.getValue(), 2.0f)
+        floatPref.setBlocking(2.0f)
+        assertEquals(floatPref.getBlocking(), 2.0f)
 
         floatPref.resetToDefault()
-        assertEquals(floatPref.getValue(), 1.0f)
+        assertEquals(floatPref.getBlocking(), 1.0f)
     }
 
     // Tests for BooleanPreference
     @Test
     fun booleanPreference_resetToDefault() {
         val boolPref = preferenceDatastore.bool("testBoolean", false)
-        boolPref.setValue(true)
-        assertEquals(boolPref.getValue(), true)
+        boolPref.setBlocking(true)
+        assertEquals(boolPref.getBlocking(), true)
 
         boolPref.resetToDefault()
-        assertEquals(boolPref.getValue(), false)
+        assertEquals(boolPref.getBlocking(), false)
     }
 
     // Tests for StringSetPreference
     @Test
     fun stringSetPreference_resetToDefault() {
         val stringSetPref = preferenceDatastore.stringSet("testStringSet", setOf("a", "b"))
-        stringSetPref.setValue(setOf("c", "d", "e"))
-        assertEquals(stringSetPref.getValue(), setOf("c", "d", "e"))
+        stringSetPref.setBlocking(setOf("c", "d", "e"))
+        assertEquals(stringSetPref.getBlocking(), setOf("c", "d", "e"))
 
         stringSetPref.resetToDefault()
-        assertEquals(stringSetPref.getValue(), setOf("a", "b"))
+        assertEquals(stringSetPref.getBlocking(), setOf("a", "b"))
     }
 
     // Tests for EnumPreference
     @Test
     fun enumPreference_setAndGetValue() {
         val enumPref = preferenceDatastore.enum("testEnum", TestEnumBlocking.VALUE_A)
-        enumPref.setValue(TestEnumBlocking.VALUE_B)
-        assertEquals(enumPref.getValue(), TestEnumBlocking.VALUE_B)
+        enumPref.setBlocking(TestEnumBlocking.VALUE_B)
+        assertEquals(enumPref.getBlocking(), TestEnumBlocking.VALUE_B)
 
         enumPref.resetToDefault()
-        assertEquals(enumPref.getValue(), TestEnumBlocking.VALUE_A)
+        assertEquals(enumPref.getBlocking(), TestEnumBlocking.VALUE_A)
     }
 
     // Tests for Serialized (ObjectPrimitive)
@@ -137,11 +140,11 @@ class DesktopDatastoreBlockingTest {
                 SerializableObjectBlocking(parts[0].toInt(), parts[1])
             },
         )
-        serializedPref.setValue(objToReset)
-        assertEquals(serializedPref.getValue(), objToReset)
+        serializedPref.setBlocking(objToReset)
+        assertEquals(serializedPref.getBlocking(), objToReset)
 
         serializedPref.resetToDefault()
-        assertEquals(serializedPref.getValue(), defaultObj)
+        assertEquals(serializedPref.getBlocking(), defaultObj)
     }
 
     // Tests for MappedPreference
@@ -153,16 +156,16 @@ class DesktopDatastoreBlockingTest {
             convert = { "ResetMapped_$it" },
             reverse = { it.removePrefix("ResetMapped_").toInt() },
         )
-        mappedPref.setValue("ResetMapped_750")
-        assertEquals(mappedPref.getValue(), "ResetMapped_750")
-        assertEquals(intPref.getValue(), 750)
+        mappedPref.setBlocking("ResetMapped_750")
+        assertEquals(mappedPref.getBlocking(), "ResetMapped_750")
+        assertEquals(intPref.getBlocking(), 750)
 
         mappedPref.resetToDefault() // This should reset the underlying intPref to its default
         assertEquals(
-            mappedPref.getValue(),
+            mappedPref.getBlocking(),
             "ResetMapped_75",
         ) // Mapped pref would return the converted default
-        assertEquals(intPref.getValue(), 75) // Base pref should be reset to its default
+        assertEquals(intPref.getBlocking(), 75) // Base pref should be reset to its default
     }
 
     // Test for StringPreference delegation
@@ -175,12 +178,12 @@ class DesktopDatastoreBlockingTest {
         // Set value via delegation
         delegatedValue = "newDelegateValueDesktop"
         assertEquals("newDelegateValueDesktop", delegatedValue)
-        assertEquals("newDelegateValueDesktop", stringPref.getValue())
+        assertEquals("newDelegateValueDesktop", stringPref.getBlocking())
 
         // Reset to default
         stringPref.resetToDefault()
         assertEquals("defaultDelegateValueDesktop", delegatedValue)
-        assertEquals("defaultDelegateValueDesktop", stringPref.getValue())
+        assertEquals("defaultDelegateValueDesktop", stringPref.getBlocking())
     }
 
     // Test for IntPreference delegation
@@ -192,12 +195,12 @@ class DesktopDatastoreBlockingTest {
         // Set value via delegation
         delegatedValue = 101
         assertEquals(101, delegatedValue)
-        assertEquals(101, intPref.getValue())
+        assertEquals(101, intPref.getBlocking())
 
         // Reset to default
         intPref.resetToDefault()
         assertEquals(789, delegatedValue)
-        assertEquals(789, intPref.getValue())
+        assertEquals(789, intPref.getBlocking())
     }
 
     // Test for LongPreference delegation
@@ -209,12 +212,12 @@ class DesktopDatastoreBlockingTest {
         // Set value via delegation
         delegatedValue = 101L
         assertEquals(101L, delegatedValue)
-        assertEquals(101L, longPref.getValue())
+        assertEquals(101L, longPref.getBlocking())
 
         // Reset to default
         longPref.resetToDefault()
         assertEquals(789L, delegatedValue)
-        assertEquals(789L, longPref.getValue())
+        assertEquals(789L, longPref.getBlocking())
     }
 
     // Test for FloatPreference delegation
@@ -226,12 +229,12 @@ class DesktopDatastoreBlockingTest {
         // Set value via delegation
         delegatedValue = 1.01f
         assertEquals(1.01f, delegatedValue)
-        assertEquals(1.01f, floatPref.getValue())
+        assertEquals(1.01f, floatPref.getBlocking())
 
         // Reset to default
         floatPref.resetToDefault()
         assertEquals(7.89f, delegatedValue)
-        assertEquals(7.89f, floatPref.getValue())
+        assertEquals(7.89f, floatPref.getBlocking())
     }
 
     // Test for BooleanPreference delegation
@@ -243,12 +246,12 @@ class DesktopDatastoreBlockingTest {
         // Set value via delegation
         delegatedValue = false
         assertEquals(false, delegatedValue)
-        assertEquals(false, boolPref.getValue())
+        assertEquals(false, boolPref.getBlocking())
 
         // Reset to default
         boolPref.resetToDefault()
         assertEquals(true, delegatedValue)
-        assertEquals(true, boolPref.getValue())
+        assertEquals(true, boolPref.getBlocking())
     }
 
     // Test for StringSetPreference delegation
@@ -261,12 +264,12 @@ class DesktopDatastoreBlockingTest {
         // Set value via delegation
         delegatedValue = setOf("z", "w")
         assertEquals(setOf("z", "w"), delegatedValue)
-        assertEquals(setOf("z", "w"), stringSetPref.getValue())
+        assertEquals(setOf("z", "w"), stringSetPref.getBlocking())
 
         // Reset to default
         stringSetPref.resetToDefault()
         assertEquals(setOf("x", "y"), delegatedValue)
-        assertEquals(setOf("x", "y"), stringSetPref.getValue())
+        assertEquals(setOf("x", "y"), stringSetPref.getBlocking())
     }
 
     // Test for EnumPreference delegation
@@ -278,12 +281,12 @@ class DesktopDatastoreBlockingTest {
         // Set value via delegation
         delegatedValue = TestEnumBlocking.VALUE_B
         assertEquals(TestEnumBlocking.VALUE_B, delegatedValue)
-        assertEquals(TestEnumBlocking.VALUE_B, enumPref.getValue())
+        assertEquals(TestEnumBlocking.VALUE_B, enumPref.getBlocking())
 
         // Reset to default
         enumPref.resetToDefault()
         assertEquals(TestEnumBlocking.VALUE_A, delegatedValue)
-        assertEquals(TestEnumBlocking.VALUE_A, enumPref.getValue())
+        assertEquals(TestEnumBlocking.VALUE_A, enumPref.getBlocking())
     }
 
     // Test for SerializedPreference delegation
@@ -305,12 +308,12 @@ class DesktopDatastoreBlockingTest {
         // Set value via delegation
         delegatedValue = newObj
         assertEquals(newObj, delegatedValue)
-        assertEquals(newObj, serializedPref.getValue())
+        assertEquals(newObj, serializedPref.getBlocking())
 
         // Reset to default
         serializedPref.resetToDefault()
         assertEquals(defaultObj, delegatedValue)
-        assertEquals(defaultObj, serializedPref.getValue())
+        assertEquals(defaultObj, serializedPref.getBlocking())
     }
 
     // Test for MappedPreference delegation
@@ -327,8 +330,8 @@ class DesktopDatastoreBlockingTest {
         // Set value via delegation
         delegatedValue = "DelegateMappedDesktop_400"
         assertEquals("DelegateMappedDesktop_400", delegatedValue)
-        assertEquals("DelegateMappedDesktop_400", mappedPref.getValue())
-        assertEquals(400, intPref.getValue()) // Check underlying preference
+        assertEquals("DelegateMappedDesktop_400", mappedPref.getBlocking())
+        assertEquals(400, intPref.getBlocking()) // Check underlying preference
 
         // Reset to default
         mappedPref.resetToDefault() // This should reset the underlying intPref to its default
@@ -336,7 +339,7 @@ class DesktopDatastoreBlockingTest {
             "DelegateMappedDesktop_300",
             delegatedValue,
         ) // Mapped pref would return the converted default
-        assertEquals("DelegateMappedDesktop_300", mappedPref.getValue())
-        assertEquals(300, intPref.getValue()) // Base pref should be reset to its default
+        assertEquals("DelegateMappedDesktop_300", mappedPref.getBlocking())
+        assertEquals(300, intPref.getBlocking()) // Base pref should be reset to its default
     }
 }
