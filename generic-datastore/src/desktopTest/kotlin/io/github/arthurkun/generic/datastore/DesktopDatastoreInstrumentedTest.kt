@@ -4,6 +4,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import io.github.arthurkun.generic.datastore.core.map
+import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.enum
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,7 +35,7 @@ class DesktopDatastoreInstrumentedTest {
     lateinit var tempFolder: File
 
     private lateinit var dataStore: DataStore<Preferences>
-    private lateinit var preferenceDatastore: GenericPreferenceDatastore
+    private lateinit var preferenceDatastore: GenericPreferencesDatastore
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var testScope: CoroutineScope
 
@@ -46,8 +49,8 @@ class DesktopDatastoreInstrumentedTest {
                 File(tempFolder, "${TEST_DATASTORE_NAME}.preferences_pb")
             },
         )
-        // Assuming GenericPreferenceDatastore takes a scope for its operations and for PrefsImpl
-        preferenceDatastore = GenericPreferenceDatastore(dataStore)
+        // Assuming GenericPreferencesDatastore takes a scope for its operations and for PrefsImpl
+        preferenceDatastore = GenericPreferencesDatastore(dataStore)
     }
 
     @AfterTest
