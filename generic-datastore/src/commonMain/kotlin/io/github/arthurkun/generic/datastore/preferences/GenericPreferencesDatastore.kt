@@ -27,6 +27,8 @@ import io.github.arthurkun.generic.datastore.preferences.GenericPreference.LongP
 import io.github.arthurkun.generic.datastore.preferences.GenericPreference.StringPrimitive
 import io.github.arthurkun.generic.datastore.preferences.GenericPreference.StringSetPrimitive
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
 
 /**
  * A DataStore implementation that provides methods for creating and managing various types of preferences.
@@ -163,6 +165,31 @@ class GenericPreferencesDatastore(
             defaultValue = defaultValue,
             serializer = serializer,
             deserializer = deserializer,
+        ),
+    )
+
+    /**
+     * Creates a preference for a custom object using Kotlin Serialization.
+     *
+     * @param T The type of the custom object. Must be annotated with @Serializable.
+     * @param key The preference key.
+     * @param defaultValue The default value for the custom object.
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json Optional custom [Json] instance for serialization.
+     * @return A [Prefs] instance for the custom object preference.
+     */
+    override fun <T> kserialized(
+        key: String,
+        defaultValue: T,
+        serializer: KSerializer<T>,
+        json: Json,
+    ): Prefs<T> = PrefsImpl(
+        KSerializedPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            json = json,
         ),
     )
 

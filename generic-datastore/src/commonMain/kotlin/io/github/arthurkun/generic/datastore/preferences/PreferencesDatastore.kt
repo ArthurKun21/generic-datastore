@@ -2,6 +2,8 @@ package io.github.arthurkun.generic.datastore.preferences
 
 import io.github.arthurkun.generic.datastore.backup.BackupPreference
 import io.github.arthurkun.generic.datastore.core.Prefs
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
 
 /**
  * Defines the contract for a preference data store.
@@ -78,6 +80,41 @@ interface PreferencesDatastore {
         defaultValue: T,
         serializer: (T) -> String,
         deserializer: (String) -> T,
+    ): Prefs<T>
+
+    /**
+     * Creates a preference for a custom object using Kotlin Serialization.
+     *
+     * This method leverages kotlinx.serialization to automatically serialize and deserialize
+     * objects to/from JSON strings. The type [T] must be annotated with `@Serializable`.
+     *
+     * Example usage:
+     * ```kotlin
+     * @Serializable
+     * data class UserSettings(
+     *     val theme: String = "light",
+     *     val notifications: Boolean = true
+     * )
+     *
+     * val userSettingsPref = datastore.kserialized(
+     *     key = "user_settings",
+     *     defaultValue = UserSettings(),
+     *     serializer = UserSettings.serializer()
+     * )
+     * ```
+     *
+     * @param T The type of the custom object. Must be annotated with `@Serializable`.
+     * @param key The preference key.
+     * @param defaultValue The default value for the custom object.
+     * @param serializer The [KSerializer] for the type [T], typically obtained via `T.serializer()`.
+     * @param json Optional custom [Json] instance for serialization. Defaults to a lenient configuration.
+     * @return A [Prefs] instance for the custom object preference.
+     */
+    fun <T> kserialized(
+        key: String,
+        defaultValue: T,
+        serializer: KSerializer<T>,
+        json: Json = KSerializedPrimitive.DefaultJson,
     ): Prefs<T>
 
     /**
