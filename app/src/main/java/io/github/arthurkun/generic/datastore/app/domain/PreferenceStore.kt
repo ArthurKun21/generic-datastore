@@ -40,10 +40,10 @@ class PreferenceStore(
         key = "duration",
         defaultValue = 0L,
     ).mapIO(
-        {
+        convert = {
             Instant.fromEpochMilliseconds(it)
         },
-        {
+        reverse = {
             it.toEpochMilliseconds()
         },
     )
