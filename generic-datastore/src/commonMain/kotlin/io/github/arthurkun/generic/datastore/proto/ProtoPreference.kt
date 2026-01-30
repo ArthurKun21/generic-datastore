@@ -24,11 +24,12 @@ import kotlin.reflect.KProperty
 internal class ProtoPreference<T>(
     private val datastore: DataStore<T>,
     override val defaultValue: T,
+    private val key: String = "proto_data",
 ) : Prefs<T> {
 
     private val ioDispatcher = Dispatchers.IO
 
-    override fun key(): String = "proto_data"
+    override fun key(): String = key
 
     override suspend fun get(): T = withContext(ioDispatcher) {
         datastore.data.first()

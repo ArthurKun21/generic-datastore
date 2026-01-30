@@ -16,12 +16,14 @@ import io.github.arthurkun.generic.datastore.core.Prefs
 class GenericProtoDatastore<T>(
     private val datastore: DataStore<T>,
     private val defaultValue: T,
+    private val key: String = "proto_datastore",
 ) : ProtoDatastore<T> {
 
     override fun data(): Prefs<T> {
         return ProtoPreference(
             datastore = datastore,
             defaultValue = defaultValue,
+            key = key,
         )
     }
 }
