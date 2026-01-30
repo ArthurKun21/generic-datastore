@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.arthurkun.generic.datastore.app.domain.Animal
 import io.github.arthurkun.generic.datastore.app.domain.Theme
+import io.github.arthurkun.generic.datastore.app.domain.UserProfile
 import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
 import io.github.arthurkun.generic.datastore.remember
 import kotlinx.coroutines.Dispatchers
@@ -53,6 +54,7 @@ fun MainScreen(
     var bool by vm.preferenceStore.bool.remember()
     var animal by vm.preferenceStore.customObject.remember()
     var duration by vm.preferenceStore.duration.remember()
+    var userProfile by vm.preferenceStore.userProfile.remember()
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -312,6 +314,146 @@ fun MainScreen(
                     "Update Duration",
                     style = MaterialTheme.typography.headlineSmall,
                 )
+            }
+        }
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
+
+        item {
+            Text(
+                "KSerialized (UserProfile)",
+                style = MaterialTheme.typography.headlineSmall,
+            )
+        }
+        item {
+            Text(
+                "Demonstrates kserialized() with @Serializable data class",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        item {
+            OutlinedTextField(
+                value = TextFieldValue(userProfile.username, TextRange(userProfile.username.length)),
+                onValueChange = {
+                    userProfile = userProfile.copy(username = it.text)
+                },
+                label = { Text("Username") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        item {
+            OutlinedTextField(
+                value = TextFieldValue(userProfile.email, TextRange(userProfile.email.length)),
+                onValueChange = {
+                    userProfile = userProfile.copy(email = it.text)
+                },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        item {
+            ListItem(
+                headlineContent = {
+                    Text(
+                        "Age: ${userProfile.age}",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                    )
+                },
+                leadingContent = {
+                    Button(
+                        onClick = {
+                            if (userProfile.age > 0) {
+                                userProfile = userProfile.copy(age = userProfile.age - 1)
+                            }
+                        },
+                    ) {
+                        Icon(Icons.Default.Remove, contentDescription = "Decrease age")
+                    }
+                },
+                trailingContent = {
+                    Button(
+                        onClick = {
+                            userProfile = userProfile.copy(age = userProfile.age + 1)
+                        },
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Increase age")
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Button(
+                    onClick = {
+                        userProfile = userProfile.copy(isPremium = true)
+                    },
+                    enabled = !userProfile.isPremium,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Premium: ON")
+                }
+                Button(
+                    onClick = {
+                        userProfile = userProfile.copy(isPremium = false)
+                    },
+                    enabled = userProfile.isPremium,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Premium: OFF")
+                }
+            }
+        }
+        item {
+            Text(
+                "Favorite Colors: ${userProfile.favoriteColors.joinToString(", ").ifEmpty { "None" }}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                listOf("Red", "Green", "Blue").forEach { color ->
+                    Button(
+                        onClick = {
+                            val newColors = if (color in userProfile.favoriteColors) {
+                                userProfile.favoriteColors - color
+                            } else {
+                                userProfile.favoriteColors + color
+                            }
+                            userProfile = userProfile.copy(favoriteColors = newColors)
+                        },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text(
+                            if (color in userProfile.favoriteColors) "✓ $color" else color,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+            }
+        }
+        item {
+            Button(
+                onClick = {
+                    userProfile = UserProfile()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+            ) {
+                Text("Reset UserProfile")
             }
         }
         item {

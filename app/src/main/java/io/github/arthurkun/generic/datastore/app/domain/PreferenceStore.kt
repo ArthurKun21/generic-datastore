@@ -49,6 +49,16 @@ class PreferenceStore(
         },
     )
 
+    /**
+     * Example of using kserialized() with a @Serializable data class.
+     * This automatically handles JSON serialization/deserialization.
+     */
+    val userProfile = datastore.kserialized(
+        key = "user_profile",
+        defaultValue = UserProfile(),
+        serializer = UserProfile.serializer(),
+    )
+
     suspend fun exportPreferences(): List<BackupPreference> = datastore.export()
 
     suspend fun importPreferences(backupPreferences: List<BackupPreference>) =
