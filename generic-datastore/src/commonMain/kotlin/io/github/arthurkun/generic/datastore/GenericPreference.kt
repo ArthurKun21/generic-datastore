@@ -119,7 +119,7 @@ sealed class GenericPreference<T>(
      * If the key is not found or an error occurs, this function returns the [defaultValue].
      * Use with caution due to potential blocking.
      */
-    override fun getValue(): T = runBlocking {
+    override fun getBlocking(): T = runBlocking {
         get()
     }
 
@@ -129,7 +129,7 @@ sealed class GenericPreference<T>(
      * Use with caution due to potential blocking.
      * @param value The new value to store for this preference.
      */
-    override fun setValue(value: T) {
+    override fun setBlocking(value: T) {
         runBlocking {
             set(value)
         }

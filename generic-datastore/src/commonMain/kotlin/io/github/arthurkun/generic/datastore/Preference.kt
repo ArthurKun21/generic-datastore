@@ -67,7 +67,13 @@ interface Preference<T> {
      *
      * @return The current preference value.
      */
-    fun getValue(): T
+    fun getBlocking(): T
+
+    @Deprecated(
+        message = "Use getBlocking() instead",
+        replaceWith = ReplaceWith("getBlocking()"),
+    )
+    fun getValue(): T = getBlocking()
 
     /**
      * Sets the value of the preference.
@@ -77,7 +83,13 @@ interface Preference<T> {
      *
      * @param value The new value for the preference.
      */
-    fun setValue(value: T)
+    fun setBlocking(value: T)
+
+    @Deprecated(
+        message = "Use setBlocking(value) instead",
+        replaceWith = ReplaceWith("setBlocking(value)"),
+    )
+    fun setValue(value: T) = setBlocking(value)
 
     /**
      * Companion object for [Preference] related utility functions.
