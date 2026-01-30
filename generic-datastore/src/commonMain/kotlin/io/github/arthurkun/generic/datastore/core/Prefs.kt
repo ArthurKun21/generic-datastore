@@ -33,9 +33,9 @@ internal class PrefsImpl<T>(
 ) : Prefs<T>,
     Preference<T> by pref {
 
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T = pref.getValue()
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = pref.getBlocking()
 
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = pref.setValue(value)
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = pref.setBlocking(value)
 
     override fun resetToDefault() = runBlocking { pref.set(pref.defaultValue) }
 }
