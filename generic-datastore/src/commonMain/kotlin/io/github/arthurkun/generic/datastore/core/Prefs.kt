@@ -1,6 +1,5 @@
 package io.github.arthurkun.generic.datastore.core
 
-import kotlinx.coroutines.runBlocking
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -37,5 +36,5 @@ internal class PrefsImpl<T>(
 
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = pref.setBlocking(value)
 
-    override fun resetToDefault() = runBlocking { pref.set(pref.defaultValue) }
+    override fun resetToDefault() = pref.setBlocking(pref.defaultValue)
 }

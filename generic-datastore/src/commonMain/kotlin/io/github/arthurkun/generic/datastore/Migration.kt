@@ -32,4 +32,4 @@ fun Any?.toJsonElement(): JsonElement = coreToJsonElement()
     ),
     level = DeprecationLevel.WARNING,
 )
-fun String.toJsonMap(): Map<String, Any> = coreToJsonMap()
+fun String.toJsonMap(): Map<String, Any?> = coreToJsonMap()

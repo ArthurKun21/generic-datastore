@@ -26,9 +26,9 @@ fun Any?.toJsonElement(): JsonElement = when (this) {
     else -> JsonPrimitive(this.toString())
 }
 
-private fun parseJsonValue(element: JsonElement): Any {
+private fun parseJsonValue(element: JsonElement): Any? {
     return when (element) {
-        is JsonNull -> ""
+        is JsonNull -> null
 
         is JsonPrimitive -> {
             when {
@@ -47,15 +47,14 @@ private fun parseJsonValue(element: JsonElement): Any {
 }
 
 /**
- * Parse a JSON string to a Map<String, Any>
+ * Parse a JSON string to a Map<String, Any?>
+ *
+ * Note: null values are preserved in the resulting map.
  */
-fun String.toJsonMap(): Map<String, Any> = try {
+fun String.toJsonMap(): Map<String, Any?> = try {
     Json.parseToJsonElement(this)
         .jsonObject
-        .mapNotNull { (k, v) ->
-            if (v is JsonNull) null else k to parseJsonValue(v)
-        }
-        .toMap()
+        .mapValues { (_, v) -> parseJsonValue(v) }
 } catch (e: SerializationException) {
     throw IllegalArgumentException("Failed to parse JSON string in toJsonMap: ${e.message}", e)
 } catch (e: IllegalArgumentException) {
