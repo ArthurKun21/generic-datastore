@@ -57,9 +57,8 @@ junit5 = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "test-ext-junit" }
 androidx-test-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "test-espresso" }
 
-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
+compose-ui-test-junit4 = { module = "org.jetbrains.compose.ui:ui-test-junit4", version.ref = "compose" }
+compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose" }
 
 leak-canary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 
