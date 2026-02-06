@@ -12,9 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.awt.EventQueue
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @Composable
 actual fun ExportImportButtons(
@@ -33,15 +37,13 @@ actual fun ExportImportButtons(
                 scope.launch(Dispatchers.IO) {
                     try {
                         val json = onExport()
-                        val chooser = JFileChooser().apply {
-                            dialogTitle = "Export Preferences"
-                            selectedFile = File("preferences.json")
-                            fileFilter = FileNameExtensionFilter("JSON files", "json")
+                        val file = showFileChooserOnEDT { chooser ->
+                            chooser.dialogTitle = "Export Preferences"
+                            chooser.selectedFile = File("preferences.json")
+                            chooser.fileFilter = FileNameExtensionFilter("JSON files", "json")
+                            chooser.showSaveDialog(null)
                         }
-                        val result = chooser.showSaveDialog(null)
-                        if (result == JFileChooser.APPROVE_OPTION) {
-                            chooser.selectedFile.writeText(json)
-                        }
+                        file?.writeText(json)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -58,13 +60,13 @@ actual fun ExportImportButtons(
             onClick = {
                 scope.launch(Dispatchers.IO) {
                     try {
-                        val chooser = JFileChooser().apply {
-                            dialogTitle = "Import Preferences"
-                            fileFilter = FileNameExtensionFilter("JSON files", "json")
+                        val file = showFileChooserOnEDT { chooser ->
+                            chooser.dialogTitle = "Import Preferences"
+                            chooser.fileFilter = FileNameExtensionFilter("JSON files", "json")
+                            chooser.showOpenDialog(null)
                         }
-                        val result = chooser.showOpenDialog(null)
-                        if (result == JFileChooser.APPROVE_OPTION) {
-                            val jsonString = chooser.selectedFile.readText()
+                        if (file != null) {
+                            val jsonString = withContext(Dispatchers.IO) { file.readText() }
                             onImport(jsonString)
                         }
                     } catch (e: Exception) {
@@ -79,5 +81,16 @@ actual fun ExportImportButtons(
                 style = MaterialTheme.typography.headlineSmall,
             )
         }
+    }
+}
+
+private suspend fun showFileChooserOnEDT(
+    configure: (JFileChooser) -> Int,
+): File? = suspendCoroutine { cont ->
+    EventQueue.invokeLater {
+        val chooser = JFileChooser()
+        val result = configure(chooser)
+        val file = if (result == JFileChooser.APPROVE_OPTION) chooser.selectedFile else null
+        cont.resume(file)
     }
 }
