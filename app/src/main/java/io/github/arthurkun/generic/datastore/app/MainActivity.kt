@@ -11,16 +11,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
-import io.github.arthurkun.generic.datastore.app.theme.GenericDataStoreAppTheme
-import io.github.arthurkun.generic.datastore.app.ui.MainScreen
-import io.github.arthurkun.generic.datastore.app.ui.MainViewModel
+import io.github.arthurkun.generic.datastore.compose.app.theme.GenericDataStoreAppTheme
+import io.github.arthurkun.generic.datastore.compose.app.ui.MainScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var mainViewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,8 +34,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        mainViewModel = MainViewModel(appContainer.preferenceStore)
-
         setContent {
             GenericDataStoreAppTheme {
                 Surface(
@@ -46,7 +41,7 @@ class MainActivity : AppCompatActivity() {
                     color = MaterialTheme.colorScheme.surface,
                 ) {
                     MainScreen(
-                        vm = mainViewModel,
+                        preferenceStore = appContainer.preferenceStore,
                     )
                 }
             }

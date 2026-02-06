@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.spotless) apply false
     alias(libs.plugins.vanniktech.maven.publish) apply false
+    alias(libs.plugins.jetbrains.compose) apply false
 }
 
 version = "1.0.0"
@@ -17,6 +18,10 @@ subprojects {
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.addAll(
+                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-opt-in=kotlin.time.ExperimentalTime",
+            )
         }
     }
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {

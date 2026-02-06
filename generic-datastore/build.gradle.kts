@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.vanniktech.maven.publish)
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -35,7 +36,6 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation(libs.junit4)
             implementation(libs.coroutines.test)
         }
 
@@ -51,8 +51,7 @@ kotlin {
         }
         val desktopTest by getting {
             dependencies {
-                // JVM-specific test dependencies
-                implementation(libs.junit5) // For JVM tests
+                implementation(libs.junit5)
             }
         }
     }

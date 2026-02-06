@@ -1,12 +1,7 @@
 package io.github.arthurkun.generic.datastore.app.domain
 
 import androidx.appcompat.app.AppCompatDelegate
-
-enum class Theme {
-    LIGHT,
-    DARK,
-    SYSTEM,
-}
+import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
 
 fun setAppCompatDelegateThemeMode(themeMode: Theme) {
     AppCompatDelegate.setDefaultNightMode(

@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.app.domain
+package io.github.arthurkun.generic.datastore.compose.app.domain
 
 import io.github.arthurkun.generic.datastore.core.mapIO
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore

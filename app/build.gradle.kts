@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("com.android.application")
     alias(libs.plugins.compose.compiler)
@@ -46,26 +44,14 @@ android {
     }
 }
 
-tasks {
-    withType<KotlinCompile> {
-        compilerOptions.freeCompilerArgs.addAll(
-            "-opt-in=kotlin.time.ExperimentalTime",
-        )
-    }
-}
-
 dependencies {
+    implementation(project(":composeApp"))
     implementation(project(":generic-datastore"))
-    implementation(project(":generic-datastore-compose"))
     implementation(libs.appcompat)
-    implementation(libs.datastore.preferences)
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.activity.compose)
 
     implementation(libs.bundles.compose)
-    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.test.junit)
