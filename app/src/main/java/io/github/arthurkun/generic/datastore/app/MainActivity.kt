@@ -11,8 +11,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
-import io.github.arthurkun.generic.datastore.app.ui.MainScreen
 import io.github.arthurkun.generic.datastore.compose.app.theme.GenericDataStoreAppTheme
+import io.github.arthurkun.generic.datastore.compose.app.ui.MainScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

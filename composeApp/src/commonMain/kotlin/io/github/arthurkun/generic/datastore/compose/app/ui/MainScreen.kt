@@ -41,7 +41,6 @@ private val jsonConfig = Json { prettyPrint = true }
 @Composable
 fun MainScreen(
     preferenceStore: PreferenceStore,
-    onThemeChanged: ((Theme) -> Unit)? = null,
 ) {
     var text by preferenceStore.text.remember()
     var theme by preferenceStore.theme.remember()
@@ -183,7 +182,6 @@ fun MainScreen(
                         selected = entry == theme,
                         onClick = {
                             theme = entry
-                            onThemeChanged?.invoke(entry)
                         },
                     ),
             )

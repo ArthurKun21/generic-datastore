@@ -1,6 +1,5 @@
 package io.github.arthurkun.generic.datastore.compose.app.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -35,13 +34,12 @@ expect fun platformColorScheme(
 
 @Composable
 fun GenericDataStoreAppTheme(
-    useDarkTheme: Boolean? = null,
+    useDarkTheme: Boolean = false,
     useDynamicColor: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    val isDarkTheme = useDarkTheme ?: isSystemInDarkTheme()
     val colorScheme = platformColorScheme(
-        useDarkTheme = isDarkTheme,
+        useDarkTheme = useDarkTheme,
         useDynamicColor = useDynamicColor,
     )
 
