@@ -65,84 +65,84 @@ class AndroidDatastoreBlockingInstrumentedTest {
 
     // Tests for StringPreference
     @Test
-    fun stringPreference_resetToDefault() {
+    fun stringPreference_resetToDefaultBlocking() {
         val stringPref = preferenceDatastore.string("testString", "defaultValueReset")
         stringPref.setBlocking("valueToReset")
         assertEquals(stringPref.getBlocking(), "valueToReset")
 
-        stringPref.resetToDefault()
+        stringPref.resetToDefaultBlocking()
         assertEquals(stringPref.getBlocking(), "defaultValueReset")
     }
 
     // Tests for IntPreference
     @Test
-    fun intPreference_resetToDefault() {
+    fun intPreference_resetToDefaultBlocking() {
         val intPref = preferenceDatastore.int("testInt", 10)
         intPref.setBlocking(20)
         assertEquals(intPref.getBlocking(), 20)
 
-        intPref.resetToDefault()
+        intPref.resetToDefaultBlocking()
         assertEquals(intPref.getBlocking(), 10)
     }
 
     // Tests for LongPreference
     @Test
-    fun longPreference_resetToDefault() {
+    fun longPreference_resetToDefaultBlocking() {
         val longPref = preferenceDatastore.long("testLong", 100L)
         longPref.setBlocking(200L)
         assertEquals(longPref.getBlocking(), 200L)
 
-        longPref.resetToDefault()
+        longPref.resetToDefaultBlocking()
         assertEquals(longPref.getBlocking(), 100L)
     }
 
     // Tests for FloatPreference
     @Test
-    fun floatPreference_resetToDefault() {
+    fun floatPreference_resetToDefaultBlocking() {
         val floatPref = preferenceDatastore.float("testFloat", 1.0f)
         floatPref.setBlocking(2.0f)
         assertEquals(floatPref.getBlocking(), 2.0f)
 
-        floatPref.resetToDefault()
+        floatPref.resetToDefaultBlocking()
         assertEquals(floatPref.getBlocking(), 1.0f)
     }
 
     // Tests for BooleanPreference
     @Test
-    fun booleanPreference_resetToDefault() {
+    fun booleanPreference_resetToDefaultBlocking() {
         val boolPref = preferenceDatastore.bool("testBoolean", false)
         boolPref.setBlocking(true)
         assertEquals(boolPref.getBlocking(), true)
 
-        boolPref.resetToDefault()
+        boolPref.resetToDefaultBlocking()
         assertEquals(boolPref.getBlocking(), false)
     }
 
     // Tests for StringSetPreference
     @Test
-    fun stringSetPreference_resetToDefault() {
+    fun stringSetPreference_resetToDefaultBlocking() {
         val stringSetPref = preferenceDatastore.stringSet("testStringSet", setOf("a", "b"))
         stringSetPref.setBlocking(setOf("c", "d", "e"))
         assertEquals(stringSetPref.getBlocking(), setOf("c", "d", "e"))
 
-        stringSetPref.resetToDefault()
+        stringSetPref.resetToDefaultBlocking()
         assertEquals(stringSetPref.getBlocking(), setOf("a", "b"))
     }
 
     // Tests for EnumPreference
     @Test
-    fun enumPreference_setAndGetValue() {
+    fun enumPreference_resetToDefaultBlocking() {
         val enumPref = preferenceDatastore.enum("testEnum", TestEnumBlocking.VALUE_A)
         enumPref.setBlocking(TestEnumBlocking.VALUE_B)
         assertEquals(enumPref.getBlocking(), TestEnumBlocking.VALUE_B)
 
-        enumPref.resetToDefault()
+        enumPref.resetToDefaultBlocking()
         assertEquals(enumPref.getBlocking(), TestEnumBlocking.VALUE_A)
     }
 
     // Tests for Serialized (ObjectPrimitive)
     @Test
-    fun serializedPreference_resetToDefault() {
+    fun serializedPreference_resetToDefaultBlocking() {
         val defaultObj = SerializableObjectBlocking(5, "DefaultReset")
         val objToReset = SerializableObjectBlocking(6, "ToReset")
         val serializedPref = preferenceDatastore.serialized(
@@ -157,13 +157,13 @@ class AndroidDatastoreBlockingInstrumentedTest {
         serializedPref.setBlocking(objToReset)
         assertEquals(serializedPref.getBlocking(), objToReset)
 
-        serializedPref.resetToDefault()
+        serializedPref.resetToDefaultBlocking()
         assertEquals(serializedPref.getBlocking(), defaultObj)
     }
 
     // Tests for MappedPreference
     @Test
-    fun mappedPreference_resetToDefault() {
+    fun mappedPreference_resetToDefaultBlocking() {
         val intPref = preferenceDatastore.int("baseForMapReset", 75)
         val mappedPref = intPref.map(
             defaultValue = "MappedDefaultReset",
@@ -174,12 +174,51 @@ class AndroidDatastoreBlockingInstrumentedTest {
         assertEquals(mappedPref.getBlocking(), "ResetMapped_750")
         assertEquals(intPref.getBlocking(), 750)
 
-        mappedPref.resetToDefault() // This should reset the underlying intPref to its default
+        mappedPref.resetToDefaultBlocking() // This should reset the underlying intPref to its default
         assertEquals(
             mappedPref.getBlocking(),
             "ResetMapped_75",
         ) // Mapped pref would return the converted default
         assertEquals(intPref.getBlocking(), 75) // Base pref should be reset to its default
+    }
+
+    @Test
+    fun stringPreference_resetToDefaultBlocking_whenNeverSet() {
+        val stringPref = preferenceDatastore.string("testStringResetNeverSet", "defaultValue")
+        stringPref.resetToDefaultBlocking()
+        assertEquals(stringPref.getBlocking(), "defaultValue")
+    }
+
+    @Test
+    fun intPreference_resetToDefaultBlocking_whenNeverSet() {
+        val intPref = preferenceDatastore.int("testIntResetNeverSet", 42)
+        intPref.resetToDefaultBlocking()
+        assertEquals(intPref.getBlocking(), 42)
+    }
+
+    @Test
+    fun stringPreference_resetToDefaultBlocking_multipleTimes() {
+        val stringPref = preferenceDatastore.string("testStringResetMultiple", "defaultMultiple")
+        stringPref.setBlocking("changed")
+        stringPref.resetToDefaultBlocking()
+        stringPref.resetToDefaultBlocking()
+        assertEquals(stringPref.getBlocking(), "defaultMultiple")
+    }
+
+    @Test
+    fun mappedPreference_resetToDefaultBlocking_resetsUnderlyingPreference() {
+        val intPref = preferenceDatastore.int("baseForMapResetUnderlying", 10)
+        val mappedPref = intPref.map(
+            defaultValue = "MappedDefault",
+            convert = { "Mapped_$it" },
+            reverse = { it.removePrefix("Mapped_").toInt() },
+        )
+        intPref.setBlocking(999)
+        assertEquals(intPref.getBlocking(), 999)
+
+        mappedPref.resetToDefaultBlocking()
+        assertEquals(intPref.getBlocking(), 10)
+        assertEquals(mappedPref.getBlocking(), "Mapped_10")
     }
 
     // Test for StringPreference delegation
@@ -194,7 +233,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         assertEquals("newDelegateValue", stringPref.getBlocking())
 
         // Reset to default
-        stringPref.resetToDefault()
+        stringPref.resetToDefaultBlocking()
         assertEquals("defaultDelegateValue", delegatedValue)
         assertEquals("defaultDelegateValue", stringPref.getBlocking())
     }
@@ -211,7 +250,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         assertEquals(456, intPref.getBlocking())
 
         // Reset to default
-        intPref.resetToDefault()
+        intPref.resetToDefaultBlocking()
         assertEquals(123, delegatedValue)
         assertEquals(123, intPref.getBlocking())
     }
@@ -228,7 +267,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         assertEquals(456L, longPref.getBlocking())
 
         // Reset to default
-        longPref.resetToDefault()
+        longPref.resetToDefaultBlocking()
         assertEquals(123L, delegatedValue)
         assertEquals(123L, longPref.getBlocking())
     }
@@ -245,7 +284,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         assertEquals(4.56f, floatPref.getBlocking())
 
         // Reset to default
-        floatPref.resetToDefault()
+        floatPref.resetToDefaultBlocking()
         assertEquals(1.23f, delegatedValue)
         assertEquals(1.23f, floatPref.getBlocking())
     }
@@ -262,7 +301,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         assertEquals(true, boolPref.getBlocking())
 
         // Reset to default
-        boolPref.resetToDefault()
+        boolPref.resetToDefaultBlocking()
         assertEquals(false, delegatedValue)
         assertEquals(false, boolPref.getBlocking())
     }
@@ -279,7 +318,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         assertEquals(setOf("c", "d"), stringSetPref.getBlocking())
 
         // Reset to default
-        stringSetPref.resetToDefault()
+        stringSetPref.resetToDefaultBlocking()
         assertEquals(setOf("a", "b"), delegatedValue)
         assertEquals(setOf("a", "b"), stringSetPref.getBlocking())
     }
@@ -296,7 +335,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         assertEquals(TestEnumBlocking.VALUE_B, enumPref.getBlocking())
 
         // Reset to default
-        enumPref.resetToDefault()
+        enumPref.resetToDefaultBlocking()
         assertEquals(TestEnumBlocking.VALUE_A, delegatedValue)
         assertEquals(TestEnumBlocking.VALUE_A, enumPref.getBlocking())
     }
@@ -323,7 +362,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         assertEquals(newObj, serializedPref.getBlocking())
 
         // Reset to default
-        serializedPref.resetToDefault()
+        serializedPref.resetToDefaultBlocking()
         assertEquals(defaultObj, delegatedValue)
         assertEquals(defaultObj, serializedPref.getBlocking())
     }
@@ -346,7 +385,7 @@ class AndroidDatastoreBlockingInstrumentedTest {
         assertEquals(200, intPref.getBlocking()) // Check underlying preference
 
         // Reset to default
-        mappedPref.resetToDefault() // This should reset the underlying intPref to its default
+        mappedPref.resetToDefaultBlocking() // This should reset the underlying intPref to its default
         assertEquals(
             "DelegateMapped_100",
             delegatedValue,
