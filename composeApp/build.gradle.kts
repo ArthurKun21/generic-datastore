@@ -55,7 +55,6 @@ kotlin {
 
     compilerOptions {
         freeCompilerArgs.addAll(
-            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-Xexpect-actual-classes",
         )
     }

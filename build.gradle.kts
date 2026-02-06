@@ -18,6 +18,10 @@ subprojects {
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.addAll(
+                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-opt-in=kotlin.time.ExperimentalTime",
+            )
         }
     }
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {

@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("com.android.application")
     alias(libs.plugins.compose.compiler)
@@ -43,14 +41,6 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
-    }
-}
-
-tasks {
-    withType<KotlinCompile> {
-        compilerOptions.freeCompilerArgs.addAll(
-            "-opt-in=kotlin.time.ExperimentalTime",
-        )
     }
 }
 
