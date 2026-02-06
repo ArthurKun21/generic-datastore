@@ -2,13 +2,7 @@ package io.github.arthurkun.generic.datastore.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.floatPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -29,8 +23,8 @@ import kotlinx.coroutines.withContext
  * while abstracting the underlying DataStore operations. It defines common operations for a preference,
  * such as reading, writing, deleting, and observing its value as a Kotlin Flow or StateFlow.
  *
- * Each specific preference type (e.g., [StringPrimitive], [IntPrimitive]) is implemented as a nested class
- * inheriting from [GenericPreference].
+ * Each specific preference type (e.g., [StringPrimitive], [IntPrimitive]) is implemented as a top-level class
+ * extending [GenericPreference].
  *
  * @param T The data type of the preference value (e.g., String, Int, Boolean).
  * @property datastore The [DataStore<Preferences>] instance used for storing and retrieving preferences.
@@ -135,106 +129,4 @@ sealed class GenericPreference<T>(
             set(value)
         }
     }
-
-    /**
-     * A [GenericPreference] for storing [String] values.
-     * @param datastore The [DataStore<Preferences>] instance used for storing and retrieving preferences.
-     * @param key The unique String key used to identify this preference within the DataStore.
-     * @param defaultValue The default value to use if the preference is not set or on retrieval error.
-     */
-    class StringPrimitive(
-        datastore: DataStore<Preferences>,
-        key: String,
-        defaultValue: String,
-    ) : GenericPreference<String>(
-        datastore = datastore,
-        key = key,
-        defaultValue = defaultValue,
-        preferences = stringPreferencesKey(key),
-    )
-
-    /**
-     * A [GenericPreference] for storing [Long] values.
-     * @param datastore The [DataStore<Preferences>] instance used for storing and retrieving preferences.
-     * @param key The unique String key used to identify this preference within the DataStore.
-     * @param defaultValue The default value to use if the preference is not set or on retrieval error.
-     */
-    class LongPrimitive(
-        datastore: DataStore<Preferences>,
-        key: String,
-        defaultValue: Long,
-    ) : GenericPreference<Long>(
-        datastore = datastore,
-        key = key,
-        defaultValue = defaultValue,
-        preferences = longPreferencesKey(key),
-    )
-
-    /**
-     * A [GenericPreference] for storing [Int] values.
-     * @param datastore The [DataStore<Preferences>] instance used for storing and retrieving preferences.
-     * @param key The unique String key used to identify this preference within the DataStore.
-     * @param defaultValue The default value to use if the preference is not set or on retrieval error.
-     */
-    class IntPrimitive(
-        datastore: DataStore<Preferences>,
-        key: String,
-        defaultValue: Int,
-    ) : GenericPreference<Int>(
-        datastore = datastore,
-        key = key,
-        defaultValue = defaultValue,
-        preferences = intPreferencesKey(key),
-    )
-
-    /**
-     * A [GenericPreference] for storing [Float] values.
-     * @param datastore The [DataStore<Preferences>] instance used for storing and retrieving preferences.
-     * @param key The unique String key used to identify this preference within the DataStore.
-     * @param defaultValue The default value to use if the preference is not set or on retrieval error.
-     */
-    class FloatPrimitive(
-        datastore: DataStore<Preferences>,
-        key: String,
-        defaultValue: Float,
-    ) : GenericPreference<Float>(
-        datastore = datastore,
-        key = key,
-        defaultValue = defaultValue,
-        preferences = floatPreferencesKey(key),
-    )
-
-    /**
-     * A [GenericPreference] for storing [Boolean] values.
-     * @param datastore The [DataStore<Preferences>] instance used for storing and retrieving preferences.
-     * @param key The unique String key used to identify this preference within the DataStore.
-     * @param defaultValue The default value to use if the preference is not set or on retrieval error.
-     */
-    class BooleanPrimitive(
-        datastore: DataStore<Preferences>,
-        key: String,
-        defaultValue: Boolean,
-    ) : GenericPreference<Boolean>(
-        datastore = datastore,
-        key = key,
-        defaultValue = defaultValue,
-        preferences = booleanPreferencesKey(key),
-    )
-
-    /**
-     * A [GenericPreference] for storing [Set] of [String] values.
-     * @param datastore The [DataStore<Preferences>] instance used for storing and retrieving preferences.
-     * @param key The unique String key used to identify this preference within the DataStore.
-     * @param defaultValue The default value to use if the preference is not set or on retrieval error.
-     */
-    class StringSetPrimitive(
-        datastore: DataStore<Preferences>,
-        key: String,
-        defaultValue: Set<String>,
-    ) : GenericPreference<Set<String>>(
-        datastore = datastore,
-        key = key,
-        defaultValue = defaultValue,
-        preferences = stringSetPreferencesKey(key),
-    )
 }
