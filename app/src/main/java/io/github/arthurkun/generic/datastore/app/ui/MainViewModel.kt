@@ -15,6 +15,14 @@ class MainViewModel(
     private val backupCreator = PreferenceBackupCreator(preferenceStore.datastore)
     private val backupRestorer = PreferenceBackupRestorer(preferenceStore.datastore)
 
+    fun incrementLoginCount() = viewModelScope.launch {
+        preferenceStore.num.update { it + 1 }
+    }
+
+    fun decrementLoginCount() = viewModelScope.launch {
+        preferenceStore.num.update { it - 1 }
+    }
+
     suspend fun exportPreferences(): String {
         return try {
             backupCreator.createBackupJson(

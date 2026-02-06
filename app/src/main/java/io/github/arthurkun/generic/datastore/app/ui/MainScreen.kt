@@ -180,6 +180,45 @@ fun MainScreen(
             )
         }
         item {
+            Text(
+                "Integer (Atomic Update)",
+                style = MaterialTheme.typography.headlineSmall,
+            )
+        }
+        item {
+            Text(
+                "Uses Preference.update { } for atomic read-modify-write",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        item {
+            ListItem(
+                headlineContent = {
+                    Text(
+                        "$num",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                    )
+                },
+                leadingContent = {
+                    Button(
+                        onClick = { vm.decrementLoginCount() },
+                    ) {
+                        Icon(Icons.Default.Remove, contentDescription = "Atomic Decrement")
+                    }
+                },
+                trailingContent = {
+                    Button(
+                        onClick = { vm.incrementLoginCount() },
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Atomic Increment")
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        item {
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp),
             )
