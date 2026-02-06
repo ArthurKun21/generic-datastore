@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * A [Preference] for storing custom [Object] values.
@@ -35,8 +36,8 @@ internal class ObjectPrimitive<T>(
     private val datastore: DataStore<Preferences>,
     private val key: String,
     override val defaultValue: T,
-    val serializer: (T) -> String,
-    val deserializer: (String) -> T,
+    private val serializer: (T) -> String,
+    private val deserializer: (String) -> T,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<T> {
     private val stringPrefKey = stringPreferencesKey(key)
@@ -87,6 +88,8 @@ internal class ObjectPrimitive<T>(
     private fun safeDeserialize(value: String): T {
         return try {
             deserializer(value)
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) {
             defaultValue
         }
