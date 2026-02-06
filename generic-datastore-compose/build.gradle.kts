@@ -34,9 +34,9 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation(libs.junit4)
             implementation(libs.coroutines.test)
         }
+
     }
 
     compilerOptions {

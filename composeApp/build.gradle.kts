@@ -44,12 +44,13 @@ kotlin {
             implementation(project(":generic-datastore-compose"))
             implementation(libs.bundles.compose)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.datastore.preferences)
+            implementation(libs.datastore.preferences.core)
         }
 
         androidMain.dependencies {
             implementation(libs.androidx.core.ktx)
             implementation(libs.activity.compose)
+            implementation(libs.datastore.preferences)
         }
 
         val desktopMain by getting {
