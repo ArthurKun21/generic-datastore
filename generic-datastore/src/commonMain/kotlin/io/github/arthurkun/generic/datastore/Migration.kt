@@ -41,6 +41,7 @@ fun Any?.toJsonElement(): JsonElement = toJsonElementImpl()
 private fun parseJsonValue(element: JsonElement): Any? {
     return when (element) {
         is JsonNull -> null
+
         is JsonPrimitive -> when {
             element.isString -> element.content
             element.booleanOrNull != null -> element.boolean
@@ -48,7 +49,9 @@ private fun parseJsonValue(element: JsonElement): Any? {
             element.doubleOrNull != null -> element.double
             else -> element.toString()
         }
+
         is JsonArray -> element.map { parseJsonValue(it) }
+
         is JsonObject -> element.mapValues { parseJsonValue(it.value) }
     }
 }
