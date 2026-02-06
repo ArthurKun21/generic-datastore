@@ -1,5 +1,6 @@
 package io.github.arthurkun.generic.datastore.preferences
 
+import androidx.datastore.preferences.core.MutablePreferences
 import io.github.arthurkun.generic.datastore.backup.BackupPreference
 import io.github.arthurkun.generic.datastore.core.Prefs
 import kotlinx.serialization.KSerializer
@@ -135,4 +136,29 @@ interface PreferencesDatastore {
      * @param backupPreferences The list of preferences to import.
      */
     suspend fun import(backupPreferences: List<BackupPreference>)
+
+    /**
+     * Runs a lightweight migration inside a single [DataStore.edit][androidx.datastore.preferences.core.edit]
+     * transaction, exposing raw [MutablePreferences] for key renames, value transforms, or removals.
+     *
+     * This is intentionally thin: for full migration pipelines (e.g., file-location moves or
+     * cross-store migrations), use AndroidX [DataMigration][androidx.datastore.core.DataMigration]
+     * when constructing the DataStore instance.
+     *
+     * Example – renaming a key and converting its value:
+     * ```kotlin
+     * datastore.migrate { prefs ->
+     *     prefs[stringPreferencesKey("theme_v2")]?.let { /* already migrated */ return@migrate }
+     *     val old = prefs[stringPreferencesKey("theme")]
+     *     if (old != null) {
+     *         prefs[stringPreferencesKey("theme_v2")] = old.uppercase()
+     *         prefs.remove(stringPreferencesKey("theme"))
+     *     }
+     * }
+     * ```
+     *
+     * @param migration A lambda that receives [MutablePreferences] to apply key renames or value
+     *   transforms within the transaction.
+     */
+    suspend fun migrate(migration: suspend (MutablePreferences) -> Unit)
 }

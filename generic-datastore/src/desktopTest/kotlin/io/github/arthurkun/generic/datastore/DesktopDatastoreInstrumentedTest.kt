@@ -4,6 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.core.map
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.enum
@@ -407,5 +409,92 @@ class DesktopDatastoreInstrumentedTest {
         assertEquals(20, intPref.get())
         // mappedPref should reflect the conversion of the underlying's new state (default)
         assertEquals("Converted_20", mappedPref.get())
+    }
+
+    // Tests for migrate()
+    @Test
+    fun migrate_renamesKey() = runTest(testDispatcher) {
+        val oldKey = stringPreferencesKey("old_key")
+        dataStore.edit { it[oldKey] = "hello" }
+
+        preferenceDatastore.migrate { prefs ->
+            val value = prefs[oldKey]
+            if (value != null) {
+                prefs[stringPreferencesKey("new_key")] = value
+                prefs.remove(oldKey)
+            }
+        }
+
+        val newPref = preferenceDatastore.string("new_key", "")
+        assertEquals("hello", newPref.get())
+
+        val oldPref = preferenceDatastore.string("old_key", "default")
+        assertEquals("default", oldPref.get())
+    }
+
+    @Test
+    fun migrate_transformsValue() = runTest(testDispatcher) {
+        val key = stringPreferencesKey("theme")
+        dataStore.edit { it[key] = "dark" }
+
+        preferenceDatastore.migrate { prefs ->
+            prefs[key]?.let { prefs[key] = it.uppercase() }
+        }
+
+        val pref = preferenceDatastore.string("theme", "")
+        assertEquals("DARK", pref.get())
+    }
+
+    @Test
+    fun migrate_removesKey() = runTest(testDispatcher) {
+        val key = stringPreferencesKey("deprecated_setting")
+        dataStore.edit { it[key] = "stale" }
+
+        preferenceDatastore.migrate { prefs ->
+            prefs.remove(key)
+        }
+
+        val pref = preferenceDatastore.string("deprecated_setting", "default")
+        assertEquals("default", pref.get())
+    }
+
+    @Test
+    fun migrate_noOpOnEmptyStore() = runTest(testDispatcher) {
+        preferenceDatastore.migrate { prefs ->
+            prefs[stringPreferencesKey("only_if_exists")]?.let {
+                prefs[stringPreferencesKey("migrated")] = it
+            }
+        }
+
+        val pref = preferenceDatastore.string("migrated", "none")
+        assertEquals("none", pref.get())
+    }
+
+    @Test
+    fun migrate_handlesMultipleKeysAtomically() = runTest(testDispatcher) {
+        val nameKey = stringPreferencesKey("user_name")
+        val ageKey = intPreferencesKey("user_age")
+        val profileKey = stringPreferencesKey("user_profile")
+
+        dataStore.edit {
+            it[nameKey] = "Alice"
+            it[ageKey] = 30
+        }
+
+        preferenceDatastore.migrate { prefs ->
+            val name = prefs[nameKey]
+            val age = prefs[ageKey]
+            if (name != null && age != null) {
+                prefs[profileKey] = "$name:$age"
+                prefs.remove(nameKey)
+                prefs.remove(ageKey)
+            }
+        }
+
+        val profilePref = preferenceDatastore.string("user_profile", "")
+        assertEquals("Alice:30", profilePref.get())
+
+        assertEquals("", preferenceDatastore.string("user_name", "").get())
+        assertEquals(0, preferenceDatastore.int("user_age", 0).get())
     }
 }
