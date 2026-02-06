@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
  * @property defaultValue The default value to be returned if the preference is not set or an error occurs.
  * @property preferences The [Preferences.Key] specific to the type `T`, used to access the preference in DataStore.
  */
-sealed class GenericPreference<T>(
+internal sealed class GenericPreference<T>(
     internal val datastore: DataStore<Preferences>,
     private val key: String,
     override val defaultValue: T,
