@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.app.domain
+package io.github.arthurkun.generic.datastore.compose.app.domain
 
 sealed class Animal(val name: String) {
 

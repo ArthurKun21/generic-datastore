@@ -3,7 +3,7 @@ package io.github.arthurkun.generic.datastore.app.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.arthurkun.generic.datastore.app.domain.PreferenceStore
+import io.github.arthurkun.generic.datastore.compose.app.domain.PreferenceStore
 import io.github.arthurkun.generic.datastore.core.toJsonElement
 import io.github.arthurkun.generic.datastore.core.toJsonMap
 import kotlinx.coroutines.launch

@@ -34,9 +34,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.arthurkun.generic.datastore.app.domain.Animal
-import io.github.arthurkun.generic.datastore.app.domain.Theme
 import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
+import io.github.arthurkun.generic.datastore.compose.app.domain.Animal
+import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
 import io.github.arthurkun.generic.datastore.remember
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
