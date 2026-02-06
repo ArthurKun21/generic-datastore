@@ -6,9 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.arthurkun.generic.datastore.core.Prefs
-import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Android implementation of [Prefs.remember] that uses [collectAsStateWithLifecycle]
@@ -24,18 +22,10 @@ actual fun <T> Prefs<T>.remember(
     val state = this.asFlow().collectAsStateWithLifecycle(defaultValue, context = context)
     val scope = rememberCoroutineScope()
     return remember(this) {
-        object : MutableState<T> {
-            override var value: T
-                get() = state.value
-                set(value) {
-                    scope.launch {
-                        set(value)
-                    }
-                }
-
-            override fun component1(): T = value
-
-            override fun component2(): (T) -> Unit = { value = it }
-        }
+        PrefsComposeState(
+            prefs = this,
+            state = state,
+            scope = scope,
+        )
     }
 }
