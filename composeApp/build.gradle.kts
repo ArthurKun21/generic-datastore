@@ -66,6 +66,7 @@ compose.desktop {
         mainClass = "io.github.arthurkun.generic.datastore.compose.app.MainKt"
 
         nativeDistributions {
+            modules("jdk.unsupported")
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "generic-datastore-sample"
             packageVersion = "1.0.0"
