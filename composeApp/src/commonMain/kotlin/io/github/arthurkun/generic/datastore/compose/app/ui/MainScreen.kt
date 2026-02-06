@@ -19,8 +19,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
@@ -33,6 +35,7 @@ import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
 import io.github.arthurkun.generic.datastore.core.toJsonElement
 import io.github.arthurkun.generic.datastore.core.toJsonMap
 import io.github.arthurkun.generic.datastore.remember
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlin.time.Clock
 
@@ -42,6 +45,7 @@ private val jsonConfig = Json { prettyPrint = true }
 fun MainScreen(
     preferenceStore: PreferenceStore,
 ) {
+    val scope = rememberCoroutineScope()
     var text by preferenceStore.text.remember()
     var theme by preferenceStore.theme.remember()
     var num by preferenceStore.num.remember()
@@ -71,6 +75,11 @@ fun MainScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
             )
+        }
+        item {
+            TextButton(onClick = { scope.launch { preferenceStore.text.resetToDefault() } }) {
+                Text("Reset to Default")
+            }
         }
         item {
             HorizontalDivider(
@@ -114,6 +123,11 @@ fun MainScreen(
             )
         }
         item {
+            TextButton(onClick = { scope.launch { preferenceStore.num.resetToDefault() } }) {
+                Text("Reset to Default")
+            }
+        }
+        item {
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp),
             )
@@ -155,6 +169,11 @@ fun MainScreen(
             }
         }
         item {
+            TextButton(onClick = { scope.launch { preferenceStore.bool.resetToDefault() } }) {
+                Text("Reset to Default")
+            }
+        }
+        item {
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp),
             )
@@ -186,6 +205,11 @@ fun MainScreen(
                     ),
             )
         }
+        item {
+            TextButton(onClick = { scope.launch { preferenceStore.theme.resetToDefault() } }) {
+                Text("Reset to Default")
+            }
+        }
 
         item {
             Text(
@@ -214,6 +238,11 @@ fun MainScreen(
                         },
                     ),
             )
+        }
+        item {
+            TextButton(onClick = { scope.launch { preferenceStore.customObject.resetToDefault() } }) {
+                Text("Reset to Default")
+            }
         }
 
         item {
@@ -247,6 +276,11 @@ fun MainScreen(
                     "Update Duration",
                     style = MaterialTheme.typography.headlineSmall,
                 )
+            }
+        }
+        item {
+            TextButton(onClick = { scope.launch { preferenceStore.duration.resetToDefault() } }) {
+                Text("Reset to Default")
             }
         }
         item {
