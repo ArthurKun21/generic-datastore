@@ -40,7 +40,7 @@ internal class KSerializedPrimitive<T>(
     private val key: String,
     override val defaultValue: T,
     private val serializer: KSerializer<T>,
-    private val json: Json = DefaultJson,
+    private val json: Json = PreferencesDefaults.json,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<T> {
     private val stringPrefKey = stringPreferencesKey(key)
@@ -109,16 +109,14 @@ internal class KSerializedPrimitive<T>(
     }
 
     companion object {
-        /**
-         * Default [Json] instance configured for preference storage.
-         * - ignoreUnknownKeys: Allows for backward compatibility when fields are added/removed.
-         * - isLenient: Allows for more relaxed JSON parsing.
-         * - encodeDefaults: Includes default values in serialized output for explicitness.
-         */
-        val DefaultJson = Json {
-            ignoreUnknownKeys = true
-            isLenient = true
-            encodeDefaults = true
-        }
+        @Deprecated(
+            message = "Use PreferencesDefaults.json instead",
+            replaceWith = ReplaceWith(
+                "PreferencesDefaults.json",
+                "io.github.arthurkun.generic.datastore.preferences.PreferencesDefaults",
+            ),
+            level = DeprecationLevel.HIDDEN,
+        )
+        val DefaultJson = PreferencesDefaults.json
     }
 }

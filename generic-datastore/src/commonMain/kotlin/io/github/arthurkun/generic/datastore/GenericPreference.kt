@@ -14,6 +14,6 @@ import io.github.arthurkun.generic.datastore.preferences.GenericPreference as Pr
         "GenericPreference",
         "io.github.arthurkun.generic.datastore.preferences.GenericPreference",
     ),
-    level = DeprecationLevel.WARNING,
+    level = DeprecationLevel.HIDDEN,
 )
 internal typealias GenericPreference<T> = PreferencesGenericPreference<T>

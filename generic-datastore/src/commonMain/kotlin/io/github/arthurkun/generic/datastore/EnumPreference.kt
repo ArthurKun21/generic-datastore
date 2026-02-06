@@ -16,7 +16,7 @@ import io.github.arthurkun.generic.datastore.preferences.enum as preferencesEnum
         "enum(key, defaultValue)",
         "io.github.arthurkun.generic.datastore.preferences.enum",
     ),
-    level = DeprecationLevel.WARNING,
+    level = DeprecationLevel.HIDDEN,
 )
 inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
     key: String,

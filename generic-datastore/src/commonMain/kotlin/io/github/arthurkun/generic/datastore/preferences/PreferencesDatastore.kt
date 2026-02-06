@@ -115,7 +115,7 @@ interface PreferencesDatastore {
         key: String,
         defaultValue: T,
         serializer: KSerializer<T>,
-        json: Json = KSerializedPrimitive.DefaultJson,
+        json: Json = PreferencesDefaults.json,
     ): Prefs<T>
 
     /**

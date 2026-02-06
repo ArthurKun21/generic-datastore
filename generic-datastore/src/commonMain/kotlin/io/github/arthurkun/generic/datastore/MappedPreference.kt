@@ -16,7 +16,7 @@ import io.github.arthurkun.generic.datastore.core.mapIO as coreMapIO
         "mapIO(convert, reverse)",
         "io.github.arthurkun.generic.datastore.core.mapIO",
     ),
-    level = DeprecationLevel.WARNING,
+    level = DeprecationLevel.HIDDEN,
 )
 fun <T, R> Prefs<T>.mapIO(
     convert: (T) -> R,
@@ -33,7 +33,7 @@ fun <T, R> Prefs<T>.mapIO(
         "map(defaultValue, convert, reverse)",
         "io.github.arthurkun.generic.datastore.core.map",
     ),
-    level = DeprecationLevel.WARNING,
+    level = DeprecationLevel.HIDDEN,
 )
 fun <T, R> Prefs<T>.map(
     defaultValue: R,

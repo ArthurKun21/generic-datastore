@@ -15,25 +15,26 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
 
+private fun Any?.toJsonElementInternal(): JsonElement = when (this) {
+    null -> JsonNull
+    is JsonElement -> this
+    is Number -> JsonPrimitive(this)
+    is Boolean -> JsonPrimitive(this)
+    is String -> JsonPrimitive(this)
+    is Collection<*> -> JsonArray(map { it.toJsonElementInternal() })
+    is Map<*, *> -> JsonObject(map { it.key.toString() to it.value.toJsonElementInternal() }.toMap())
+    else -> JsonPrimitive(this.toString())
+}
+
 @Deprecated(
     message = "Use PreferenceBackupCreator for type-safe backup/restore",
     replaceWith = ReplaceWith(
         "PreferenceBackupCreator(datastore).createBackup()",
         "io.github.arthurkun.generic.datastore.backup.PreferenceBackupCreator",
     ),
-    level = DeprecationLevel.WARNING,
+    level = DeprecationLevel.HIDDEN,
 )
-@Suppress("DEPRECATION")
-fun Any?.toJsonElement(): JsonElement = when (this) {
-    null -> JsonNull
-    is JsonElement -> this
-    is Number -> JsonPrimitive(this)
-    is Boolean -> JsonPrimitive(this)
-    is String -> JsonPrimitive(this)
-    is Collection<*> -> JsonArray(map { it.toJsonElement() })
-    is Map<*, *> -> JsonObject(map { it.key.toString() to it.value.toJsonElement() }.toMap())
-    else -> JsonPrimitive(this.toString())
-}
+fun Any?.toJsonElement(): JsonElement = toJsonElementInternal()
 
 private fun parseJsonValue(element: JsonElement): Any? {
     return when (element) {
@@ -66,7 +67,7 @@ private fun parseJsonValue(element: JsonElement): Any? {
         "PreferenceBackupRestorer(datastore).restoreFromJson(jsonString)",
         "io.github.arthurkun.generic.datastore.backup.PreferenceBackupRestorer",
     ),
-    level = DeprecationLevel.WARNING,
+    level = DeprecationLevel.HIDDEN,
 )
 fun String.toJsonMap(): Map<String, Any?> = try {
     Json.parseToJsonElement(this)

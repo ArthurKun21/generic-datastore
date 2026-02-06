@@ -14,6 +14,6 @@ import io.github.arthurkun.generic.datastore.core.Preference as CorePreference
         "Preference",
         "io.github.arthurkun.generic.datastore.core.Preference",
     ),
-    level = DeprecationLevel.WARNING,
+    level = DeprecationLevel.HIDDEN,
 )
 typealias Preference<T> = CorePreference<T>

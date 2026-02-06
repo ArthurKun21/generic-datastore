@@ -14,6 +14,6 @@ import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
         "PreferencesDatastore",
         "io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore",
     ),
-    level = DeprecationLevel.WARNING,
+    level = DeprecationLevel.HIDDEN,
 )
 typealias PreferenceDatastore = PreferencesDatastore
