@@ -35,6 +35,14 @@ interface Preference<T> {
     suspend fun set(value: T)
 
     /**
+     * Atomically reads the current value and applies [transform] to compute a new value,
+     * then writes it back in a single DataStore transaction (read-modify-write).
+     *
+     * @param transform A function that receives the current value and returns the new value.
+     */
+    suspend fun update(transform: (T) -> T)
+
+    /**
      * Deletes the preference from the underlying storage.
      */
     suspend fun delete()

@@ -64,6 +64,16 @@ internal class ObjectPrimitive<T>(
         }
     }
 
+    override suspend fun update(transform: (T) -> T) {
+        withContext(ioDispatcher) {
+            datastore.edit { prefs ->
+                val current = prefs[stringPrefKey]?.let { safeDeserialize(it) }
+                    ?: this@ObjectPrimitive.defaultValue
+                prefs[stringPrefKey] = serializer(transform(current))
+            }
+        }
+    }
+
     override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->

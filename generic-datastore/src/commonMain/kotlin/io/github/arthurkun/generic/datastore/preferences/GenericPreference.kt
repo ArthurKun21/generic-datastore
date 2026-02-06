@@ -74,6 +74,19 @@ internal sealed class GenericPreference<T>(
     }
 
     /**
+     * Atomically reads the current value and applies [transform] to compute a new value,
+     * then writes it back in a single [datastore.edit] transaction.
+     */
+    override suspend fun update(transform: (T) -> T) {
+        withContext(ioDispatcher) {
+            datastore.edit { ds ->
+                val current = ds[preferences] ?: defaultValue
+                ds[preferences] = transform(current)
+            }
+        }
+    }
+
+    /**
      * Removes the preference from the DataStore.
      * This is a suspending function.
      */

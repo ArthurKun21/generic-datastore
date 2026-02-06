@@ -41,6 +41,12 @@ internal class ProtoPreference<T>(
         }
     }
 
+    override suspend fun update(transform: (T) -> T) {
+        withContext(ioDispatcher) {
+            datastore.updateData { current -> transform(current) }
+        }
+    }
+
     override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.updateData { defaultValue }

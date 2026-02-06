@@ -67,6 +67,16 @@ internal class KSerializedPrimitive<T>(
         }
     }
 
+    override suspend fun update(transform: (T) -> T) {
+        withContext(ioDispatcher) {
+            datastore.edit { prefs ->
+                val current = prefs[stringPrefKey]?.let { safeDeserialize(it) }
+                    ?: this@KSerializedPrimitive.defaultValue
+                prefs[stringPrefKey] = json.encodeToString(serializer, transform(current))
+            }
+        }
+    }
+
     override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
