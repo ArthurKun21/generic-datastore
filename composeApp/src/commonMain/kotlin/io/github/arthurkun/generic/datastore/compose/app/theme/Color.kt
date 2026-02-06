@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.app.theme
+package io.github.arthurkun.generic.datastore.compose.app.theme
 
 import androidx.compose.ui.graphics.Color
 

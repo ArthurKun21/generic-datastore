@@ -63,11 +63,9 @@ dependencies {
     implementation(libs.datastore.preferences)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.activity.compose)
 
     implementation(libs.bundles.compose)
-    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.test.junit)
