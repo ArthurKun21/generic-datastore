@@ -1,3 +1,5 @@
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -70,6 +72,14 @@ compose.desktop {
     application {
         mainClass = "io.github.arthurkun.generic.datastore.compose.app.MainKt"
 
+        buildTypes {
+            release {
+                proguard {
+                    configurationFiles.from(project.file("proguard-rules.pro"))
+                }
+            }
+        }
+
         nativeDistributions {
             modules("jdk.unsupported")
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
@@ -77,4 +87,8 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+tasks.withType<Jar>().configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
