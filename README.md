@@ -161,7 +161,7 @@ currentUserName = "Jane Doe"
 #### Reset to Default
 
 ```kotlin
-userName.resetToDefault()
+userName.resetToDefaultBlocking()
 ```
 
 ### Mapped Preferences
