@@ -67,7 +67,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "io.github.arthurkun.generic.datastore.sample"
+            packageName = "generic-datastore-sample"
             packageVersion = "1.0.0"
         }
     }
