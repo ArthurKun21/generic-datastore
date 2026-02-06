@@ -3,17 +3,25 @@ package io.github.arthurkun.generic.datastore
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SnapshotMutationPolicy
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.structuralEqualityPolicy
 import io.github.arthurkun.generic.datastore.core.Prefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+private object Unset
+
 /**
  * A [MutableState] backed by a [Prefs] instance.
  *
  * Reads are delegated to a collected [State] snapshot of the preference flow,
  * and writes are launched asynchronously via the provided [CoroutineScope].
+ * An optimistic local override is applied immediately so that synchronous UI
+ * inputs (e.g., `TextField`) reflect the new value without waiting for the
+ * DataStore round-trip.
  *
  * The [policy] controls when a new value is considered different from the current one.
  * Only values that are not equivalent according to the policy will trigger a write
@@ -33,11 +41,28 @@ class PrefsComposeState<T>(
     private val policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
 ) : MutableState<T> {
 
+    private var localOverride: Any? by mutableStateOf(Unset)
+
     override var value: T
-        get() = state.value
+        get() {
+            val upstream = state.value
+            val current = localOverride
+            if (current !== Unset) {
+                @Suppress("UNCHECKED_CAST")
+                val override = current as T
+                return if (!policy.equivalent(override, upstream)) {
+                    override
+                } else {
+                    localOverride = Unset
+                    upstream
+                }
+            }
+            return upstream
+        }
         set(value) {
-            val oldValue = Snapshot.withoutReadObservation { state.value }
+            val oldValue = Snapshot.withoutReadObservation { this.value }
             if (!policy.equivalent(oldValue, value)) {
+                localOverride = value
                 scope.launch {
                     prefs.set(value)
                 }
