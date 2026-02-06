@@ -135,10 +135,10 @@ data class PreferencesBackup(
     }
 
     fun toJson(): String {
-        return Companion.json.encodeToString(this)
+        return json.encodeToString(this)
     }
 
     fun toJsonElement(): JsonElement {
-        return Companion.json.encodeToJsonElement(this)
+        return json.encodeToJsonElement(this)
     }
 }
