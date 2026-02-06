@@ -1,21 +1,21 @@
-This app example uses manual dependency injection in order to lessen the dependency needed to run the app.
+This Android app example uses manual dependency injection to keep dependencies minimal.
 
-You can refer to the creation of the GenericPreferenceDataStore here in [AppContainer](./src/main/java/io/github/arthurkun/generic/datastore/app/AppContainer.kt) and was injected from the [MainApplication](./src/main/java/io/github/arthurkun/generic/datastore/app/MainApplication.kt) class.
+The shared [AppContainer](../composeApp/src/commonMain/kotlin/io/github/arthurkun/generic/datastore/compose/app/AppContainer.kt) (with its [Android-specific implementation](../composeApp/src/androidMain/kotlin/io/github/arthurkun/generic/datastore/compose/app/AppContainer.android.kt)) is instantiated in [MainApplication](./src/main/java/io/github/arthurkun/generic/datastore/app/MainApplication.kt) and retrieved in [MainActivity](./src/main/java/io/github/arthurkun/generic/datastore/app/MainActivity.kt), where it provides the [PreferenceStore](../composeApp/src/commonMain/kotlin/io/github/arthurkun/generic/datastore/compose/app/domain/PreferenceStore.kt) to the shared [MainScreen](../composeApp/src/commonMain/kotlin/io/github/arthurkun/generic/datastore/compose/app/ui/MainScreen.kt).
 
-It is finally retrieved in the [MainActivity](./src/main/java/io/github/arthurkun/generic/datastore/app/MainActivity.kt) class, where it is used to create the [MainViewModel](./src/main/java/io/github/arthurkun/generic/datastore/app/ui/MainViewModel.kt) class.
+The app also observes the theme preference and applies it via `AppCompatDelegate` using [setAppCompatDelegateThemeMode](./src/main/java/io/github/arthurkun/generic/datastore/app/domain/Theme.kt).
 
-You can then initialized the preferences in datastore in this way
+You can initialize preferences in the datastore like this:
 
-[PreferenceStore](./src/main/java/io/github/arthurkun/generic/datastore/app/domain/PreferenceStore.kt)
+[PreferenceStore](../composeApp/src/commonMain/kotlin/io/github/arthurkun/generic/datastore/compose/app/domain/PreferenceStore.kt)
 
 ```kotlin
 class PreferenceStore(
-    datastore: GenericPreferenceDatastore,
+    private val datastore: GenericPreferencesDatastore,
 ) {
 
     val theme = datastore.enum(
         "theme",
-        defaultValue = Theme.SYSTEM,
+        Theme.SYSTEM,
     )
 
     val text = datastore.string(
@@ -39,5 +39,21 @@ class PreferenceStore(
         serializer = { Animal.to(it) },
         deserializer = { Animal.from(it) },
     )
+
+    val duration = datastore.long(
+        key = "duration",
+        defaultValue = 0L,
+    ).mapIO(
+        convert = {
+            Instant.fromEpochMilliseconds(it)
+        },
+        reverse = {
+            it.toEpochMilliseconds()
+        },
+    )
+
+    suspend fun exportPreferences() = datastore.export()
+
+    suspend fun importPreferences(data: Map<String, Any>) = datastore.import(data)
 }
 ```
