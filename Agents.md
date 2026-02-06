@@ -1,18 +1,28 @@
 # Generic Datastore
 
-This repository contains a Kotlin Multiplatform library that provides a thin wrapper around AndroidX DataStore Preferences. The main module is `generic-datastore`, with optional Jetpack Compose extensions in `generic-datastore-compose`.
+This repository contains a Kotlin Multiplatform library that provides a thin wrapper around AndroidX DataStore Preferences and Proto DataStore. The main module is `generic-datastore`, with optional Jetpack Compose extensions in `generic-datastore-compose`.
 
 ## Modules
 
-- `:generic-datastore` core preference wrapper library.
-- `:generic-datastore-compose` Compose helpers built on the core module.
-- `:app` sample app for local development.
+- `:generic-datastore` – core preference and proto datastore wrapper library.
+  - `core/` – shared interfaces (`Preference`, `Prefs`, `MappedPreference`, `Migration`).
+  - `preferences/` – DataStore Preferences implementation (`GenericPreference`, `EnumPreference`, `ObjectPrimitive`, `PreferencesDatastore`, `GenericPreferencesDatastore`).
+  - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`, `GenericProtoDatastore`).
+- `:generic-datastore-compose` – Compose helpers (e.g. `Prefs<T>.remember()`) built on the core module.
+- `:app` – sample app for local development.
+
+## KMP Targets
+
+Both library modules target:
+
+- **Android** (`androidMain`)
+- **Desktop / JVM** (`jvm("desktop")`)
 
 ## Workflow
 
 - Use Gradle Kotlin DSL (`*.gradle.kts`).
 - Prefer Kotlin Multiplatform idioms and keep shared APIs in `commonMain`.
-- Keep this library as a thin convenience wrapper over `DataStore<Preferences>` and avoid heavy abstractions.
+- Keep this library as a thin convenience wrapper over `DataStore<Preferences>` / Proto DataStore and avoid heavy abstractions.
 
 ## Code Style
 
@@ -45,6 +55,20 @@ Ensure the module compiles by running the appropriate Gradle tasks and resolving
     ./gradlew :<module-name>:compileAndroidDeviceTest
     ```
 
+#### KMP modules targeting Desktop (JVM) Build
+
+- Compile the Desktop main source set:
+
+    ```shell
+    ./gradlew :<module-name>:compileKotlinDesktop
+    ```
+
+- Compile the Desktop test source set:
+
+    ```shell
+    ./gradlew :<module-name>:compileTestKotlinDesktop
+    ```
+
 ### Running tests
 
 If no Android device or emulator is available, run unit tests and at least compile the Android instrumentation test source set to verify correctness.
@@ -61,4 +85,12 @@ If no Android device or emulator is available, run unit tests and at least compi
 
     ```shell
     ./gradlew :<module-name>:connectedAndroidDeviceTest
+    ```
+
+#### KMP modules targeting Desktop (JVM) Test
+
+- Run Desktop (JVM) tests (uses JUnit 5):
+
+    ```shell
+    ./gradlew :<module-name>:desktopTest
     ```
