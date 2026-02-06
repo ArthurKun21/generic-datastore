@@ -17,7 +17,9 @@ actual fun platformColorScheme(
             val context = LocalContext.current
             if (useDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+
         useDarkTheme -> DarkColorScheme
+
         else -> LightColorScheme
     }
 }
