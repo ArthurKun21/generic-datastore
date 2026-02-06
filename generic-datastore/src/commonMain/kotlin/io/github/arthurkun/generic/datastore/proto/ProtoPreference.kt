@@ -41,6 +41,8 @@ internal class ProtoPreference<T>(
         }
     }
 
+    override suspend fun resetToDefault() = set(defaultValue)
+
     override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.updateData { defaultValue }
@@ -56,7 +58,7 @@ internal class ProtoPreference<T>(
 
     override fun setBlocking(value: T) = runBlocking { set(value) }
 
-    override fun resetToDefault() = runBlocking { set(defaultValue) }
+    override fun resetToDefaultBlocking() = setBlocking(defaultValue)
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = getBlocking()
 

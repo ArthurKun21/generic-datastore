@@ -161,7 +161,11 @@ currentUserName = "Jane Doe"
 #### Reset to Default
 
 ```kotlin
+// Suspend
 userName.resetToDefault()
+
+// Blocking — avoid on the main/UI thread
+userName.resetToDefaultBlocking()
 ```
 
 ### Mapped Preferences
