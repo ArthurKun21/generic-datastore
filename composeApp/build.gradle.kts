@@ -1,4 +1,3 @@
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
@@ -91,4 +90,9 @@ compose.desktop {
 
 tasks.withType<Jar>().configureEach {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    exclude("META-INF/AL2.0")
+    exclude("META-INF/LGPL2.1")
+
+    exclude("META-INF/MANIFEST.MF")
 }
