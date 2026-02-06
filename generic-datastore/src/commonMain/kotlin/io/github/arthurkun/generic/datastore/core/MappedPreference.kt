@@ -138,7 +138,7 @@ internal class MappedPrefs<T, R>(
 
     override fun setBlocking(value: R) = prefs.setBlocking(reverseFallback(value))
 
-    override fun resetToDefault() = prefs.resetToDefault()
+    override fun resetToDefaultBlocking() = prefs.setBlocking(reverseFallback(defaultValue))
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): R {
         return getBlocking()

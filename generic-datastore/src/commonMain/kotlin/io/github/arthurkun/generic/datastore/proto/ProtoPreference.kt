@@ -56,7 +56,7 @@ internal class ProtoPreference<T>(
 
     override fun setBlocking(value: T) = runBlocking { set(value) }
 
-    override fun resetToDefault() = runBlocking { set(defaultValue) }
+    override fun resetToDefaultBlocking() = setBlocking(defaultValue)
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = getBlocking()
 
