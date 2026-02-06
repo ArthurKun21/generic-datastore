@@ -34,7 +34,7 @@ import kotlinx.serialization.json.Json
  * @param json The [Json] instance to use for serialization/deserialization. Defaults to a lenient, ignoreUnknownKeys instance.
  * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations. Defaults to [Dispatchers.IO].
  */
-class KSerializedPrimitive<T>(
+internal class KSerializedPrimitive<T>(
     private val datastore: DataStore<Preferences>,
     private val key: String,
     override val defaultValue: T,

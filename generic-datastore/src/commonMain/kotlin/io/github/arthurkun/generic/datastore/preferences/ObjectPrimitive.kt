@@ -31,7 +31,7 @@ import kotlinx.coroutines.withContext
  * @param serializer A function to serialize the object of type [T] to its String representation for storage.
  * @param deserializer A function to deserialize the String representation back to an object of type [T].
  */
-class ObjectPrimitive<T>(
+internal class ObjectPrimitive<T>(
     private val datastore: DataStore<Preferences>,
     private val key: String,
     override val defaultValue: T,

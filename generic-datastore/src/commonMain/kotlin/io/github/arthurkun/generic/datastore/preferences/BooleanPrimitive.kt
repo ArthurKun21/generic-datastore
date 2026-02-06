@@ -10,7 +10,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
  * @param key The unique String key used to identify this preference within the DataStore.
  * @param defaultValue The default value to use if the preference is not set or on retrieval error.
  */
-class BooleanPrimitive(
+internal class BooleanPrimitive(
     datastore: DataStore<Preferences>,
     key: String,
     defaultValue: Boolean,
