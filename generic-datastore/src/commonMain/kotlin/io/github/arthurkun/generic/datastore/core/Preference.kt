@@ -40,6 +40,13 @@ interface Preference<T> {
     suspend fun delete()
 
     /**
+     * Resets the preference value to its [defaultValue].
+     *
+     * This is a suspending function equivalent of [Prefs.resetToDefaultBlocking].
+     */
+    suspend fun resetToDefault()
+
+    /**
      * Returns the default value of the preference.
      */
     val defaultValue: T

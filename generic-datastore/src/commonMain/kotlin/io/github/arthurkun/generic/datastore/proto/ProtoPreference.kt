@@ -41,6 +41,8 @@ internal class ProtoPreference<T>(
         }
     }
 
+    override suspend fun resetToDefault() = set(defaultValue)
+
     override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.updateData { defaultValue }

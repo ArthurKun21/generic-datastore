@@ -91,6 +91,8 @@ sealed class GenericPreference<T>(
         }
     }
 
+    override suspend fun resetToDefault() = set(defaultValue)
+
     /**
      * Returns a [Flow] that emits the preference's current value and subsequent updates from DataStore.
      * If the preference is not set in the DataStore or an error occurs during retrieval,
