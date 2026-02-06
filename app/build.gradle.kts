@@ -55,6 +55,7 @@ tasks {
 }
 
 dependencies {
+    implementation(project(":composeApp"))
     implementation(project(":generic-datastore"))
     implementation(project(":generic-datastore-compose"))
     implementation(libs.appcompat)
