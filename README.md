@@ -1,114 +1,112 @@
-# Generic Preference Datastore Library
+# Generic Datastore Library
 
-Inspired by the [flow-preferences](https://github.com/tfcporciuncula/flow-preferences) library for shared-preferences. I wanted to create a preference datastore version of it.
+A Kotlin Multiplatform library that provides a thin, convenient wrapper around AndroidX DataStore Preferences and Proto DataStore.
 
-This library provides a convenient way to work with AndroidX Jetpack DataStore by offering a `GenericPreferenceDatastore` class. This class simplifies the creation and management of various preference types.
+Inspired by [flow-preferences](https://github.com/tfcporciuncula/flow-preferences) for SharedPreferences.
 
-## Features
+## Modules
 
-The `GenericPreferenceDatastore` wraps a `DataStore<Preferences>` instance and provides methods to easily define and use preferences for:
+| Module | Description |
+|---|---|
+| `generic-datastore` | Core library with Preferences DataStore and Proto DataStore wrappers |
+| `generic-datastore-compose` | Jetpack Compose extensions (`Prefs<T>.remember()`) |
 
-*   **Primitive Types:**
-    *   String
-    *   Long
-    *   Int
-    *   Float
-    *   Boolean
-    *   Set<String>
-*   **Custom Objects:**
-    *   Supports storing any custom object by providing serializer and deserializer functions (e.g., using Gson or Kotlinx Serialization).
+### KMP Targets
 
-## How it Works
+Both modules target **Android** and **Desktop (JVM)**.
 
-The library offers a `PreferenceDatastore` interface and its implementation `GenericPreferenceDatastore`. You initialize `GenericPreferenceDatastore` with your `DataStore<Preferences>` instance. Then, you can use its methods like `string()`, `long()`, `int()`, `float()`, `bool()`, `stringSet()`, and `serialized()` to create `Prefs<T>` objects. Each `Prefs<T>` object is initialized with a key and a default value. This default value is automatically used during retrieval operations (like `get()`, `getValue()`, or when its `Flow` emits) if the preference key is not found in the DataStore or if an error occurs. These `Prefs<T>` objects provide flexible ways to interact with your preferences:
+## Installation
 
-*   **Asynchronous Operations:** Use the `get()` suspend function to retrieve values and `set(value: T)` suspend function to store values within coroutines.
-*   **Flow-based Observation:** Use `asFlow()` to get a `Flow<T>` that emits updates whenever the preference changes, or `stateIn(scope)` to get a `StateFlow<T>`.
-*   **Synchronous Access & Fire-and-Forget Update:**
-    *   `getValue()`: Synchronously retrieves the current value from DataStore. It blocks the calling thread (using `runBlocking`) until the value is available. While useful for immediate access, it should be used cautiously, especially on UI threads, to prevent unresponsiveness.
-    *   `setValue(value: T)`: Sets the preference value from a non-suspending context. This method launches a fire-and-forget coroutine internally to perform the update.
-
-## Example Usage (Conceptual)
+Add the JitPack repository to your `settings.gradle.kts`:
 
 ```kotlin
-// Initialize DataStore (this is standard DataStore setup)
-val Context.myDataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
-// Initialize GenericPreferenceDatastore
-val genericDatastore = GenericPreferenceDatastore(context.myDataStore)
-
-// Define preferences
-val userNamePref: Prefs<String> = genericDatastore.string("user_name", "Guest")
-val userScorePref: Prefs<Int> = genericDatastore.int("user_score", 0)
-```
-
-```kotlin
-// Example for a custom object
-@Serializable // Add Kotlinx Serialization annotation
-data class UserProfile(val id: Int, val email: String)
-
-val userProfilePref: Prefs<UserProfile> = genericDatastore.serialized(
-    key = "user_profile",
-    defaultValue = UserProfile(0, ""),
-    serializer = { profile -> Json.encodeToString(UserProfile.serializer(), profile) }, 
-    deserializer = { json -> Json.decodeFromString(UserProfile.serializer(), json) }
-)
-
-// Using the preferences
-CoroutineScope(Dispatchers.IO).launch {
-    // Get a value
-    val currentUserName = userNamePref.get()
-    println("Current user: $currentUserName")
-
-    // Set a value
-    userNamePref.set("John Doe")
-
-    // Get a custom object
-    val profile = userProfilePref.get()
-    println("User email: ${profile.email}")
-
-    // Set a custom object
-    userProfilePref.set(UserProfile(1, "john.doe@example.com"))
+dependencyResolutionManagement {
+    repositories {
+        maven("https://jitpack.io")
+    }
 }
 ```
 
-Or you can check this example with sealed class
+Add the dependencies:
 
-[Animal.kt](app/src/main/java/io/github/arthurkun/generic/datastore/app/domain/Animal.kt)
+```kotlin
+dependencies {
+    implementation("com.github.arthurkun:generic-datastore:<version>")
+
+    // Optional: Compose extensions
+    implementation("com.github.arthurkun:generic-datastore-compose:<version>")
+}
+```
+
+## Preferences DataStore
+
+### Setup
+
+```kotlin
+// Standard DataStore setup
+val Context.myDataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
+// Create the GenericPreferencesDatastore
+val datastore = GenericPreferencesDatastore(context.myDataStore)
+```
+
+### Defining Preferences
+
+The `GenericPreferencesDatastore` provides factory methods for all supported types:
+
+```kotlin
+val userName: Prefs<String>      = datastore.string("user_name", "Guest")
+val userScore: Prefs<Int>        = datastore.int("user_score", 0)
+val highScore: Prefs<Long>       = datastore.long("high_score", 0L)
+val volume: Prefs<Float>         = datastore.float("volume", 1.0f)
+val darkMode: Prefs<Boolean>     = datastore.bool("dark_mode", false)
+val tags: Prefs<Set<String>>     = datastore.stringSet("tags")
+```
+
+### Enum Preferences
+
+Store enum values directly using the `enum()` extension:
+
+```kotlin
+enum class Theme { LIGHT, DARK, SYSTEM }
+
+val themePref: Prefs<Theme> = datastore.enum("theme", Theme.SYSTEM)
+```
+
+### Custom Serialized Objects
+
+Store any object by providing serializer/deserializer functions:
+
+```kotlin
+@Serializable
+data class UserProfile(val id: Int, val email: String)
+
+val userProfilePref: Prefs<UserProfile> = datastore.serialized(
+    key = "user_profile",
+    defaultValue = UserProfile(0, ""),
+    serializer = { Json.encodeToString(UserProfile.serializer(), it) },
+    deserializer = { Json.decodeFromString(UserProfile.serializer(), it) },
+)
+```
+
+Or with a sealed class:
 
 ```kotlin
 sealed class Animal(val name: String) {
-
     data object Dog : Animal("Dog")
-
     data object Cat : Animal("Cat")
 
-    override fun toString(): String = name
-
     companion object {
-        fun from(value: String): Animal {
-            return when (value) {
-                "Dog" -> Dog
-                "Cat" -> Cat
-                else -> throw Exception("Unknown animal type: $value")
-            }
+        fun from(value: String): Animal = when (value) {
+            "Dog" -> Dog
+            "Cat" -> Cat
+            else -> throw Exception("Unknown animal type: $value")
         }
-
-        fun to(animal: Animal): String {
-            return animal.name
-        }
-
-        val entries by lazy {
-            listOf(
-                Dog,
-                Cat,
-            )
-        }
+        fun to(animal: Animal): String = animal.name
     }
 }
 
-
-val customObject = datastore.serialized(
+val animalPref = datastore.serialized(
     key = "animal",
     defaultValue = Animal.Dog,
     serializer = { Animal.to(it) },
@@ -116,87 +114,140 @@ val customObject = datastore.serialized(
 )
 ```
 
-## Synchronous Access & Property Delegation
-The library provides multiple ways to access and modify preference values synchronously or from non-suspending contexts.
+### Reading & Writing Values
 
-### Delegated Properties
-`Prefs<T>` implements the `ReadWriteProperty` interface, allowing you to use preferences as delegated properties. This offers a concise way to work with preference values as if they were regular variables.
+Each `Prefs<T>` provides multiple access patterns:
 
-When you read a delegated property (e.g., `val name = userNamePref`), it internally calls `getValue()`. This is a synchronous operation that blocks the current thread until the value is retrieved from DataStore. Be cautious with this on performance-sensitive threads like the UI thread.
-
-When you assign a value to a delegated property (e.g., `userNamePref = "Jane Doe"`), it internally calls `setValue(value)`. This performs a fire-and-forget update to the DataStore.
+#### Suspend Functions
 
 ```kotlin
-// Assuming userNamePref is a Prefs<String> (e.g., genericDatastore.string("user_name", "Guest"))
-var currentUserName: String by userNamePref
+CoroutineScope(Dispatchers.IO).launch {
+    val name = userName.get()
+    userName.set("John Doe")
+    userName.delete()
+}
+```
 
-// Read the value (synchronous, internally uses getValue())
-println("Current user name: $currentUserName")
+#### Flow-based Observation
 
-// Update the value (fire-and-forget, internally uses setValue())
+```kotlin
+userName.asFlow().collect { value -> /* react to changes */ }
+
+val nameState: StateFlow<String> = userName.stateIn(viewModelScope)
+```
+
+#### Blocking Access
+
+```kotlin
+// Blocks the calling thread — avoid on the main/UI thread
+val name = userName.getBlocking()
+userName.setBlocking("John Doe")
+```
+
+#### Property Delegation
+
+`Prefs<T>` implements `ReadWriteProperty`, so you can use it as a delegated property:
+
+```kotlin
+var currentUserName: String by userName
+
+// Read (blocking)
+println(currentUserName)
+
+// Write (blocking)
 currentUserName = "Jane Doe"
 ```
 
-### Direct Synchronous Access
-You can also access values synchronously or set them from non-suspending contexts using `getValue()` and `setValue()`:
+#### Reset to Default
 
 ```kotlin
-// Assuming userScorePref is a Prefs<Int>
-
-// Synchronous read - BE CAUTIOUS
-// This blocks the current thread until the value is retrieved.
-// Avoid on the main thread to prevent UI unresponsiveness.
-val currentScore = userScorePref.getValue()
-println("Current score via getValue(): $currentScore")
-
-// Fire-and-forget write from a non-suspending context
-userScorePref.setValue(100)
-
-// The value is updated in the DataStore.
-// You can observe this change via its Flow or by calling get()/getValue() later.
-// For example, in a coroutine:
-// CoroutineScope(Dispatchers.Main).launch {
-//     delay(100) // give a moment for the background write
-//     println("Score after setValue: ${userScorePref.get()}")
-// }
+userName.resetToDefault()
 ```
 
-**Note on Synchronous Reads (`getValue()`):** When using `getValue()` directly for synchronous reads, be cautious. This method blocks the current
-thread by calling the suspending `get()` function within `runBlocking`. This can lead to UI
-unresponsiveness if the DataStore operation is slow, especially if called on the main thread. For
-non-blocking alternatives, consider using `asFlow()`, `stateIn()`, or calling `get()` from within a
-coroutine. (The same caution for reads applies when using property delegation, as detailed in its dedicated section). Writes via `setValue` (and by extension, property delegation) are generally safe fire-and-forget operations.
+### Mapped Preferences
 
-## Usage in Jetpack Compose
+Transform a `Prefs<T>` into a `Prefs<R>` with converter functions:
 
-You can easily integrate these preferences into your Jetpack Compose UI using the `.remember()` extension function. This function observes the preference value and provides a `MutableState` that recomposes your UI when the preference changes.
+```kotlin
+val scoreAsString: Prefs<String> = userScore.map(
+    defaultValue = "0",
+    convert = { it.toString() },
+    reverse = { it.toIntOrNull() ?: 0 },
+)
 
-Under the hood, `.remember()` utilizes `collectAsStateWithLifecycle` to ensure that the preference value is collected in a lifecycle-aware manner, preventing unnecessary work.
+// Or infer the default value from the original preference's default:
+val scoreAsString2: Prefs<String> = userScore.mapIO(
+    convert = { it.toString() },
+    reverse = { it.toInt() },
+)
+```
 
-For the implementation you can take a look here in [Remember.kt](library/src/commonMain/kotlin/io/github/arthurkun/generic/datastore/Remember.kt).
+`map` catches exceptions in conversions and falls back to defaults. `mapIO` throws if conversion of the default value fails.
 
-Here's an example of how you might use it in a Composable function:
+### Export & Import
+
+`GenericPreferencesDatastore` supports exporting and importing all preferences as JSON:
+
+```kotlin
+// Export (returns Map<String, JsonElement>)
+val exported = datastore.export(
+    exportPrivate = false,
+    exportAppState = false,
+)
+
+// Import (accepts Map<String, Any>)
+datastore.import(data)
+```
+
+### Private & App-State Key Prefixes
+
+Use `Preference.privateKey(key)` or `Preference.appStateKey(key)` to prefix keys so they can be filtered during export:
+
+```kotlin
+val token = datastore.string(Preference.privateKey("auth_token"), "")
+val onboarded = datastore.bool(Preference.appStateKey("onboarding_done"), false)
+```
+
+## Proto DataStore
+
+Wrap a typed `DataStore<T>` for proto messages:
+
+```kotlin
+val protoDatastore = GenericProtoDatastore(
+    datastore = myProtoDataStore,
+    defaultValue = MyProtoMessage.getDefaultInstance(),
+)
+
+val dataPref: Prefs<MyProtoMessage> = protoDatastore.data()
+
+// Then use get(), set(), asFlow(), etc. just like Preferences DataStore
+```
+
+## Compose Extensions (`generic-datastore-compose`)
+
+The `remember()` extension turns any `Prefs<T>` into a lifecycle-aware `MutableState<T>`:
 
 ```kotlin
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
-// In your Composable function
 @Composable
-fun MyScreen(viewModel: MyViewModel = viewModel()) {
-    // Assuming preferenceStore is an instance of GenericPreferenceDatastore
-    // and 'userNamePref' is a Prefs<String> defined as shown previously.
-    var userName by viewModel.preferenceStore.userNamePref.remember()
+fun SettingsScreen(datastore: GenericPreferencesDatastore) {
+    var userName by datastore.string("user_name", "Guest").remember()
 
     Column {
         Text("Current User: $userName")
         OutlinedTextField(
             value = userName,
             onValueChange = { userName = it },
-            label = { Text("Enter username") }
+            label = { Text("Enter username") },
         )
     }
 }
 ```
 
-This library aims to reduce boilerplate code when working with Jetpack DataStore for common preference types and custom objects.
+Under the hood, `remember()` uses `collectAsStateWithLifecycle` for lifecycle-safe collection and launches a coroutine for writes.
+
+## License
+
+[Apache License 2.0](LICENSE.md)
