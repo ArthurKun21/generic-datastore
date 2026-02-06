@@ -10,15 +10,13 @@ import okio.Path.Companion.toPath
 
 actual class AppContainer(context: Context) {
 
-    private val dataStoreFileName = "dice.preferences_pb"
-
     private fun createDataStore(producePath: () -> String): DataStore<Preferences> =
         PreferenceDataStoreFactory.createWithPath(
             produceFile = { producePath().toPath() },
         )
 
     private fun createDataStore(context: Context): DataStore<Preferences> = createDataStore(
-        producePath = { context.filesDir.resolve(dataStoreFileName).absolutePath },
+        producePath = { context.filesDir.resolve(preferenceName).absolutePath },
     )
 
     private val genericPreferenceDatastore = GenericPreferencesDatastore(

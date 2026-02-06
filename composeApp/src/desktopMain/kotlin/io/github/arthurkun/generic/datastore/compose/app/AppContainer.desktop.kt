@@ -10,12 +10,10 @@ import java.io.File
 
 actual class AppContainer {
 
-    private val dataStoreFileName = "dice.preferences_pb"
-
     private fun createDataStore(): DataStore<Preferences> {
         val appDir = File(System.getProperty("user.home"), ".generic-datastore-sample")
         appDir.mkdirs()
-        val filePath = File(appDir, dataStoreFileName).absolutePath
+        val filePath = File(appDir, preferenceName).absolutePath
         return PreferenceDataStoreFactory.createWithPath(
             produceFile = { filePath.toPath() },
         )

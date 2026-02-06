@@ -9,3 +9,5 @@ import io.github.arthurkun.generic.datastore.compose.app.domain.PreferenceStore
 expect class AppContainer {
     val preferenceStore: PreferenceStore
 }
+
+internal val preferenceName = "test.preferences_pb"
