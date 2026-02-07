@@ -88,9 +88,25 @@ Tests should verify expected behavior as well as edge cases, and must be placed 
 source sets:
 
 * `commonTest` — Shared tests for all targets (preferred)
-* `androidTest` — Android instrumentation tests (platform-specific only)
+* `androidDeviceTest` — Android instrumentation tests (platform-specific only)
 * `androidHostTest` — Android unit tests (platform-specific only)
 * `desktopTest` — Desktop/JVM tests (platform-specific only)
+
+### Abstract test class pattern
+
+Tests use an abstract base class pattern to avoid duplicating test logic across platforms. Shared
+test methods live in abstract classes in `commonTest`, while platform source sets
+(`androidDeviceTest`, `desktopTest`) provide thin subclasses that only handle DataStore
+initialization and teardown.
+
+- `commonTest` — Abstract base classes (e.g. `AbstractDatastoreInstrumentedTest`,
+  `AbstractDatastoreBlockingTest`) containing all test methods.
+- `androidDeviceTest` / `desktopTest` — Concrete subclasses that override abstract properties
+  (`preferenceDatastore`, `dataStore`, `testDispatcher`) and supply platform-specific setup/teardown.
+
+When adding new tests, add them to the abstract class in `commonTest` so they run on all platforms
+automatically. Only add tests directly to a platform source set when the test requires
+platform-specific APIs that cannot be abstracted.
 
 #### KMP modules targeting Android Test
 
