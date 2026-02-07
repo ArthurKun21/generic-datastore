@@ -1,7 +1,10 @@
 package io.github.arthurkun.generic.datastore.preferences
 
 import io.github.arthurkun.generic.datastore.core.Prefs
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.serializer
 
 /**
  * Defines the contract for a preference data store.
@@ -98,6 +101,24 @@ public interface PreferencesDatastore {
         deserializer: (String) -> T,
     ): Prefs<Set<T>>
 
+    /**
+     * Creates a preference for a custom object using Kotlin Serialization.
+     * The object is serialized to JSON for storage.
+     *
+     * @param T The type of the custom object. Must be serializable using kotlinx.serialization.
+     * @param key The preference key.
+     * @param defaultValue The default value for the custom object.
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json The [Json] instance to use for serialization/deserialization.
+     * @return A [Prefs] instance for the custom object preference.
+     */
+    public fun <T> kserialized(
+        key: String,
+        defaultValue: T,
+        serializer: KSerializer<T>,
+        json: Json = io.github.arthurkun.generic.datastore.core.defaultJson,
+    ): Prefs<T>
+
     public suspend fun export(
         exportPrivate: Boolean = false,
         exportAppState: Boolean = false,
@@ -107,3 +128,26 @@ public interface PreferencesDatastore {
         data: Map<String, Any>,
     )
 }
+
+/**
+ * Creates a preference for a custom object using Kotlin Serialization,
+ * inferring the [KSerializer] from the reified type parameter.
+ *
+ * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ *
+ * @param T The type of the custom object.
+ * @param key The preference key.
+ * @param defaultValue The default value for the custom object.
+ * @param json The [Json] instance to use for serialization/deserialization.
+ * @return A [Prefs] instance for the custom object preference.
+ */
+public inline fun <reified T> PreferencesDatastore.kserialized(
+    key: String,
+    defaultValue: T,
+    json: Json = io.github.arthurkun.generic.datastore.core.defaultJson,
+): Prefs<T> = kserialized(
+    key = key,
+    defaultValue = defaultValue,
+    serializer = serializer<T>(),
+    json = json,
+)

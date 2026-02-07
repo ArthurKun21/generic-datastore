@@ -86,9 +86,7 @@ internal class KSerializedPrimitive<T>(
         }
     }
 
-    override suspend fun resetToDefault() {
-        TODO("Not yet implemented")
-    }
+    override suspend fun resetToDefault() = set(defaultValue)
 
     override fun asFlow(): Flow<T> {
         return datastore.data.map { prefs ->

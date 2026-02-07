@@ -13,6 +13,8 @@ import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.core.PrefsImpl
 import io.github.arthurkun.generic.datastore.core.toJsonElement
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
 /**
@@ -176,6 +178,21 @@ public class GenericPreferencesDatastore(
             defaultValue = defaultValue,
             serializer = serializer,
             deserializer = deserializer,
+        ),
+    )
+
+    override fun <T> kserialized(
+        key: String,
+        defaultValue: T,
+        serializer: KSerializer<T>,
+        json: Json,
+    ): Prefs<T> = PrefsImpl(
+        KSerializedPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            json = json,
         ),
     )
 
