@@ -14,11 +14,14 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.AfterClass
 import org.junit.BeforeClass
+import org.junit.FixMethodOrder
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 import java.io.File
 
 private const val TEST_DATASTORE_BLOCKING_NAME = "test_datastore_blocking"
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4::class)
 class AndroidDatastoreBlockingInstrumentedTest : AbstractDatastoreBlockingTest() {
 
