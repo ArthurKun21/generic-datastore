@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.spotless) apply false
     alias(libs.plugins.vanniktech.maven.publish) apply false
     alias(libs.plugins.jetbrains.compose) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
 }
 
 version = "1.0.0"
