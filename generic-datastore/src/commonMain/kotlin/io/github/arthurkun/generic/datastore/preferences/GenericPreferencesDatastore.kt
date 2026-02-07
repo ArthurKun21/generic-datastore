@@ -229,6 +229,36 @@ public class GenericPreferencesDatastore(
         ),
     )
 
+    override fun <T> serializedList(
+        key: String,
+        defaultValue: List<T>,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Prefs<List<T>> = PrefsImpl(
+        SerializedListPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
+    override fun <T> kserializedList(
+        key: String,
+        defaultValue: List<T>,
+        serializer: KSerializer<T>,
+        json: Json,
+    ): Prefs<List<T>> = PrefsImpl(
+        KSerializedListPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            json = json,
+        ),
+    )
+
     override suspend fun clearAll() {
         datastore.edit { it.clear() }
     }

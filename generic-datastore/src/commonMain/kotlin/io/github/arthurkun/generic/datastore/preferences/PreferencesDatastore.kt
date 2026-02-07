@@ -150,6 +150,43 @@ public interface PreferencesDatastore {
     ): Prefs<Set<T>>
 
     /**
+     * Creates a preference for a [List] of custom objects that can be serialized to and
+     * deserialized from Strings. The list is stored as a JSON array string using
+     * [stringPreferencesKey].
+     *
+     * @param T The type of each element in the list.
+     * @param key The preference key.
+     * @param defaultValue The default value for the list (defaults to an empty list).
+     * @param serializer A function to serialize each element to a String.
+     * @param deserializer A function to deserialize each String back to an element.
+     * @return A [Prefs] instance for the List preference.
+     */
+    public fun <T> serializedList(
+        key: String,
+        defaultValue: List<T> = emptyList(),
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Prefs<List<T>>
+
+    /**
+     * Creates a preference for a [List] of custom objects using Kotlin Serialization.
+     * The list is serialized to a JSON array string for storage using [stringPreferencesKey].
+     *
+     * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
+     * @param key The preference key.
+     * @param defaultValue The default value for the list (defaults to an empty list).
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json The [Json] instance to use for serialization/deserialization.
+     * @return A [Prefs] instance for the List preference.
+     */
+    public fun <T> kserializedList(
+        key: String,
+        defaultValue: List<T> = emptyList(),
+        serializer: KSerializer<T>,
+        json: Json = defaultJson,
+    ): Prefs<List<T>>
+
+    /**
      * Clears all preferences stored in this datastore.
      *
      * After calling this, all preferences will return their default values.
@@ -206,6 +243,29 @@ public inline fun <reified T> PreferencesDatastore.kserializedSet(
     defaultValue: Set<T> = emptySet(),
     json: Json = defaultJson,
 ): Prefs<Set<T>> = kserializedSet(
+    key = key,
+    defaultValue = defaultValue,
+    serializer = serializer<T>(),
+    json = json,
+)
+
+/**
+ * Creates a preference for a [List] of custom objects using Kotlin Serialization,
+ * inferring the [KSerializer] from the reified type parameter.
+ *
+ * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ *
+ * @param T The type of each element in the list.
+ * @param key The preference key.
+ * @param defaultValue The default value for the list (defaults to an empty list).
+ * @param json The [Json] instance to use for serialization/deserialization.
+ * @return A [Prefs] instance for the List preference.
+ */
+public inline fun <reified T> PreferencesDatastore.kserializedList(
+    key: String,
+    defaultValue: List<T> = emptyList(),
+    json: Json = defaultJson,
+): Prefs<List<T>> = kserializedList(
     key = key,
     defaultValue = defaultValue,
     serializer = serializer<T>(),
