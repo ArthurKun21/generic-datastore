@@ -7,6 +7,7 @@ import io.github.arthurkun.generic.datastore.core.map
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.enum
 import io.github.arthurkun.generic.datastore.preferences.enumSet
+import io.github.arthurkun.generic.datastore.preferences.toggle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -742,5 +743,128 @@ abstract class AbstractDatastoreInstrumentedTest {
 
         assertEquals(20, intPref.get())
         assertEquals("Converted_20", mappedPref.get())
+    }
+
+    @Test
+    fun stringSetPreference_toggleAddsItem() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.stringSet("testStringSetToggleAdd", setOf("a"))
+        pref.toggle("b")
+        assertEquals(setOf("a", "b"), pref.get())
+    }
+
+    @Test
+    fun stringSetPreference_toggleRemovesItem() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.stringSet("testStringSetToggleRemove", setOf("a", "b"))
+        pref.toggle("b")
+        assertEquals(setOf("a"), pref.get())
+    }
+
+    @Test
+    fun stringSetPreference_toggleOnEmptySetAddsItem() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.stringSet("testStringSetToggleEmpty")
+        pref.toggle("a")
+        assertEquals(setOf("a"), pref.get())
+    }
+
+    @Test
+    fun stringSetPreference_toggleSameItemTwiceRestoresOriginal() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.stringSet("testStringSetToggleTwice", setOf("a"))
+        pref.toggle("b")
+        assertEquals(setOf("a", "b"), pref.get())
+        pref.toggle("b")
+        assertEquals(setOf("a"), pref.get())
+    }
+
+    @Test
+    fun enumSetPreference_toggleAddsItem() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.enumSet("testEnumSetToggleAdd", setOf(TestEnum.VALUE_A))
+        pref.toggle(TestEnum.VALUE_B)
+        assertEquals(setOf(TestEnum.VALUE_A, TestEnum.VALUE_B), pref.get())
+    }
+
+    @Test
+    fun enumSetPreference_toggleRemovesItem() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.enumSet("testEnumSetToggleRemove", setOf(TestEnum.VALUE_A, TestEnum.VALUE_B))
+        pref.toggle(TestEnum.VALUE_A)
+        assertEquals(setOf(TestEnum.VALUE_B), pref.get())
+    }
+
+    @Test
+    fun enumSetPreference_toggleOnEmptySetAddsItem() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.enumSet<TestEnum>("testEnumSetToggleEmpty")
+        pref.toggle(TestEnum.VALUE_C)
+        assertEquals(setOf(TestEnum.VALUE_C), pref.get())
+    }
+
+    @Test
+    fun enumSetPreference_toggleSameItemTwiceRestoresOriginal() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.enumSet("testEnumSetToggleTwice", setOf(TestEnum.VALUE_A))
+        pref.toggle(TestEnum.VALUE_B)
+        assertEquals(setOf(TestEnum.VALUE_A, TestEnum.VALUE_B), pref.get())
+        pref.toggle(TestEnum.VALUE_B)
+        assertEquals(setOf(TestEnum.VALUE_A), pref.get())
+    }
+
+    @Test
+    fun serializedSetPreference_toggleAddsItem() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetToggleAdd",
+            defaultValue = setOf(SerializableObject(1, "A")),
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+        pref.toggle(SerializableObject(2, "B"))
+        assertEquals(setOf(SerializableObject(1, "A"), SerializableObject(2, "B")), pref.get())
+    }
+
+    @Test
+    fun serializedSetPreference_toggleRemovesItem() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetToggleRemove",
+            defaultValue = setOf(SerializableObject(1, "A"), SerializableObject(2, "B")),
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+        pref.toggle(SerializableObject(2, "B"))
+        assertEquals(setOf(SerializableObject(1, "A")), pref.get())
+    }
+
+    @Test
+    fun serializedSetPreference_toggleOnEmptySetAddsItem() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetToggleEmpty",
+            defaultValue = emptySet(),
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+        pref.toggle(SerializableObject(1, "A"))
+        assertEquals(setOf(SerializableObject(1, "A")), pref.get())
+    }
+
+    @Test
+    fun serializedSetPreference_toggleSameItemTwiceRestoresOriginal() = runTest(testDispatcher) {
+        val defaultSet = setOf(SerializableObject(1, "A"))
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetToggleTwice",
+            defaultValue = defaultSet,
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+        pref.toggle(SerializableObject(2, "B"))
+        assertEquals(setOf(SerializableObject(1, "A"), SerializableObject(2, "B")), pref.get())
+        pref.toggle(SerializableObject(2, "B"))
+        assertEquals(defaultSet, pref.get())
     }
 }
