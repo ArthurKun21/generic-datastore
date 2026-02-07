@@ -8,6 +8,8 @@ plugins {
 kotlin {
     explicitApi()
 
+    applyDefaultHierarchyTemplate()
+
     androidLibrary {
         namespace = "io.github.arthurkun.generic.datastore"
         compileSdk = libs.versions.compile.sdk.get().toInt()
@@ -19,7 +21,9 @@ kotlin {
             consumerKeepRules.file("consumer-rules.pro")
         }
 
-        withDeviceTest {
+        withDeviceTestBuilder {
+            sourceSetTreeName = "test"
+        }.configure {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
     }
@@ -42,7 +46,6 @@ kotlin {
         }
 
         getByName("androidDeviceTest") {
-            dependsOn(commonTest.get())
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.coroutines.test)
