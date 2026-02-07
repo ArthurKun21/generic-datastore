@@ -1,6 +1,7 @@
 package io.github.arthurkun.generic.datastore.preferences
 
 import io.github.arthurkun.generic.datastore.core.Prefs
+import io.github.arthurkun.generic.datastore.core.PreferenceDefaults.defaultJson
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -116,7 +117,7 @@ public interface PreferencesDatastore {
         key: String,
         defaultValue: T,
         serializer: KSerializer<T>,
-        json: Json = io.github.arthurkun.generic.datastore.core.defaultJson,
+        json: Json = defaultJson,
     ): Prefs<T>
 
     public suspend fun export(
@@ -144,7 +145,7 @@ public interface PreferencesDatastore {
 public inline fun <reified T> PreferencesDatastore.kserialized(
     key: String,
     defaultValue: T,
-    json: Json = io.github.arthurkun.generic.datastore.core.defaultJson,
+    json: Json = defaultJson,
 ): Prefs<T> = kserialized(
     key = key,
     defaultValue = defaultValue,

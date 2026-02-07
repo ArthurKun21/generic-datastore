@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
-import io.github.arthurkun.generic.datastore.core.defaultJson
+import io.github.arthurkun.generic.datastore.core.PreferenceDefaults.defaultJson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
