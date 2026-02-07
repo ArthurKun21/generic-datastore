@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import io.github.arthurkun.generic.datastore.core.map
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.enum
+import io.github.arthurkun.generic.datastore.preferences.enumSet
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -541,6 +542,76 @@ abstract class AbstractDatastoreInstrumentedTest {
 
         val result = pref.get()
         assertEquals(setOf(SerializableObject(1, "Valid")), result)
+    }
+
+    @Test
+    fun enumSetPreference_defaultValueWhenNotSet() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.enumSet("testEnumSetDefault", setOf(TestEnum.VALUE_A, TestEnum.VALUE_B))
+        assertEquals(setOf(TestEnum.VALUE_A, TestEnum.VALUE_B), pref.get())
+    }
+
+    @Test
+    fun enumSetPreference_setAndGetValue() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.enumSet<TestEnum>("testEnumSetSetGet")
+        pref.set(setOf(TestEnum.VALUE_B, TestEnum.VALUE_C))
+        assertEquals(setOf(TestEnum.VALUE_B, TestEnum.VALUE_C), pref.get())
+    }
+
+    @Test
+    fun enumSetPreference_observeSetValue() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.enumSet<TestEnum>("testEnumSetFlow")
+        pref.set(setOf(TestEnum.VALUE_A))
+        val value = pref.asFlow().first()
+        assertEquals(setOf(TestEnum.VALUE_A), value)
+    }
+
+    @Test
+    fun enumSetPreference_deleteValue() = runTest(testDispatcher) {
+        val defaultSet = setOf(TestEnum.VALUE_A)
+        val pref = preferenceDatastore.enumSet("testEnumSetDelete", defaultSet)
+        pref.set(setOf(TestEnum.VALUE_C))
+        assertEquals(setOf(TestEnum.VALUE_C), pref.get())
+
+        pref.delete()
+        assertEquals(defaultSet, pref.get())
+    }
+
+    @Test
+    fun enumSetPreference_updateValue() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.enumSet("testEnumSetUpdate", setOf(TestEnum.VALUE_A))
+        pref.update { it + TestEnum.VALUE_B }
+        assertEquals(setOf(TestEnum.VALUE_A, TestEnum.VALUE_B), pref.get())
+    }
+
+    @Test
+    fun enumSetPreference_resetToDefault() = runTest(testDispatcher) {
+        val defaultSet = setOf(TestEnum.VALUE_A, TestEnum.VALUE_B)
+        val pref = preferenceDatastore.enumSet("testEnumSetReset", defaultSet)
+        pref.set(setOf(TestEnum.VALUE_C))
+        assertEquals(setOf(TestEnum.VALUE_C), pref.get())
+
+        pref.resetToDefault()
+        assertEquals(defaultSet, pref.get())
+    }
+
+    @Test
+    fun enumSetPreference_handleUnknownValueSkipsInvalidElements() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.enumSet<TestEnum>("testEnumSetUnknown")
+
+        val stringSetKey = androidx.datastore.preferences.core.stringSetPreferencesKey("testEnumSetUnknown")
+        dataStore.edit { settings ->
+            settings[stringSetKey] = setOf("VALUE_A", "INVALID_VALUE", "VALUE_C")
+        }
+
+        val result = pref.get()
+        assertEquals(setOf(TestEnum.VALUE_A, TestEnum.VALUE_C), result)
+    }
+
+    @Test
+    fun enumSetPreference_emptySet() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.enumSet<TestEnum>("testEnumSetEmpty")
+        pref.set(emptySet())
+        assertEquals(emptySet(), pref.get())
     }
 
     @Test
