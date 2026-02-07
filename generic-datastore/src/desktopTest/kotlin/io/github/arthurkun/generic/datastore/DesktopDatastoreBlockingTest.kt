@@ -8,8 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.AfterTest
@@ -17,7 +15,6 @@ import kotlin.test.BeforeTest
 
 private const val TEST_DATASTORE_BLOCKING_NAME = "test_datastore_blocking"
 
-@TestMethodOrder(MethodOrderer.MethodName::class)
 class DesktopDatastoreBlockingTest : AbstractDatastoreBlockingTest() {
 
     @TempDir
