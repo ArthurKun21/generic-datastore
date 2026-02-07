@@ -114,6 +114,60 @@ val animalPref = datastore.serialized(
 )
 ```
 
+### Kotlin Serialization (`kserialized`)
+
+Store any `@Serializable` type directly without manual serializer/deserializer functions:
+
+```kotlin
+@Serializable
+data class UserProfile(val name: String, val age: Int)
+
+val userProfilePref: Prefs<UserProfile> = datastore.kserialized(
+    key = "user_profile",
+    defaultValue = UserProfile(name = "John", age = 25),
+)
+```
+
+A custom `Json` instance can be provided if needed:
+
+```kotlin
+val customJson = Json { prettyPrint = true }
+
+val userProfilePref: Prefs<UserProfile> = datastore.kserialized(
+    key = "user_profile",
+    defaultValue = UserProfile(name = "John", age = 25),
+    json = customJson,
+)
+```
+
+### Serialized Set
+
+Store a `Set` of custom objects using per-element serialization with `serializedSet()`:
+
+```kotlin
+val animalSetPref: Prefs<Set<Animal>> = datastore.serializedSet(
+    key = "animal_set",
+    defaultValue = emptySet(),
+    serializer = { Animal.to(it) },
+    deserializer = { Animal.from(it) },
+)
+```
+
+Each element is individually serialized to a String and stored using a `stringSetPreferencesKey`. Elements that fail deserialization are silently skipped.
+
+### Enum Set
+
+Store a `Set` of enum values with the `enumSet()` extension:
+
+```kotlin
+val themeSetPref: Prefs<Set<Theme>> = datastore.enumSet<Theme>(
+    key = "theme_set",
+    defaultValue = emptySet(),
+)
+```
+
+Each enum value is stored by its `name`. Unknown enum values encountered during deserialization are skipped.
+
 ### Reading & Writing Values
 
 Each `Prefs<T>` provides multiple access patterns:
