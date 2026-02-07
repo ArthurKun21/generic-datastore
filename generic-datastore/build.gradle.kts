@@ -40,16 +40,17 @@ kotlin {
         }
 
         getByName("androidDeviceTest") {
+            kotlin.srcDir("src/commonTest/kotlin")
             dependencies {
-                implementation(libs.datastore.preferences)
                 implementation(libs.kotlin.test)
-                implementation(libs.junit4)
                 implementation(libs.coroutines.test)
+                implementation(libs.datastore.preferences)
+                implementation(libs.junit4)
                 implementation(libs.androidx.test.junit)
                 implementation(libs.androidx.test.espresso)
             }
         }
-        val desktopTest by getting {
+        named("desktopTest") {
             dependencies {
                 implementation(libs.junit5)
             }
