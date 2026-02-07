@@ -14,6 +14,7 @@ import io.github.arthurkun.generic.datastore.core.Preference
 import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.core.PrefsImpl
 import io.github.arthurkun.generic.datastore.core.toJsonElement
+import io.github.arthurkun.generic.datastore.preferences.nullable.NullableBooleanPrimitive
 import io.github.arthurkun.generic.datastore.preferences.nullable.NullableDoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.nullable.NullableFloatPrimitive
 import io.github.arthurkun.generic.datastore.preferences.nullable.NullableIntPrimitive
