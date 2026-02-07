@@ -217,3 +217,12 @@ public suspend inline fun <T> Prefs<Set<T>>.toggle(item: T) {
         if (item in current) current - item else current + item
     }
 }
+
+/**
+ * Toggles a [Boolean] preference.
+ *
+ * Flips the current value: `true` becomes `false`, and `false` becomes `true`.
+ */
+public suspend inline fun Prefs<Boolean>.toggle() {
+    update { !it }
+}
