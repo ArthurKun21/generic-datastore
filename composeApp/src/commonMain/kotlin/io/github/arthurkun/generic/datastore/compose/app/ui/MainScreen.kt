@@ -38,6 +38,7 @@ import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
 import io.github.arthurkun.generic.datastore.compose.app.domain.UserProfile
 import io.github.arthurkun.generic.datastore.core.toJsonElement
 import io.github.arthurkun.generic.datastore.core.toJsonMap
+import io.github.arthurkun.generic.datastore.preferences.toggle
 import io.github.arthurkun.generic.datastore.remember
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -154,7 +155,7 @@ fun MainScreen(
         item {
             SerializedSetSection(
                 animalSet = animalSet,
-                onAnimalSetChange = { animalSet = it },
+                onToggle = { entry -> scope.launch { preferenceStore.animalSet.toggle(entry) } },
                 onReset = { scope.launch { preferenceStore.animalSet.resetToDefault() } },
             )
         }
@@ -166,7 +167,7 @@ fun MainScreen(
         item {
             EnumSetSection(
                 themeSet = themeSet,
-                onThemeSetChange = { themeSet = it },
+                onToggle = { entry -> scope.launch { preferenceStore.themeSet.toggle(entry) } },
                 onReset = { scope.launch { preferenceStore.themeSet.resetToDefault() } },
             )
         }
@@ -434,7 +435,7 @@ private fun KSerializedSection(
 @Composable
 private fun SerializedSetSection(
     animalSet: Set<Animal>,
-    onAnimalSetChange: (Set<Animal>) -> Unit,
+    onToggle: (Animal) -> Unit,
     onReset: () -> Unit,
 ) {
     Column {
@@ -457,11 +458,7 @@ private fun SerializedSetSection(
                     .fillMaxWidth()
                     .toggleable(
                         value = isSelected,
-                        onValueChange = {
-                            onAnimalSetChange(
-                                if (isSelected) animalSet - entry else animalSet + entry,
-                            )
-                        },
+                        onValueChange = { onToggle(entry) },
                     ),
             )
         }
@@ -474,7 +471,7 @@ private fun SerializedSetSection(
 @Composable
 private fun EnumSetSection(
     themeSet: Set<Theme>,
-    onThemeSetChange: (Set<Theme>) -> Unit,
+    onToggle: (Theme) -> Unit,
     onReset: () -> Unit,
 ) {
     Column {
@@ -497,11 +494,7 @@ private fun EnumSetSection(
                     .fillMaxWidth()
                     .toggleable(
                         value = isSelected,
-                        onValueChange = {
-                            onThemeSetChange(
-                                if (isSelected) themeSet - entry else themeSet + entry,
-                            )
-                        },
+                        onValueChange = { onToggle(entry) },
                     ),
             )
         }
