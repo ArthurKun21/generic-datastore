@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * A [GenericPreference] for storing custom [Object] values.
@@ -59,6 +60,16 @@ class ObjectPrimitive<T>(
         }
     }
 
+    override suspend fun update(transform: (T) -> T) {
+        withContext(ioDispatcher) {
+            datastore.edit { prefs ->
+                val current = prefs[stringPrefKey]?.let { safeDeserialize(it) }
+                    ?: this@ObjectPrimitive.defaultValue
+                prefs[stringPrefKey] = serializer(transform(current))
+            }
+        }
+    }
+
     override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
@@ -70,6 +81,16 @@ class ObjectPrimitive<T>(
     override fun asFlow(): Flow<T> {
         return datastore.data.map { prefs ->
             prefs[stringPrefKey]?.let { deserializer(it) } ?: this@ObjectPrimitive.defaultValue
+        }
+    }
+
+    private fun safeDeserialize(value: String): T {
+        return try {
+            deserializer(value)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            defaultValue
         }
     }
 }
