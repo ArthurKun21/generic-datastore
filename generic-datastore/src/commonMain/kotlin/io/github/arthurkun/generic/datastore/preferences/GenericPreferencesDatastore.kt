@@ -196,6 +196,21 @@ public class GenericPreferencesDatastore(
         ),
     )
 
+    override fun <T> kserializedSet(
+        key: String,
+        defaultValue: Set<T>,
+        serializer: KSerializer<T>,
+        json: Json,
+    ): Prefs<Set<T>> = PrefsImpl(
+        KSerializedSetPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            json = json,
+        ),
+    )
+
     override suspend fun export(exportPrivate: Boolean, exportAppState: Boolean): Map<String, JsonElement> {
         return datastore
             .data

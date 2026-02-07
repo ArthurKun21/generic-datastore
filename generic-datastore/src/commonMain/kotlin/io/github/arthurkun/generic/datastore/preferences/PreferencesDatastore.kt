@@ -120,6 +120,24 @@ public interface PreferencesDatastore {
         json: Json = defaultJson,
     ): Prefs<T>
 
+    /**
+     * Creates a preference for a [Set] of custom objects using Kotlin Serialization.
+     * Each element is serialized to JSON for storage using [stringSetPreferencesKey].
+     *
+     * @param T The type of each element in the set. Must be serializable using kotlinx.serialization.
+     * @param key The preference key.
+     * @param defaultValue The default value for the set (defaults to an empty set).
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json The [Json] instance to use for serialization/deserialization.
+     * @return A [Prefs] instance for the Set preference.
+     */
+    public fun <T> kserializedSet(
+        key: String,
+        defaultValue: Set<T> = emptySet(),
+        serializer: KSerializer<T>,
+        json: Json = defaultJson,
+    ): Prefs<Set<T>>
+
     public suspend fun export(
         exportPrivate: Boolean = false,
         exportAppState: Boolean = false,
@@ -147,6 +165,29 @@ public inline fun <reified T> PreferencesDatastore.kserialized(
     defaultValue: T,
     json: Json = defaultJson,
 ): Prefs<T> = kserialized(
+    key = key,
+    defaultValue = defaultValue,
+    serializer = serializer<T>(),
+    json = json,
+)
+
+/**
+ * Creates a preference for a [Set] of custom objects using Kotlin Serialization,
+ * inferring the [KSerializer] from the reified type parameter.
+ *
+ * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ *
+ * @param T The type of each element in the set.
+ * @param key The preference key.
+ * @param defaultValue The default value for the set (defaults to an empty set).
+ * @param json The [Json] instance to use for serialization/deserialization.
+ * @return A [Prefs] instance for the Set preference.
+ */
+public inline fun <reified T> PreferencesDatastore.kserializedSet(
+    key: String,
+    defaultValue: Set<T> = emptySet(),
+    json: Json = defaultJson,
+): Prefs<Set<T>> = kserializedSet(
     key = key,
     defaultValue = defaultValue,
     serializer = serializer<T>(),
