@@ -80,6 +80,24 @@ public interface PreferencesDatastore {
         deserializer: (String) -> T,
     ): Prefs<T>
 
+    /**
+     * Creates a preference for a [Set] of custom objects, stored using a string set preference key.
+     * Each element is individually serialized to and deserialized from a String.
+     *
+     * @param T The type of each element in the set.
+     * @param key The preference key.
+     * @param defaultValue The default value for the set (defaults to an empty set).
+     * @param serializer A function to serialize each element to a String.
+     * @param deserializer A function to deserialize each String back to an element.
+     * @return A [Prefs] instance for the Set preference.
+     */
+    public fun <T> serializedSet(
+        key: String,
+        defaultValue: Set<T> = emptySet(),
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Prefs<Set<T>>
+
     public suspend fun export(
         exportPrivate: Boolean = false,
         exportAppState: Boolean = false,

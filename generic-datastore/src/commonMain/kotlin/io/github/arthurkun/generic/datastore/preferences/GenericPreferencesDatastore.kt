@@ -153,6 +153,32 @@ public class GenericPreferencesDatastore(
         ),
     )
 
+    /**
+     * Creates a preference for a [Set] of custom objects, stored using a string set preference key.
+     * Each element is individually serialized to and deserialized from a String.
+     *
+     * @param T The type of each element in the set.
+     * @param key The preference key.
+     * @param defaultValue The default value for the set.
+     * @param serializer A function to serialize each element to a String.
+     * @param deserializer A function to deserialize each String back to an element.
+     * @return A [Prefs] instance for the Set preference.
+     */
+    override fun <T> serializedSet(
+        key: String,
+        defaultValue: Set<T>,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Prefs<Set<T>> = PrefsImpl(
+        SerializedSetPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
     override suspend fun export(exportPrivate: Boolean, exportAppState: Boolean): Map<String, JsonElement> {
         return datastore
             .data
