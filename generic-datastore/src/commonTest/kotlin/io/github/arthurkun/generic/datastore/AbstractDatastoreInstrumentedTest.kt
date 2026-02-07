@@ -7,6 +7,7 @@ import io.github.arthurkun.generic.datastore.core.map
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.enum
 import io.github.arthurkun.generic.datastore.preferences.enumSet
+import io.github.arthurkun.generic.datastore.preferences.distinctFlow
 import io.github.arthurkun.generic.datastore.preferences.toggle
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -943,6 +944,51 @@ abstract class AbstractDatastoreInstrumentedTest {
         pref.set(true)
         pref.toggle()
         assertFalse(pref.get())
+    }
+
+    @Test
+    fun distinctFlow_emitsDefaultValue() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("distinctFlowDefault", 42)
+        val value = intPref.distinctFlow().first()
+        assertEquals(42, value)
+    }
+
+    @Test
+    fun distinctFlow_filtersConsecutiveDuplicates() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("distinctFlowDistinct", 0)
+        intPref.set(5)
+        val value = intPref.distinctFlow().first()
+        assertEquals(5, value)
+
+        intPref.set(5)
+        val sameValue = intPref.distinctFlow().first()
+        assertEquals(5, sameValue)
+
+        intPref.set(10)
+        val newValue = intPref.distinctFlow().first()
+        assertEquals(10, newValue)
+    }
+
+    @Test
+    fun distinctFlow_worksWithStringPreference() = runTest(testDispatcher) {
+        val stringPref = preferenceDatastore.string("distinctFlowString", "initial")
+        val value = stringPref.distinctFlow().first()
+        assertEquals("initial", value)
+
+        stringPref.set("changed")
+        val updated = stringPref.distinctFlow().first()
+        assertEquals("changed", updated)
+    }
+
+    @Test
+    fun distinctFlow_worksWithBooleanPreference() = runTest(testDispatcher) {
+        val boolPref = preferenceDatastore.bool("distinctFlowBool", false)
+        val value = boolPref.distinctFlow().first()
+        assertEquals(false, value)
+
+        boolPref.set(true)
+        val updated = boolPref.distinctFlow().first()
+        assertEquals(true, updated)
     }
 
     @Test
