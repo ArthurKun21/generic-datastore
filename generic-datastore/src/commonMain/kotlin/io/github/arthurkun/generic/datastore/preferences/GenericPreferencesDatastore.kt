@@ -12,12 +12,6 @@ import io.github.arthurkun.generic.datastore.core.Preference
 import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.core.PrefsImpl
 import io.github.arthurkun.generic.datastore.core.toJsonElement
-import io.github.arthurkun.generic.datastore.preferences.GenericPreference.BooleanPrimitive
-import io.github.arthurkun.generic.datastore.preferences.GenericPreference.FloatPrimitive
-import io.github.arthurkun.generic.datastore.preferences.GenericPreference.IntPrimitive
-import io.github.arthurkun.generic.datastore.preferences.GenericPreference.LongPrimitive
-import io.github.arthurkun.generic.datastore.preferences.GenericPreference.StringPrimitive
-import io.github.arthurkun.generic.datastore.preferences.GenericPreference.StringSetPrimitive
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.JsonElement
 
