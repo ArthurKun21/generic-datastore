@@ -105,6 +105,49 @@ abstract class AbstractDatastoreBlockingTest {
     }
 
     @Test
+    fun serializedSetPreference_resetToDefaultBlocking() {
+        val defaultSet = setOf(SerializableObjectBlocking(1, "A"), SerializableObjectBlocking(2, "B"))
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetResetBlocking",
+            defaultValue = defaultSet,
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObjectBlocking(parts[0].toInt(), parts[1])
+            },
+        )
+        pref.setBlocking(setOf(SerializableObjectBlocking(3, "C")))
+        assertEquals(setOf(SerializableObjectBlocking(3, "C")), pref.getBlocking())
+
+        pref.resetToDefaultBlocking()
+        assertEquals(defaultSet, pref.getBlocking())
+    }
+
+    @Test
+    fun serializedSetPreference_delegation() {
+        val defaultSet = setOf(SerializableObjectBlocking(1, "A"))
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetDelegate",
+            defaultValue = defaultSet,
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObjectBlocking(parts[0].toInt(), parts[1])
+            },
+        )
+        var delegatedValue: Set<SerializableObjectBlocking> by pref
+
+        val newSet = setOf(SerializableObjectBlocking(2, "B"), SerializableObjectBlocking(3, "C"))
+        delegatedValue = newSet
+        assertEquals(newSet, delegatedValue)
+        assertEquals(newSet, pref.getBlocking())
+
+        pref.resetToDefaultBlocking()
+        assertEquals(defaultSet, delegatedValue)
+        assertEquals(defaultSet, pref.getBlocking())
+    }
+
+    @Test
     fun mappedPreference_resetToDefaultBlocking() {
         val intPref = preferenceDatastore.int("baseForMapReset", 75)
         val mappedPref = intPref.map(

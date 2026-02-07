@@ -423,6 +423,127 @@ abstract class AbstractDatastoreInstrumentedTest {
     }
 
     @Test
+    fun serializedSetPreference_defaultValueWhenNotSet() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetDefault",
+            defaultValue = setOf(SerializableObject(1, "A"), SerializableObject(2, "B")),
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+        assertEquals(setOf(SerializableObject(1, "A"), SerializableObject(2, "B")), pref.get())
+    }
+
+    @Test
+    fun serializedSetPreference_setAndGetValue() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetSetGet",
+            defaultValue = emptySet(),
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+        val newSet = setOf(SerializableObject(3, "C"), SerializableObject(4, "D"))
+        pref.set(newSet)
+        assertEquals(newSet, pref.get())
+    }
+
+    @Test
+    fun serializedSetPreference_observeSetValue() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetFlow",
+            defaultValue = emptySet(),
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+        val newSet = setOf(SerializableObject(5, "E"))
+        pref.set(newSet)
+        val value = pref.asFlow().first()
+        assertEquals(newSet, value)
+    }
+
+    @Test
+    fun serializedSetPreference_deleteValue() = runTest(testDispatcher) {
+        val defaultSet = setOf(SerializableObject(1, "Default"))
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetDelete",
+            defaultValue = defaultSet,
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+        pref.set(setOf(SerializableObject(9, "ToDelete")))
+        assertEquals(setOf(SerializableObject(9, "ToDelete")), pref.get())
+
+        pref.delete()
+        assertEquals(defaultSet, pref.get())
+    }
+
+    @Test
+    fun serializedSetPreference_updateValue() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetUpdate",
+            defaultValue = setOf(SerializableObject(1, "A")),
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+        pref.update { it + SerializableObject(2, "B") }
+        assertEquals(setOf(SerializableObject(1, "A"), SerializableObject(2, "B")), pref.get())
+    }
+
+    @Test
+    fun serializedSetPreference_resetToDefault() = runTest(testDispatcher) {
+        val defaultSet = setOf(SerializableObject(1, "Default"))
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetReset",
+            defaultValue = defaultSet,
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+        pref.set(setOf(SerializableObject(99, "Changed")))
+        assertEquals(setOf(SerializableObject(99, "Changed")), pref.get())
+
+        pref.resetToDefault()
+        assertEquals(defaultSet, pref.get())
+    }
+
+    @Test
+    fun serializedSetPreference_handleDeserializationErrorSkipsInvalidElements() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetDeserError",
+            defaultValue = emptySet(),
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+
+        val stringSetKey = androidx.datastore.preferences.core.stringSetPreferencesKey("testSerializedSetDeserError")
+        dataStore.edit { settings ->
+            settings[stringSetKey] = setOf("1,Valid", "INVALID_DATA")
+        }
+
+        val result = pref.get()
+        assertEquals(setOf(SerializableObject(1, "Valid")), result)
+    }
+
+    @Test
     fun mappedPreference_defaultValueWhenNotSet() = runTest(testDispatcher) {
         val intPref = preferenceDatastore.int("baseForMapDefault", 0)
         val mappedPref = intPref.map(
