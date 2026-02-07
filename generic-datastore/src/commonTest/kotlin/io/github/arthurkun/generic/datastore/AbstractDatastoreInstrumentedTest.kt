@@ -91,6 +91,50 @@ abstract class AbstractDatastoreInstrumentedTest {
     }
 
     @Test
+    fun doublePreference_defaultValueWhenNotSet() = runTest(testDispatcher) {
+        val doublePref = preferenceDatastore.double("testDouble", 1.0)
+        assertEquals(1.0, doublePref.get())
+    }
+
+    @Test
+    fun doublePreference_setAndGetValue() = runTest(testDispatcher) {
+        val doublePref = preferenceDatastore.double("testDouble", 1.0)
+        doublePref.set(2.5)
+        assertEquals(2.5, doublePref.get())
+    }
+
+    @Test
+    fun doublePreference_observeDefaultValue() = runTest(testDispatcher) {
+        val doublePref = preferenceDatastore.double("testDoubleFlow", 3.14)
+        val value = doublePref.asFlow().first()
+        assertEquals(3.14, value)
+    }
+
+    @Test
+    fun doublePreference_observeSetValue() = runTest(testDispatcher) {
+        val doublePref = preferenceDatastore.double("testDoubleFlowSet", 0.0)
+        doublePref.set(9.99)
+        val value = doublePref.asFlow().first()
+        assertEquals(9.99, value)
+    }
+
+    @Test
+    fun doublePreference_deleteValue() = runTest(testDispatcher) {
+        val doublePref = preferenceDatastore.double("testDoubleDelete", 1.0)
+        doublePref.set(2.0)
+        assertEquals(2.0, doublePref.get())
+        doublePref.delete()
+        assertEquals(1.0, doublePref.get())
+    }
+
+    @Test
+    fun doublePreference_updateValue() = runTest(testDispatcher) {
+        val doublePref = preferenceDatastore.double("testDoubleUpdate", 1.0)
+        doublePref.update { it + 0.5 }
+        assertEquals(1.5, doublePref.get())
+    }
+
+    @Test
     fun floatPreference_updateValue() = runTest(testDispatcher) {
         val floatPref = preferenceDatastore.float("testFloatUpdate", 1.0f)
         floatPref.update { it + 0.5f }
