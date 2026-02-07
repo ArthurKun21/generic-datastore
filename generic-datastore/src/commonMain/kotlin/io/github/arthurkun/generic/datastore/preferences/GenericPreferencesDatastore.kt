@@ -25,7 +25,7 @@ import kotlinx.serialization.json.JsonElement
  * @property datastore The underlying [DataStore<Preferences>] instance.
  */
 @Suppress("unused")
-class GenericPreferencesDatastore(
+public class GenericPreferencesDatastore(
     private val datastore: DataStore<Preferences>,
 ) : PreferencesDatastore {
 

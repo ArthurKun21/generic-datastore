@@ -28,7 +28,7 @@ import kotlin.reflect.KProperty
  * @throws Exception if `convert(this.defaultValue)` fails.
  */
 @Suppress("unused")
-fun <T, R> Prefs<T>.mapIO(
+public fun <T, R> Prefs<T>.mapIO(
     convert: (T) -> R,
     reverse: (R) -> T,
 ): Prefs<R> =
@@ -62,7 +62,7 @@ fun <T, R> Prefs<T>.mapIO(
  *   and error handling logic.
  */
 @Suppress("unused")
-fun <T, R> Prefs<T>.map(
+public fun <T, R> Prefs<T>.map(
     defaultValue: R,
     convert: (T) -> R,
     reverse: (R) -> T,

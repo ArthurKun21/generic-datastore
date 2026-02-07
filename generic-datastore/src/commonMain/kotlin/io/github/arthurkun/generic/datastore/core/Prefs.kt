@@ -11,11 +11,11 @@ import kotlin.reflect.KProperty
  *
  * @param T The type of the preference value.
  */
-interface Prefs<T> : ReadWriteProperty<Any?, T>, Preference<T> {
+public interface Prefs<T> : ReadWriteProperty<Any?, T>, Preference<T> {
     /**
      * Resets the preference value to its default.
      */
-    fun resetToDefaultBlocking()
+    public fun resetToDefaultBlocking()
 }
 
 /**

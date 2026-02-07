@@ -16,4 +16,4 @@ import io.github.arthurkun.generic.datastore.core.Prefs as CorePrefs
     ),
     level = DeprecationLevel.WARNING,
 )
-typealias Prefs<T> = CorePrefs<T>
+public typealias Prefs<T> = CorePrefs<T>
