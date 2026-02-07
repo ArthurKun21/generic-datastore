@@ -12,6 +12,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -32,7 +33,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.material.icons.filled.Delete
 import io.github.arthurkun.generic.datastore.compose.app.domain.Animal
 import io.github.arthurkun.generic.datastore.compose.app.domain.PreferenceStore
 import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
