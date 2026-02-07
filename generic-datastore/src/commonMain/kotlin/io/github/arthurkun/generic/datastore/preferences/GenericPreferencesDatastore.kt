@@ -3,6 +3,7 @@ package io.github.arthurkun.generic.datastore.preferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -89,6 +90,22 @@ public class GenericPreferencesDatastore(
     override fun float(key: String, defaultValue: Float): Prefs<Float> =
         PrefsImpl(
             FloatPrimitive(
+                datastore = datastore,
+                key = key,
+                defaultValue = defaultValue,
+            ),
+        )
+
+    /**
+     * Creates a Double preference.
+     *
+     * @param key The preference key.
+     * @param defaultValue The default Double value.
+     * @return A [Prefs] instance for the Double preference.
+     */
+    override fun double(key: String, defaultValue: Double): Prefs<Double> =
+        PrefsImpl(
+            DoublePrimitive(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
@@ -241,6 +258,8 @@ public class GenericPreferencesDatastore(
                     is Int -> mutablePreferences[intPreferencesKey(key)] = value
 
                     is Float -> mutablePreferences[floatPreferencesKey(key)] = value
+
+                    is Double -> mutablePreferences[doublePreferencesKey(key)] = value
 
                     is Boolean -> mutablePreferences[booleanPreferencesKey(key)] = value
 

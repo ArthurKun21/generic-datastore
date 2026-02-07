@@ -50,6 +50,15 @@ public interface PreferencesDatastore {
     public fun float(key: String, defaultValue: Float = 0f): Prefs<Float>
 
     /**
+     * Creates a Double preference.
+     *
+     * @param key The preference key.
+     * @param defaultValue The default Double value (defaults to 0.0).
+     * @return A [Prefs] instance for the Double preference.
+     */
+    public fun double(key: String, defaultValue: Double = 0.0): Prefs<Double>
+
+    /**
      * Creates a Boolean preference.
      *
      * @param key The preference key.
