@@ -13,6 +13,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
 import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.core.PrefsImpl
+import io.github.arthurkun.generic.datastore.preferences.nullable.*
 import io.github.arthurkun.generic.datastore.core.toJsonElement
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.KSerializer
@@ -126,6 +127,54 @@ public class GenericPreferencesDatastore(
                 datastore = datastore,
                 key = key,
                 defaultValue = defaultValue,
+            ),
+        )
+
+    override fun nullableString(key: String): Prefs<String?> =
+        PrefsImpl(
+            NullableStringPrimitive(
+                datastore = datastore,
+                key = key,
+            ),
+        )
+
+    override fun nullableInt(key: String): Prefs<Int?> =
+        PrefsImpl(
+            NullableIntPrimitive(
+                datastore = datastore,
+                key = key,
+            ),
+        )
+
+    override fun nullableLong(key: String): Prefs<Long?> =
+        PrefsImpl(
+            NullableLongPrimitive(
+                datastore = datastore,
+                key = key,
+            ),
+        )
+
+    override fun nullableFloat(key: String): Prefs<Float?> =
+        PrefsImpl(
+            NullableFloatPrimitive(
+                datastore = datastore,
+                key = key,
+            ),
+        )
+
+    override fun nullableDouble(key: String): Prefs<Double?> =
+        PrefsImpl(
+            NullableDoublePrimitive(
+                datastore = datastore,
+                key = key,
+            ),
+        )
+
+    override fun nullableBool(key: String): Prefs<Boolean?> =
+        PrefsImpl(
+            NullableBooleanPrimitive(
+                datastore = datastore,
+                key = key,
             ),
         )
 

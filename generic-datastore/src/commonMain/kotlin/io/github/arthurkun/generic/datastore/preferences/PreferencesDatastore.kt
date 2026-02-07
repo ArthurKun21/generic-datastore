@@ -70,6 +70,60 @@ public interface PreferencesDatastore {
     public fun bool(key: String, defaultValue: Boolean = false): Prefs<Boolean>
 
     /**
+     * Creates a nullable String preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable String preference.
+     */
+    public fun nullableString(key: String): Prefs<String?>
+
+    /**
+     * Creates a nullable Int preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Int preference.
+     */
+    public fun nullableInt(key: String): Prefs<Int?>
+
+    /**
+     * Creates a nullable Long preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Long preference.
+     */
+    public fun nullableLong(key: String): Prefs<Long?>
+
+    /**
+     * Creates a nullable Float preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Float preference.
+     */
+    public fun nullableFloat(key: String): Prefs<Float?>
+
+    /**
+     * Creates a nullable Double preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Double preference.
+     */
+    public fun nullableDouble(key: String): Prefs<Double?>
+
+    /**
+     * Creates a nullable Boolean preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Boolean preference.
+     */
+    public fun nullableBool(key: String): Prefs<Boolean?>
+
+    /**
      * Creates a Set<String> preference.
      *
      * @param key The preference key.
