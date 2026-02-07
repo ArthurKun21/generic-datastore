@@ -3,6 +3,8 @@ package io.github.arthurkun.generic.datastore.compose.app.domain
 import io.github.arthurkun.generic.datastore.core.mapIO
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.enum
+import io.github.arthurkun.generic.datastore.preferences.enumSet
+import io.github.arthurkun.generic.datastore.preferences.kserialized
 import kotlin.time.Instant
 
 class PreferenceStore(
@@ -46,6 +48,23 @@ class PreferenceStore(
         reverse = {
             it.toEpochMilliseconds()
         },
+    )
+
+    val userProfile = datastore.kserialized(
+        key = "user_profile",
+        defaultValue = UserProfile(name = "John", age = 25),
+    )
+
+    val animalSet = datastore.serializedSet(
+        key = "animal_set",
+        defaultValue = emptySet(),
+        serializer = { Animal.to(it) },
+        deserializer = { Animal.from(it) },
+    )
+
+    val themeSet = datastore.enumSet<Theme>(
+        key = "theme_set",
+        defaultValue = emptySet(),
     )
 
     suspend fun exportPreferences() = datastore.export()

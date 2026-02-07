@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import io.github.arthurkun.generic.datastore.compose.app.domain.Animal
 import io.github.arthurkun.generic.datastore.compose.app.domain.PreferenceStore
 import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
+import io.github.arthurkun.generic.datastore.compose.app.domain.UserProfile
 import io.github.arthurkun.generic.datastore.core.toJsonElement
 import io.github.arthurkun.generic.datastore.core.toJsonMap
 import io.github.arthurkun.generic.datastore.remember
@@ -54,6 +57,9 @@ fun MainScreen(
     var bool by preferenceStore.bool.remember()
     var animal by preferenceStore.customObject.remember()
     var duration by preferenceStore.duration.remember()
+    var userProfile by preferenceStore.userProfile.remember()
+    var animalSet by preferenceStore.animalSet.remember()
+    var themeSet by preferenceStore.themeSet.remember()
 
     LazyColumn(
         modifier = Modifier
@@ -126,6 +132,42 @@ fun MainScreen(
                 duration = duration,
                 onUpdate = { duration = Clock.System.now() },
                 onReset = { scope.launch { preferenceStore.duration.resetToDefault() } },
+            )
+        }
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
+        item {
+            KSerializedSection(
+                userProfile = userProfile,
+                onUserProfileChange = { userProfile = it },
+                onReset = { scope.launch { preferenceStore.userProfile.resetToDefault() } },
+            )
+        }
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
+        item {
+            SerializedSetSection(
+                animalSet = animalSet,
+                onAnimalSetChange = { animalSet = it },
+                onReset = { scope.launch { preferenceStore.animalSet.resetToDefault() } },
+            )
+        }
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
+        item {
+            EnumSetSection(
+                themeSet = themeSet,
+                onThemeSetChange = { themeSet = it },
+                onReset = { scope.launch { preferenceStore.themeSet.resetToDefault() } },
             )
         }
         item {
@@ -338,6 +380,129 @@ private fun DurationSection(
             Text(
                 "Update Duration",
                 style = MaterialTheme.typography.headlineSmall,
+            )
+        }
+        TextButton(onClick = onReset) {
+            Text("Reset to Default")
+        }
+    }
+}
+
+@Composable
+private fun KSerializedSection(
+    userProfile: UserProfile,
+    onUserProfileChange: (UserProfile) -> Unit,
+    onReset: () -> Unit,
+) {
+    Column {
+        Text(
+            "KSerialized",
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        OutlinedTextField(
+            value = TextFieldValue(userProfile.name, TextRange(userProfile.name.length)),
+            onValueChange = { onUserProfileChange(userProfile.copy(name = it.text)) },
+            label = { Text("Name") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        ListItem(
+            headlineContent = {
+                Text(
+                    "${userProfile.age}",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                )
+            },
+            leadingContent = {
+                Button(onClick = { onUserProfileChange(userProfile.copy(age = userProfile.age - 1)) }) {
+                    Icon(Icons.Default.Remove, contentDescription = "Decrement Age")
+                }
+            },
+            trailingContent = {
+                Button(onClick = { onUserProfileChange(userProfile.copy(age = userProfile.age + 1)) }) {
+                    Icon(Icons.Default.Add, contentDescription = "Increment Age")
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        TextButton(onClick = onReset) {
+            Text("Reset to Default")
+        }
+    }
+}
+
+@Composable
+private fun SerializedSetSection(
+    animalSet: Set<Animal>,
+    onAnimalSetChange: (Set<Animal>) -> Unit,
+    onReset: () -> Unit,
+) {
+    Column {
+        Text(
+            "Serialized Set",
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        Text("Selected: ${animalSet.joinToString { it.name }}")
+        Animal.entries.forEach { entry ->
+            val isSelected = entry in animalSet
+            ListItem(
+                headlineContent = { Text(entry.toString()) },
+                leadingContent = {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckedChange = null,
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = isSelected,
+                        onValueChange = {
+                            onAnimalSetChange(
+                                if (isSelected) animalSet - entry else animalSet + entry,
+                            )
+                        },
+                    ),
+            )
+        }
+        TextButton(onClick = onReset) {
+            Text("Reset to Default")
+        }
+    }
+}
+
+@Composable
+private fun EnumSetSection(
+    themeSet: Set<Theme>,
+    onThemeSetChange: (Set<Theme>) -> Unit,
+    onReset: () -> Unit,
+) {
+    Column {
+        Text(
+            "Enum Set",
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        Text("Selected: ${themeSet.joinToString { it.name }}")
+        Theme.entries.forEach { entry ->
+            val isSelected = entry in themeSet
+            ListItem(
+                headlineContent = { Text(entry.name) },
+                leadingContent = {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckedChange = null,
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = isSelected,
+                        onValueChange = {
+                            onThemeSetChange(
+                                if (isSelected) themeSet - entry else themeSet + entry,
+                            )
+                        },
+                    ),
             )
         }
         TextButton(onClick = onReset) {
