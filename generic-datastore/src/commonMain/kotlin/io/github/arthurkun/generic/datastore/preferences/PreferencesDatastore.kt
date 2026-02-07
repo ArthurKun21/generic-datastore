@@ -152,3 +152,18 @@ public inline fun <reified T> PreferencesDatastore.kserialized(
     serializer = serializer<T>(),
     json = json,
 )
+
+/**
+ * Toggles an item in a [Set] preference.
+ *
+ * If the set contains the item, it is removed; otherwise, it is added.
+ * Works with [stringSet], [serializedSet], and [enumSet][PreferencesDatastore.enumSet] preferences.
+ *
+ * @param T The type of each element in the set.
+ * @param item The item to toggle.
+ */
+public suspend inline fun <T> Prefs<Set<T>>.toggle(item: T) {
+    update { current ->
+        if (item in current) current - item else current + item
+    }
+}
