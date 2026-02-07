@@ -15,7 +15,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
 
-fun Any?.toJsonElement(): JsonElement = when (this) {
+public fun Any?.toJsonElement(): JsonElement = when (this) {
     null -> JsonNull
     is JsonElement -> this
     is Number -> JsonPrimitive(this)
@@ -49,7 +49,7 @@ private fun parseJsonValue(element: JsonElement): Any {
 /**
  * Parse a JSON string to a Map<String, Any>
  */
-fun String.toJsonMap(): Map<String, Any> = try {
+public fun String.toJsonMap(): Map<String, Any> = try {
     Json.parseToJsonElement(this)
         .jsonObject
         .mapNotNull { (k, v) ->

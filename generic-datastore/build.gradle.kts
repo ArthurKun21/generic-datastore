@@ -6,6 +6,10 @@ plugins {
 }
 
 kotlin {
+    explicitApi()
+
+    applyDefaultHierarchyTemplate()
+
     androidLibrary {
         namespace = "io.github.arthurkun.generic.datastore"
         compileSdk = libs.versions.compile.sdk.get().toInt()
@@ -17,7 +21,9 @@ kotlin {
             consumerKeepRules.file("consumer-rules.pro")
         }
 
-        withDeviceTest {
+        withDeviceTestBuilder {
+            sourceSetTreeName = "test"
+        }.configure {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
     }
@@ -40,7 +46,6 @@ kotlin {
         }
 
         getByName("androidDeviceTest") {
-            kotlin.srcDir("src/commonTest/kotlin")
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.coroutines.test)
@@ -68,7 +73,6 @@ publishing {
     publications {
         withType<MavenPublication> {
             groupId = "com.github.arthurkun"
-            artifactId = "generic-datastore"
             version = project.version.toString()
 
             pom {

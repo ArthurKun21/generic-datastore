@@ -13,26 +13,26 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param T The type of the preference value.
  */
-interface Preference<T> {
+public interface Preference<T> {
 
     /**
      * Returns the key of the preference.
      */
-    fun key(): String
+    public fun key(): String
 
     /**
      * Gets the current value of the preference.
      *
      * @return The current preference value.
      */
-    suspend fun get(): T
+    public suspend fun get(): T
 
     /**
      * Sets the value of the preference.
      *
      * @param value The new value for the preference.
      */
-    suspend fun set(value: T)
+    public suspend fun set(value: T)
 
     /**
      * Atomically reads the current value and applies [transform] to compute a new value,
@@ -40,31 +40,31 @@ interface Preference<T> {
      *
      * @param transform A function that receives the current value and returns the new value.
      */
-    suspend fun update(transform: (T) -> T)
+    public suspend fun update(transform: (T) -> T)
 
     /**
      * Deletes the preference from the underlying storage.
      */
-    suspend fun delete()
+    public suspend fun delete()
 
     /**
      * Resets the preference value to its [defaultValue].
      *
      * This is a suspending function equivalent of [Prefs.resetToDefaultBlocking].
      */
-    suspend fun resetToDefault()
+    public suspend fun resetToDefault()
 
     /**
      * Returns the default value of the preference.
      */
-    val defaultValue: T
+    public val defaultValue: T
 
     /**
      * Returns a [Flow] that emits the preference value whenever it changes.
      *
      * @return A [Flow] of the preference value.
      */
-    fun asFlow(): Flow<T>
+    public fun asFlow(): Flow<T>
 
     /**
      * Converts the preference [Flow] into a [StateFlow].
@@ -72,7 +72,7 @@ interface Preference<T> {
      * @param scope The [CoroutineScope] to use for the [StateFlow].
      * @return A [StateFlow] of the preference value.
      */
-    fun stateIn(scope: CoroutineScope): StateFlow<T>
+    public fun stateIn(scope: CoroutineScope): StateFlow<T>
 
     /**
      * Gets the current value of the preference.
@@ -82,13 +82,13 @@ interface Preference<T> {
      *
      * @return The current preference value.
      */
-    fun getBlocking(): T
+    public fun getBlocking(): T
 
     @Deprecated(
         message = "Use getBlocking() instead",
         replaceWith = ReplaceWith("getBlocking()"),
     )
-    fun getValue(): T = getBlocking()
+    public fun getValue(): T = getBlocking()
 
     /**
      * Sets the value of the preference.
@@ -98,18 +98,18 @@ interface Preference<T> {
      *
      * @param value The new value for the preference.
      */
-    fun setBlocking(value: T)
+    public fun setBlocking(value: T)
 
     @Deprecated(
         message = "Use setBlocking(value) instead",
         replaceWith = ReplaceWith("setBlocking(value)"),
     )
-    fun setValue(value: T) = setBlocking(value)
+    public fun setValue(value: T): Unit = setBlocking(value)
 
     /**
      * Companion object for [Preference] related utility functions.
      */
-    companion object {
+    public companion object {
         /**
          * Checks if a preference key is marked as private.
          * Private preferences should not be exposed in backups without user consent.
@@ -118,7 +118,7 @@ interface Preference<T> {
          * @return `true` if the key starts with the private prefix, `false` otherwise.
          */
         @Suppress("unused")
-        fun isPrivate(key: String): Boolean {
+        public fun isPrivate(key: String): Boolean {
             return key.startsWith(PRIVATE_PREFIX)
         }
 
@@ -129,7 +129,7 @@ interface Preference<T> {
          * @return The key with the private prefix.
          */
         @Suppress("unused")
-        fun privateKey(key: String): String {
+        public fun privateKey(key: String): String {
             return "$PRIVATE_PREFIX$key"
         }
 
@@ -141,7 +141,7 @@ interface Preference<T> {
          * @return `true` if the key starts with the app state prefix, `false` otherwise.
          */
         @Suppress("unused")
-        fun isAppState(key: String): Boolean {
+        public fun isAppState(key: String): Boolean {
             return key.startsWith(APP_STATE_PREFIX)
         }
 
@@ -152,7 +152,7 @@ interface Preference<T> {
          * @return The key with the app state prefix.
          */
         @Suppress("unused")
-        fun appStateKey(key: String): String = "$APP_STATE_PREFIX$key"
+        public fun appStateKey(key: String): String = "$APP_STATE_PREFIX$key"
 
         private const val APP_STATE_PREFIX = "__APP_STATE_"
         private const val PRIVATE_PREFIX = "__PRIVATE_"

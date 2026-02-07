@@ -18,7 +18,7 @@ import io.github.arthurkun.generic.datastore.preferences.enum as preferencesEnum
     ),
     level = DeprecationLevel.WARNING,
 )
-inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
+public inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
     key: String,
     defaultValue: T,
 ): Prefs<T> = preferencesEnum(key, defaultValue)

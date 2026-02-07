@@ -18,7 +18,7 @@ import kotlin.coroutines.CoroutineContext
  * @return A [MutableState] representing the preference value.
  */
 @Composable
-actual fun <T> Prefs<T>.remember(
+public actual fun <T> Prefs<T>.remember(
     context: CoroutineContext,
     policy: SnapshotMutationPolicy<T>,
 ): MutableState<T> {

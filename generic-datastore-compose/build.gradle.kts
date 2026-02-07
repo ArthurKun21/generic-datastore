@@ -6,6 +6,10 @@ plugins {
 }
 
 kotlin {
+    explicitApi()
+
+    applyDefaultHierarchyTemplate()
+
     androidLibrary {
         namespace = "io.github.arthurkun.generic.datastore.compose"
         compileSdk = libs.versions.compile.sdk.get().toInt()
@@ -15,7 +19,9 @@ kotlin {
             consumerKeepRules.file("consumer-rules.pro")
         }
 
-        withDeviceTest {
+        withDeviceTestBuilder {
+            sourceSetTreeName = "test"
+        }.configure {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
     }
@@ -49,7 +55,6 @@ publishing {
     publications {
         withType<MavenPublication> {
             groupId = "com.github.arthurkun"
-            artifactId = "generic-datastore-compose"
             version = project.version.toString()
 
             pom {

@@ -9,11 +9,11 @@ import io.github.arthurkun.generic.datastore.core.Prefs
  *
  * @param T The proto message type.
  */
-interface ProtoDatastore<T> {
+public interface ProtoDatastore<T> {
     /**
      * Returns the proto message wrapped as a [Prefs] instance.
      *
      * @return A [Prefs] instance for the proto message.
      */
-    fun data(): Prefs<T>
+    public fun data(): Prefs<T>
 }

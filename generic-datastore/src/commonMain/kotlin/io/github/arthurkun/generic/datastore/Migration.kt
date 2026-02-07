@@ -18,7 +18,7 @@ import io.github.arthurkun.generic.datastore.core.toJsonMap as coreToJsonMap
     ),
     level = DeprecationLevel.WARNING,
 )
-fun Any?.toJsonElement(): JsonElement = coreToJsonElement()
+public fun Any?.toJsonElement(): JsonElement = coreToJsonElement()
 
 /**
  * Extension for backwards compatibility.
@@ -32,4 +32,4 @@ fun Any?.toJsonElement(): JsonElement = coreToJsonElement()
     ),
     level = DeprecationLevel.WARNING,
 )
-fun String.toJsonMap(): Map<String, Any> = coreToJsonMap()
+public fun String.toJsonMap(): Map<String, Any> = coreToJsonMap()

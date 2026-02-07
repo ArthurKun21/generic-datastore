@@ -22,7 +22,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @return A [MutableState] representing the preference value.
  */
 @Composable
-expect fun <T> Prefs<T>.remember(
+public expect fun <T> Prefs<T>.remember(
     context: CoroutineContext = EmptyCoroutineContext,
     policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
 ): MutableState<T>

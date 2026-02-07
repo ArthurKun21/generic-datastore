@@ -15,7 +15,7 @@ import io.github.arthurkun.generic.datastore.core.Prefs
  * deserialization fails.
  */
 @Suppress("unused")
-inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
+public inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
     key: String,
     defaultValue: T,
 ): Prefs<T> = serialized(
