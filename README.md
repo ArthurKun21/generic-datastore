@@ -172,6 +172,37 @@ val profileSetPref: Prefs<Set<UserProfile>> = datastore.kserializedSet(
 
 Each element is individually serialized to JSON and stored using a `stringSetPreferencesKey`. Elements that fail deserialization are silently skipped. A custom `Json` instance can be provided if needed.
 
+### Serialized List
+
+Store a `List` of custom objects using per-element serialization with `serializedList()`:
+
+```kotlin
+val animalListPref: Prefs<List<Animal>> = datastore.serializedList(
+    key = "animal_list",
+    defaultValue = emptyList(),
+    serializer = { Animal.to(it) },
+    deserializer = { Animal.from(it) },
+)
+```
+
+Each element is individually serialized to a String and stored as a JSON array string using a `stringPreferencesKey`. Elements that fail deserialization are silently skipped. Unlike sets, lists preserve insertion order and allow duplicates.
+
+### Kotlin Serialization List (`kserializedList`)
+
+Store a `List` of `@Serializable` objects without manual serializer/deserializer functions:
+
+```kotlin
+@Serializable
+data class UserProfile(val name: String, val age: Int)
+
+val profileListPref: Prefs<List<UserProfile>> = datastore.kserializedList(
+    key = "profile_list",
+    defaultValue = emptyList(),
+)
+```
+
+The list is serialized to a JSON array string and stored using a `stringPreferencesKey`. If deserialization fails (e.g., due to corrupted data), the default value is returned. A custom `Json` instance can be provided if needed.
+
 ### Enum Set
 
 Store a `Set` of enum values with the `enumSet()` extension:
