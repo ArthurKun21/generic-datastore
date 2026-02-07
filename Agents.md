@@ -80,13 +80,17 @@ Ensure the module compiles by running the appropriate Gradle tasks and resolving
 If no Android device or emulator is available, execute unit tests and at minimum compile the Android
 instrumentation test source set to validate build correctness.
 
-Maintain test coverage across both Android and Desktop source sets, and confirm all tests pass
-before merging changes. Resolve any failures and add missing tests as needed. Tests should verify
-expected behavior as well as edge cases, and must be placed in the appropriate source sets:
+Prefer placing tests in `commonTest` whenever possible so they can be executed across all targets.
+Platform-specific tests should only be added when platform behavior diverges.
 
-* `androidTest` — Android instrumentation tests
-* `androidHostTest` — Android unit tests
-* `desktopTest` — Desktop/JVM tests
+Confirm all tests pass before merging changes. Resolve failures and add missing tests as needed.
+Tests should verify expected behavior as well as edge cases, and must be placed in the appropriate
+source sets:
+
+* `commonTest` — Shared tests for all targets (preferred)
+* `androidTest` — Android instrumentation tests (platform-specific only)
+* `androidHostTest` — Android unit tests (platform-specific only)
+* `desktopTest` — Desktop/JVM tests (platform-specific only)
 
 #### KMP modules targeting Android Test
 
