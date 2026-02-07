@@ -40,7 +40,7 @@ kotlin {
         }
 
         getByName("androidDeviceTest") {
-            kotlin.srcDir("src/commonTest/kotlin")
+            dependsOn(commonTest.get())
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.coroutines.test)
