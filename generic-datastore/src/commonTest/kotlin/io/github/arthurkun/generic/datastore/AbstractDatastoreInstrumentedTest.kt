@@ -8,6 +8,8 @@ import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatas
 import io.github.arthurkun.generic.datastore.preferences.enum
 import io.github.arthurkun.generic.datastore.preferences.enumSet
 import io.github.arthurkun.generic.datastore.preferences.toggle
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -910,5 +912,36 @@ abstract class AbstractDatastoreInstrumentedTest {
         assertEquals(setOf(SerializableObject(1, "A"), SerializableObject(2, "B")), pref.get())
         pref.toggle(SerializableObject(2, "B"))
         assertEquals(defaultSet, pref.get())
+    }
+
+    @Test
+    fun booleanPreference_toggleFromFalse() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.bool("testBoolToggleFalse", false)
+        pref.toggle()
+        assertTrue(pref.get())
+    }
+
+    @Test
+    fun booleanPreference_toggleFromTrue() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.bool("testBoolToggleTrue", true)
+        pref.toggle()
+        assertFalse(pref.get())
+    }
+
+    @Test
+    fun booleanPreference_toggleTwiceRestoresOriginal() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.bool("testBoolToggleTwice", false)
+        pref.toggle()
+        assertTrue(pref.get())
+        pref.toggle()
+        assertFalse(pref.get())
+    }
+
+    @Test
+    fun booleanPreference_toggleAfterSet() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.bool("testBoolToggleAfterSet", false)
+        pref.set(true)
+        pref.toggle()
+        assertFalse(pref.get())
     }
 }
