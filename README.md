@@ -59,6 +59,7 @@ val userName: Prefs<String>      = datastore.string("user_name", "Guest")
 val userScore: Prefs<Int>        = datastore.int("user_score", 0)
 val highScore: Prefs<Long>       = datastore.long("high_score", 0L)
 val volume: Prefs<Float>         = datastore.float("volume", 1.0f)
+val precision: Prefs<Double>     = datastore.double("precision", 0.0)
 val darkMode: Prefs<Boolean>     = datastore.bool("dark_mode", false)
 val tags: Prefs<Set<String>>     = datastore.stringSet("tags")
 ```
