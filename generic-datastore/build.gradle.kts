@@ -34,17 +34,18 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
         }
 
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-            implementation(libs.coroutines.test)
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.coroutines.test)
+            }
         }
 
         getByName("androidDeviceTest") {
+            dependsOn(commonTest)
             dependencies {
                 implementation(libs.datastore.preferences)
-                implementation(libs.kotlin.test)
                 implementation(libs.junit4)
-                implementation(libs.coroutines.test)
                 implementation(libs.androidx.test.junit)
                 implementation(libs.androidx.test.espresso)
             }
