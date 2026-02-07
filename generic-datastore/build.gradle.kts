@@ -34,23 +34,23 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
         }
 
-        val commonTest by getting {
-            dependencies {
-                implementation(libs.kotlin.test)
-                implementation(libs.coroutines.test)
-            }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.coroutines.test)
         }
 
         getByName("androidDeviceTest") {
-            dependsOn(commonTest)
+            kotlin.srcDir("src/commonTest/kotlin")
             dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.coroutines.test)
                 implementation(libs.datastore.preferences)
                 implementation(libs.junit4)
                 implementation(libs.androidx.test.junit)
                 implementation(libs.androidx.test.espresso)
             }
         }
-        val desktopTest by getting {
+        named("desktopTest") {
             dependencies {
                 implementation(libs.junit5)
             }
