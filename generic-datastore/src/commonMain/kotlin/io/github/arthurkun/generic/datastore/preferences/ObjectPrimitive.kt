@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * A [GenericPreference] for storing custom [Object] values.
+ * A [GenericPreferenceItem] for storing custom [Object] values.
  * This class handles the serialization of the object to a String for storage
  * and deserialization from String back to the object on retrieval.
  *
@@ -32,7 +32,7 @@ internal class ObjectPrimitive<T>(
     private val serializer: (T) -> String,
     private val deserializer: (String) -> T,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : GenericPreference<T>(
+) : GenericPreferenceItem<T>(
     datastore = datastore,
     key = key,
     defaultValue = defaultValue,

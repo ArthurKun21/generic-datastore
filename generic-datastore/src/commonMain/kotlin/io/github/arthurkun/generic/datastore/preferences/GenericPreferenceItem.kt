@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
  * such as reading, writing, deleting, and observing its value as a Kotlin Flow or StateFlow.
  *
  * Each specific preference type (e.g., [StringPrimitive], [IntPrimitive]) is implemented as a nested class
- * inheriting from [GenericPreference].
+ * inheriting from [GenericPreferenceItem].
  *
  * @param T The data type of the preference value (e.g., String, Int, Boolean).
  * @property datastore The [DataStore<Preferences>] instance used for storing and retrieving preferences.
@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
  * @property defaultValue The default value to be returned if the preference is not set or an error occurs.
  * @property preferences The [Preferences.Key] specific to the type `T`, used to access the preference in DataStore.
  */
-internal sealed class GenericPreference<T>(
+internal sealed class GenericPreferenceItem<T>(
     internal val datastore: DataStore<Preferences>,
     private val key: String,
     override val defaultValue: T,
@@ -54,7 +54,7 @@ internal sealed class GenericPreference<T>(
             datastore
                 .data
                 .map { preferences ->
-                    preferences[this@GenericPreference.preferences] ?: defaultValue
+                    preferences[this@GenericPreferenceItem.preferences] ?: defaultValue
                 }
                 .first()
         }
