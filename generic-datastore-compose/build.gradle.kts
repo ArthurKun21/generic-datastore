@@ -49,7 +49,6 @@ publishing {
     publications {
         withType<MavenPublication> {
             groupId = "com.github.arthurkun"
-            artifactId = "generic-datastore-compose"
             version = project.version.toString()
 
             pom {
