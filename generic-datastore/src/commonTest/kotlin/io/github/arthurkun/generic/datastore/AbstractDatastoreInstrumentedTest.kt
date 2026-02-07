@@ -944,4 +944,43 @@ abstract class AbstractDatastoreInstrumentedTest {
         pref.toggle()
         assertFalse(pref.get())
     }
+
+    @Test
+    fun clearAll_resetsAllPreferencesToDefaults() = runTest(testDispatcher) {
+        val stringPref = preferenceDatastore.string("clearAllString", "default")
+        val intPref = preferenceDatastore.int("clearAllInt", 0)
+        val boolPref = preferenceDatastore.bool("clearAllBool", false)
+
+        stringPref.set("changed")
+        intPref.set(42)
+        boolPref.set(true)
+
+        assertEquals("changed", stringPref.get())
+        assertEquals(42, intPref.get())
+        assertEquals(true, boolPref.get())
+
+        preferenceDatastore.clearAll()
+
+        assertEquals("default", stringPref.get())
+        assertEquals(0, intPref.get())
+        assertEquals(false, boolPref.get())
+    }
+
+    @Test
+    fun clearAll_onEmptyDatastoreDoesNotThrow() = runTest(testDispatcher) {
+        preferenceDatastore.clearAll()
+        val stringPref = preferenceDatastore.string("clearAllEmpty", "default")
+        assertEquals("default", stringPref.get())
+    }
+
+    @Test
+    fun clearAll_preferencesCanBeSetAgainAfterClear() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("clearAllReuse", 0)
+        intPref.set(10)
+        preferenceDatastore.clearAll()
+        assertEquals(0, intPref.get())
+
+        intPref.set(20)
+        assertEquals(20, intPref.get())
+    }
 }
