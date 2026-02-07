@@ -20,7 +20,7 @@ class DesktopDatastoreBlockingTest : AbstractDatastoreBlockingTest() {
     @TempDir
     lateinit var tempFolder: File
 
-    private lateinit var _dataStore: DataStore<Preferences>
+    private lateinit var dataStore: DataStore<Preferences>
     private lateinit var _preferenceDatastore: GenericPreferencesDatastore
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -29,12 +29,12 @@ class DesktopDatastoreBlockingTest : AbstractDatastoreBlockingTest() {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        _dataStore = PreferenceDataStoreFactory.create(
+        dataStore = PreferenceDataStoreFactory.create(
             produceFile = {
                 File(tempFolder, "${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb")
             },
         )
-        _preferenceDatastore = GenericPreferencesDatastore(_dataStore)
+        _preferenceDatastore = GenericPreferencesDatastore(dataStore)
     }
 
     @AfterTest

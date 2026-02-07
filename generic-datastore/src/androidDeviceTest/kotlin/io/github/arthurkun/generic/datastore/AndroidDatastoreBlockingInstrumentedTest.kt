@@ -23,7 +23,7 @@ private const val TEST_DATASTORE_BLOCKING_NAME = "test_datastore_blocking"
 class AndroidDatastoreBlockingInstrumentedTest : AbstractDatastoreBlockingTest() {
 
     companion object {
-        private lateinit var _dataStore: DataStore<Preferences>
+        private lateinit var dataStore: DataStore<Preferences>
         private lateinit var _preferenceDatastore: GenericPreferencesDatastore
         private lateinit var testContext: Context
         private val testDispatcher = UnconfinedTestDispatcher()
@@ -33,10 +33,10 @@ class AndroidDatastoreBlockingInstrumentedTest : AbstractDatastoreBlockingTest()
         fun setupClass() {
             Dispatchers.setMain(testDispatcher)
             testContext = ApplicationProvider.getApplicationContext()
-            _dataStore = PreferenceDataStoreFactory.create(
+            dataStore = PreferenceDataStoreFactory.create(
                 produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_BLOCKING_NAME) },
             )
-            _preferenceDatastore = GenericPreferencesDatastore(_dataStore)
+            _preferenceDatastore = GenericPreferencesDatastore(dataStore)
         }
 
         @JvmStatic
