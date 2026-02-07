@@ -16,6 +16,9 @@ kotlin {
         common {
             withAndroidTarget()
             withJvm()
+            withCompilations { compilation ->
+                compilation.target.platformType == org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.androidJvm
+            }
         }
     }
 
