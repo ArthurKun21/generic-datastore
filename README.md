@@ -216,6 +216,29 @@ val themeSetPref: Prefs<Set<Theme>> = datastore.enumSet<Theme>(
 
 Each enum value is stored by its `name`. Unknown enum values encountered during deserialization are skipped.
 
+### Nullable Preferences
+
+Create preferences that return `null` when no value has been set, instead of a default value:
+
+```kotlin
+val nickname: Prefs<String?>  = datastore.nullableString("nickname")
+val age: Prefs<Int?>          = datastore.nullableInt("age")
+val timestamp: Prefs<Long?>   = datastore.nullableLong("timestamp")
+val weight: Prefs<Float?>     = datastore.nullableFloat("weight")
+val latitude: Prefs<Double?>  = datastore.nullableDouble("latitude")
+val agreed: Prefs<Boolean?>   = datastore.nullableBool("agreed")
+```
+
+Setting a nullable preference to `null` removes the key from DataStore. `resetToDefault()` also removes the key, since the default is `null`.
+
+```kotlin
+nickname.get()        // null (not set yet)
+nickname.set("Alice") // stores "Alice"
+nickname.get()        // "Alice"
+nickname.set(null)    // removes the key
+nickname.get()        // null
+```
+
 ### Reading & Writing Values
 
 Each `Prefs<T>` provides multiple access patterns:
