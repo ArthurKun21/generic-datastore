@@ -147,6 +147,13 @@ public interface PreferencesDatastore {
         json: Json = defaultJson,
     ): Prefs<Set<T>>
 
+    /**
+     * Clears all preferences stored in this datastore.
+     *
+     * After calling this, all preferences will return their default values.
+     */
+    public suspend fun clearAll()
+
     public suspend fun export(
         exportPrivate: Boolean = false,
         exportAppState: Boolean = false,

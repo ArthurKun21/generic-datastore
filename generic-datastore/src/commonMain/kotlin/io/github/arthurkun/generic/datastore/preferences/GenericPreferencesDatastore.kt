@@ -2,6 +2,7 @@ package io.github.arthurkun.generic.datastore.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
@@ -227,6 +228,10 @@ public class GenericPreferencesDatastore(
             json = json,
         ),
     )
+
+    override suspend fun clearAll() {
+        datastore.edit { it.clear() }
+    }
 
     override suspend fun export(exportPrivate: Boolean, exportAppState: Boolean): Map<String, JsonElement> {
         return datastore
