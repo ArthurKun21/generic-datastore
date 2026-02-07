@@ -1,14 +1,19 @@
 # Generic Datastore
 
-This repository contains a Kotlin Multiplatform library that provides a thin wrapper around AndroidX DataStore Preferences and Proto DataStore. The main module is `generic-datastore`, with optional Jetpack Compose extensions in `generic-datastore-compose`.
+This repository contains a Kotlin Multiplatform library that provides a thin wrapper around AndroidX
+DataStore Preferences and Proto DataStore. The main module is `generic-datastore`, with optional
+Jetpack Compose extensions in `generic-datastore-compose`.
 
 ## Modules
 
 - `:generic-datastore` – core preference and proto datastore wrapper library.
-  - `core/` – shared interfaces (`Preference`, `Prefs`, `MappedPreference`, `Migration`).
-  - `preferences/` – DataStore Preferences implementation (`GenericPreference`, `EnumPreference`, `ObjectPrimitive`, `PreferencesDatastore`, `GenericPreferencesDatastore`).
-  - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`, `GenericProtoDatastore`).
-- `:generic-datastore-compose` – Compose helpers (e.g. `Prefs<T>.remember()`) built on the core module.
+    - `core/` – shared interfaces (`Preference`, `Prefs`, `MappedPreference`, `Migration`).
+    - `preferences/` – DataStore Preferences implementation (`GenericPreference`, `EnumPreference`,
+      `ObjectPrimitive`, `PreferencesDatastore`, `GenericPreferencesDatastore`).
+    - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
+      `GenericProtoDatastore`).
+- `:generic-datastore-compose` – Compose helpers (e.g. `Prefs<T>.remember()`) built on the core
+  module.
 - `:app` – sample app for local development.
 
 ## KMP Targets
@@ -22,7 +27,8 @@ Both library modules target:
 
 - Use Gradle Kotlin DSL (`*.gradle.kts`).
 - Prefer Kotlin Multiplatform idioms and keep shared APIs in `commonMain`.
-- Keep this library as a thin convenience wrapper over `DataStore<Preferences>` / Proto DataStore and avoid heavy abstractions.
+- Keep this library as a thin convenience wrapper over `DataStore<Preferences>` / Proto DataStore
+  and avoid heavy abstractions.
 
 ## Code Style
 
@@ -69,9 +75,22 @@ Ensure the module compiles by running the appropriate Gradle tasks and resolving
     ./gradlew :<module-name>:compileTestKotlinDesktop
     ```
 
-### Running tests
+### Running Tests
 
-If no Android device or emulator is available, run unit tests and at least compile the Android instrumentation test source set to verify correctness.
+If no Android device or emulator is available, execute unit tests and at minimum compile the Android
+instrumentation test source set to validate build correctness.
+
+Prefer placing tests in `commonTest` whenever possible so they can be executed across all targets.
+Platform-specific tests should only be added when platform behavior diverges.
+
+Confirm all tests pass before merging changes. Resolve failures and add missing tests as needed.
+Tests should verify expected behavior as well as edge cases, and must be placed in the appropriate
+source sets:
+
+* `commonTest` — Shared tests for all targets (preferred)
+* `androidTest` — Android instrumentation tests (platform-specific only)
+* `androidHostTest` — Android unit tests (platform-specific only)
+* `desktopTest` — Desktop/JVM tests (platform-specific only)
 
 #### KMP modules targeting Android Test
 

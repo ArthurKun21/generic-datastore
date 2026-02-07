@@ -107,6 +107,86 @@ class AndroidDatastoreInstrumentedTest {
         assertEquals(stringPref.get(), "defaultValue") // Should revert to default
     }
 
+    // Tests for update (atomic read-modify-write)
+    @Test
+    fun stringPreference_updateValue() = runTest(testDispatcher) {
+        val stringPref = preferenceDatastore.string("testStringUpdate", "hello")
+        stringPref.update { current -> "$current world" }
+        assertEquals("hello world", stringPref.get())
+    }
+
+    @Test
+    fun intPreference_updateValue() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("testIntUpdate", 10)
+        intPref.update { it + 5 }
+        assertEquals(15, intPref.get())
+    }
+
+    @Test
+    fun intPreference_updateFromDefault() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("testIntUpdateDefault", 42)
+        intPref.update { it * 2 }
+        assertEquals(84, intPref.get())
+    }
+
+    @Test
+    fun longPreference_updateValue() = runTest(testDispatcher) {
+        val longPref = preferenceDatastore.long("testLongUpdate", 100L)
+        longPref.set(200L)
+        longPref.update { it + 50L }
+        assertEquals(250L, longPref.get())
+    }
+
+    @Test
+    fun floatPreference_updateValue() = runTest(testDispatcher) {
+        val floatPref = preferenceDatastore.float("testFloatUpdate", 1.0f)
+        floatPref.update { it + 0.5f }
+        assertEquals(1.5f, floatPref.get())
+    }
+
+    @Test
+    fun booleanPreference_updateValue() = runTest(testDispatcher) {
+        val boolPref = preferenceDatastore.bool("testBoolUpdate", false)
+        boolPref.update { !it }
+        assertEquals(true, boolPref.get())
+    }
+
+    @Test
+    fun stringSetPreference_updateValue() = runTest(testDispatcher) {
+        val stringSetPref = preferenceDatastore.stringSet("testStringSetUpdate", setOf("a"))
+        stringSetPref.update { it + "b" }
+        assertEquals(setOf("a", "b"), stringSetPref.get())
+    }
+
+    @Test
+    fun serializedPreference_updateValue() = runTest(testDispatcher) {
+        val defaultObj = SerializableObject(1, "Default")
+        val serializedPref = preferenceDatastore.serialized(
+            key = "testSerializedUpdate",
+            defaultValue = defaultObj,
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObject(parts[0].toInt(), parts[1])
+            },
+        )
+        serializedPref.update { it.copy(id = it.id + 1, name = "Updated") }
+        assertEquals(SerializableObject(2, "Updated"), serializedPref.get())
+    }
+
+    @Test
+    fun mappedPreference_updateValue() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("baseForMapUpdate", 10)
+        val mappedPref = intPref.map(
+            defaultValue = "MappedDefault",
+            convert = { "Mapped_$it" },
+            reverse = { it.removePrefix("Mapped_").toInt() },
+        )
+        mappedPref.update { current -> "Mapped_${current.removePrefix("Mapped_").toInt() + 5}" }
+        assertEquals("Mapped_15", mappedPref.get())
+        assertEquals(15, intPref.get())
+    }
+
     // Tests for IntPreference
     @Test
     fun intPreference_defaultValueWhenNotSet() = runTest(testDispatcher) {
