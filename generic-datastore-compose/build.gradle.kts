@@ -6,6 +6,8 @@ plugins {
 }
 
 kotlin {
+    explicitApi()
+
     androidLibrary {
         namespace = "io.github.arthurkun.generic.datastore.compose"
         compileSdk = libs.versions.compile.sdk.get().toInt()

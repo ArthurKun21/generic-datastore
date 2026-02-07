@@ -34,7 +34,7 @@ private object Unset
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
  *   Defaults to [structuralEqualityPolicy].
  */
-class PrefsComposeState<T>(
+internal class PrefsComposeState<T>(
     private val prefs: Prefs<T>,
     private val state: State<T>,
     private val scope: CoroutineScope,
