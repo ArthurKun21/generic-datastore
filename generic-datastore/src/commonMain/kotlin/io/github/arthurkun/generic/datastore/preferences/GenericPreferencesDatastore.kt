@@ -2,9 +2,9 @@ package io.github.arthurkun.generic.datastore.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -13,8 +13,12 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
 import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.core.PrefsImpl
-import io.github.arthurkun.generic.datastore.preferences.nullable.*
 import io.github.arthurkun.generic.datastore.core.toJsonElement
+import io.github.arthurkun.generic.datastore.preferences.nullable.NullableDoublePrimitive
+import io.github.arthurkun.generic.datastore.preferences.nullable.NullableFloatPrimitive
+import io.github.arthurkun.generic.datastore.preferences.nullable.NullableIntPrimitive
+import io.github.arthurkun.generic.datastore.preferences.nullable.NullableLongPrimitive
+import io.github.arthurkun.generic.datastore.preferences.nullable.NullableStringPrimitive
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
