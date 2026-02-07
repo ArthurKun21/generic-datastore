@@ -5,6 +5,7 @@ import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatas
 import io.github.arthurkun.generic.datastore.preferences.enum
 import io.github.arthurkun.generic.datastore.preferences.enumSet
 import io.github.arthurkun.generic.datastore.preferences.kserialized
+import io.github.arthurkun.generic.datastore.preferences.kserializedSet
 import kotlin.time.Instant
 
 class PreferenceStore(
@@ -60,6 +61,11 @@ class PreferenceStore(
         defaultValue = emptySet(),
         serializer = { Animal.to(it) },
         deserializer = { Animal.from(it) },
+    )
+
+    val userProfileSet = datastore.kserializedSet<UserProfile>(
+        key = "user_profile_set",
+        defaultValue = emptySet(),
     )
 
     val themeSet = datastore.enumSet<Theme>(

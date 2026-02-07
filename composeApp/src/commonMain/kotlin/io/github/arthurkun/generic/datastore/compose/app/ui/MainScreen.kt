@@ -32,6 +32,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.Delete
 import io.github.arthurkun.generic.datastore.compose.app.domain.Animal
 import io.github.arthurkun.generic.datastore.compose.app.domain.PreferenceStore
 import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
@@ -59,6 +60,7 @@ fun MainScreen(
     var animal by preferenceStore.customObject.remember()
     var duration by preferenceStore.duration.remember()
     var userProfile by preferenceStore.userProfile.remember()
+    var userProfileSet by preferenceStore.userProfileSet.remember()
     var animalSet by preferenceStore.animalSet.remember()
     var themeSet by preferenceStore.themeSet.remember()
 
@@ -145,6 +147,27 @@ fun MainScreen(
                 userProfile = userProfile,
                 onUserProfileChange = { userProfile = it },
                 onReset = { scope.launch { preferenceStore.userProfile.resetToDefault() } },
+            )
+        }
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
+        item {
+            KSerializedSetSection(
+                userProfileSet = userProfileSet,
+                onAdd = { profile ->
+                    scope.launch {
+                        preferenceStore.userProfileSet.update { it + profile }
+                    }
+                },
+                onRemove = { profile ->
+                    scope.launch {
+                        preferenceStore.userProfileSet.update { it - profile }
+                    }
+                },
+                onReset = { scope.launch { preferenceStore.userProfileSet.resetToDefault() } },
             )
         }
         item {
@@ -461,6 +484,55 @@ private fun SerializedSetSection(
                         onValueChange = { onToggle(entry) },
                     ),
             )
+        }
+        TextButton(onClick = onReset) {
+            Text("Reset to Default")
+        }
+    }
+}
+
+@Composable
+private fun KSerializedSetSection(
+    userProfileSet: Set<UserProfile>,
+    onAdd: (UserProfile) -> Unit,
+    onRemove: (UserProfile) -> Unit,
+    onReset: () -> Unit,
+) {
+    Column {
+        Text(
+            "KSerialized Set",
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        Text("Count: ${userProfileSet.size}")
+        userProfileSet.forEach { profile ->
+            ListItem(
+                headlineContent = { Text(profile.name) },
+                supportingContent = { Text("Age: ${profile.age}") },
+                trailingContent = {
+                    Button(onClick = { onRemove(profile) }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Remove")
+                    }
+                },
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Button(
+                onClick = {
+                    onAdd(
+                        UserProfile(
+                            name = "User ${userProfileSet.size + 1}",
+                            age = (18..65).random(),
+                        ),
+                    )
+                },
+                modifier = Modifier.weight(1f),
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add")
+                Text(" Add Profile")
+            }
         }
         TextButton(onClick = onReset) {
             Text("Reset to Default")
