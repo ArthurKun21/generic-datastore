@@ -11,7 +11,7 @@ import io.github.arthurkun.generic.datastore.preferences.backup.toJsonMap as cor
  * @see io.github.arthurkun.generic.datastore.preferences.backup.toJsonElement
  */
 @Deprecated(
-    message = "Moved to core package",
+    message = "Moved to new package",
     replaceWith = ReplaceWith(
         "toJsonElement()",
         "io.github.arthurkun.generic.datastore.preferences.backup.toJsonElement",
@@ -25,7 +25,7 @@ public fun Any?.toJsonElement(): JsonElement = coreToJsonElement()
  * @see io.github.arthurkun.generic.datastore.preferences.backup.toJsonMap
  */
 @Deprecated(
-    message = "Moved to core package",
+    message = "Moved to new package",
     replaceWith = ReplaceWith(
         "toJsonMap()",
         "io.github.arthurkun.generic.datastore.preferences.backup.toJsonMap",
