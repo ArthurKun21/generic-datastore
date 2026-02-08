@@ -31,10 +31,15 @@ internal class PreferenceBackupRestorer(private val datastore: DataStore<Prefere
                 val backupKey = backupPref.key
                 when (val backupValue = backupPref.value) {
                     is IntPreferenceValue -> mutablePreferences[intPreferencesKey(backupKey)] = backupValue.value
+
                     is LongPreferenceValue -> mutablePreferences[longPreferencesKey(backupKey)] = backupValue.value
+
                     is FloatPreferenceValue -> mutablePreferences[floatPreferencesKey(backupKey)] = backupValue.value
+
                     is DoublePreferenceValue -> mutablePreferences[doublePreferencesKey(backupKey)] = backupValue.value
+
                     is StringPreferenceValue -> mutablePreferences[stringPreferencesKey(backupKey)] = backupValue.value
+
                     is BooleanPreferenceValue -> mutablePreferences[booleanPreferencesKey(backupKey)] =
                         backupValue.value
 

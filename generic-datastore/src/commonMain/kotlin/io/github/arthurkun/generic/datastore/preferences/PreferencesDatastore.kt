@@ -247,7 +247,8 @@ public interface PreferencesDatastore {
     public suspend fun clearAll()
 
     @Deprecated(
-        message = "This method is deprecated in favor of exportAsData and exportAsString for better type safety and flexibility.",
+        message = "This method is deprecated in favor of exportAsData and exportAsString " +
+            "for better type safety and flexibility.",
         replaceWith = ReplaceWith("exportAsData(exportPrivate, exportAppState)"),
         level = DeprecationLevel.WARNING,
     )
@@ -257,7 +258,8 @@ public interface PreferencesDatastore {
     ): Map<String, JsonElement>
 
     @Deprecated(
-        message = "This method is deprecated in favor of importData and importDataAsString for better type safety and flexibility.",
+        message = "This method is deprecated in favor of importData and importDataAsString " +
+            "for better type safety and flexibility.",
         replaceWith = ReplaceWith("importData(backup)"),
         level = DeprecationLevel.WARNING,
     )
