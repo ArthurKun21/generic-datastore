@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
 /**
@@ -63,7 +64,7 @@ internal class PreferenceBackupRestorer(private val datastore: DataStore<Prefere
                     }
                 }
 
-            mutablePreferences.toPreferences()
+            mutablePreferences
         }
     }
 
@@ -73,7 +74,13 @@ internal class PreferenceBackupRestorer(private val datastore: DataStore<Prefere
         importAppState: Boolean,
         json: Json,
     ) {
-        val backup = json.decodeFromString<PreferencesBackup>(backupString)
+        val backup = try {
+            json.decodeFromString<PreferencesBackup>(backupString)
+        } catch (e: SerializationException) {
+            throw BackupParsingException("Failed to parse backup string", e)
+        } catch (e: IllegalArgumentException) {
+            throw BackupParsingException("Failed to parse backup string", e)
+        }
         importData(
             backup = backup,
             importPrivate = importPrivate,

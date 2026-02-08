@@ -24,14 +24,13 @@ internal class PreferenceBackupCreator(private val datastore: DataStore<Preferen
         val items = datastore
             .data
             .first()
-            .toPreferences()
             .asMap()
             .filter { (key, _) ->
                 (exportPrivate || !Preference.isPrivate(key.name)) &&
                     (exportAppState || !Preference.isAppState(key.name))
             }
             .mapNotNull { (key, value) ->
-                value.toBackupPreferenceValue()?.let { preferenceValue ->
+                PreferenceValue.fromAny(value)?.let { preferenceValue ->
                     BackupPreference(key = key.name, value = preferenceValue)
                 }
             }
@@ -45,9 +44,5 @@ internal class PreferenceBackupCreator(private val datastore: DataStore<Preferen
     ): String {
         val backup = exportAsData(exportPrivate, exportAppState)
         return json.encodeToString<PreferencesBackup>(backup)
-    }
-
-    private fun Any?.toBackupPreferenceValue(): PreferenceValue? {
-        return PreferenceValue.fromAny(this)
     }
 }
