@@ -19,6 +19,11 @@ kotlin {
             withCompilations { compilation ->
                 compilation.target.platformType == org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.androidJvm
             }
+            group("ios") {
+                withIosX64()
+                withIosArm64()
+                withIosSimulatorArm64()
+            }
         }
     }
 
@@ -40,6 +45,10 @@ kotlin {
         }
     }
 
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
     jvm("desktop") {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
@@ -48,6 +57,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(libs.coroutines.core)
             implementation(libs.datastore.preferences.core)
             implementation(libs.kotlinx.serialization.json)
         }
