@@ -8,7 +8,7 @@ import kotlinx.serialization.json.Json
 public object PreferenceDefaults {
     /**
      * A default [Json] instance configured with lenient parsing, unknown key ignoring,
-     * and default value encoding.
+     * default value encoding and trailing comma allowance.
      *
      * Used as the default serializer for [KSerializer]-based preference types.
      */
@@ -16,5 +16,6 @@ public object PreferenceDefaults {
         ignoreUnknownKeys = true
         isLenient = true
         encodeDefaults = true
+        allowTrailingComma = true
     }
 }
