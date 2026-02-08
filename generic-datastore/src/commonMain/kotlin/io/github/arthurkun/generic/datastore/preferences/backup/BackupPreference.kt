@@ -3,6 +3,9 @@ package io.github.arthurkun.generic.datastore.preferences.backup
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * A single preference entry in a backup, consisting of a key and its typed value.
+ */
 @Serializable
 public data class BackupPreference(
     @SerialName("key")
@@ -11,11 +14,18 @@ public data class BackupPreference(
     val value: PreferenceValue,
 )
 
+/**
+ * Sealed interface representing a typed preference value supported by DataStore Preferences.
+ */
 @Serializable
 public sealed interface PreferenceValue {
     public fun getValue(): Any
 
     public companion object {
+        /**
+         * Converts an [Any] value to the corresponding [PreferenceValue] subtype,
+         * or returns `null` if the value type is not supported.
+         */
         public fun fromAny(value: Any?): PreferenceValue? {
             return when (value) {
                 is Int -> IntPreferenceValue(value)
@@ -31,8 +41,12 @@ public sealed interface PreferenceValue {
                 is Boolean -> BooleanPreferenceValue(value)
 
                 is Set<*> -> {
-                    @Suppress("UNCHECKED_CAST")
-                    (value as? Set<String>)?.let { StringSetPreferenceValue(it) }
+                    if (value.all { it is String }) {
+                        @Suppress("UNCHECKED_CAST")
+                        StringSetPreferenceValue(value as Set<String>)
+                    } else {
+                        null
+                    }
                 }
 
                 else -> null
@@ -41,6 +55,9 @@ public sealed interface PreferenceValue {
     }
 }
 
+/**
+ * A [PreferenceValue] holding an [Int].
+ */
 @Serializable
 @SerialName("int")
 public data class IntPreferenceValue(
@@ -50,6 +67,9 @@ public data class IntPreferenceValue(
     override fun getValue(): Any = value
 }
 
+/**
+ * A [PreferenceValue] holding a [Long].
+ */
 @Serializable
 @SerialName("long")
 public data class LongPreferenceValue(
@@ -59,6 +79,9 @@ public data class LongPreferenceValue(
     override fun getValue(): Any = value
 }
 
+/**
+ * A [PreferenceValue] holding a [Float].
+ */
 @Serializable
 @SerialName("float")
 public data class FloatPreferenceValue(
@@ -68,6 +91,9 @@ public data class FloatPreferenceValue(
     override fun getValue(): Any = value
 }
 
+/**
+ * A [PreferenceValue] holding a [Double].
+ */
 @Serializable
 @SerialName("double")
 public data class DoublePreferenceValue(
@@ -77,6 +103,9 @@ public data class DoublePreferenceValue(
     override fun getValue(): Any = value
 }
 
+/**
+ * A [PreferenceValue] holding a [String].
+ */
 @Serializable
 @SerialName("string")
 public data class StringPreferenceValue(
@@ -86,6 +115,9 @@ public data class StringPreferenceValue(
     override fun getValue(): Any = value
 }
 
+/**
+ * A [PreferenceValue] holding a [Boolean].
+ */
 @Serializable
 @SerialName("boolean")
 public data class BooleanPreferenceValue(
@@ -95,6 +127,9 @@ public data class BooleanPreferenceValue(
     override fun getValue(): Any = value
 }
 
+/**
+ * A [PreferenceValue] holding a [Set] of [String]s.
+ */
 @Serializable
 @SerialName("stringSet")
 public data class StringSetPreferenceValue(
@@ -104,6 +139,9 @@ public data class StringSetPreferenceValue(
     override fun getValue(): Any = value
 }
 
+/**
+ * Top-level backup container holding a list of [BackupPreference] entries.
+ */
 @Serializable
 public data class PreferencesBackup(
     @SerialName("preferences")
