@@ -171,7 +171,7 @@ public fun <T> createProtoDatastore(
         storage = OkioStorage(
             fileSystem = FileSystem.SYSTEM,
             serializer = serializer,
-            producePath = { "${producePath()}/$fileName".toPath() },
+            producePath = { producePath().toPath() / fileName },
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,

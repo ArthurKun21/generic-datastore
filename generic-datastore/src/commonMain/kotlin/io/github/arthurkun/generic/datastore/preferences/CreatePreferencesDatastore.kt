@@ -133,7 +133,7 @@ public fun createPreferencesDatastore(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
         scope = scope,
-        produceFile = { "${producePath()}/$fileName".toPath() },
+        produceFile = { producePath().toPath() / fileName },
     )
     return GenericPreferencesDatastore(
         datastore = datastore,
