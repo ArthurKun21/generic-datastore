@@ -16,10 +16,10 @@ import io.github.arthurkun.generic.datastore.core.Preference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.core.PrefsImpl
-import io.github.arthurkun.generic.datastore.core.toJsonElement
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupCreator
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupRestorer
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
+import io.github.arthurkun.generic.datastore.preferences.backup.toJsonElement
 import io.github.arthurkun.generic.datastore.preferences.default.BooleanPrimitive
 import io.github.arthurkun.generic.datastore.preferences.default.DoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.default.FloatPrimitive

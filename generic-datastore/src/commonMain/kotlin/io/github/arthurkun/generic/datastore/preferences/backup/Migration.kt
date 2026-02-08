@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.core
+package io.github.arthurkun.generic.datastore.preferences.backup
 
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
