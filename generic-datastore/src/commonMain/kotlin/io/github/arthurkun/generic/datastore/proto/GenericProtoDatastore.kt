@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.DataStore
@@ -12,7 +14,6 @@ import io.github.arthurkun.generic.datastore.core.Prefs
  * @param datastore The underlying [DataStore<T>] instance.
  * @param defaultValue The default value for the proto message.
  */
-@Suppress("unused")
 public class GenericProtoDatastore<T>(
     private val datastore: DataStore<T>,
     private val defaultValue: T,

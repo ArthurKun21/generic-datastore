@@ -17,6 +17,18 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
+/**
+ * Represents a nullable generic preference that can be stored in and retrieved from a DataStore.
+ *
+ * This sealed class provides a type-safe way to handle nullable preference types.
+ * When a key is not set in DataStore, `null` is returned instead of a default value.
+ * Setting a `null` value removes the key from DataStore.
+ *
+ * @param T The non-null data type of the preference value (e.g., String, Int, Boolean).
+ * @property datastore The [DataStore] instance used for storing and retrieving preferences.
+ * @param key The unique String key used to identify this preference within the DataStore.
+ * @param preferences The [Preferences.Key] specific to the type [T], used to access the preference in DataStore.
+ */
 internal sealed class NullableGenericPreferenceItem<T : Any>(
     internal val datastore: DataStore<Preferences>,
     private val key: String,

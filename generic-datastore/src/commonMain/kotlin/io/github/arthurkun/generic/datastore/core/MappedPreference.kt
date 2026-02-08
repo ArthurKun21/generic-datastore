@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.arthurkun.generic.datastore.core
 
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +29,6 @@ import kotlin.reflect.KProperty
  * @return A new [Prefs] instance of type [R].
  * @throws Exception if `convert(this.defaultValue)` fails.
  */
-@Suppress("unused")
 public fun <T, R> Prefs<T>.mapIO(
     convert: (T) -> R,
     reverse: (R) -> T,
@@ -61,7 +62,6 @@ public fun <T, R> Prefs<T>.mapIO(
  * @return A new [Prefs] instance of type [R] that applies the specified conversions
  *   and error handling logic.
  */
-@Suppress("unused")
 public fun <T, R> Prefs<T>.map(
     defaultValue: R,
     convert: (T) -> R,

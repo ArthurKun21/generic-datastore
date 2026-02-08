@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.arthurkun.generic.datastore.preferences
 
 import io.github.arthurkun.generic.datastore.core.Prefs
@@ -14,7 +16,6 @@ import io.github.arthurkun.generic.datastore.core.Prefs
  * @param defaultValue The default set of enum values to use if the key is not found
  * (defaults to an empty set).
  */
-@Suppress("unused")
 public inline fun <reified T : Enum<T>> PreferencesDatastore.enumSet(
     key: String,
     defaultValue: Set<T> = emptySet(),

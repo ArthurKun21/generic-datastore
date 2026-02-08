@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.arthurkun.generic.datastore.preferences
 
 import androidx.datastore.core.DataStore
@@ -34,7 +36,6 @@ import kotlinx.serialization.json.JsonElement
  *
  * @property datastore The underlying [DataStore<Preferences>] instance.
  */
-@Suppress("unused")
 public class GenericPreferencesDatastore(
     private val datastore: DataStore<Preferences>,
 ) : PreferencesDatastore {
@@ -135,6 +136,13 @@ public class GenericPreferencesDatastore(
             ),
         )
 
+    /**
+     * Creates a nullable String preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable String preference.
+     */
     override fun nullableString(key: String): Prefs<String?> =
         PrefsImpl(
             NullableStringPrimitive(
@@ -143,6 +151,13 @@ public class GenericPreferencesDatastore(
             ),
         )
 
+    /**
+     * Creates a nullable Int preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Int preference.
+     */
     override fun nullableInt(key: String): Prefs<Int?> =
         PrefsImpl(
             NullableIntPrimitive(
@@ -151,6 +166,13 @@ public class GenericPreferencesDatastore(
             ),
         )
 
+    /**
+     * Creates a nullable Long preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Long preference.
+     */
     override fun nullableLong(key: String): Prefs<Long?> =
         PrefsImpl(
             NullableLongPrimitive(
@@ -159,6 +181,13 @@ public class GenericPreferencesDatastore(
             ),
         )
 
+    /**
+     * Creates a nullable Float preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Float preference.
+     */
     override fun nullableFloat(key: String): Prefs<Float?> =
         PrefsImpl(
             NullableFloatPrimitive(
@@ -167,6 +196,13 @@ public class GenericPreferencesDatastore(
             ),
         )
 
+    /**
+     * Creates a nullable Double preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Double preference.
+     */
     override fun nullableDouble(key: String): Prefs<Double?> =
         PrefsImpl(
             NullableDoublePrimitive(
@@ -175,6 +211,13 @@ public class GenericPreferencesDatastore(
             ),
         )
 
+    /**
+     * Creates a nullable Boolean preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Boolean preference.
+     */
     override fun nullableBool(key: String): Prefs<Boolean?> =
         PrefsImpl(
             NullableBooleanPrimitive(
@@ -253,6 +296,17 @@ public class GenericPreferencesDatastore(
         ),
     )
 
+    /**
+     * Creates a preference for a custom object using Kotlin Serialization.
+     * The object is serialized to JSON for storage.
+     *
+     * @param T The type of the custom object. Must be serializable using kotlinx.serialization.
+     * @param key The preference key.
+     * @param defaultValue The default value for the custom object.
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json The [Json] instance to use for serialization/deserialization.
+     * @return A [Prefs] instance for the custom object preference.
+     */
     override fun <T> kserialized(
         key: String,
         defaultValue: T,
@@ -268,6 +322,17 @@ public class GenericPreferencesDatastore(
         ),
     )
 
+    /**
+     * Creates a preference for a [Set] of custom objects using Kotlin Serialization.
+     * Each element is serialized to JSON for storage using [stringSetPreferencesKey].
+     *
+     * @param T The type of each element in the set. Must be serializable using kotlinx.serialization.
+     * @param key The preference key.
+     * @param defaultValue The default value for the set (defaults to an empty set).
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json The [Json] instance to use for serialization/deserialization.
+     * @return A [Prefs] instance for the Set preference.
+     */
     override fun <T> kserializedSet(
         key: String,
         defaultValue: Set<T>,
@@ -283,6 +348,17 @@ public class GenericPreferencesDatastore(
         ),
     )
 
+    /**
+     * Creates a preference for a [List] of custom objects that can be serialized to and
+     * deserialized from Strings. The list is stored as a JSON array string.
+     *
+     * @param T The type of each element in the list.
+     * @param key The preference key.
+     * @param defaultValue The default value for the list (defaults to an empty list).
+     * @param serializer A function to serialize each element to a String.
+     * @param deserializer A function to deserialize each String back to an element.
+     * @return A [Prefs] instance for the List preference.
+     */
     override fun <T> serializedList(
         key: String,
         defaultValue: List<T>,
@@ -298,6 +374,17 @@ public class GenericPreferencesDatastore(
         ),
     )
 
+    /**
+     * Creates a preference for a [List] of custom objects using Kotlin Serialization.
+     * The list is serialized to a JSON array string for storage.
+     *
+     * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
+     * @param key The preference key.
+     * @param defaultValue The default value for the list (defaults to an empty list).
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json The [Json] instance to use for serialization/deserialization.
+     * @return A [Prefs] instance for the List preference.
+     */
     override fun <T> kserializedList(
         key: String,
         defaultValue: List<T>,
@@ -313,10 +400,22 @@ public class GenericPreferencesDatastore(
         ),
     )
 
+    /**
+     * Clears all preferences stored in this datastore.
+     *
+     * After calling this, all preferences will return their default values.
+     */
     override suspend fun clearAll() {
         datastore.edit { it.clear() }
     }
 
+    /**
+     * Exports all preferences as a map of keys to [JsonElement] values.
+     *
+     * @param exportPrivate Whether to include private preferences in the export.
+     * @param exportAppState Whether to include app state preferences in the export.
+     * @return A map of preference keys to their [JsonElement] representations.
+     */
     override suspend fun export(exportPrivate: Boolean, exportAppState: Boolean): Map<String, JsonElement> {
         return datastore
             .data
@@ -335,6 +434,14 @@ public class GenericPreferencesDatastore(
             .toMap()
     }
 
+    /**
+     * Imports preferences from a map of keys to values, merging them into existing preferences.
+     *
+     * Supported value types: [String], [Long], [Int], [Float], [Double], [Boolean],
+     * and [Collection] of [String]. Other types are stored as their JSON string representation.
+     *
+     * @param data The map of preference keys to values to import.
+     */
     override suspend fun import(data: Map<String, Any>) {
         datastore.updateData { currentPreferences ->
             val mutablePreferences = currentPreferences.toMutablePreferences()
