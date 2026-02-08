@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import io.github.arthurkun.generic.datastore.core.Preference
 import kotlinx.serialization.json.Json
 
 /**
@@ -23,12 +24,24 @@ import kotlinx.serialization.json.Json
  */
 internal class PreferenceBackupRestorer(private val datastore: DataStore<Preferences>) {
 
-    suspend fun importData(backup: PreferencesBackup) {
+    suspend fun importData(
+        backup: PreferencesBackup,
+        importPrivate: Boolean,
+        importAppState: Boolean,
+    ) {
         datastore.updateData { currentPreferences ->
             val mutablePreferences = currentPreferences.toMutablePreferences()
 
             backup.preferences.forEach { backupPref ->
                 val backupKey = backupPref.key
+
+                if (!importPrivate && Preference.isPrivate(backupKey)) {
+                    return@forEach
+                }
+                if (!importAppState && Preference.isAppState(backupKey)) {
+                    return@forEach
+                }
+
                 when (val backupValue = backupPref.value) {
                     is IntPreferenceValue -> mutablePreferences[intPreferencesKey(backupKey)] = backupValue.value
 
@@ -54,9 +67,15 @@ internal class PreferenceBackupRestorer(private val datastore: DataStore<Prefere
 
     suspend fun importDataAsString(
         backupString: String,
+        importPrivate: Boolean,
+        importAppState: Boolean,
         json: Json,
     ) {
         val backup = json.decodeFromString<PreferencesBackup>(backupString)
-        importData(backup)
+        importData(
+            backup = backup,
+            importPrivate = importPrivate,
+            importAppState = importAppState,
+        )
     }
 }

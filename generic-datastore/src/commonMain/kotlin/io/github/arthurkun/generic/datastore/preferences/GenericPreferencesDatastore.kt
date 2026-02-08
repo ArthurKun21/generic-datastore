@@ -526,13 +526,28 @@ public class GenericPreferencesDatastore(
         )
     }
 
-    override suspend fun importData(backup: PreferencesBackup) {
-        backupRestorer.importData(backup)
+    override suspend fun importData(
+        backup: PreferencesBackup,
+        importPrivate: Boolean,
+        importAppState: Boolean,
+    ) {
+        backupRestorer.importData(
+            backup = backup,
+            importPrivate = importPrivate,
+            importAppState = importAppState,
+        )
     }
 
-    override suspend fun importDataAsString(backupString: String, json: Json?) {
+    override suspend fun importDataAsString(
+        backupString: String,
+        importPrivate: Boolean,
+        importAppState: Boolean,
+        json: Json?,
+    ) {
         backupRestorer.importDataAsString(
             backupString = backupString,
+            importPrivate = importPrivate,
+            importAppState = importAppState,
             json = json ?: defaultJson,
         )
     }

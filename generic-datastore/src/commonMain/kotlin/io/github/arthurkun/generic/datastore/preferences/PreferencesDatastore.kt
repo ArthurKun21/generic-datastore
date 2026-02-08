@@ -280,10 +280,14 @@ public interface PreferencesDatastore {
 
     public suspend fun importData(
         backup: PreferencesBackup,
+        importPrivate: Boolean = false,
+        importAppState: Boolean = false,
     )
 
     public suspend fun importDataAsString(
         backupString: String,
+        importPrivate: Boolean = false,
+        importAppState: Boolean = false,
         json: Json? = null,
     )
 }
