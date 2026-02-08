@@ -95,8 +95,6 @@ compose = [
     "compose-ui-tooling-preview",
     "compose-material3",
     "compose-material-icons-core",
-    "compose-material-icons-extended"]
-library-compose = [
-    "compose-runtime",
-    "lifecycle-runtime-compose"
+    "compose-material-icons-extended"
 ]
+

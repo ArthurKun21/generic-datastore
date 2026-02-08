@@ -39,12 +39,16 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":generic-datastore")) // Core library dependency
-            implementation(libs.bundles.library.compose)
+            implementation(libs.compose.runtime)
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.coroutines.test)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.lifecycle.runtime.compose)
         }
     }
 
