@@ -13,7 +13,8 @@ Jetpack Compose extensions in `generic-datastore-compose`.
   - `preferences/default/` – DataStore Preferences implementation (primitive types, enum types,
       kotlinx.serialization-backed types, and custom-serializer types).
   - `preferences/optional/` – nullable preference variants.
-    - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
+  - `preferences/backup/` – backup/restore support for preferences datastore.
+  - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
       `GenericProtoDatastore`).
   - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
     `preferences/` and `preferences/default/`.
