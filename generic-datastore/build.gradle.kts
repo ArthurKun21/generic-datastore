@@ -11,6 +11,7 @@ kotlin {
     // Workaround for https://youtrack.jetbrains.com/projects/KTIJ/issues/KTIJ-34430/Incorrect-resolution-of-platform-specific-APIs-in-commonMain-in-a-KMP-with-the-JVM-target-and-the-pluggable-target
     // issue with kotlin serialization with android jvm target in Android studio.
     // https://dev.to/rsicarelli/the-hidden-cost-of-default-hierarchy-templates-in-kotlin-multiplatform-256a
+    // NEW UPDATE: It is still bad, adding the ios target stabilizes it, but it is still bad.
     // applyDefaultHierarchyTemplate()
     applyHierarchyTemplate {
         common {
