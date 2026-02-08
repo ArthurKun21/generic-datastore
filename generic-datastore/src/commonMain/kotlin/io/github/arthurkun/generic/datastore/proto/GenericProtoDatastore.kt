@@ -15,7 +15,7 @@ import io.github.arthurkun.generic.datastore.core.Prefs
  * @param defaultValue The default value for the proto message.
  */
 public class GenericProtoDatastore<T>(
-    private val datastore: DataStore<T>,
+    internal val datastore: DataStore<T>,
     private val defaultValue: T,
     private val key: String = "proto_datastore",
 ) : ProtoDatastore<T> {
