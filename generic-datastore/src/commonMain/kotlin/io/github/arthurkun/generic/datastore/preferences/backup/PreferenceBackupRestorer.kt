@@ -32,34 +32,36 @@ internal class PreferenceBackupRestorer(private val datastore: DataStore<Prefere
         datastore.updateData { currentPreferences ->
             val mutablePreferences = currentPreferences.toMutablePreferences()
 
-            backup.preferences.forEach { backupPref ->
-                val backupKey = backupPref.key
-
-                if (!importPrivate && Preference.isPrivate(backupKey)) {
-                    return@forEach
+            backup.preferences
+                .filter { backupPref ->
+                    val backupKey = backupPref.key
+                    (importPrivate || !Preference.isPrivate(backupKey)) &&
+                        (importAppState || !Preference.isAppState(backupKey))
                 }
-                if (!importAppState && Preference.isAppState(backupKey)) {
-                    return@forEach
+                .forEach { backupPref ->
+                    val backupKey = backupPref.key
+
+                    when (val backupValue = backupPref.value) {
+                        is IntPreferenceValue -> mutablePreferences[intPreferencesKey(backupKey)] = backupValue.value
+
+                        is LongPreferenceValue -> mutablePreferences[longPreferencesKey(backupKey)] = backupValue.value
+
+                        is FloatPreferenceValue -> mutablePreferences[floatPreferencesKey(backupKey)] =
+                            backupValue.value
+
+                        is DoublePreferenceValue -> mutablePreferences[doublePreferencesKey(backupKey)] =
+                            backupValue.value
+
+                        is StringPreferenceValue -> mutablePreferences[stringPreferencesKey(backupKey)] =
+                            backupValue.value
+
+                        is BooleanPreferenceValue -> mutablePreferences[booleanPreferencesKey(backupKey)] =
+                            backupValue.value
+
+                        is StringSetPreferenceValue -> mutablePreferences[stringSetPreferencesKey(backupKey)] =
+                            backupValue.value
+                    }
                 }
-
-                when (val backupValue = backupPref.value) {
-                    is IntPreferenceValue -> mutablePreferences[intPreferencesKey(backupKey)] = backupValue.value
-
-                    is LongPreferenceValue -> mutablePreferences[longPreferencesKey(backupKey)] = backupValue.value
-
-                    is FloatPreferenceValue -> mutablePreferences[floatPreferencesKey(backupKey)] = backupValue.value
-
-                    is DoublePreferenceValue -> mutablePreferences[doublePreferencesKey(backupKey)] = backupValue.value
-
-                    is StringPreferenceValue -> mutablePreferences[stringPreferencesKey(backupKey)] = backupValue.value
-
-                    is BooleanPreferenceValue -> mutablePreferences[booleanPreferencesKey(backupKey)] =
-                        backupValue.value
-
-                    is StringSetPreferenceValue -> mutablePreferences[stringSetPreferencesKey(backupKey)] =
-                        backupValue.value
-                }
-            }
 
             mutablePreferences.toPreferences()
         }
