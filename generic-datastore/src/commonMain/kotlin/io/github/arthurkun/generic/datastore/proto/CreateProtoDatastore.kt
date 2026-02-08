@@ -11,10 +11,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.io.files.Path as KotlinxIoPath
-import kotlin.jvm.JvmName
 import okio.FileSystem
 import okio.Path.Companion.toPath
+import kotlin.jvm.JvmName
+import kotlinx.io.files.Path as KotlinxIoPath
 
 /**
  * Creates a [GenericProtoDatastore] using an [OkioSerializer] and a path producer
