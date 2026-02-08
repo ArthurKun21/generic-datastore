@@ -2,7 +2,8 @@ package io.github.arthurkun.generic.datastore
 
 import io.github.arthurkun.generic.datastore.core.map
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.enum
+import io.github.arthurkun.generic.datastore.preferences.default.enum
+import io.github.arthurkun.generic.datastore.preferences.default.enumSet
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -102,6 +103,75 @@ abstract class AbstractDatastoreBlockingTest {
 
         serializedPref.resetToDefaultBlocking()
         assertEquals(serializedPref.getBlocking(), defaultObj)
+    }
+
+    @Test
+    fun serializedSetPreference_resetToDefaultBlocking() {
+        val defaultSet = setOf(SerializableObjectBlocking(1, "A"), SerializableObjectBlocking(2, "B"))
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetResetBlocking",
+            defaultValue = defaultSet,
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObjectBlocking(parts[0].toInt(), parts[1])
+            },
+        )
+        pref.setBlocking(setOf(SerializableObjectBlocking(3, "C")))
+        assertEquals(setOf(SerializableObjectBlocking(3, "C")), pref.getBlocking())
+
+        pref.resetToDefaultBlocking()
+        assertEquals(defaultSet, pref.getBlocking())
+    }
+
+    @Test
+    fun enumSetPreference_resetToDefaultBlocking() {
+        val defaultSet = setOf(TestEnumBlocking.VALUE_A)
+        val pref = preferenceDatastore.enumSet("testEnumSetResetBlocking", defaultSet)
+        pref.setBlocking(setOf(TestEnumBlocking.VALUE_B))
+        assertEquals(setOf(TestEnumBlocking.VALUE_B), pref.getBlocking())
+
+        pref.resetToDefaultBlocking()
+        assertEquals(defaultSet, pref.getBlocking())
+    }
+
+    @Test
+    fun enumSetPreference_delegation() {
+        val defaultSet = setOf(TestEnumBlocking.VALUE_A)
+        val pref = preferenceDatastore.enumSet("testEnumSetDelegate", defaultSet)
+        var delegatedValue: Set<TestEnumBlocking> by pref
+
+        delegatedValue = setOf(TestEnumBlocking.VALUE_A, TestEnumBlocking.VALUE_B)
+        assertEquals(setOf(TestEnumBlocking.VALUE_A, TestEnumBlocking.VALUE_B), delegatedValue)
+        assertEquals(setOf(TestEnumBlocking.VALUE_A, TestEnumBlocking.VALUE_B), pref.getBlocking())
+
+        pref.resetToDefaultBlocking()
+        assertEquals(defaultSet, delegatedValue)
+        assertEquals(defaultSet, pref.getBlocking())
+    }
+
+    @Test
+    fun serializedSetPreference_delegation() {
+        val defaultSet = setOf(SerializableObjectBlocking(1, "A"))
+        val pref = preferenceDatastore.serializedSet(
+            key = "testSerializedSetDelegate",
+            defaultValue = defaultSet,
+            serializer = { "${it.id},${it.name}" },
+            deserializer = { str ->
+                val parts = str.split(",", limit = 2)
+                SerializableObjectBlocking(parts[0].toInt(), parts[1])
+            },
+        )
+        var delegatedValue: Set<SerializableObjectBlocking> by pref
+
+        val newSet = setOf(SerializableObjectBlocking(2, "B"), SerializableObjectBlocking(3, "C"))
+        delegatedValue = newSet
+        assertEquals(newSet, delegatedValue)
+        assertEquals(newSet, pref.getBlocking())
+
+        pref.resetToDefaultBlocking()
+        assertEquals(defaultSet, delegatedValue)
+        assertEquals(defaultSet, pref.getBlocking())
     }
 
     @Test

@@ -7,14 +7,19 @@ Jetpack Compose extensions in `generic-datastore-compose`.
 ## Modules
 
 - `:generic-datastore` – core preference and proto datastore wrapper library.
-    - `core/` – shared interfaces (`Preference`, `Prefs`, `MappedPreference`, `Migration`).
-    - `preferences/` – DataStore Preferences implementation (`GenericPreference`, `EnumPreference`,
-      `ObjectPrimitive`, `PreferencesDatastore`, `GenericPreferencesDatastore`).
+    - `core/` – shared interfaces and utilities (`Preference`, `Prefs`, `PrefsImpl`,
+      `MappedPreference`, `Migration`, `PreferenceDefaults`, `PreferenceExtension`).
+  - `preferences/` - DataStore wrapper implementations for `Preference` types.
+  - `preferences/default/` – DataStore Preferences implementation (primitive types, enum types,
+      kotlinx.serialization-backed types, and custom-serializer types).
+  - `preferences/optional/` – nullable preference variants.
     - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
       `GenericProtoDatastore`).
+  - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
+    `preferences/` and `preferences/default/`.
 - `:generic-datastore-compose` – Compose helpers (e.g. `Prefs<T>.remember()`) built on the core
   module.
-- `:app` – sample app for local development.
+- `:app` and `:composeApp` – sample apps for local development.
 
 ## KMP Targets
 
@@ -34,6 +39,7 @@ Both library modules target:
 
 - Follow Spotless + ktlint rules configured in the root `build.gradle.kts`.
 - Keep APIs small, predictable, and documented in README when public behavior changes.
+- Do not use wildcard imports (e.g., import foo.bar.*).
 
 ## Testing and Quality Assurance
 
@@ -107,6 +113,18 @@ initialization and teardown.
 When adding new tests, add them to the abstract class in `commonTest` so they run on all platforms
 automatically. Only add tests directly to a platform source set when the test requires
 platform-specific APIs that cannot be abstracted.
+
+### Separating blocking and suspending tests
+
+Do not mix suspending and blocking assertions in the same abstract test class. When adding a new
+preference type, create both:
+
+- `Abstract<Feature>Test` — suspending tests (`get()`, `set()`, `asFlow()`, `delete()`, `update()`,
+  `resetToDefault()`, `toggle()`). Requires `dataStore`, `testDispatcher`, and `preferenceDatastore`
+  abstract properties; uses `runTest(testDispatcher)`.
+- `Abstract<Feature>BlockingTest` — blocking tests (`getBlocking()`, `setBlocking()`,
+  `resetToDefaultBlocking()`, property delegation). Only requires `preferenceDatastore`; runs as
+  plain (non-suspending) test functions.
 
 #### KMP modules targeting Android Test
 

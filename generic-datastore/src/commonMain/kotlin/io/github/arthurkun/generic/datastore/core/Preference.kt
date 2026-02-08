@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.arthurkun.generic.datastore.core
 
 import kotlinx.coroutines.CoroutineScope
@@ -117,7 +119,6 @@ public interface Preference<T> {
          * @param key The preference key to check.
          * @return `true` if the key starts with the private prefix, `false` otherwise.
          */
-        @Suppress("unused")
         public fun isPrivate(key: String): Boolean {
             return key.startsWith(PRIVATE_PREFIX)
         }
@@ -128,7 +129,6 @@ public interface Preference<T> {
          * @param key The original key.
          * @return The key with the private prefix.
          */
-        @Suppress("unused")
         public fun privateKey(key: String): String {
             return "$PRIVATE_PREFIX$key"
         }
@@ -140,7 +140,6 @@ public interface Preference<T> {
          * @param key The preference key to check.
          * @return `true` if the key starts with the app state prefix, `false` otherwise.
          */
-        @Suppress("unused")
         public fun isAppState(key: String): Boolean {
             return key.startsWith(APP_STATE_PREFIX)
         }
@@ -151,7 +150,6 @@ public interface Preference<T> {
          * @param key The original key.
          * @return The key with the app state prefix.
          */
-        @Suppress("unused")
         public fun appStateKey(key: String): String = "$APP_STATE_PREFIX$key"
 
         private const val APP_STATE_PREFIX = "__APP_STATE_"

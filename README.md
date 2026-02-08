@@ -59,6 +59,7 @@ val userName: Prefs<String>      = datastore.string("user_name", "Guest")
 val userScore: Prefs<Int>        = datastore.int("user_score", 0)
 val highScore: Prefs<Long>       = datastore.long("high_score", 0L)
 val volume: Prefs<Float>         = datastore.float("volume", 1.0f)
+val precision: Prefs<Double>     = datastore.double("precision", 0.0)
 val darkMode: Prefs<Boolean>     = datastore.bool("dark_mode", false)
 val tags: Prefs<Set<String>>     = datastore.stringSet("tags")
 ```
@@ -112,6 +113,130 @@ val animalPref = datastore.serialized(
     serializer = { Animal.to(it) },
     deserializer = { Animal.from(it) },
 )
+```
+
+### Kotlin Serialization (`kserialized`)
+
+Store any `@Serializable` type directly without manual serializer/deserializer functions:
+
+```kotlin
+@Serializable
+data class UserProfile(val name: String, val age: Int)
+
+val userProfilePref: Prefs<UserProfile> = datastore.kserialized(
+    key = "user_profile",
+    defaultValue = UserProfile(name = "John", age = 25),
+)
+```
+
+A custom `Json` instance can be provided if needed:
+
+```kotlin
+val customJson = Json { prettyPrint = true }
+
+val userProfilePref: Prefs<UserProfile> = datastore.kserialized(
+    key = "user_profile",
+    defaultValue = UserProfile(name = "John", age = 25),
+    json = customJson,
+)
+```
+
+### Serialized Set
+
+Store a `Set` of custom objects using per-element serialization with `serializedSet()`:
+
+```kotlin
+val animalSetPref: Prefs<Set<Animal>> = datastore.serializedSet(
+    key = "animal_set",
+    defaultValue = emptySet(),
+    serializer = { Animal.to(it) },
+    deserializer = { Animal.from(it) },
+)
+```
+
+Each element is individually serialized to a String and stored using a `stringSetPreferencesKey`. Elements that fail deserialization are silently skipped.
+
+### Kotlin Serialization Set (`kserializedSet`)
+
+Store a `Set` of `@Serializable` objects without manual serializer/deserializer functions:
+
+```kotlin
+@Serializable
+data class UserProfile(val name: String, val age: Int)
+
+val profileSetPref: Prefs<Set<UserProfile>> = datastore.kserializedSet(
+    key = "profile_set",
+    defaultValue = emptySet(),
+)
+```
+
+Each element is individually serialized to JSON and stored using a `stringSetPreferencesKey`. Elements that fail deserialization are silently skipped. A custom `Json` instance can be provided if needed.
+
+### Serialized List
+
+Store a `List` of custom objects using per-element serialization with `serializedList()`:
+
+```kotlin
+val animalListPref: Prefs<List<Animal>> = datastore.serializedList(
+    key = "animal_list",
+    defaultValue = emptyList(),
+    serializer = { Animal.to(it) },
+    deserializer = { Animal.from(it) },
+)
+```
+
+Each element is individually serialized to a String and stored as a JSON array string using a `stringPreferencesKey`. Elements that fail deserialization are silently skipped. Unlike sets, lists preserve insertion order and allow duplicates.
+
+### Kotlin Serialization List (`kserializedList`)
+
+Store a `List` of `@Serializable` objects without manual serializer/deserializer functions:
+
+```kotlin
+@Serializable
+data class UserProfile(val name: String, val age: Int)
+
+val profileListPref: Prefs<List<UserProfile>> = datastore.kserializedList(
+    key = "profile_list",
+    defaultValue = emptyList(),
+)
+```
+
+The list is serialized to a JSON array string and stored using a `stringPreferencesKey`. If deserialization fails (e.g., due to corrupted data), the default value is returned. A custom `Json` instance can be provided if needed.
+
+### Enum Set
+
+Store a `Set` of enum values with the `enumSet()` extension:
+
+```kotlin
+val themeSetPref: Prefs<Set<Theme>> = datastore.enumSet<Theme>(
+    key = "theme_set",
+    defaultValue = emptySet(),
+)
+```
+
+Each enum value is stored by its `name`. Unknown enum values encountered during deserialization are skipped.
+
+### Nullable Preferences
+
+Create preferences that return `null` when no value has been set, instead of a default value:
+
+```kotlin
+val nickname: Prefs<String?>  = datastore.nullableString("nickname")
+val age: Prefs<Int?>          = datastore.nullableInt("age")
+val timestamp: Prefs<Long?>   = datastore.nullableLong("timestamp")
+val weight: Prefs<Float?>     = datastore.nullableFloat("weight")
+val latitude: Prefs<Double?>  = datastore.nullableDouble("latitude")
+val agreed: Prefs<Boolean?>   = datastore.nullableBool("agreed")
+```
+
+Setting a nullable preference to `null` removes the key from DataStore. `resetToDefault()` also removes the key, since the default is `null`.
+
+```kotlin
+nickname.get()        // null (not set yet)
+nickname.set("Alice") // stores "Alice"
+nickname.get()        // "Alice"
+nickname.set(null)    // removes the key
+nickname.get()        // null
 ```
 
 ### Reading & Writing Values
@@ -250,7 +375,8 @@ fun SettingsScreen(datastore: GenericPreferencesDatastore) {
 }
 ```
 
-Under the hood, `remember()` uses `collectAsStateWithLifecycle` for lifecycle-safe collection and launches a coroutine for writes.
+Under the hood, `remember()` uses `collectAsStateWithLifecycle` for lifecycle-safe collection for
+Android while it uses `collectAsState()` for Desktop/JVM. It launches a coroutine for writes.
 
 ## License
 

@@ -1,6 +1,9 @@
-package io.github.arthurkun.generic.datastore.preferences
+@file:Suppress("unused")
+
+package io.github.arthurkun.generic.datastore.preferences.default
 
 import io.github.arthurkun.generic.datastore.core.Prefs
+import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 
 /**
  * Defines a preference for storing enum values.
@@ -14,7 +17,6 @@ import io.github.arthurkun.generic.datastore.core.Prefs
  * @param defaultValue The default enum value to use if the key is not found or
  * deserialization fails.
  */
-@Suppress("unused")
 public inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
     key: String,
     defaultValue: T,
