@@ -1,11 +1,10 @@
-package io.github.arthurkun.generic.datastore.preferences
+package io.github.arthurkun.generic.datastore.preferences.default
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
-import io.github.arthurkun.generic.datastore.core.PreferenceDefaults.defaultJson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,36 +17,37 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * A [Preference] for storing a [List] of custom objects using Kotlin Serialization.
+ * A [Preference] for storing a [List] of custom objects using per-element serialization.
  * The list is serialized to a JSON array string and stored using [stringPreferencesKey].
- * On retrieval, the JSON array string is deserialized back via the provided [KSerializer].
+ * On retrieval, each element in the JSON array is deserialized back via [deserializer].
  *
- * If deserialization fails (e.g., due to corrupted data), the [defaultValue] is returned.
+ * If deserialization of an individual element fails, that element is skipped.
  *
- * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
+ * @param T The type of each element in the list.
  * @param datastore The [DataStore<Preferences>] instance used for storing preferences.
  * @param key The unique String key used to identify this preference within the DataStore.
  * @param defaultValue The default value to be returned if the preference is not set.
- * @param serializer The [KSerializer] for the type [T].
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to a lenient, ignoreUnknownKeys instance.
+ * @param serializer A function to serialize an element of type [T] to its String representation.
+ * @param deserializer A function to deserialize a String back to an element of type [T].
  * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations. Defaults to [Dispatchers.IO].
  */
-internal class KSerializedListPrimitive<T>(
+internal class SerializedListPrimitive<T>(
     private val datastore: DataStore<Preferences>,
     private val key: String,
     override val defaultValue: List<T>,
-    private val serializer: KSerializer<T>,
-    private val json: Json = defaultJson,
+    private val serializer: (T) -> String,
+    private val deserializer: (String) -> T,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<List<T>> {
     private val stringPrefKey = stringPreferencesKey(key)
-    private val listSerializer = ListSerializer(serializer)
 
     override fun key(): String = key
 
@@ -56,8 +56,8 @@ internal class KSerializedListPrimitive<T>(
             datastore
                 .data
                 .map { prefs ->
-                    prefs[stringPrefKey]?.let { safeDeserialize(it) }
-                        ?: this@KSerializedListPrimitive.defaultValue
+                    prefs[stringPrefKey]?.let { safeDeserializeList(it) }
+                        ?: this@SerializedListPrimitive.defaultValue
                 }
                 .first()
         }
@@ -66,7 +66,7 @@ internal class KSerializedListPrimitive<T>(
     override suspend fun set(value: List<T>) {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
-                prefs[stringPrefKey] = json.encodeToString(listSerializer, value)
+                prefs[stringPrefKey] = serializeList(value)
             }
         }
     }
@@ -74,9 +74,9 @@ internal class KSerializedListPrimitive<T>(
     override suspend fun update(transform: (List<T>) -> List<T>) {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
-                val current = prefs[stringPrefKey]?.let { safeDeserialize(it) }
-                    ?: this@KSerializedListPrimitive.defaultValue
-                prefs[stringPrefKey] = json.encodeToString(listSerializer, transform(current))
+                val current = prefs[stringPrefKey]?.let { safeDeserializeList(it) }
+                    ?: this@SerializedListPrimitive.defaultValue
+                prefs[stringPrefKey] = serializeList(transform(current))
             }
         }
     }
@@ -93,8 +93,8 @@ internal class KSerializedListPrimitive<T>(
 
     override fun asFlow(): Flow<List<T>> {
         return datastore.data.map { prefs ->
-            prefs[stringPrefKey]?.let { safeDeserialize(it) }
-                ?: this@KSerializedListPrimitive.defaultValue
+            prefs[stringPrefKey]?.let { safeDeserializeList(it) }
+                ?: this@SerializedListPrimitive.defaultValue
         }
     }
 
@@ -105,9 +105,22 @@ internal class KSerializedListPrimitive<T>(
 
     override fun setBlocking(value: List<T>) = runBlocking { set(value) }
 
-    private fun safeDeserialize(value: String): List<T> {
+    private fun serializeList(value: List<T>): String {
+        val jsonArray = JsonArray(value.map { JsonPrimitive(serializer(it)) })
+        return jsonArray.toString()
+    }
+
+    private fun safeDeserializeList(value: String): List<T> {
         return try {
-            json.decodeFromString(listSerializer, value)
+            Json.parseToJsonElement(value).jsonArray.mapNotNull { element ->
+                try {
+                    deserializer(element.jsonPrimitive.content)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: Exception) {
+                    null
+                }
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {

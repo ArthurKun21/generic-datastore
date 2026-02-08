@@ -328,7 +328,7 @@ public inline fun <reified T> PreferencesDatastore.kserializedList(
  * Toggles an item in a [Set] preference.
  *
  * If the set contains the item, it is removed; otherwise, it is added.
- * Works with [stringSet], [serializedSet], and [enumSet][PreferencesDatastore.enumSet] preferences.
+ * Works with [stringSet], [serializedSet], and [enumSet][io.github.arthurkun.generic.datastore.preferences.default.enumSet] preferences.
  *
  * @param T The type of each element in the set.
  * @param item The item to toggle.

@@ -2,8 +2,8 @@ package io.github.arthurkun.generic.datastore
 
 import io.github.arthurkun.generic.datastore.core.map
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.enum
-import io.github.arthurkun.generic.datastore.preferences.enumSet
+import io.github.arthurkun.generic.datastore.preferences.default.enum
+import io.github.arthurkun.generic.datastore.preferences.default.enumSet
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -1,9 +1,9 @@
-package io.github.arthurkun.generic.datastore.preferences
+package io.github.arthurkun.generic.datastore.preferences.default
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults.defaultJson
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,58 +23,58 @@ import kotlinx.serialization.json.Json
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * A [Preference] for storing custom objects using Kotlin Serialization.
- * This class handles the serialization of the object to a JSON String for storage
- * and deserialization from JSON String back to the object on retrieval.
+ * A [Preference] for storing a [Set] of custom objects using Kotlin Serialization.
+ * Each element is serialized to a JSON String and stored using [stringSetPreferencesKey].
+ * On retrieval, each String element is deserialized back via the provided [KSerializer].
  *
- * If deserialization fails (e.g., due to corrupted data), the [defaultValue] is returned.
+ * If deserialization of an individual element fails, that element is skipped.
  *
- * @param T The type of the custom object. Must be serializable using kotlinx.serialization.
+ * @param T The type of each element in the set. Must be serializable using kotlinx.serialization.
  * @param datastore The [DataStore<Preferences>] instance used for storing preferences.
  * @param key The unique String key used to identify this preference within the DataStore.
- * @param defaultValue The default value to be returned if the preference is not set or an error occurs during deserialization.
+ * @param defaultValue The default value to be returned if the preference is not set.
  * @param serializer The [KSerializer] for the type [T].
  * @param json The [Json] instance to use for serialization/deserialization. Defaults to a lenient, ignoreUnknownKeys instance.
  * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations. Defaults to [Dispatchers.IO].
  */
-internal class KSerializedPrimitive<T>(
+internal class KSerializedSetPrimitive<T>(
     private val datastore: DataStore<Preferences>,
     private val key: String,
-    override val defaultValue: T,
+    override val defaultValue: Set<T>,
     private val serializer: KSerializer<T>,
     private val json: Json = defaultJson,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : Preference<T> {
-    private val stringPrefKey = stringPreferencesKey(key)
+) : Preference<Set<T>> {
+    private val stringSetPrefKey = stringSetPreferencesKey(key)
 
     override fun key(): String = key
 
-    override suspend fun get(): T {
+    override suspend fun get(): Set<T> {
         return withContext(ioDispatcher) {
             datastore
                 .data
                 .map { prefs ->
-                    prefs[stringPrefKey]?.let { safeDeserialize(it) }
-                        ?: this@KSerializedPrimitive.defaultValue
+                    prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
+                        ?: this@KSerializedSetPrimitive.defaultValue
                 }
                 .first()
         }
     }
 
-    override suspend fun set(value: T) {
+    override suspend fun set(value: Set<T>) {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
-                prefs[stringPrefKey] = json.encodeToString(serializer, value)
+                prefs[stringSetPrefKey] = value.map { json.encodeToString(serializer, it) }.toSet()
             }
         }
     }
 
-    override suspend fun update(transform: (T) -> T) {
+    override suspend fun update(transform: (Set<T>) -> Set<T>) {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
-                val current = prefs[stringPrefKey]?.let { safeDeserialize(it) }
-                    ?: this@KSerializedPrimitive.defaultValue
-                prefs[stringPrefKey] = json.encodeToString(serializer, transform(current))
+                val current = prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
+                    ?: this@KSerializedSetPrimitive.defaultValue
+                prefs[stringSetPrefKey] = transform(current).map { json.encodeToString(serializer, it) }.toSet()
             }
         }
     }
@@ -82,33 +82,36 @@ internal class KSerializedPrimitive<T>(
     override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
-                prefs.remove(stringPrefKey)
+                prefs.remove(stringSetPrefKey)
             }
         }
     }
 
     override suspend fun resetToDefault() = set(defaultValue)
 
-    override fun asFlow(): Flow<T> {
+    override fun asFlow(): Flow<Set<T>> {
         return datastore.data.map { prefs ->
-            prefs[stringPrefKey]?.let { safeDeserialize(it) } ?: this@KSerializedPrimitive.defaultValue
+            prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
+                ?: this@KSerializedSetPrimitive.defaultValue
         }
     }
 
-    override fun stateIn(scope: CoroutineScope): StateFlow<T> =
+    override fun stateIn(scope: CoroutineScope): StateFlow<Set<T>> =
         asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
 
-    override fun getBlocking(): T = runBlocking { get() }
+    override fun getBlocking(): Set<T> = runBlocking { get() }
 
-    override fun setBlocking(value: T) = runBlocking { set(value) }
+    override fun setBlocking(value: Set<T>) = runBlocking { set(value) }
 
-    private fun safeDeserialize(value: String): T {
-        return try {
-            json.decodeFromString(serializer, value)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {
-            defaultValue
-        }
+    private fun safeDeserializeSet(values: Set<String>): Set<T> {
+        return values.mapNotNull { value ->
+            try {
+                json.decodeFromString(serializer, value)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                null
+            }
+        }.toSet()
     }
 }

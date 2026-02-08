@@ -1,11 +1,10 @@
-package io.github.arthurkun.generic.datastore.preferences
+package io.github.arthurkun.generic.datastore.preferences.default
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
-import io.github.arthurkun.generic.datastore.core.PreferenceDefaults.defaultJson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,31 +17,30 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.Json
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * A [Preference] for storing a [Set] of custom objects using Kotlin Serialization.
- * Each element is serialized to a JSON String and stored using [stringSetPreferencesKey].
- * On retrieval, each String element is deserialized back via the provided [KSerializer].
+ * A [Preference] for storing a [Set] of custom objects using per-element serialization.
+ * Each element is serialized to a String via [serializer] and stored using
+ * [stringSetPreferencesKey]. On retrieval, each String element is deserialized back
+ * via [deserializer].
  *
  * If deserialization of an individual element fails, that element is skipped.
  *
- * @param T The type of each element in the set. Must be serializable using kotlinx.serialization.
+ * @param T The type of each element in the set.
  * @param datastore The [DataStore<Preferences>] instance used for storing preferences.
  * @param key The unique String key used to identify this preference within the DataStore.
  * @param defaultValue The default value to be returned if the preference is not set.
- * @param serializer The [KSerializer] for the type [T].
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to a lenient, ignoreUnknownKeys instance.
+ * @param serializer A function to serialize an element of type [T] to its String representation.
+ * @param deserializer A function to deserialize a String back to an element of type [T].
  * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations. Defaults to [Dispatchers.IO].
  */
-internal class KSerializedSetPrimitive<T>(
+internal class SerializedSetPrimitive<T>(
     private val datastore: DataStore<Preferences>,
     private val key: String,
     override val defaultValue: Set<T>,
-    private val serializer: KSerializer<T>,
-    private val json: Json = defaultJson,
+    private val serializer: (T) -> String,
+    private val deserializer: (String) -> T,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<Set<T>> {
     private val stringSetPrefKey = stringSetPreferencesKey(key)
@@ -55,7 +53,7 @@ internal class KSerializedSetPrimitive<T>(
                 .data
                 .map { prefs ->
                     prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
-                        ?: this@KSerializedSetPrimitive.defaultValue
+                        ?: this@SerializedSetPrimitive.defaultValue
                 }
                 .first()
         }
@@ -64,7 +62,7 @@ internal class KSerializedSetPrimitive<T>(
     override suspend fun set(value: Set<T>) {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
-                prefs[stringSetPrefKey] = value.map { json.encodeToString(serializer, it) }.toSet()
+                prefs[stringSetPrefKey] = value.map { serializer(it) }.toSet()
             }
         }
     }
@@ -73,8 +71,8 @@ internal class KSerializedSetPrimitive<T>(
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
                 val current = prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
-                    ?: this@KSerializedSetPrimitive.defaultValue
-                prefs[stringSetPrefKey] = transform(current).map { json.encodeToString(serializer, it) }.toSet()
+                    ?: this@SerializedSetPrimitive.defaultValue
+                prefs[stringSetPrefKey] = transform(current).map { serializer(it) }.toSet()
             }
         }
     }
@@ -92,7 +90,7 @@ internal class KSerializedSetPrimitive<T>(
     override fun asFlow(): Flow<Set<T>> {
         return datastore.data.map { prefs ->
             prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
-                ?: this@KSerializedSetPrimitive.defaultValue
+                ?: this@SerializedSetPrimitive.defaultValue
         }
     }
 
@@ -106,7 +104,7 @@ internal class KSerializedSetPrimitive<T>(
     private fun safeDeserializeSet(values: Set<String>): Set<T> {
         return values.mapNotNull { value ->
             try {
-                json.decodeFromString(serializer, value)
+                deserializer(value)
             } catch (e: CancellationException) {
                 throw e
             } catch (_: Exception) {
