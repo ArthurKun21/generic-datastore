@@ -260,7 +260,6 @@ public interface PreferencesDatastore {
     @Deprecated(
         message = "This method is deprecated in favor of importData and importDataAsString " +
             "for better type safety and flexibility.",
-        replaceWith = ReplaceWith("importData(backup)"),
         level = DeprecationLevel.WARNING,
     )
     public suspend fun import(
