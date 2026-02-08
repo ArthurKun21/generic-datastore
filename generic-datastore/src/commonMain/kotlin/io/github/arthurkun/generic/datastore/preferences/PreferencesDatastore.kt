@@ -267,23 +267,72 @@ public interface PreferencesDatastore {
         data: Map<String, Any>,
     )
 
+    /**
+     * Reads current DataStore preferences and returns a [PreferencesBackup] snapshot.
+     *
+     * Only keys currently set in DataStore are included. Keys marked private
+     * (prefixed `__PRIVATE_`) are excluded unless [exportPrivate] is true.
+     * Keys marked app state (prefixed `__APP_STATE_`) are excluded unless
+     * [exportAppState] is true.
+     *
+     * @param exportPrivate Whether to include private keys in the backup.
+     * @param exportAppState Whether to include app-state keys in the backup.
+     * @return A [PreferencesBackup] containing the exported preferences.
+     */
     public suspend fun exportAsData(
         exportPrivate: Boolean = false,
         exportAppState: Boolean = false,
     ): PreferencesBackup
 
+    /**
+     * Exports current DataStore preferences as a JSON string.
+     *
+     * Serializes the backup produced by [exportAsData] using the provided [json]
+     * instance or [PreferenceDefaults.defaultJson] if not provided.
+     *
+     * @param exportPrivate Whether to include private keys in the backup.
+     * @param exportAppState Whether to include app-state keys in the backup.
+     * @param json The [Json] instance to use for serialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+     * @return A JSON-encoded string representing the exported preferences.
+     * @throws kotlinx.serialization.SerializationException if serialization fails.
+     */
     public suspend fun exportAsString(
         exportPrivate: Boolean = false,
         exportAppState: Boolean = false,
         json: Json? = null,
     ): String
 
+    /**
+     * Applies a [PreferencesBackup] into DataStore in a single transaction.
+     *
+     * Overwrites existing keys present in the backup but does **not** remove keys
+     * absent from the backup. Call [clearAll] before import for full replace semantics.
+     * Keys marked private (prefixed `__PRIVATE_`) are skipped unless [importPrivate]
+     * is true. Keys marked app state (prefixed `__APP_STATE_`) are skipped unless
+     * [importAppState] is true.
+     *
+     * @param backup The [PreferencesBackup] to import.
+     * @param importPrivate Whether to import private keys from the backup.
+     * @param importAppState Whether to import app-state keys from the backup.
+     */
     public suspend fun importData(
         backup: PreferencesBackup,
         importPrivate: Boolean = false,
         importAppState: Boolean = false,
     )
 
+    /**
+     * Decodes a JSON string into a [PreferencesBackup] and imports it via [importData].
+     *
+     * Uses the provided [json] instance or [PreferenceDefaults.defaultJson] if not
+     * provided for deserialization.
+     *
+     * @param backupString The JSON-encoded backup string to import.
+     * @param importPrivate Whether to import private keys from the backup.
+     * @param importAppState Whether to import app-state keys from the backup.
+     * @param json The [Json] instance to use for deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+     * @throws kotlinx.serialization.SerializationException if the JSON string is invalid.
+     */
     public suspend fun importDataAsString(
         backupString: String,
         importPrivate: Boolean = false,
