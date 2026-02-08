@@ -9,7 +9,6 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
 import io.github.arthurkun.generic.datastore.compose.app.theme.GenericDataStoreAppTheme
-import io.github.arthurkun.generic.datastore.compose.app.ui.MainScreen
 import io.github.arthurkun.generic.datastore.remember
 
 fun main() {
@@ -32,9 +31,7 @@ fun main() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    MainScreen(
-                        preferenceStore = appContainer.preferenceStore,
-                    )
+                    MainApp(appContainer.preferenceStore)
                 }
             }
         }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
@@ -26,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
@@ -34,35 +32,26 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.arthurkun.generic.datastore.compose.app.domain.Animal
-import io.github.arthurkun.generic.datastore.compose.app.domain.PreferenceStore
 import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
 import io.github.arthurkun.generic.datastore.compose.app.domain.UserProfile
-import io.github.arthurkun.generic.datastore.core.toJsonElement
-import io.github.arthurkun.generic.datastore.core.toJsonMap
-import io.github.arthurkun.generic.datastore.preferences.toggle
 import io.github.arthurkun.generic.datastore.remember
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-private val jsonConfig = Json { prettyPrint = true }
-
 @Composable
 fun MainScreen(
-    preferenceStore: PreferenceStore,
+    viewModel: MainViewModel,
 ) {
-    val scope = rememberCoroutineScope()
-    var text by preferenceStore.text.remember()
-    var theme by preferenceStore.theme.remember()
-    var num by preferenceStore.num.remember()
-    var bool by preferenceStore.bool.remember()
-    var animal by preferenceStore.customObject.remember()
-    var duration by preferenceStore.duration.remember()
-    var userProfile by preferenceStore.userProfile.remember()
-    var userProfileSet by preferenceStore.userProfileSet.remember()
-    var animalSet by preferenceStore.animalSet.remember()
-    var themeSet by preferenceStore.themeSet.remember()
+    var text by viewModel.text.remember()
+    var theme by viewModel.theme.remember()
+    var num by viewModel.num.remember()
+    var bool by viewModel.bool.remember()
+    var animal by viewModel.customObject.remember()
+    var duration by viewModel.duration.remember()
+    var userProfile by viewModel.userProfile.remember()
+    var userProfileSet by viewModel.userProfileSet.remember()
+    var animalSet by viewModel.animalSet.remember()
+    var themeSet by viewModel.themeSet.remember()
 
     LazyColumn(
         modifier = Modifier
@@ -73,7 +62,7 @@ fun MainScreen(
             StringSection(
                 text = text,
                 onTextChange = { text = it },
-                onReset = { scope.launch { preferenceStore.text.resetToDefault() } },
+                onReset = { viewModel.resetText() },
             )
         }
         item {
@@ -86,7 +75,7 @@ fun MainScreen(
                 num = num,
                 onDecrement = { num -= 1 },
                 onIncrement = { num += 1 },
-                onReset = { scope.launch { preferenceStore.num.resetToDefault() } },
+                onReset = { viewModel.resetNum() },
             )
         }
         item {
@@ -98,7 +87,7 @@ fun MainScreen(
             BooleanSection(
                 bool = bool,
                 onBoolChange = { bool = it },
-                onReset = { scope.launch { preferenceStore.bool.resetToDefault() } },
+                onReset = { viewModel.resetBool() },
             )
         }
         item {
@@ -110,7 +99,7 @@ fun MainScreen(
             EnumSection(
                 theme = theme,
                 onThemeChange = { theme = it },
-                onReset = { scope.launch { preferenceStore.theme.resetToDefault() } },
+                onReset = { viewModel.resetTheme() },
             )
         }
         item {
@@ -122,7 +111,7 @@ fun MainScreen(
             SerializerSection(
                 animal = animal,
                 onAnimalChange = { animal = it },
-                onReset = { scope.launch { preferenceStore.customObject.resetToDefault() } },
+                onReset = { viewModel.resetCustomObject() },
             )
         }
         item {
@@ -134,7 +123,7 @@ fun MainScreen(
             DurationSection(
                 duration = duration,
                 onUpdate = { duration = Clock.System.now() },
-                onReset = { scope.launch { preferenceStore.duration.resetToDefault() } },
+                onReset = { viewModel.resetDuration() },
             )
         }
         item {
@@ -146,7 +135,7 @@ fun MainScreen(
             KSerializedSection(
                 userProfile = userProfile,
                 onUserProfileChange = { userProfile = it },
-                onReset = { scope.launch { preferenceStore.userProfile.resetToDefault() } },
+                onReset = { viewModel.resetUserProfile() },
             )
         }
         item {
@@ -157,17 +146,9 @@ fun MainScreen(
         item {
             KSerializedSetSection(
                 userProfileSet = userProfileSet,
-                onAdd = { profile ->
-                    scope.launch {
-                        preferenceStore.userProfileSet.update { it + profile }
-                    }
-                },
-                onRemove = { profile ->
-                    scope.launch {
-                        preferenceStore.userProfileSet.update { it - profile }
-                    }
-                },
-                onReset = { scope.launch { preferenceStore.userProfileSet.resetToDefault() } },
+                onAdd = { profile -> viewModel.addUserProfile(profile) },
+                onRemove = { profile -> viewModel.removeUserProfile(profile) },
+                onReset = { viewModel.resetUserProfileSet() },
             )
         }
         item {
@@ -178,8 +159,8 @@ fun MainScreen(
         item {
             SerializedSetSection(
                 animalSet = animalSet,
-                onToggle = { entry -> scope.launch { preferenceStore.animalSet.toggle(entry) } },
-                onReset = { scope.launch { preferenceStore.animalSet.resetToDefault() } },
+                onToggle = { entry -> viewModel.toggleAnimal(entry) },
+                onReset = { viewModel.resetAnimalSet() },
             )
         }
         item {
@@ -190,8 +171,8 @@ fun MainScreen(
         item {
             EnumSetSection(
                 themeSet = themeSet,
-                onToggle = { entry -> scope.launch { preferenceStore.themeSet.toggle(entry) } },
-                onReset = { scope.launch { preferenceStore.themeSet.resetToDefault() } },
+                onToggle = { entry -> viewModel.toggleTheme(entry) },
+                onReset = { viewModel.resetThemeSet() },
             )
         }
         item {
@@ -201,14 +182,8 @@ fun MainScreen(
         }
         item {
             ExportImportButtons(
-                onExport = {
-                    val data = preferenceStore.exportPreferences()
-                    jsonConfig.encodeToString(data.toJsonElement())
-                },
-                onImport = { jsonString ->
-                    val newData = jsonString.toJsonMap()
-                    preferenceStore.importPreferences(newData)
-                },
+                onExport = { viewModel.exportPreferences() },
+                onImport = { jsonString -> viewModel.importPreferences(jsonString) },
             )
         }
     }

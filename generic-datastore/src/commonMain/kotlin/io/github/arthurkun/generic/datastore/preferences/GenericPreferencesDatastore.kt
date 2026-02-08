@@ -16,7 +16,10 @@ import io.github.arthurkun.generic.datastore.core.Preference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.core.PrefsImpl
-import io.github.arthurkun.generic.datastore.core.toJsonElement
+import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupCreator
+import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupRestorer
+import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
+import io.github.arthurkun.generic.datastore.preferences.backup.toJsonElement
 import io.github.arthurkun.generic.datastore.preferences.default.BooleanPrimitive
 import io.github.arthurkun.generic.datastore.preferences.default.DoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.default.FloatPrimitive
@@ -55,6 +58,9 @@ public class GenericPreferencesDatastore(
     private val datastore: DataStore<Preferences>,
     private val defaultJson: Json = PreferenceDefaults.defaultJson,
 ) : PreferencesDatastore {
+
+    private val backupCreator = PreferenceBackupCreator(datastore)
+    private val backupRestorer = PreferenceBackupRestorer(datastore)
 
     /**
      * Creates a String preference.
@@ -432,6 +438,11 @@ public class GenericPreferencesDatastore(
      * @param exportAppState Whether to include app state preferences in the export.
      * @return A map of preference keys to their [JsonElement] representations.
      */
+    @Deprecated(
+        "This method is deprecated in favor of exportAsData and exportAsString for better type safety and flexibility.",
+        replaceWith = ReplaceWith("exportAsData(exportPrivate, exportAppState)"),
+        level = DeprecationLevel.WARNING,
+    )
     override suspend fun export(exportPrivate: Boolean, exportAppState: Boolean): Map<String, JsonElement> {
         return datastore
             .data
@@ -458,6 +469,10 @@ public class GenericPreferencesDatastore(
      *
      * @param data The map of preference keys to values to import.
      */
+    @Deprecated(
+        "This method is deprecated in favor of importData and importDataAsString for better type safety and flexibility.",
+        level = DeprecationLevel.WARNING,
+    )
     override suspend fun import(data: Map<String, Any>) {
         datastore.updateData { currentPreferences ->
             val mutablePreferences = currentPreferences.toMutablePreferences()
@@ -496,5 +511,53 @@ public class GenericPreferencesDatastore(
             }
             mutablePreferences.toPreferences()
         }
+    }
+
+    override suspend fun exportAsData(
+        exportPrivate: Boolean,
+        exportAppState: Boolean,
+    ): PreferencesBackup {
+        return backupCreator.exportAsData(
+            exportPrivate = exportPrivate,
+            exportAppState = exportAppState,
+        )
+    }
+
+    override suspend fun exportAsString(
+        exportPrivate: Boolean,
+        exportAppState: Boolean,
+        json: Json?,
+    ): String {
+        return backupCreator.exportAsString(
+            exportPrivate = exportPrivate,
+            exportAppState = exportAppState,
+            json = json ?: defaultJson,
+        )
+    }
+
+    override suspend fun importData(
+        backup: PreferencesBackup,
+        importPrivate: Boolean,
+        importAppState: Boolean,
+    ) {
+        backupRestorer.importData(
+            backup = backup,
+            importPrivate = importPrivate,
+            importAppState = importAppState,
+        )
+    }
+
+    override suspend fun importDataAsString(
+        backupString: String,
+        importPrivate: Boolean,
+        importAppState: Boolean,
+        json: Json?,
+    ) {
+        backupRestorer.importDataAsString(
+            backupString = backupString,
+            importPrivate = importPrivate,
+            importAppState = importAppState,
+            json = json ?: defaultJson,
+        )
     }
 }

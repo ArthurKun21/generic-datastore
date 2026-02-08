@@ -313,24 +313,63 @@ val scoreAsString2: Prefs<String> = userScore.mapIO(
 
 `map` catches exceptions in conversions and falls back to defaults. `mapIO` throws if conversion of the default value fails.
 
-### Export & Import
+### Backup & Restore
 
-`GenericPreferencesDatastore` supports exporting and importing all preferences as JSON:
+`GenericPreferencesDatastore` supports exporting and importing all preferences using type-safe backup models:
+
+#### Export as structured data
 
 ```kotlin
-// Export (returns Map<String, JsonElement>)
-val exported = datastore.export(
+val backup: PreferencesBackup = datastore.exportAsData(
     exportPrivate = false,
     exportAppState = false,
 )
-
-// Import (accepts Map<String, Any>)
-datastore.import(data)
 ```
+
+#### Export as JSON string
+
+```kotlin
+val jsonString: String = datastore.exportAsString(
+    exportPrivate = false,
+    exportAppState = false,
+)
+```
+
+A custom `Json` instance can be provided if needed:
+
+```kotlin
+val jsonString: String = datastore.exportAsString(
+    exportPrivate = false,
+    exportAppState = false,
+    json = customJson,
+)
+```
+
+#### Import from structured data
+
+```kotlin
+datastore.importData(
+    backup = backup,
+    importPrivate = false,
+    importAppState = false,
+)
+```
+
+#### Import from JSON string
+
+```kotlin
+datastore.importDataAsString(
+    backupString = jsonString,
+    importPrivate = false,
+    importAppState = false,
+)
+```
+
+Import merges into existing preferences. Call `datastore.clearAll()` before import for full replace semantics. A `BackupParsingException` is thrown if the JSON string is invalid or exceeds the 10 MB size limit.
 
 ### Private & App-State Key Prefixes
 
-Use `Preference.privateKey(key)` or `Preference.appStateKey(key)` to prefix keys so they can be filtered during export:
+Use `Preference.privateKey(key)` or `Preference.appStateKey(key)` to prefix keys so they can be filtered during backup:
 
 ```kotlin
 val token = datastore.string(Preference.privateKey("auth_token"), "")

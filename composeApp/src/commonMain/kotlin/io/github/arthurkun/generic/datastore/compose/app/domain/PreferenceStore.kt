@@ -6,6 +6,7 @@ import io.github.arthurkun.generic.datastore.preferences.default.enum
 import io.github.arthurkun.generic.datastore.preferences.default.enumSet
 import io.github.arthurkun.generic.datastore.preferences.kserialized
 import io.github.arthurkun.generic.datastore.preferences.kserializedSet
+import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
 class PreferenceStore(
@@ -73,7 +74,9 @@ class PreferenceStore(
         defaultValue = emptySet(),
     )
 
-    suspend fun exportPreferences() = datastore.export()
+    suspend fun exportPreferences(json: Json? = null): String =
+        datastore.exportAsString(json = json)
 
-    suspend fun importPreferences(data: Map<String, Any>) = datastore.import(data)
+    suspend fun importPreferences(backupString: String, json: Json? = null) =
+        datastore.importDataAsString(backupString = backupString, json = json)
 }
