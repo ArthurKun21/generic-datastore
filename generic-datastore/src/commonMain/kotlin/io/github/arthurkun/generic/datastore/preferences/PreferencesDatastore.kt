@@ -2,8 +2,6 @@ package io.github.arthurkun.generic.datastore.preferences
 
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults.defaultJson
 import io.github.arthurkun.generic.datastore.core.Prefs
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -349,14 +347,3 @@ public suspend inline fun <T> Prefs<Set<T>>.toggle(item: T) {
 public suspend inline fun Prefs<Boolean>.toggle() {
     update { !it }
 }
-
-/**
- * Returns a [Flow] that emits the preference value only when it changes,
- * filtering out consecutive duplicate emissions.
- *
- * This is a convenience wrapper around `asFlow().distinctUntilChanged()`.
- *
- * @param T The type of the preference value.
- * @return A [Flow] that emits distinct consecutive values.
- */
-public fun <T> Prefs<T>.distinctFlow(): Flow<T> = asFlow().distinctUntilChanged()
