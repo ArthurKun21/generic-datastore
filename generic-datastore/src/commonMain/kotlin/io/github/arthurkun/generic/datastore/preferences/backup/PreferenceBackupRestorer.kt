@@ -25,6 +25,10 @@ import kotlinx.serialization.json.Json
  */
 internal class PreferenceBackupRestorer(private val datastore: DataStore<Preferences>) {
 
+    companion object {
+        private const val MAX_BACKUP_STRING_LENGTH = 10 * 1024 * 1024 // 10 MB
+    }
+
     suspend fun importData(
         backup: PreferencesBackup,
         importPrivate: Boolean,
@@ -74,6 +78,12 @@ internal class PreferenceBackupRestorer(private val datastore: DataStore<Prefere
         importAppState: Boolean,
         json: Json,
     ) {
+        if (backupString.length > MAX_BACKUP_STRING_LENGTH) {
+            throw BackupParsingException(
+                "Backup string exceeds maximum allowed size of $MAX_BACKUP_STRING_LENGTH characters",
+            )
+        }
+
         val backup = try {
             json.decodeFromString<PreferencesBackup>(backupString)
         } catch (e: SerializationException) {
