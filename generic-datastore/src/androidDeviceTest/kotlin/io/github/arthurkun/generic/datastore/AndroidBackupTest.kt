@@ -2,12 +2,12 @@ package io.github.arthurkun.generic.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.createPreferencesDatastore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,14 +26,13 @@ private const val TEST_DATASTORE_NAME = "test_backup_datastore"
 @RunWith(AndroidJUnit4::class)
 class AndroidBackupTest : AbstractBackupTest() {
 
-    private lateinit var _dataStore: DataStore<Preferences>
     private lateinit var _preferenceDatastore: GenericPreferencesDatastore
     private lateinit var testContext: Context
     private val _testDispatcher = StandardTestDispatcher()
     private lateinit var testScope: CoroutineScope
 
     override val preferenceDatastore: GenericPreferencesDatastore get() = _preferenceDatastore
-    override val dataStore: DataStore<Preferences> get() = _dataStore
+    override val dataStore: DataStore<Preferences> get() = _preferenceDatastore.datastore
     override val testDispatcher: TestDispatcher get() = _testDispatcher
 
     @Before
@@ -41,11 +40,12 @@ class AndroidBackupTest : AbstractBackupTest() {
         Dispatchers.setMain(_testDispatcher)
         testContext = ApplicationProvider.getApplicationContext()
         testScope = CoroutineScope(Job() + _testDispatcher)
-        _dataStore = PreferenceDataStoreFactory.create(
+        _preferenceDatastore = createPreferencesDatastore(
             scope = testScope,
-            produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_NAME) },
+            producePath = {
+                testContext.preferencesDataStoreFile(TEST_DATASTORE_NAME).absolutePath
+            },
         )
-        _preferenceDatastore = GenericPreferencesDatastore(_dataStore)
     }
 
     @After

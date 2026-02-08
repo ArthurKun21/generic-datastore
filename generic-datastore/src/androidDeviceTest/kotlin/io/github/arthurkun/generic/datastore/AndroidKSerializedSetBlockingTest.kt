@@ -1,13 +1,11 @@
 package io.github.arthurkun.generic.datastore
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.createPreferencesDatastore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -23,7 +21,6 @@ private const val TEST_DATASTORE_BLOCKING_NAME = "test_kserialized_set_datastore
 class AndroidKSerializedSetBlockingTest : AbstractKSerializedSetBlockingTest() {
 
     companion object {
-        private lateinit var dataStore: DataStore<Preferences>
         private lateinit var _preferenceDatastore: GenericPreferencesDatastore
         private lateinit var testContext: Context
         private val testDispatcher = UnconfinedTestDispatcher()
@@ -33,10 +30,11 @@ class AndroidKSerializedSetBlockingTest : AbstractKSerializedSetBlockingTest() {
         fun setupClass() {
             Dispatchers.setMain(testDispatcher)
             testContext = ApplicationProvider.getApplicationContext()
-            dataStore = PreferenceDataStoreFactory.create(
-                produceFile = { testContext.preferencesDataStoreFile(TEST_DATASTORE_BLOCKING_NAME) },
+            _preferenceDatastore = createPreferencesDatastore(
+                producePath = {
+                    testContext.preferencesDataStoreFile(TEST_DATASTORE_BLOCKING_NAME).absolutePath
+                },
             )
-            _preferenceDatastore = GenericPreferencesDatastore(dataStore)
         }
 
         @JvmStatic

@@ -54,7 +54,7 @@ import kotlinx.serialization.json.JsonElement
  * @property defaultJson The default [Json] instance to use for Kotlin Serialization-based preferences.
  */
 public class GenericPreferencesDatastore(
-    private val datastore: DataStore<Preferences>,
+    internal val datastore: DataStore<Preferences>,
     private val defaultJson: Json = PreferenceDefaults.defaultJson,
 ) : PreferencesDatastore {
 
