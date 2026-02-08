@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
-import io.github.arthurkun.generic.datastore.core.PreferenceDefaults.defaultJson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +34,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * @param key The unique String key used to identify this preference within the DataStore.
  * @param defaultValue The default value to be returned if the preference is not set.
  * @param serializer The [KSerializer] for the type [T].
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to a lenient, ignoreUnknownKeys instance.
+ * @param json The [Json] instance to use for serialization/deserialization.
  * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations. Defaults to [Dispatchers.IO].
  */
 internal class KSerializedListPrimitive<T>(
@@ -43,7 +42,7 @@ internal class KSerializedListPrimitive<T>(
     private val key: String,
     override val defaultValue: List<T>,
     private val serializer: KSerializer<T>,
-    private val json: Json = defaultJson,
+    private val json: Json,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<List<T>> {
     private val stringPrefKey = stringPreferencesKey(key)
