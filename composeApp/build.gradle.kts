@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.bundles.compose)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.datastore.preferences.core)
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
         }
 
         androidMain.dependencies {

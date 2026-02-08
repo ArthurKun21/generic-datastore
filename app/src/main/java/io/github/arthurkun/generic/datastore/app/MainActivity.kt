@@ -11,8 +11,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import io.github.arthurkun.generic.datastore.app.domain.setAppCompatDelegateThemeMode
+import io.github.arthurkun.generic.datastore.compose.app.MainApp
 import io.github.arthurkun.generic.datastore.compose.app.theme.GenericDataStoreAppTheme
-import io.github.arthurkun.generic.datastore.compose.app.ui.MainScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,9 +40,7 @@ class MainActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.surface,
                 ) {
-                    MainScreen(
-                        preferenceStore = appContainer.preferenceStore,
-                    )
+                    MainApp(appContainer.preferenceStore)
                 }
             }
         }
