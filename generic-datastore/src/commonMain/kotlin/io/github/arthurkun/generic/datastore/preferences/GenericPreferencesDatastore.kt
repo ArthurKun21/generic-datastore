@@ -13,6 +13,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.core.PrefsImpl
 import io.github.arthurkun.generic.datastore.core.toJsonElement
@@ -35,9 +36,11 @@ import kotlinx.serialization.json.JsonElement
  * and Set<String>, as well as custom serialized objects.
  *
  * @property datastore The underlying [DataStore<Preferences>] instance.
+ * @property defaultJson The default [Json] instance to use for Kotlin Serialization-based preferences.
  */
 public class GenericPreferencesDatastore(
     private val datastore: DataStore<Preferences>,
+    private val defaultJson: Json = PreferenceDefaults.defaultJson,
 ) : PreferencesDatastore {
 
     /**
@@ -311,14 +314,14 @@ public class GenericPreferencesDatastore(
         key: String,
         defaultValue: T,
         serializer: KSerializer<T>,
-        json: Json,
+        json: Json?,
     ): Prefs<T> = PrefsImpl(
         KSerializedPrimitive(
             datastore = datastore,
             key = key,
             defaultValue = defaultValue,
             serializer = serializer,
-            json = json,
+            json = json ?: defaultJson,
         ),
     )
 
@@ -337,14 +340,14 @@ public class GenericPreferencesDatastore(
         key: String,
         defaultValue: Set<T>,
         serializer: KSerializer<T>,
-        json: Json,
+        json: Json?,
     ): Prefs<Set<T>> = PrefsImpl(
         KSerializedSetPrimitive(
             datastore = datastore,
             key = key,
             defaultValue = defaultValue,
             serializer = serializer,
-            json = json,
+            json = json ?: defaultJson,
         ),
     )
 
@@ -389,14 +392,14 @@ public class GenericPreferencesDatastore(
         key: String,
         defaultValue: List<T>,
         serializer: KSerializer<T>,
-        json: Json,
+        json: Json?,
     ): Prefs<List<T>> = PrefsImpl(
         KSerializedListPrimitive(
             datastore = datastore,
             key = key,
             defaultValue = defaultValue,
             serializer = serializer,
-            json = json,
+            json = json ?: defaultJson,
         ),
     )
 

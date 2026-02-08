@@ -1,6 +1,6 @@
 package io.github.arthurkun.generic.datastore.preferences
 
-import io.github.arthurkun.generic.datastore.core.PreferenceDefaults.defaultJson
+import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.core.Prefs
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
@@ -173,14 +173,14 @@ public interface PreferencesDatastore {
      * @param key The preference key.
      * @param defaultValue The default value for the custom object.
      * @param serializer The [KSerializer] for the type [T].
-     * @param json The [Json] instance to use for serialization/deserialization.
+     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
      * @return A [Prefs] instance for the custom object preference.
      */
     public fun <T> kserialized(
         key: String,
         defaultValue: T,
         serializer: KSerializer<T>,
-        json: Json = defaultJson,
+        json: Json? = null,
     ): Prefs<T>
 
     /**
@@ -191,14 +191,14 @@ public interface PreferencesDatastore {
      * @param key The preference key.
      * @param defaultValue The default value for the set (defaults to an empty set).
      * @param serializer The [KSerializer] for the type [T].
-     * @param json The [Json] instance to use for serialization/deserialization.
+     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
      * @return A [Prefs] instance for the Set preference.
      */
     public fun <T> kserializedSet(
         key: String,
         defaultValue: Set<T> = emptySet(),
         serializer: KSerializer<T>,
-        json: Json = defaultJson,
+        json: Json? = null,
     ): Prefs<Set<T>>
 
     /**
@@ -228,14 +228,14 @@ public interface PreferencesDatastore {
      * @param key The preference key.
      * @param defaultValue The default value for the list (defaults to an empty list).
      * @param serializer The [KSerializer] for the type [T].
-     * @param json The [Json] instance to use for serialization/deserialization.
+     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
      * @return A [Prefs] instance for the List preference.
      */
     public fun <T> kserializedList(
         key: String,
         defaultValue: List<T> = emptyList(),
         serializer: KSerializer<T>,
-        json: Json = defaultJson,
+        json: Json? = null,
     ): Prefs<List<T>>
 
     /**
@@ -264,13 +264,13 @@ public interface PreferencesDatastore {
  * @param T The type of the custom object.
  * @param key The preference key.
  * @param defaultValue The default value for the custom object.
- * @param json The [Json] instance to use for serialization/deserialization.
+ * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
  * @return A [Prefs] instance for the custom object preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserialized(
     key: String,
     defaultValue: T,
-    json: Json = defaultJson,
+    json: Json? = null,
 ): Prefs<T> = kserialized(
     key = key,
     defaultValue = defaultValue,
@@ -287,13 +287,13 @@ public inline fun <reified T> PreferencesDatastore.kserialized(
  * @param T The type of each element in the set.
  * @param key The preference key.
  * @param defaultValue The default value for the set (defaults to an empty set).
- * @param json The [Json] instance to use for serialization/deserialization.
+ * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
  * @return A [Prefs] instance for the Set preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserializedSet(
     key: String,
     defaultValue: Set<T> = emptySet(),
-    json: Json = defaultJson,
+    json: Json? = null,
 ): Prefs<Set<T>> = kserializedSet(
     key = key,
     defaultValue = defaultValue,
@@ -310,13 +310,13 @@ public inline fun <reified T> PreferencesDatastore.kserializedSet(
  * @param T The type of each element in the list.
  * @param key The preference key.
  * @param defaultValue The default value for the list (defaults to an empty list).
- * @param json The [Json] instance to use for serialization/deserialization.
+ * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
  * @return A [Prefs] instance for the List preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserializedList(
     key: String,
     defaultValue: List<T> = emptyList(),
-    json: Json = defaultJson,
+    json: Json? = null,
 ): Prefs<List<T>> = kserializedList(
     key = key,
     defaultValue = defaultValue,
