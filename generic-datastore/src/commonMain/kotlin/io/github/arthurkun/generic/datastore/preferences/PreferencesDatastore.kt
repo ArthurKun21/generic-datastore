@@ -2,6 +2,7 @@ package io.github.arthurkun.generic.datastore.preferences
 
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.core.Prefs
+import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -245,13 +246,43 @@ public interface PreferencesDatastore {
      */
     public suspend fun clearAll()
 
+    @Deprecated(
+        message = "This method is deprecated in favor of exportAsData and exportAsString for better type safety and flexibility.",
+        replaceWith = ReplaceWith("exportAsData(exportPrivate, exportAppState)"),
+        level = DeprecationLevel.WARNING,
+    )
     public suspend fun export(
         exportPrivate: Boolean = false,
         exportAppState: Boolean = false,
     ): Map<String, JsonElement>
 
+    @Deprecated(
+        message = "This method is deprecated in favor of importData and importDataAsString for better type safety and flexibility.",
+        replaceWith = ReplaceWith("importData(backup)"),
+        level = DeprecationLevel.WARNING,
+    )
     public suspend fun import(
         data: Map<String, Any>,
+    )
+
+    public suspend fun exportAsData(
+        exportPrivate: Boolean = false,
+        exportAppState: Boolean = false,
+    ): PreferencesBackup
+
+    public suspend fun exportAsString(
+        exportPrivate: Boolean = false,
+        exportAppState: Boolean = false,
+        json: Json? = null,
+    ): String
+
+    public suspend fun importData(
+        backup: PreferencesBackup,
+    )
+
+    public suspend fun importDataAsString(
+        backupString: String,
+        json: Json? = null,
     )
 }
 

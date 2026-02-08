@@ -17,6 +17,9 @@ import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.core.PrefsImpl
 import io.github.arthurkun.generic.datastore.core.toJsonElement
+import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupCreator
+import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupRestorer
+import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
 import io.github.arthurkun.generic.datastore.preferences.default.BooleanPrimitive
 import io.github.arthurkun.generic.datastore.preferences.default.DoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.default.FloatPrimitive
@@ -55,6 +58,9 @@ public class GenericPreferencesDatastore(
     private val datastore: DataStore<Preferences>,
     private val defaultJson: Json = PreferenceDefaults.defaultJson,
 ) : PreferencesDatastore {
+
+    private val backupCreator = PreferenceBackupCreator(datastore)
+    private val backupRestorer = PreferenceBackupRestorer(datastore)
 
     /**
      * Creates a String preference.
@@ -496,5 +502,38 @@ public class GenericPreferencesDatastore(
             }
             mutablePreferences.toPreferences()
         }
+    }
+
+    override suspend fun exportAsData(
+        exportPrivate: Boolean,
+        exportAppState: Boolean,
+    ): PreferencesBackup {
+        return backupCreator.exportAsData(
+            exportPrivate = exportPrivate,
+            exportAppState = exportAppState,
+        )
+    }
+
+    override suspend fun exportAsString(
+        exportPrivate: Boolean,
+        exportAppState: Boolean,
+        json: Json?,
+    ): String {
+        return backupCreator.exportAsString(
+            exportPrivate = exportPrivate,
+            exportAppState = exportAppState,
+            json = json ?: defaultJson,
+        )
+    }
+
+    override suspend fun importData(backup: PreferencesBackup) {
+        backupRestorer.importData(backup)
+    }
+
+    override suspend fun importDataAsString(backupString: String, json: Json?) {
+        backupRestorer.importDataAsString(
+            backupString = backupString,
+            json = json ?: defaultJson,
+        )
     }
 }
