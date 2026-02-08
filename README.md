@@ -375,7 +375,8 @@ fun SettingsScreen(datastore: GenericPreferencesDatastore) {
 }
 ```
 
-Under the hood, `remember()` uses `collectAsStateWithLifecycle` for lifecycle-safe collection and launches a coroutine for writes.
+Under the hood, `remember()` uses `collectAsStateWithLifecycle` for lifecycle-safe collection for
+Android while it uses `collectAsState()` for Desktop/JVM. It launches a coroutine for writes.
 
 ## License
 
