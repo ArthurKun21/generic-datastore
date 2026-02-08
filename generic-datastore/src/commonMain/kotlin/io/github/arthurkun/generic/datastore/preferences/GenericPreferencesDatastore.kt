@@ -438,6 +438,11 @@ public class GenericPreferencesDatastore(
      * @param exportAppState Whether to include app state preferences in the export.
      * @return A map of preference keys to their [JsonElement] representations.
      */
+    @Deprecated(
+        "This method is deprecated in favor of exportAsData and exportAsString for better type safety and flexibility.",
+        replaceWith = ReplaceWith("exportAsData(exportPrivate, exportAppState)"),
+        level = DeprecationLevel.WARNING,
+    )
     override suspend fun export(exportPrivate: Boolean, exportAppState: Boolean): Map<String, JsonElement> {
         return datastore
             .data
@@ -464,6 +469,10 @@ public class GenericPreferencesDatastore(
      *
      * @param data The map of preference keys to values to import.
      */
+    @Deprecated(
+        "This method is deprecated in favor of importData and importDataAsString for better type safety and flexibility.",
+        level = DeprecationLevel.WARNING,
+    )
     override suspend fun import(data: Map<String, Any>) {
         datastore.updateData { currentPreferences ->
             val mutablePreferences = currentPreferences.toMutablePreferences()
