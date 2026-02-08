@@ -43,7 +43,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-
 /**
  * A DataStore implementation that provides methods for creating and managing various types of preferences.
  *

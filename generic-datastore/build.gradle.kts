@@ -59,7 +59,9 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.coroutines.core)
-            implementation(libs.datastore.preferences.core)
+            api(libs.datastore.preferences.core)
+            api(libs.datastore.core)
+            api(libs.kotlinx.io.core)
             implementation(libs.kotlinx.serialization.json)
         }
 
