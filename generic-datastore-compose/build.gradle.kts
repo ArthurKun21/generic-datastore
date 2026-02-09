@@ -70,10 +70,10 @@ publishing {
             }
         }
 
-        maven {
-            name = "JitPack"
-            url = uri("https://jitpack.io")
-        }
+//        maven {
+//            name = "JitPack"
+//            url = uri("https://jitpack.io")
+//        }
     }
     publications {
         withType<MavenPublication> {
