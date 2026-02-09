@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.vanniktech.maven.publish)
@@ -55,8 +57,13 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.addAll(
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-opt-in=kotlinx.cinterop.ExperimentalForeignApi",
         )
+    }
+}
+
+tasks.withType<KotlinNativeCompile>().configureEach {
+    compilerOptions {
+        optIn.add("kotlinx.cinterop.ExperimentalForeignApi")
     }
 }
 
