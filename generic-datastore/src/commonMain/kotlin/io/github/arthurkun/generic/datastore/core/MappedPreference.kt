@@ -96,7 +96,7 @@ internal class MappedPrefs<T, R>(
 
     /**
      * Safely converts a value from type [T] to [R] using the provided [convert] function.
-     * If [convert] throws an exception, logs the error and returns [defaultValue] of type [R].
+     * If [convert] throws an exception, returns [defaultValue] of type [R].
      *
      * @param value The value of type [T] to convert.
      * @return The converted value of type [R], or [defaultValue] if conversion fails.
@@ -113,7 +113,7 @@ internal class MappedPrefs<T, R>(
 
     /**
      * Safely converts a value from type [R] to [T] using the provided [reverse] function.
-     * If [reverse] throws an exception, logs the error and returns the `defaultValue`
+     * If [reverse] throws an exception, returns the `defaultValue`
      * of the original [Prefs] instance (type [T]).
      *
      * @param value The value of type [R] to convert.
