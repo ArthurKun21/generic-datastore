@@ -26,10 +26,6 @@ public inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
     defaultValue = defaultValue,
     serializer = { it.name },
     deserializer = {
-        try {
-            enumValueOf(it)
-        } catch (_: IllegalArgumentException) {
-            defaultValue
-        }
+        enumValueOf(it)
     },
 )
