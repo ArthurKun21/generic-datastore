@@ -17,10 +17,6 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSUUID
 
-/**
- * Helper class for iOS tests that provides common setup and teardown logic
- * for datastore tests.
- */
 class IosTestHelper private constructor(
     private val datastoreName: String,
     private val useStandardDispatcher: Boolean,
@@ -28,7 +24,7 @@ class IosTestHelper private constructor(
     private lateinit var tempDir: String
     private lateinit var _preferenceDatastore: GenericPreferencesDatastore
     private lateinit var _testDispatcher: TestDispatcher
-    private var testScope: CoroutineScope? = null
+    private lateinit var testScope: CoroutineScope
 
     val preferenceDatastore: GenericPreferencesDatastore get() = _preferenceDatastore
     val dataStore: DataStore<Preferences> get() = _preferenceDatastore.datastore
@@ -43,42 +39,36 @@ class IosTestHelper private constructor(
         }
         Dispatchers.setMain(_testDispatcher)
 
-        if (useStandardDispatcher) {
-            testScope = CoroutineScope(Job() + _testDispatcher)
-            _preferenceDatastore = createPreferencesDatastore(
-                fileName = "$datastoreName.preferences_pb",
-                scope = testScope!!,
-            ) {
-                tempDir
-            }
-        } else {
-            _preferenceDatastore = createPreferencesDatastore(
-                fileName = "$datastoreName.preferences_pb",
-            ) {
-                tempDir
-            }
+        testScope = CoroutineScope(Job() + _testDispatcher)
+        _preferenceDatastore = createPreferencesDatastore(
+            fileName = "$datastoreName.preferences_pb",
+            scope = testScope,
+        ) {
+            tempDir
         }
     }
 
     fun tearDown() {
-        Dispatchers.resetMain()
-        testScope?.cancel()
-        NSFileManager.defaultManager.removeItemAtPath(tempDir, null)
+        try {
+            if (::testScope.isInitialized) {
+                testScope.cancel()
+            }
+        } finally {
+            try {
+                if (::tempDir.isInitialized) {
+                    NSFileManager.defaultManager.removeItemAtPath(tempDir, null)
+                }
+            } finally {
+                Dispatchers.resetMain()
+            }
+        }
     }
 
     companion object {
-        /**
-         * Creates a helper for standard tests that use StandardTestDispatcher
-         * and a custom CoroutineScope.
-         */
         fun standard(datastoreName: String): IosTestHelper {
             return IosTestHelper(datastoreName, useStandardDispatcher = true)
         }
 
-        /**
-         * Creates a helper for blocking tests that use UnconfinedTestDispatcher
-         * without a custom CoroutineScope.
-         */
         fun blocking(datastoreName: String): IosTestHelper {
             return IosTestHelper(datastoreName, useStandardDispatcher = false)
         }

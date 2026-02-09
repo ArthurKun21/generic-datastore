@@ -14,27 +14,18 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 
-/**
- * Helper class for Desktop tests that provides common setup and teardown logic
- * for datastore tests.
- */
 class DesktopTestHelper private constructor(
     private val datastoreName: String,
     private val useStandardDispatcher: Boolean,
 ) {
     private lateinit var _preferenceDatastore: GenericPreferencesDatastore
     private lateinit var _testDispatcher: TestDispatcher
-    private var testScope: CoroutineScope? = null
+    private lateinit var testScope: CoroutineScope
 
     val preferenceDatastore: GenericPreferencesDatastore get() = _preferenceDatastore
     val dataStore: DataStore<Preferences> get() = _preferenceDatastore.datastore
     val testDispatcher: TestDispatcher get() = _testDispatcher
 
-    /**
-     * Sets up the test environment.
-     * @param tempFolderPath The path to the temporary folder for the datastore file.
-     *                       This should be provided from JUnit's @TempDir annotation.
-     */
     fun setup(tempFolderPath: String) {
         _testDispatcher = if (useStandardDispatcher) {
             StandardTestDispatcher()
@@ -43,41 +34,30 @@ class DesktopTestHelper private constructor(
         }
         Dispatchers.setMain(_testDispatcher)
 
-        if (useStandardDispatcher) {
-            testScope = CoroutineScope(Job() + _testDispatcher)
-            _preferenceDatastore = createPreferencesDatastore(
-                fileName = "$datastoreName.preferences_pb",
-                scope = testScope!!,
-            ) {
-                tempFolderPath
-            }
-        } else {
-            _preferenceDatastore = createPreferencesDatastore(
-                fileName = "$datastoreName.preferences_pb",
-            ) {
-                tempFolderPath
-            }
+        testScope = CoroutineScope(Job() + _testDispatcher)
+        _preferenceDatastore = createPreferencesDatastore(
+            fileName = "$datastoreName.preferences_pb",
+            scope = testScope,
+        ) {
+            tempFolderPath
         }
     }
 
     fun tearDown() {
-        Dispatchers.resetMain()
-        testScope?.cancel()
+        try {
+            if (::testScope.isInitialized) {
+                testScope.cancel()
+            }
+        } finally {
+            Dispatchers.resetMain()
+        }
     }
 
     companion object {
-        /**
-         * Creates a helper for standard tests that use StandardTestDispatcher
-         * and a custom CoroutineScope.
-         */
         fun standard(datastoreName: String): DesktopTestHelper {
             return DesktopTestHelper(datastoreName, useStandardDispatcher = true)
         }
 
-        /**
-         * Creates a helper for blocking tests that use UnconfinedTestDispatcher
-         * without a custom CoroutineScope.
-         */
         fun blocking(datastoreName: String): DesktopTestHelper {
             return DesktopTestHelper(datastoreName, useStandardDispatcher = false)
         }
