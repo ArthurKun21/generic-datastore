@@ -21,7 +21,7 @@ env:
   JAVA_DISTRO: 'temurin'
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.ref }}-test
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
