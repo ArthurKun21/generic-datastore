@@ -6,8 +6,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.reflect.KProperty
 
 /**
@@ -102,6 +104,8 @@ internal class MappedPrefs<T, R>(
     private fun convertFallback(value: T): R {
         return try {
             convert(value)
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) {
             defaultValue
         }
@@ -118,12 +122,14 @@ internal class MappedPrefs<T, R>(
     private fun reverseFallback(value: R): T {
         return try {
             reverse(value)
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) {
             prefs.defaultValue
         }
     }
 
-    override suspend fun get(): R = convertFallback(prefs.get())
+    override suspend fun get(): R = asFlow().first()
 
     override suspend fun set(value: R) = prefs.set(reverseFallback(value))
 
@@ -139,8 +145,8 @@ internal class MappedPrefs<T, R>(
 
     override fun asFlow(): Flow<R> = prefs.asFlow().map { convertFallback(it) }
 
-    override fun stateIn(scope: CoroutineScope): StateFlow<R> =
-        asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
+    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<R> =
+        asFlow().stateIn(scope, started, defaultValue)
 
     override fun getBlocking(): R = convertFallback(prefs.getBlocking())
 

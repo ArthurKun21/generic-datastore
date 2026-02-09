@@ -24,15 +24,15 @@ import io.github.arthurkun.generic.datastore.preferences.default.BooleanPrimitiv
 import io.github.arthurkun.generic.datastore.preferences.default.DoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.default.FloatPrimitive
 import io.github.arthurkun.generic.datastore.preferences.default.IntPrimitive
-import io.github.arthurkun.generic.datastore.preferences.default.KSerializedListPrimitive
-import io.github.arthurkun.generic.datastore.preferences.default.KSerializedPrimitive
-import io.github.arthurkun.generic.datastore.preferences.default.KSerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.default.LongPrimitive
-import io.github.arthurkun.generic.datastore.preferences.default.ObjectPrimitive
-import io.github.arthurkun.generic.datastore.preferences.default.SerializedListPrimitive
-import io.github.arthurkun.generic.datastore.preferences.default.SerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.default.StringPrimitive
 import io.github.arthurkun.generic.datastore.preferences.default.StringSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.default.custom.KSerializedListPrimitive
+import io.github.arthurkun.generic.datastore.preferences.default.custom.KSerializedPrimitive
+import io.github.arthurkun.generic.datastore.preferences.default.custom.ObjectPrimitive
+import io.github.arthurkun.generic.datastore.preferences.default.custom.SerializedListPrimitive
+import io.github.arthurkun.generic.datastore.preferences.default.customSet.KSerializedSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.default.customSet.SerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableBooleanPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableDoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableFloatPrimitive
@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+
 /**
  * A DataStore implementation that provides methods for creating and managing various types of preferences.
  *
@@ -390,8 +391,8 @@ public class GenericPreferencesDatastore(
             datastore = datastore,
             key = key,
             defaultValue = defaultValue,
-            serializer = serializer,
-            deserializer = deserializer,
+            elementSerializer = serializer,
+            elementDeserializer = deserializer,
         ),
     )
 

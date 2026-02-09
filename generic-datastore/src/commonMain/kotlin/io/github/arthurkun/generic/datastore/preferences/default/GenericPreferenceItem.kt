@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,13 @@ internal sealed class GenericPreferenceItem<T>(
     private val preferences: Preferences.Key<T>,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<T> {
+
+    init {
+        require(key.isNotBlank()) {
+            "Preference key cannot be blank."
+        }
+    }
+
     /**
      * Returns the unique String key used to identify this preference within the DataStore.
      */
@@ -52,12 +60,7 @@ internal sealed class GenericPreferenceItem<T>(
      */
     override suspend fun get(): T {
         return withContext(ioDispatcher) {
-            datastore
-                .data
-                .map { preferences ->
-                    preferences[this@GenericPreferenceItem.preferences] ?: defaultValue
-                }
-                .first()
+            asFlow().first()
         }
     }
 
@@ -108,7 +111,7 @@ internal sealed class GenericPreferenceItem<T>(
      */
     override fun asFlow(): Flow<T> {
         return datastore
-            .data
+            .dataOrEmpty
             .map { preferences ->
                 preferences[this.preferences] ?: defaultValue
             }
@@ -119,10 +122,11 @@ internal sealed class GenericPreferenceItem<T>(
      * The [StateFlow] is typically started when there are subscribers and shares the most recent value.
      * It will be initialized with the current preference value (or [defaultValue] if not set or on error).
      * @param scope The [CoroutineScope] in which to launch the [StateFlow].
+     * @param started The [SharingStarted] strategy that controls when the upstream flow is active.
      * @return A [StateFlow] representing the preference's value.
      */
-    override fun stateIn(scope: CoroutineScope): StateFlow<T> =
-        asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
+    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<T> =
+        asFlow().stateIn(scope, started, defaultValue)
 
     /**
      * Synchronously retrieves the current value of the preference.

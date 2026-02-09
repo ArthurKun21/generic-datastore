@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,18 +37,19 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<T?> {
 
+    init {
+        require(key.isNotBlank()) {
+            "Preference key cannot be blank."
+        }
+    }
+
     override val defaultValue: T? = null
 
     override fun key(): String = key
 
     override suspend fun get(): T? {
         return withContext(ioDispatcher) {
-            datastore
-                .data
-                .map { preferences ->
-                    preferences[this@NullableGenericPreferenceItem.preferences]
-                }
-                .first()
+            asFlow().first()
         }
     }
 
@@ -91,14 +93,14 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
 
     override fun asFlow(): Flow<T?> {
         return datastore
-            .data
+            .dataOrEmpty
             .map { preferences ->
                 preferences[this.preferences]
             }
     }
 
-    override fun stateIn(scope: CoroutineScope): StateFlow<T?> =
-        asFlow().stateIn(scope, SharingStarted.Eagerly, null)
+    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<T?> =
+        asFlow().stateIn(scope, started, null)
 
     override fun getBlocking(): T? = runBlocking {
         get()
