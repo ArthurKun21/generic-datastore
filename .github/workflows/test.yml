@@ -52,6 +52,29 @@ jobs:
         run: |
           ./gradlew :generic-datastore:cleanDesktopTest :generic-datastore:desktopTest --parallel
 
+  Test-iOS:
+    timeout-minutes: 15
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v5
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
+
+      - name: Set up gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Run tests
+        run: |
+          ./gradlew :generic-datastore:iosSimulatorArm64Test --parallel
+
   Test-Android:
     timeout-minutes: 15
     runs-on: ubuntu-latest
