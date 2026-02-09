@@ -63,7 +63,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/arthurkun/generic-datastore")
+            url = uri("https://maven.pkg.github.com/ArthurKun21/generic-datastore")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
