@@ -130,6 +130,84 @@ preference type, create both:
   `resetToDefaultBlocking()`, property delegation). Only requires `preferenceDatastore`; runs as
   plain (non-suspending) test functions.
 
+### Platform-specific test helpers
+
+Each platform source set has a corresponding test helper class that encapsulates the common
+setup/teardown logic for DataStore tests. These helpers reduce boilerplate in individual test files
+and centralize platform-specific initialization code.
+
+| Platform | Helper Class | Location |
+| -------- | ------------ | -------- |
+| Android | `AndroidTestHelper` | `androidDeviceTest/.../AndroidTestHelper.kt` |
+| Desktop (JVM) | `DesktopTestHelper` | `desktopTest/.../DesktopTestHelper.kt` |
+| iOS | `IosTestHelper` | `iosSimulatorArm64Test/.../IosTestHelper.kt` |
+
+Each helper provides two factory methods:
+
+- `standard(datastoreName)` — For suspending tests using `StandardTestDispatcher` with a custom
+  `CoroutineScope`. Exposes `preferenceDatastore`, `dataStore`, and `testDispatcher` properties.
+- `blocking(datastoreName)` — For blocking tests using `UnconfinedTestDispatcher` without a custom
+  scope. Only exposes `preferenceDatastore`.
+
+#### Usage examples
+
+**Standard test (Android/iOS):**
+
+```kotlin
+class MyFeatureTest : AbstractMyFeatureTest() {
+    private val helper = AndroidTestHelper.standard("test_my_feature")  // or IosTestHelper
+
+    override val preferenceDatastore get() = helper.preferenceDatastore
+    override val dataStore get() = helper.dataStore
+    override val testDispatcher get() = helper.testDispatcher
+
+    @Before  // or @BeforeTest for iOS
+    fun setup() = helper.setup()
+
+    @After   // or @AfterTest for iOS
+    fun tearDown() = helper.tearDown()
+}
+```
+
+**Standard test (Desktop — requires temp folder from JUnit's `@TempDir`):**
+
+```kotlin
+class MyFeatureTest : AbstractMyFeatureTest() {
+    @TempDir
+    lateinit var tempFolder: File
+
+    private val helper = DesktopTestHelper.standard("test_my_feature")
+
+    override val preferenceDatastore get() = helper.preferenceDatastore
+    override val dataStore get() = helper.dataStore
+    override val testDispatcher get() = helper.testDispatcher
+
+    @BeforeTest
+    fun setup() = helper.setup(tempFolder.absolutePath)
+
+    @AfterTest
+    fun tearDown() = helper.tearDown()
+}
+```
+
+**Blocking test (Android with companion object):**
+
+```kotlin
+class MyFeatureBlockingTest : AbstractMyFeatureBlockingTest() {
+    companion object {
+        private val helper = AndroidTestHelper.blocking("test_my_feature_blocking")
+
+        @JvmStatic @BeforeClass
+        fun setupClass() = helper.setup()
+
+        @JvmStatic @AfterClass
+        fun tearDownClass() = helper.tearDown()
+    }
+
+    override val preferenceDatastore get() = helper.preferenceDatastore
+}
+```
+
 #### KMP modules targeting Android Test
 
 - Run Android unit tests:
