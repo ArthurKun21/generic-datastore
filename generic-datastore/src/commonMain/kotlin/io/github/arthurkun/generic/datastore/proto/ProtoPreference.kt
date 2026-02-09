@@ -1,6 +1,7 @@
 package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.IOException
 import io.github.arthurkun.generic.datastore.core.Preference
 import io.github.arthurkun.generic.datastore.core.Prefs
 import kotlinx.coroutines.CoroutineScope
@@ -9,6 +10,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
@@ -33,7 +35,7 @@ internal class ProtoPreference<T>(
     override fun key(): String = key
 
     override suspend fun get(): T = withContext(ioDispatcher) {
-        datastore.data.first()
+        asFlow().first()
     }
 
     override suspend fun set(value: T) {
@@ -56,7 +58,15 @@ internal class ProtoPreference<T>(
         }
     }
 
-    override fun asFlow(): Flow<T> = datastore.data
+    override fun asFlow(): Flow<T> = datastore
+        .data
+        .catch { e ->
+            if (e is IOException) {
+                emit(defaultValue)
+            } else {
+                throw e
+            }
+        }
 
     override fun stateIn(scope: CoroutineScope): StateFlow<T> =
         asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
