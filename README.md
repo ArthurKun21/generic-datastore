@@ -40,14 +40,41 @@ dependencies {
 
 ## Preferences DataStore
 
-### Setup
+### Setup Preference DataStore
+
+Use the `createPreferencesDatastore` factory function to create a `GenericPreferencesDatastore`:
 
 ```kotlin
-// Standard DataStore setup
-val Context.myDataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+val datastore = createPreferencesDatastore(
+    producePath = { context.filesDir.resolve("settings.preferences_pb").absolutePath },
+)
+```
 
-// Create the GenericPreferencesDatastore
-val datastore = GenericPreferencesDatastore(context.myDataStore)
+A `fileName` overload is available that appends the file name to a directory path:
+
+```kotlin
+val datastore = createPreferencesDatastore(
+    fileName = "settings.preferences_pb",
+    producePath = { context.filesDir.absolutePath },
+)
+```
+
+Optional parameters allow customizing the corruption handler, migrations, coroutine scope, and the default `Json` instance used for serialization-based preferences:
+
+```kotlin
+val datastore = createPreferencesDatastore(
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+    migrations = listOf(myMigration),
+    scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    defaultJson = Json { prettyPrint = true },
+    producePath = { context.filesDir.resolve("settings.preferences_pb").absolutePath },
+)
+```
+
+Alternatively, wrap an existing `DataStore<Preferences>` directly:
+
+```kotlin
+val datastore = GenericPreferencesDatastore(myExistingDataStore)
 ```
 
 ### Defining Preferences
@@ -378,14 +405,55 @@ val onboarded = datastore.bool(Preference.appStateKey("onboarding_done"), false)
 
 ## Proto DataStore
 
-Wrap a typed `DataStore<T>` for proto messages:
+### Setup Proto DataStore
+
+Use the `createProtoDatastore` factory function to create a `GenericProtoDatastore`:
+
+```kotlin
+val protoDatastore = createProtoDatastore(
+    serializer = MyProtoSerializer,
+    defaultValue = MyProtoMessage.getDefaultInstance(),
+    producePath = { context.filesDir.resolve("my_proto.pb").absolutePath },
+)
+```
+
+A `fileName` overload is available that appends the file name to a directory path:
+
+```kotlin
+val protoDatastore = createProtoDatastore(
+    serializer = MyProtoSerializer,
+    defaultValue = MyProtoMessage.getDefaultInstance(),
+    fileName = "my_proto.pb",
+    producePath = { context.filesDir.absolutePath },
+)
+```
+
+Optional parameters allow customizing the key, corruption handler, migrations, and coroutine scope:
+
+```kotlin
+val protoDatastore = createProtoDatastore(
+    serializer = MyProtoSerializer,
+    defaultValue = MyProtoMessage.getDefaultInstance(),
+    key = "my_proto",
+    corruptionHandler = ReplaceFileCorruptionHandler { MyProtoMessage.getDefaultInstance() },
+    migrations = listOf(myMigration),
+    scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    producePath = { context.filesDir.resolve("my_proto.pb").absolutePath },
+)
+```
+
+Alternatively, wrap an existing `DataStore<T>` directly:
 
 ```kotlin
 val protoDatastore = GenericProtoDatastore(
-    datastore = myProtoDataStore,
+    datastore = myExistingProtoDataStore,
     defaultValue = MyProtoMessage.getDefaultInstance(),
 )
+```
 
+### Usage
+
+```kotlin
 val dataPref: Prefs<MyProtoMessage> = protoDatastore.data()
 
 // Then use get(), set(), asFlow(), etc. just like Preferences DataStore
