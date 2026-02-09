@@ -20,6 +20,24 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
 
+/**
+ * Base sealed class for [Preference] implementations that store values as strings
+ * via [stringPreferencesKey].
+ *
+ * Subclasses provide [serializer] and [deserializer] functions to convert between [T]
+ * and its [String] representation. If deserialization fails (e.g., due to corrupted data),
+ * the [defaultValue] is returned instead.
+ *
+ * @param T The type of the preference value.
+ * @param datastore The [DataStore] instance used for storing preferences.
+ * @param key The unique string key used to identify this preference within the DataStore.
+ * @param defaultValue The default value returned when the preference is not set or
+ *   deserialization fails.
+ * @param serializer A function to convert a value of type [T] to its [String] representation.
+ * @param deserializer A function to convert a [String] representation back to a value of type [T].
+ * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations.
+ *   Defaults to [Dispatchers.IO].
+ */
 internal sealed class CustomGenericPreferenceItem<T>(
     private val datastore: DataStore<Preferences>,
     private val key: String,

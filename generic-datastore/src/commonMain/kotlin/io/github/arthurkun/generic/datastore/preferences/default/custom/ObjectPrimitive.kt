@@ -7,16 +7,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
 /**
- * A [io.github.arthurkun.generic.datastore.preferences.default.GenericPreferenceItem] for storing custom [Object] values.
- * This class handles the serialization of the object to a String for storage
- * and deserialization from String back to the object on retrieval.
+ * A [CustomGenericPreferenceItem] for storing custom objects using caller-provided
+ * serialization and deserialization functions.
+ *
+ * If deserialization fails (e.g., due to corrupted data), the [defaultValue] is returned.
  *
  * @param T The type of the custom object.
- * @param datastore The [DataStore<Preferences>] instance used for storing preferences.
- * @param key The unique String key used to identify this preference within the DataStore.
- * @param defaultValue The default value to be returned if the preference is not set or an error occurs during deserialization.
- * @param serializer A function to serialize the object of type [T] to its String representation for storage.
- * @param deserializer A function to deserialize the String representation back to an object of type [T].
+ * @param datastore The [DataStore] instance used for storing preferences.
+ * @param key The unique string key used to identify this preference within the DataStore.
+ * @param defaultValue The default value returned when the preference is not set or
+ *   deserialization fails.
+ * @param serializer A function to serialize the object of type [T] to its [String]
+ *   representation for storage.
+ * @param deserializer A function to deserialize the [String] representation back to an
+ *   object of type [T].
+ * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations.
+ *   Defaults to [Dispatchers.IO].
  */
 internal class ObjectPrimitive<T>(
     datastore: DataStore<Preferences>,

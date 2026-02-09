@@ -391,8 +391,8 @@ public class GenericPreferencesDatastore(
             datastore = datastore,
             key = key,
             defaultValue = defaultValue,
-            serializer = serializer,
-            deserializer = deserializer,
+            elementSerializer = serializer,
+            elementDeserializer = deserializer,
         ),
     )
 

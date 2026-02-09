@@ -2,114 +2,42 @@ package io.github.arthurkun.generic.datastore.preferences.default.custom
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import io.github.arthurkun.generic.datastore.core.Preference
-import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * A [Preference] for storing custom objects using Kotlin Serialization.
- * This class handles the serialization of the object to a JSON String for storage
- * and deserialization from JSON String back to the object on retrieval.
+ * A [CustomGenericPreferenceItem] for storing custom objects using
+ * [kotlinx.serialization][KSerializer].
  *
- * If deserialization fails (e.g., due to corrupted data), the [defaultValue] is returned.
+ * Values are serialized to a JSON string via the provided [json] instance and
+ * [serializer], then stored as a string preference. If deserialization fails
+ * (e.g., due to corrupted data), the [defaultValue] is returned.
  *
- * @param T The type of the custom object. Must be serializable using kotlinx.serialization.
- * @param datastore The [DataStore<Preferences>] instance used for storing preferences.
- * @param key The unique String key used to identify this preference within the DataStore.
- * @param defaultValue The default value to be returned if the preference is not set or an error occurs during deserialization.
+ * @param T The type of the custom object. Must be serializable via kotlinx.serialization.
+ * @param datastore The [DataStore] instance used for storing preferences.
+ * @param key The unique string key used to identify this preference within the DataStore.
+ * @param defaultValue The default value returned when the preference is not set or
+ *   deserialization fails.
  * @param serializer The [KSerializer] for the type [T].
- * @param json The [Json] instance to use for serialization/deserialization.
- * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations. Defaults to [Dispatchers.IO].
+ * @param json The [Json] instance to use for serialization and deserialization.
+ * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations.
+ *   Defaults to [Dispatchers.IO].
  */
 internal class KSerializedPrimitive<T>(
-    private val datastore: DataStore<Preferences>,
-    private val key: String,
-    override val defaultValue: T,
-    private val serializer: KSerializer<T>,
-    private val json: Json,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : Preference<T> {
-
-    init {
-        require(key.isNotBlank()) {
-            "Preference key cannot be blank."
-        }
-    }
-
-    private val stringPrefKey = stringPreferencesKey(key)
-
-    override fun key(): String = key
-
-    override suspend fun get(): T {
-        return withContext(ioDispatcher) {
-            asFlow().first()
-        }
-    }
-
-    override suspend fun set(value: T) {
-        withContext(ioDispatcher) {
-            datastore.edit { prefs ->
-                prefs[stringPrefKey] = json.encodeToString(serializer, value)
-            }
-        }
-    }
-
-    override suspend fun update(transform: (T) -> T) {
-        withContext(ioDispatcher) {
-            datastore.edit { prefs ->
-                val current = prefs[stringPrefKey]?.let { safeDeserialize(it) }
-                    ?: this@KSerializedPrimitive.defaultValue
-                prefs[stringPrefKey] = json.encodeToString(serializer, transform(current))
-            }
-        }
-    }
-
-    override suspend fun delete() {
-        withContext(ioDispatcher) {
-            datastore.edit { prefs ->
-                prefs.remove(stringPrefKey)
-            }
-        }
-    }
-
-    override suspend fun resetToDefault() = set(defaultValue)
-
-    override fun asFlow(): Flow<T> {
-        return datastore.dataOrEmpty.map { prefs ->
-            prefs[stringPrefKey]?.let { safeDeserialize(it) } ?: this@KSerializedPrimitive.defaultValue
-        }
-    }
-
-    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<T> =
-        asFlow().stateIn(scope, started, defaultValue)
-
-    override fun getBlocking(): T = runBlocking { get() }
-
-    override fun setBlocking(value: T) = runBlocking { set(value) }
-
-    private fun safeDeserialize(value: String): T {
-        return try {
-            json.decodeFromString(serializer, value)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {
-            defaultValue
-        }
-    }
-}
+    datastore: DataStore<Preferences>,
+    key: String,
+    defaultValue: T,
+    serializer: KSerializer<T>,
+    json: Json,
+    ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+) : CustomGenericPreferenceItem<T>(
+    datastore = datastore,
+    key = key,
+    defaultValue = defaultValue,
+    serializer = { json.encodeToString(serializer, it) },
+    deserializer = { json.decodeFromString(serializer, it) },
+    ioDispatcher = ioDispatcher,
+)
