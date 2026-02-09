@@ -11,6 +11,7 @@ on:
       - '.github/**.md'
   pull_request:
     paths:
+      - '.github/workflows/**'
       - 'gradle/**'
       - 'app/**'
       - 'composeApp/**'
@@ -85,3 +86,34 @@ jobs:
       - name: Create distributable
         run: |
           ./gradlew :composeApp:createReleaseDistributable
+  
+  Compile-IOS:
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        commands: [ publishIosArm64PublicationToMavenLocal, publishIosSimulatorArm64PublicationToMavenLocal, publishIosX64PublicationToMavenLocal ]
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v5
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
+
+      - name: Set up gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Create Release for Generic Datastore
+        run: |
+          ./gradlew :generic-datastore:${{ matrix.commands }}
+
+      - name: Create Release for Generic Datastore Compose
+        run: |
+          ./gradlew :generic-datastore-compose:${{ matrix.commands }}
