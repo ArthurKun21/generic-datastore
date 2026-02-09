@@ -41,6 +41,13 @@ internal sealed class GenericPreferenceItem<T>(
     private val preferences: Preferences.Key<T>,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<T> {
+
+    init {
+        require(key.isNotBlank()) {
+            "Preference key cannot be blank."
+        }
+    }
+
     /**
      * Returns the unique String key used to identify this preference within the DataStore.
      */

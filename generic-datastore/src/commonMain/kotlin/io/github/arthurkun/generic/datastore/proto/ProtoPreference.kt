@@ -30,6 +30,12 @@ internal class ProtoPreference<T>(
     private val key: String = "proto_data",
 ) : Prefs<T> {
 
+    init {
+        require(key.isNotBlank()) {
+            "Proto key cannot be blank."
+        }
+    }
+
     private val ioDispatcher = Dispatchers.IO
 
     override fun key(): String = key

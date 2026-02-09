@@ -37,6 +37,12 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<T?> {
 
+    init {
+        require(key.isNotBlank()) {
+            "Preference key cannot be blank."
+        }
+    }
+
     override val defaultValue: T? = null
 
     override fun key(): String = key
