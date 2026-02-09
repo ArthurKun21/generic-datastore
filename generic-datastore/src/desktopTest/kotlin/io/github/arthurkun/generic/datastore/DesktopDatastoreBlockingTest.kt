@@ -1,11 +1,6 @@
 package io.github.arthurkun.generic.datastore
 
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.createPreferencesDatastore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.AfterTest
@@ -18,23 +13,13 @@ class DesktopDatastoreBlockingTest : AbstractDatastoreBlockingTest() {
     @TempDir
     lateinit var tempFolder: File
 
-    private lateinit var _preferenceDatastore: GenericPreferencesDatastore
-    private val testDispatcher = UnconfinedTestDispatcher()
+    private val helper = DesktopTestHelper.blocking(TEST_DATASTORE_BLOCKING_NAME)
 
-    override val preferenceDatastore: GenericPreferencesDatastore get() = _preferenceDatastore
+    override val preferenceDatastore: GenericPreferencesDatastore get() = helper.preferenceDatastore
 
     @BeforeTest
-    fun setup() {
-        Dispatchers.setMain(testDispatcher)
-        _preferenceDatastore = createPreferencesDatastore(
-            fileName = "${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb",
-        ) {
-            tempFolder.absolutePath
-        }
-    }
+    fun setup() = helper.setup(tempFolder.absolutePath)
 
     @AfterTest
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
+    fun tearDown() = helper.tearDown()
 }
