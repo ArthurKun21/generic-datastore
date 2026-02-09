@@ -27,6 +27,8 @@ import kotlinx.serialization.json.Json
  * @param json The [Json] instance to use for serialization and deserialization.
  * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations.
  *   Defaults to [Dispatchers.IO].
+ * @param listSerializer The [KSerializer] for the list of type [T]. Defaults to
+ *   [ListSerializer] of the provided element serializer.
  */
 internal class KSerializedListPrimitive<T>(
     datastore: DataStore<Preferences>,
@@ -35,11 +37,12 @@ internal class KSerializedListPrimitive<T>(
     serializer: KSerializer<T>,
     json: Json,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    listSerializer: KSerializer<List<T>> = ListSerializer(serializer),
 ) : CustomGenericPreferenceItem<List<T>>(
     datastore = datastore,
     key = key,
     defaultValue = defaultValue,
-    serializer = { json.encodeToString(ListSerializer(serializer), it) },
-    deserializer = { json.decodeFromString(ListSerializer(serializer), it) },
+    serializer = { json.encodeToString(listSerializer, it) },
+    deserializer = { json.decodeFromString(listSerializer, it) },
     ioDispatcher = ioDispatcher,
 )
