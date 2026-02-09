@@ -4,6 +4,7 @@ package io.github.arthurkun.generic.datastore.core
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -74,7 +75,7 @@ public interface Preference<T> {
      * @param scope The [CoroutineScope] to use for the [StateFlow].
      * @return A [StateFlow] of the preference value.
      */
-    public fun stateIn(scope: CoroutineScope): StateFlow<T>
+    public fun stateIn(scope: CoroutineScope, started: SharingStarted = SharingStarted.Eagerly): StateFlow<T>
 
     /**
      * Gets the current value of the preference.

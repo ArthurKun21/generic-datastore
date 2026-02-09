@@ -92,8 +92,8 @@ internal class KSerializedListPrimitive<T>(
         }
     }
 
-    override fun stateIn(scope: CoroutineScope): StateFlow<List<T>> =
-        asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
+    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<List<T>> =
+        asFlow().stateIn(scope, started, defaultValue)
 
     override fun getBlocking(): List<T> = runBlocking { get() }
 

@@ -89,8 +89,8 @@ internal class SerializedSetPrimitive<T>(
         }
     }
 
-    override fun stateIn(scope: CoroutineScope): StateFlow<Set<T>> =
-        asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
+    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<Set<T>> =
+        asFlow().stateIn(scope, started, defaultValue)
 
     override fun getBlocking(): Set<T> = runBlocking { get() }
 

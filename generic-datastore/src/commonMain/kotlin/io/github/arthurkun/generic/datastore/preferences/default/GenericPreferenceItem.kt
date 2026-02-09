@@ -122,10 +122,11 @@ internal sealed class GenericPreferenceItem<T>(
      * The [StateFlow] is typically started when there are subscribers and shares the most recent value.
      * It will be initialized with the current preference value (or [defaultValue] if not set or on error).
      * @param scope The [CoroutineScope] in which to launch the [StateFlow].
+     * @param started The [SharingStarted] strategy that controls when the upstream flow is active.
      * @return A [StateFlow] representing the preference's value.
      */
-    override fun stateIn(scope: CoroutineScope): StateFlow<T> =
-        asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
+    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<T> =
+        asFlow().stateIn(scope, started, defaultValue)
 
     /**
      * Synchronously retrieves the current value of the preference.

@@ -145,8 +145,8 @@ internal class MappedPrefs<T, R>(
 
     override fun asFlow(): Flow<R> = prefs.asFlow().map { convertFallback(it) }
 
-    override fun stateIn(scope: CoroutineScope): StateFlow<R> =
-        asFlow().stateIn(scope, SharingStarted.Eagerly, defaultValue)
+    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<R> =
+        asFlow().stateIn(scope, started, defaultValue)
 
     override fun getBlocking(): R = convertFallback(prefs.getBlocking())
 

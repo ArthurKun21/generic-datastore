@@ -99,8 +99,8 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
             }
     }
 
-    override fun stateIn(scope: CoroutineScope): StateFlow<T?> =
-        asFlow().stateIn(scope, SharingStarted.Eagerly, null)
+    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<T?> =
+        asFlow().stateIn(scope, started, null)
 
     override fun getBlocking(): T? = runBlocking {
         get()
