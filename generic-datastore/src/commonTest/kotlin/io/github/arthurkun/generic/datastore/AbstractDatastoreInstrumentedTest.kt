@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import io.github.arthurkun.generic.datastore.core.distinctFlow
 import io.github.arthurkun.generic.datastore.core.map
+import io.github.arthurkun.generic.datastore.core.mapIO
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.default.custom.enum
 import io.github.arthurkun.generic.datastore.preferences.default.customSet.enumSet
@@ -15,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 enum class TestEnum { VALUE_A, VALUE_B, VALUE_C }
@@ -790,6 +792,78 @@ abstract class AbstractDatastoreInstrumentedTest {
 
         assertEquals(20, intPref.get())
         assertEquals("Converted_20", mappedPref.get())
+    }
+
+    @Test
+    fun mappedPreference_io_defaultValueInferred() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("baseForMapIoDefault", 7)
+        val mappedPref = intPref.mapIO(
+            convert = { "Io_$it" },
+            reverse = { it.removePrefix("Io_").toInt() },
+        )
+
+        assertEquals("Io_7", mappedPref.get())
+
+        mappedPref.set("Io_9")
+        assertEquals(9, intPref.get())
+        assertEquals("Io_9", mappedPref.get())
+    }
+
+    @Test
+    fun mappedPreference_io_usesFallbackWhenConvertFails() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("baseForMapIoConvertFallback", 0)
+        val mappedPref = intPref.mapIO(
+            convert = { value ->
+                if (value == 0) {
+                    "Zero"
+                } else {
+                    throw IllegalStateException("Bad value")
+                }
+            },
+            reverse = { value ->
+                if (value == "Zero") {
+                    0
+                } else {
+                    value.toInt()
+                }
+            },
+        )
+
+        intPref.set(1)
+
+        assertEquals("Zero", mappedPref.get())
+    }
+
+    @Test
+    fun mappedPreference_io_usesFallbackWhenReverseFails() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("baseForMapIoReverseFallback", 0)
+        val mappedPref = intPref.mapIO(
+            convert = { "Zero" },
+            reverse = { value ->
+                if (value == "Zero") {
+                    0
+                } else {
+                    throw IllegalStateException("Bad value")
+                }
+            },
+        )
+
+        mappedPref.set("Bad")
+
+        assertEquals(0, intPref.get())
+        assertEquals("Zero", mappedPref.get())
+    }
+
+    @Test
+    fun mappedPreference_io_throwsWhenDefaultConversionFails() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("baseForMapIoDefaultFail", 3)
+
+        assertFailsWith<IllegalStateException> {
+            intPref.mapIO(
+                convert = { throw IllegalStateException("Default conversion failed") },
+                reverse = { it.toInt() },
+            )
+        }
     }
 
     @Test
