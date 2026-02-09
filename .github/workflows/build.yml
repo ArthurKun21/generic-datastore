@@ -8,12 +8,18 @@ on:
       - 'jitpack.yml'
       - '**/.gitignore'
       - '**/*.md'
+      - '.github/**.md'
   pull_request:
-    paths-ignore:
-      - '.idea/**'
-      - 'jitpack.yml'
-      - '**/.gitignore'
-      - '**/*.md'
+    paths:
+      - 'gradle/**'
+      - 'app/**'
+      - 'composeApp/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'generic-datastore/build.gradle.kts'
+      - 'generic-datastore/src/androidMain/**'
+      - 'generic-datastore/src/commonMain/**'
+      - 'generic-datastore-compose/src/**'
   workflow_dispatch:
 
 env:
