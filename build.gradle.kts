@@ -19,6 +19,21 @@ version = providers.environmentVariable("RELEASE_TAG")
 subprojects {
     version = rootProject.version
     apply(plugin = "com.diffplug.spotless")
+
+    plugins.withId("com.vanniktech.maven.publish") {
+        configure<PublishingExtension> {
+            repositories {
+                maven {
+                    name = "GitHubPackages"
+                    url = uri("https://maven.pkg.github.com/ArthurKun21/generic-datastore")
+                    credentials {
+                        username = System.getenv("GITHUB_ACTOR")
+                        password = System.getenv("GITHUB_TOKEN")
+                    }
+                }
+            }
+        }
+    }
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)

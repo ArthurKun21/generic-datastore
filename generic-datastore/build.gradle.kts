@@ -76,50 +76,30 @@ kotlin {
     }
 }
 
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/ArthurKun21/generic-datastore")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+mavenPublishing {
+    coordinates("com.github.ArthurKun21", "generic-datastore", version.toString())
+
+    pom {
+        name.set("Generic Datastore Library")
+        description.set("A generic datastore library for Kotlin Multiplatform.")
+        url.set("https://github.com/ArthurKun21/generic-datastore")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
-
-//        maven {
-//            name = "JitPack"
-//            url = uri("https://jitpack.io")
-//        }
-    }
-    publications {
-        withType<MavenPublication> {
-            groupId = "com.github.arthurkun"
-            version = project.version.toString()
-
-            pom {
-                name.set("Generic Datastore Library")
-                description.set("A generic datastore library for Kotlin Multiplatform.")
-                url.set("https://github.com/arthurkun/generic-datastore")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("arthurkun")
-                        name.set("Arthur")
-                        email.set("16458204+ArthurKun21@users.noreply.github.com")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:git://github.com/arthurkun/generic-datastore.git")
-                    developerConnection.set("scm:git:ssh://github.com/arthurkun/generic-datastore.git")
-                    url.set("https://github.com/arthurkun/generic-datastore")
-                }
+        developers {
+            developer {
+                id.set("ArthurKun21")
+                name.set("Arthur")
+                email.set("16458204+ArthurKun21@users.noreply.github.com")
             }
+        }
+        scm {
+            connection.set("scm:git:git://github.com/ArthurKun21/generic-datastore.git")
+            developerConnection.set("scm:git:ssh://github.com/ArthurKun21/generic-datastore.git")
+            url.set("https://github.com/ArthurKun21/generic-datastore")
         }
     }
 }
