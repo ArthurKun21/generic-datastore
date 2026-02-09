@@ -244,4 +244,82 @@ abstract class AbstractNullablePreferenceTest {
         pref.resetToDefault()
         assertNull(pref.get())
     }
+
+    @Test
+    fun nullableStringSet_defaultIsNull() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableStringSet("nullableStringSetDefault")
+        assertNull(pref.get())
+    }
+
+    @Test
+    fun nullableStringSet_setAndGet() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableStringSet("nullableStringSetSetGet")
+        val value = setOf("a", "b", "c")
+        pref.set(value)
+        assertEquals(value, pref.get())
+    }
+
+    @Test
+    fun nullableStringSet_setNullClearsValue() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableStringSet("nullableStringSetSetNull")
+        pref.set(setOf("hello"))
+        assertEquals(setOf("hello"), pref.get())
+        pref.set(null)
+        assertNull(pref.get())
+    }
+
+    @Test
+    fun nullableStringSet_deleteResetsToNull() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableStringSet("nullableStringSetDelete")
+        pref.set(setOf("value"))
+        pref.delete()
+        assertNull(pref.get())
+    }
+
+    @Test
+    fun nullableStringSet_observeDefaultValue() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableStringSet("nullableStringSetFlowDefault")
+        val value = pref.asFlow().first()
+        assertNull(value)
+    }
+
+    @Test
+    fun nullableStringSet_observeSetValue() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableStringSet("nullableStringSetFlowSet")
+        val expected = setOf("observed", "values")
+        pref.set(expected)
+        val value = pref.asFlow().first()
+        assertEquals(expected, value)
+    }
+
+    @Test
+    fun nullableStringSet_updateFromNull() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableStringSet("nullableStringSetUpdateNull")
+        pref.update { current -> (current ?: emptySet()) + "added" }
+        assertEquals(setOf("added"), pref.get())
+    }
+
+    @Test
+    fun nullableStringSet_updateExistingValue() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableStringSet("nullableStringSetUpdateExisting")
+        pref.set(setOf("a", "b"))
+        pref.update { current -> current?.plus("c") }
+        assertEquals(setOf("a", "b", "c"), pref.get())
+    }
+
+    @Test
+    fun nullableStringSet_resetToDefaultResetsToNull() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableStringSet("nullableStringSetResetDefault")
+        pref.set(setOf("value"))
+        assertEquals(setOf("value"), pref.get())
+        pref.resetToDefault()
+        assertNull(pref.get())
+    }
+
+    @Test
+    fun nullableStringSet_emptySet() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableStringSet("nullableStringSetEmpty")
+        pref.set(emptySet())
+        assertEquals(emptySet(), pref.get())
+    }
 }
