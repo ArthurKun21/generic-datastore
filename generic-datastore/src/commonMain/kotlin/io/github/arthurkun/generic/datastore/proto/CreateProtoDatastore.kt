@@ -7,11 +7,11 @@ import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.core.okio.OkioSerializer
 import androidx.datastore.core.okio.OkioStorage
+import io.github.arthurkun.generic.datastore.core.systemFileSystem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
-import okio.FileSystem
 import okio.Path.Companion.toPath
 import kotlin.jvm.JvmName
 import kotlinx.io.files.Path as KotlinxIoPath
@@ -53,7 +53,7 @@ public fun <T> createProtoDatastore(
 ): GenericProtoDatastore<T> {
     val datastore = DataStoreFactory.create(
         storage = OkioStorage(
-            fileSystem = FileSystem.SYSTEM,
+            fileSystem = systemFileSystem,
             serializer = serializer,
             producePath = { producePath().toPath() },
         ),
@@ -102,7 +102,7 @@ public fun <T> createProtoDatastore(
 ): GenericProtoDatastore<T> {
     val datastore = DataStoreFactory.create(
         storage = OkioStorage(
-            fileSystem = FileSystem.SYSTEM,
+            fileSystem = systemFileSystem,
             serializer = serializer,
             producePath = produceOkioPath,
         ),
@@ -152,7 +152,7 @@ public fun <T> createProtoDatastore(
 ): GenericProtoDatastore<T> {
     val datastore = DataStoreFactory.create(
         storage = OkioStorage(
-            fileSystem = FileSystem.SYSTEM,
+            fileSystem = systemFileSystem,
             serializer = serializer,
             producePath = { produceKotlinxIoPath().toString().toPath() },
         ),
@@ -205,7 +205,7 @@ public fun <T> createProtoDatastore(
 ): GenericProtoDatastore<T> {
     val datastore = DataStoreFactory.create(
         storage = OkioStorage(
-            fileSystem = FileSystem.SYSTEM,
+            fileSystem = systemFileSystem,
             serializer = serializer,
             producePath = { producePath().toPath() / fileName },
         ),
