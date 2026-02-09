@@ -11,6 +11,7 @@ on:
       - '.github/**.md'
   pull_request:
     paths:
+      - '.github/workflows/**'
       - 'gradle/**'
       - 'app/**'
       - 'composeApp/**'
