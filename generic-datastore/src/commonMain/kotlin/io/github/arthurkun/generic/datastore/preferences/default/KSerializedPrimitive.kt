@@ -45,6 +45,13 @@ internal class KSerializedPrimitive<T>(
     private val json: Json,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<T> {
+
+    init {
+        require(key.isNotBlank()) {
+            "Preference key cannot be blank."
+        }
+    }
+
     private val stringPrefKey = stringPreferencesKey(key)
 
     override fun key(): String = key

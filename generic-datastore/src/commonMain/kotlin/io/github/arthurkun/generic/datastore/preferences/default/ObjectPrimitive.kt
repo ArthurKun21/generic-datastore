@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -43,13 +44,7 @@ internal class ObjectPrimitive<T>(
 
     override suspend fun get(): T {
         return withContext(ioDispatcher) {
-            datastore
-                .data
-                .map { prefs ->
-                    prefs[stringPrefKey]?.let { deserializer(it) }
-                        ?: this@ObjectPrimitive.defaultValue
-                }
-                .first()
+            asFlow().first()
         }
     }
 
@@ -80,8 +75,8 @@ internal class ObjectPrimitive<T>(
     }
 
     override fun asFlow(): Flow<T> {
-        return datastore.data.map { prefs ->
-            prefs[stringPrefKey]?.let { deserializer(it) } ?: this@ObjectPrimitive.defaultValue
+        return datastore.dataOrEmpty.map { prefs ->
+            prefs[stringPrefKey]?.let { safeDeserialize(it) } ?: this@ObjectPrimitive.defaultValue
         }
     }
 

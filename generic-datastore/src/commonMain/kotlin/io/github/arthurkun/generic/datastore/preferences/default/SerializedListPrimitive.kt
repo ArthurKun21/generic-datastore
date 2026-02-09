@@ -48,6 +48,13 @@ internal class SerializedListPrimitive<T>(
     private val deserializer: (String) -> T,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<List<T>> {
+
+    init {
+        require(key.isNotBlank()) {
+            "Preference key cannot be blank."
+        }
+    }
+
     private val stringPrefKey = stringPreferencesKey(key)
 
     override fun key(): String = key

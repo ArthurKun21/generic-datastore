@@ -46,6 +46,13 @@ internal class KSerializedListPrimitive<T>(
     private val json: Json,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<List<T>> {
+
+    init {
+        require(key.isNotBlank()) {
+            "Preference key cannot be blank."
+        }
+    }
+
     private val stringPrefKey = stringPreferencesKey(key)
     private val listSerializer = ListSerializer(serializer)
 

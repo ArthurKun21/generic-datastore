@@ -44,6 +44,13 @@ internal class SerializedSetPrimitive<T>(
     private val deserializer: (String) -> T,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<Set<T>> {
+
+    init {
+        require(key.isNotBlank()) {
+            "Preference key cannot be blank."
+        }
+    }
+
     private val stringSetPrefKey = stringSetPreferencesKey(key)
 
     override fun key(): String = key
