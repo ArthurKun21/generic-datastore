@@ -249,6 +249,82 @@ public interface PreferencesDatastore {
     ): Prefs<List<T>>
 
     /**
+     * Creates a nullable preference for a custom object that can be serialized to and
+     * deserialized from a String.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * If deserialization fails, `null` is returned.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer A function to serialize the object to a String.
+     * @param deserializer A function to deserialize the String back to the object.
+     * @return A [Prefs] instance for the nullable custom object preference.
+     */
+    public fun <T : Any> nullableSerialized(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Prefs<T?>
+
+    /**
+     * Creates a nullable preference for a custom object using Kotlin Serialization.
+     * The object is serialized to JSON for storage.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * If deserialization fails, `null` is returned.
+     *
+     * @param T The non-null type of the custom object. Must be serializable using kotlinx.serialization.
+     * @param key The preference key.
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+     * @return A [Prefs] instance for the nullable custom object preference.
+     */
+    public fun <T : Any> nullableKserialized(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json? = null,
+    ): Prefs<T?>
+
+    /**
+     * Creates a nullable preference for a [List] of custom objects that can be serialized
+     * to and deserialized from Strings. The list is stored as a JSON array string.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * If deserialization fails, `null` is returned.
+     *
+     * @param T The type of each element in the list.
+     * @param key The preference key.
+     * @param serializer A function to serialize each element to a String.
+     * @param deserializer A function to deserialize each String back to an element.
+     * @return A [Prefs] instance for the nullable List preference.
+     */
+    public fun <T> nullableSerializedList(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Prefs<List<T>?>
+
+    /**
+     * Creates a nullable preference for a [List] of custom objects using Kotlin Serialization.
+     * The list is serialized to a JSON array string for storage.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * If deserialization fails, `null` is returned.
+     *
+     * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
+     * @param key The preference key.
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+     * @return A [Prefs] instance for the nullable List preference.
+     */
+    public fun <T> nullableKserializedList(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json? = null,
+    ): Prefs<List<T>?>
+
+    /**
      * Clears all preferences stored in this datastore.
      *
      * After calling this, all preferences will return their default values.
@@ -414,6 +490,46 @@ public inline fun <reified T> PreferencesDatastore.kserializedList(
 ): Prefs<List<T>> = kserializedList(
     key = key,
     defaultValue = defaultValue,
+    serializer = serializer<T>(),
+    json = json,
+)
+
+/**
+ * Creates a nullable preference for a custom object using Kotlin Serialization,
+ * inferring the [KSerializer] from the reified type parameter.
+ *
+ * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ *
+ * @param T The non-null type of the custom object.
+ * @param key The preference key.
+ * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+ * @return A [Prefs] instance for the nullable custom object preference.
+ */
+public inline fun <reified T : Any> PreferencesDatastore.nullableKserialized(
+    key: String,
+    json: Json? = null,
+): Prefs<T?> = nullableKserialized(
+    key = key,
+    serializer = serializer<T>(),
+    json = json,
+)
+
+/**
+ * Creates a nullable preference for a [List] of custom objects using Kotlin Serialization,
+ * inferring the [KSerializer] from the reified type parameter.
+ *
+ * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ *
+ * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
+ * @param key The preference key.
+ * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+ * @return A [Prefs] instance for the nullable List preference.
+ */
+public inline fun <reified T> PreferencesDatastore.nullableKserializedList(
+    key: String,
+    json: Json? = null,
+): Prefs<List<T>?> = nullableKserializedList(
+    key = key,
     serializer = serializer<T>(),
     json = json,
 )

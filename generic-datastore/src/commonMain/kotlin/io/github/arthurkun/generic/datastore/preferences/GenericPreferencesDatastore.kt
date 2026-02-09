@@ -40,6 +40,10 @@ import io.github.arthurkun.generic.datastore.preferences.optional.NullableIntPri
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableLongPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableStringPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableStringSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableKSerializedListPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableKSerializedPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableObjectPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedListPrimitive
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
@@ -433,6 +437,58 @@ public class GenericPreferencesDatastore(
             datastore = datastore,
             key = key,
             defaultValue = defaultValue,
+            serializer = serializer,
+            json = json ?: defaultJson,
+        ),
+    )
+
+    override fun <T : Any> nullableSerialized(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Prefs<T?> = PrefsImpl(
+        NullableObjectPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
+    override fun <T : Any> nullableKserialized(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json?,
+    ): Prefs<T?> = PrefsImpl(
+        NullableKSerializedPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            json = json ?: defaultJson,
+        ),
+    )
+
+    override fun <T> nullableSerializedList(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Prefs<List<T>?> = PrefsImpl(
+        NullableSerializedListPrimitive(
+            datastore = datastore,
+            key = key,
+            elementSerializer = serializer,
+            elementDeserializer = deserializer,
+        ),
+    )
+
+    override fun <T> nullableKserializedList(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json?,
+    ): Prefs<List<T>?> = PrefsImpl(
+        NullableKSerializedListPrimitive(
+            datastore = datastore,
+            key = key,
             serializer = serializer,
             json = json ?: defaultJson,
         ),
