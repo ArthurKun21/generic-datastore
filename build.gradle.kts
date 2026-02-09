@@ -12,9 +12,12 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
 }
 
-version = "1.0.0"
+version = providers.environmentVariable("RELEASE_TAG")
+    .map { it.removePrefix("v") }
+    .getOrElse("1.0.0")
 
 subprojects {
+    version = rootProject.version
     apply(plugin = "com.diffplug.spotless")
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
