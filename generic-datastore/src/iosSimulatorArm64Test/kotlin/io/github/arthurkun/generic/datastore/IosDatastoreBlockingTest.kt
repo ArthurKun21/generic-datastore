@@ -1,24 +1,19 @@
 package io.github.arthurkun.generic.datastore
 
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 private const val TEST_DATASTORE_BLOCKING_NAME = "test_datastore_blocking"
 
-class DesktopDatastoreBlockingTest : AbstractDatastoreBlockingTest() {
+class IosDatastoreBlockingTest : AbstractDatastoreBlockingTest() {
 
-    @TempDir
-    lateinit var tempFolder: File
-
-    private val helper = DesktopTestHelper.blocking(TEST_DATASTORE_BLOCKING_NAME)
+    private val helper = IosTestHelper.blocking(TEST_DATASTORE_BLOCKING_NAME)
 
     override val preferenceDatastore: GenericPreferencesDatastore get() = helper.preferenceDatastore
 
     @BeforeTest
-    fun setup() = helper.setup(tempFolder.absolutePath)
+    fun setup() = helper.setup()
 
     @AfterTest
     fun tearDown() = helper.tearDown()

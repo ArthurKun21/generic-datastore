@@ -2,27 +2,24 @@ package io.github.arthurkun.generic.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import kotlinx.coroutines.test.TestDispatcher
-import org.junit.After
-import org.junit.Before
-import org.junit.runner.RunWith
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 
-private const val TEST_DATASTORE_NAME = "test_kserialized_set_datastore"
+private const val TEST_DATASTORE_NAME = "test_kserialized_list_datastore"
 
-@RunWith(AndroidJUnit4::class)
-class AndroidKSerializedSetTest : AbstractKSerializedSetTest() {
+class IosKSerializedListTest : AbstractKSerializedListTest() {
 
-    private val helper = AndroidTestHelper.standard(TEST_DATASTORE_NAME)
+    private val helper = IosTestHelper.standard(TEST_DATASTORE_NAME)
 
     override val preferenceDatastore: GenericPreferencesDatastore get() = helper.preferenceDatastore
     override val dataStore: DataStore<Preferences> get() = helper.dataStore
     override val testDispatcher: TestDispatcher get() = helper.testDispatcher
 
-    @Before
+    @BeforeTest
     fun setup() = helper.setup()
 
-    @After
+    @AfterTest
     fun tearDown() = helper.tearDown()
 }

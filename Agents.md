@@ -28,6 +28,7 @@ Both library modules target:
 
 - **Android** (`androidMain`)
 - **Desktop / JVM** (`jvm("desktop")`)
+- **iOS** (`iosX64`, `iosArm64`, `iosSimulatorArm64`)
 
 ## Workflow
 
@@ -98,18 +99,20 @@ source sets:
 * `androidDeviceTest` — Android instrumentation tests (platform-specific only)
 * `androidHostTest` — Android unit tests (platform-specific only)
 * `desktopTest` — Desktop/JVM tests (platform-specific only)
+* `iosSimulatorArm64Test` — iOS simulator tests (platform-specific only, requires macOS)
 
 ### Abstract test class pattern
 
 Tests use an abstract base class pattern to avoid duplicating test logic across platforms. Shared
 test methods live in abstract classes in `commonTest`, while platform source sets
-(`androidDeviceTest`, `desktopTest`) provide thin subclasses that only handle DataStore
-initialization and teardown.
+(`androidDeviceTest`, `desktopTest`, `iosSimulatorArm64Test`) provide thin subclasses that only
+handle DataStore initialization and teardown.
 
 - `commonTest` — Abstract base classes (e.g. `AbstractDatastoreInstrumentedTest`,
   `AbstractDatastoreBlockingTest`) containing all test methods.
-- `androidDeviceTest` / `desktopTest` — Concrete subclasses that override abstract properties
-  (`preferenceDatastore`, `dataStore`, `testDispatcher`) and supply platform-specific setup/teardown.
+- `androidDeviceTest` / `desktopTest` / `iosSimulatorArm64Test` — Concrete subclasses that override
+  abstract properties (`preferenceDatastore`, `dataStore`, `testDispatcher`) and supply
+  platform-specific setup/teardown.
 
 When adding new tests, add them to the abstract class in `commonTest` so they run on all platforms
 automatically. Only add tests directly to a platform source set when the test requires
@@ -126,6 +129,84 @@ preference type, create both:
 - `Abstract<Feature>BlockingTest` — blocking tests (`getBlocking()`, `setBlocking()`,
   `resetToDefaultBlocking()`, property delegation). Only requires `preferenceDatastore`; runs as
   plain (non-suspending) test functions.
+
+### Platform-specific test helpers
+
+Each platform source set has a corresponding test helper class that encapsulates the common
+setup/teardown logic for DataStore tests. These helpers reduce boilerplate in individual test files
+and centralize platform-specific initialization code.
+
+| Platform | Helper Class | Location |
+| -------- | ------------ | -------- |
+| Android | `AndroidTestHelper` | `androidDeviceTest/.../AndroidTestHelper.kt` |
+| Desktop (JVM) | `DesktopTestHelper` | `desktopTest/.../DesktopTestHelper.kt` |
+| iOS | `IosTestHelper` | `iosSimulatorArm64Test/.../IosTestHelper.kt` |
+
+Each helper provides two factory methods:
+
+- `standard(datastoreName)` — For suspending tests using `StandardTestDispatcher` with a custom
+  `CoroutineScope`. Exposes `preferenceDatastore`, `dataStore`, and `testDispatcher` properties.
+- `blocking(datastoreName)` — For blocking tests using `UnconfinedTestDispatcher` without a custom
+  scope. Only exposes `preferenceDatastore`.
+
+#### Usage examples
+
+**Standard test (Android/iOS):**
+
+```kotlin
+class MyFeatureTest : AbstractMyFeatureTest() {
+    private val helper = AndroidTestHelper.standard("test_my_feature")  // or IosTestHelper
+
+    override val preferenceDatastore get() = helper.preferenceDatastore
+    override val dataStore get() = helper.dataStore
+    override val testDispatcher get() = helper.testDispatcher
+
+    @Before  // or @BeforeTest for iOS
+    fun setup() = helper.setup()
+
+    @After   // or @AfterTest for iOS
+    fun tearDown() = helper.tearDown()
+}
+```
+
+**Standard test (Desktop — requires temp folder from JUnit's `@TempDir`):**
+
+```kotlin
+class MyFeatureTest : AbstractMyFeatureTest() {
+    @TempDir
+    lateinit var tempFolder: File
+
+    private val helper = DesktopTestHelper.standard("test_my_feature")
+
+    override val preferenceDatastore get() = helper.preferenceDatastore
+    override val dataStore get() = helper.dataStore
+    override val testDispatcher get() = helper.testDispatcher
+
+    @BeforeTest
+    fun setup() = helper.setup(tempFolder.absolutePath)
+
+    @AfterTest
+    fun tearDown() = helper.tearDown()
+}
+```
+
+**Blocking test (Android with companion object):**
+
+```kotlin
+class MyFeatureBlockingTest : AbstractMyFeatureBlockingTest() {
+    companion object {
+        private val helper = AndroidTestHelper.blocking("test_my_feature_blocking")
+
+        @JvmStatic @BeforeClass
+        fun setupClass() = helper.setup()
+
+        @JvmStatic @AfterClass
+        fun tearDownClass() = helper.tearDown()
+    }
+
+    override val preferenceDatastore get() = helper.preferenceDatastore
+}
+```
 
 #### KMP modules targeting Android Test
 
@@ -147,4 +228,12 @@ preference type, create both:
 
     ```shell
     ./gradlew :<module-name>:desktopTest
+    ```
+
+#### KMP modules targeting iOS Test
+
+- Run iOS simulator tests (requires macOS with Xcode):
+
+    ```shell
+    ./gradlew :<module-name>:iosSimulatorArm64Test
     ```
