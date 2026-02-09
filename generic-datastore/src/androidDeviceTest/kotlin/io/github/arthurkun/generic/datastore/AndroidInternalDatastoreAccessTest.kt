@@ -21,10 +21,10 @@ import org.junit.Before
 import org.junit.runner.RunWith
 import java.io.File
 
-private const val TEST_DATASTORE_NAME = "test_kserialized_set_datastore"
+private const val TEST_DATASTORE_NAME = "test_internal_access_datastore"
 
 @RunWith(AndroidJUnit4::class)
-class AndroidKSerializedSetTest : AbstractKSerializedSetTest() {
+class AndroidInternalDatastoreAccessTest : AbstractInternalDatastoreAccessTest() {
 
     private lateinit var _preferenceDatastore: GenericPreferencesDatastore
     private lateinit var testContext: Context

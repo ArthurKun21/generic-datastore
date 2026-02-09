@@ -1,9 +1,7 @@
 package io.github.arthurkun.generic.datastore
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.createPreferencesDatastore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -20,7 +18,6 @@ class DesktopKSerializedBlockingTest : AbstractKSerializedBlockingTest() {
     @TempDir
     lateinit var tempFolder: File
 
-    private lateinit var dataStore: DataStore<Preferences>
     private lateinit var _preferenceDatastore: GenericPreferencesDatastore
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -29,12 +26,11 @@ class DesktopKSerializedBlockingTest : AbstractKSerializedBlockingTest() {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        dataStore = PreferenceDataStoreFactory.create(
-            produceFile = {
-                File(tempFolder, "${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb")
-            },
-        )
-        _preferenceDatastore = GenericPreferencesDatastore(dataStore)
+        _preferenceDatastore = createPreferencesDatastore(
+            fileName = "${TEST_DATASTORE_BLOCKING_NAME}.preferences_pb",
+        ) {
+            tempFolder.absolutePath
+        }
     }
 
     @AfterTest

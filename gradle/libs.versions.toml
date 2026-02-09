@@ -29,6 +29,7 @@ datastore = "1.2.0"
 kotlinx_serialization = "1.10.0"
 
 coroutines = "1.10.2"
+kotlinx-io = "0.8.2"
 
 spotless = "8.2.1"
 ktlint-core = "1.8.0"
@@ -63,6 +64,8 @@ leak-canary = { module = "com.squareup.leakcanary:leakcanary-android", version.r
 
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
+datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastore" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx_serialization" }
 
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }

@@ -43,7 +43,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-
 /**
  * A DataStore implementation that provides methods for creating and managing various types of preferences.
  *
@@ -55,7 +54,7 @@ import kotlinx.serialization.json.JsonElement
  * @property defaultJson The default [Json] instance to use for Kotlin Serialization-based preferences.
  */
 public class GenericPreferencesDatastore(
-    private val datastore: DataStore<Preferences>,
+    internal val datastore: DataStore<Preferences>,
     private val defaultJson: Json = PreferenceDefaults.defaultJson,
 ) : PreferencesDatastore {
 
