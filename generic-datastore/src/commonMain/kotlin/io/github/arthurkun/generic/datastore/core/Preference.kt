@@ -73,6 +73,7 @@ public interface Preference<T> {
      * Converts the preference [Flow] into a [StateFlow].
      *
      * @param scope The [CoroutineScope] to use for the [StateFlow].
+     * @param started The [SharingStarted] strategy for the [StateFlow]. Defaults to [SharingStarted.Eagerly].
      * @return A [StateFlow] of the preference value.
      */
     public fun stateIn(scope: CoroutineScope, started: SharingStarted = SharingStarted.Eagerly): StateFlow<T>
