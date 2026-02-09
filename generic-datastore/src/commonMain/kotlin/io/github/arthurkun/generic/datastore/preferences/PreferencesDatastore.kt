@@ -78,6 +78,15 @@ public interface PreferencesDatastore {
     public fun nullableString(key: String): Prefs<String?>
 
     /**
+     * Creates a nullable Set<String> preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Set<String> preference.
+     */
+    public fun nullableStringSet(key: String): Prefs<Set<String>?>
+
+    /**
      * Creates a nullable Int preference.
      * Returns `null` when the key is not set in DataStore.
      *

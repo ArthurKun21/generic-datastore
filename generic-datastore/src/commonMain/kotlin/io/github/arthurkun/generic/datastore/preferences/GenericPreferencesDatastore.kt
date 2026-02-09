@@ -39,6 +39,7 @@ import io.github.arthurkun.generic.datastore.preferences.optional.NullableFloatP
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableIntPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableLongPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableStringPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.NullableStringSetPrimitive
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
@@ -168,6 +169,21 @@ public class GenericPreferencesDatastore(
     override fun nullableString(key: String): Prefs<String?> =
         PrefsImpl(
             NullableStringPrimitive(
+                datastore = datastore,
+                key = key,
+            ),
+        )
+
+    /**
+     * Creates a nullable Set<String> preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [Prefs] instance for the nullable Set<String> preference.
+     */
+    override fun nullableStringSet(key: String): Prefs<Set<String>?> =
+        PrefsImpl(
+            NullableStringSetPrimitive(
                 datastore = datastore,
                 key = key,
             ),
