@@ -95,6 +95,21 @@ kotlin {
 }
 
 publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://github.com/arthurkun/generic-datastore")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+
+        maven {
+            name = "JitPack"
+            url = uri("https://jitpack.io")
+        }
+    }
     publications {
         withType<MavenPublication> {
             groupId = "com.github.arthurkun"
