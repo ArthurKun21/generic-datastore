@@ -136,11 +136,11 @@ Each platform source set has a corresponding test helper class that encapsulates
 setup/teardown logic for DataStore tests. These helpers reduce boilerplate in individual test files
 and centralize platform-specific initialization code.
 
-| Platform | Helper Class | Location |
-| -------- | ------------ | -------- |
-| Android | `AndroidTestHelper` | `androidDeviceTest/.../AndroidTestHelper.kt` |
-| Desktop (JVM) | `DesktopTestHelper` | `desktopTest/.../DesktopTestHelper.kt` |
-| iOS | `IosTestHelper` | `iosSimulatorArm64Test/.../IosTestHelper.kt` |
+| Platform      | Helper Class        | Location                                     |
+|---------------|---------------------|----------------------------------------------|
+| Android       | `AndroidTestHelper` | `androidDeviceTest/.../AndroidTestHelper.kt` |
+| Desktop (JVM) | `DesktopTestHelper` | `desktopTest/.../DesktopTestHelper.kt`       |
+| iOS           | `IosTestHelper`     | `iosSimulatorArm64Test/.../IosTestHelper.kt` |
 
 Each helper provides two factory methods:
 
@@ -197,10 +197,12 @@ class MyFeatureBlockingTest : AbstractMyFeatureBlockingTest() {
     companion object {
         private val helper = AndroidTestHelper.blocking("test_my_feature_blocking")
 
-        @JvmStatic @BeforeClass
+        @JvmStatic
+        @BeforeClass
         fun setupClass() = helper.setup()
 
-        @JvmStatic @AfterClass
+        @JvmStatic
+        @AfterClass
         fun tearDownClass() = helper.tearDown()
     }
 
@@ -237,3 +239,25 @@ class MyFeatureBlockingTest : AbstractMyFeatureBlockingTest() {
     ```shell
     ./gradlew :<module-name>:iosSimulatorArm64Test
     ```
+
+## Platform-Specific Notes
+
+### Okio `FileSystem.SYSTEM` and iOS
+
+Okio's `FileSystem.SYSTEM` cannot be referenced directly in `commonMain` when compiling for iOS
+targets. The compiler reports `Unresolved reference 'SYSTEM'` during iOS publication or compilation.
+
+**Workaround:** Use the `expect`/`actual` pattern. Declare an `internal expect val` in `commonMain`
+and provide `actual` implementations in each platform source set (`androidMain`, `desktopMain`,
+`iosMain`) that return `FileSystem.SYSTEM`. The `iosMain` source set covers all three iOS targets
+(`iosX64`, `iosArm64`, `iosSimulatorArm64`) via `applyDefaultHierarchyTemplate()`.
+
+Files involved:
+
+- `commonMain/.../core/SystemFileSystem.kt` — `expect` declaration
+- `androidMain/.../core/SystemFileSystem.android.kt` — Android `actual`
+- `desktopMain/.../core/SystemFileSystem.desktop.kt` — Desktop/JVM `actual`
+- `iosMain/.../core/SystemFileSystem.ios.kt` — iOS `actual`
+
+When adding new code in `commonMain` that needs `FileSystem.SYSTEM`, use the `systemFileSystem`
+property instead of referencing `FileSystem.SYSTEM` directly.
