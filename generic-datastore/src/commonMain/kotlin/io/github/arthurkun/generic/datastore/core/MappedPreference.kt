@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlin.coroutines.cancellation.CancellationException
@@ -128,7 +129,7 @@ internal class MappedPrefs<T, R>(
         }
     }
 
-    override suspend fun get(): R = convertFallback(prefs.get())
+    override suspend fun get(): R = asFlow().first()
 
     override suspend fun set(value: R) = prefs.set(reverseFallback(value))
 
