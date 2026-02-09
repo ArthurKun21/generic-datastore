@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.reflect.KProperty
 
 /**
@@ -102,6 +103,8 @@ internal class MappedPrefs<T, R>(
     private fun convertFallback(value: T): R {
         return try {
             convert(value)
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) {
             defaultValue
         }
@@ -118,6 +121,8 @@ internal class MappedPrefs<T, R>(
     private fun reverseFallback(value: R): T {
         return try {
             reverse(value)
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) {
             prefs.defaultValue
         }
