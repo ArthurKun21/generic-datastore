@@ -92,7 +92,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: [ compileKotlinIosArm64, compileKotlinIosSimulatorArm64, compileKotlinIosX64 ]
+        commands: [ linkReleaseFrameworkIosArm64, linkReleaseFrameworkIosX64, linkReleaseFrameworkIosSimulatorArm64 ]
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -110,10 +110,10 @@ jobs:
       - name: Set up gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Create Generic Datastore iOS framework
+      - name: Create Release for Generic Datastore
         run: |
           ./gradlew :generic-datastore:${{ matrix.commands }}
 
-      - name: Create Generic Datastore Compose iOS framework
+      - name: Create Release for Generic Datastore Compose
         run: |
           ./gradlew :generic-datastore-compose:${{ matrix.commands }}
