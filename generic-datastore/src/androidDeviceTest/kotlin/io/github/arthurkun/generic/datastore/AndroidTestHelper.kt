@@ -64,7 +64,7 @@ class AndroidTestHelper private constructor(
     fun tearDown() {
         Dispatchers.resetMain()
         val dataStoreFile =
-            File(testContext.filesDir, "datastore/${datastoreName}.preferences_pb")
+            File(testContext.filesDir, "datastore/$datastoreName.preferences_pb")
         if (dataStoreFile.exists()) {
             dataStoreFile.delete()
         }
