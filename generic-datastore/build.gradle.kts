@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.konan.target.HostManager
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.vanniktech.maven.publish)
@@ -42,14 +39,12 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(libs.coroutines.core)
-                api(libs.datastore.preferences.core)
-                api(libs.datastore.core)
-                api(libs.kotlinx.io.core)
-                implementation(libs.kotlinx.serialization.json)
-            }
+        commonMain.dependencies {
+            implementation(libs.coroutines.core)
+            api(libs.datastore.preferences.core)
+            api(libs.datastore.core)
+            api(libs.kotlinx.io.core)
+            implementation(libs.kotlinx.serialization.json)
         }
 
         commonTest.dependencies {
@@ -72,16 +67,6 @@ kotlin {
                 implementation(libs.junit5)
             }
         }
-
-        val androidMain by getting
-        val desktopMain by getting
-
-        val jvmCommon by creating {
-            dependsOn(commonMain)
-        }
-
-        androidMain.dependsOn(jvmCommon)
-        desktopMain.dependsOn(jvmCommon)
     }
 
     compilerOptions {
