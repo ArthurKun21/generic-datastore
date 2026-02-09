@@ -1,11 +1,10 @@
 package io.github.arthurkun.generic.datastore.preferences.default
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
 import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +12,6 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -106,14 +104,7 @@ internal sealed class GenericPreferenceItem<T>(
      */
     override fun asFlow(): Flow<T> {
         return datastore
-            .data
-            .catch { e ->
-                if (e is IOException) {
-                    emit(emptyPreferences())
-                } else {
-                    throw e
-                }
-            }
+            .dataOrEmpty
             .map { preferences ->
                 preferences[this.preferences] ?: defaultValue
             }

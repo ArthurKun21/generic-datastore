@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,13 +50,7 @@ internal class SerializedSetPrimitive<T>(
 
     override suspend fun get(): Set<T> {
         return withContext(ioDispatcher) {
-            datastore
-                .data
-                .map { prefs ->
-                    prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
-                        ?: this@SerializedSetPrimitive.defaultValue
-                }
-                .first()
+            asFlow().first()
         }
     }
 
@@ -88,7 +83,7 @@ internal class SerializedSetPrimitive<T>(
     override suspend fun resetToDefault() = set(defaultValue)
 
     override fun asFlow(): Flow<Set<T>> {
-        return datastore.data.map { prefs ->
+        return datastore.dataOrEmpty.map { prefs ->
             prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
                 ?: this@SerializedSetPrimitive.defaultValue
         }
