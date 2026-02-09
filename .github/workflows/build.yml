@@ -92,7 +92,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: [ linkIosArm64, linkIosSimulatorArm64, linkIosX64 ]
+        commands: [ publishIosArm64PublicationToMavenLocal, publishIosSimulatorArm64PublicationToMavenLocal, publishIosX64PublicationToMavenLocal ]
     runs-on: macos-latest
     steps:
       - name: Checkout code
