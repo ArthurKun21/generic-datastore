@@ -92,7 +92,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: [ linkReleaseFrameworkIosArm64, linkReleaseFrameworkIosX64, linkReleaseFrameworkIosSimulatorArm64 ]
+        commands: [ linkIosArm64, linkIosSimulatorArm64, linkIosX64 ]
     runs-on: macos-latest
     steps:
       - name: Checkout code
