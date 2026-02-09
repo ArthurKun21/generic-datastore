@@ -3,7 +3,7 @@ package io.github.arthurkun.generic.datastore
 import io.github.arthurkun.generic.datastore.core.map
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.default.custom.enum
-import io.github.arthurkun.generic.datastore.preferences.default.enumSet
+import io.github.arthurkun.generic.datastore.preferences.default.customSet.enumSet
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

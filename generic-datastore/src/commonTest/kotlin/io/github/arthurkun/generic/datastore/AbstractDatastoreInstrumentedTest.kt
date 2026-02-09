@@ -7,7 +7,7 @@ import io.github.arthurkun.generic.datastore.core.distinctFlow
 import io.github.arthurkun.generic.datastore.core.map
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.default.custom.enum
-import io.github.arthurkun.generic.datastore.preferences.default.enumSet
+import io.github.arthurkun.generic.datastore.preferences.default.customSet.enumSet
 import io.github.arthurkun.generic.datastore.preferences.toggle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestDispatcher
