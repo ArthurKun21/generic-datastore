@@ -38,18 +38,24 @@ kotlin {
         }
     }
 
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
-        commonMain.dependencies {
-            implementation(project(":generic-datastore"))
-            implementation(project(":generic-datastore-compose"))
-            implementation(libs.bundles.compose)
-            implementation(libs.kotlinx.serialization.json)
-            implementation(libs.androidx.lifecycle.viewmodel.compose)
+        val commonMain by getting {
+            dependencies {
+                implementation(project(":generic-datastore"))
+                implementation(project(":generic-datastore-compose"))
+                implementation(libs.bundles.compose)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.androidx.lifecycle.viewmodel.compose)
+            }
         }
 
-        androidMain.dependencies {
-            implementation(libs.androidx.core.ktx)
-            implementation(libs.activity.compose)
+        val androidMain by getting {
+            dependencies {
+                implementation(libs.androidx.core.ktx)
+                implementation(libs.activity.compose)
+            }
         }
 
         val desktopMain by getting {
@@ -58,6 +64,13 @@ kotlin {
                 implementation(compose.desktop.currentOs)
             }
         }
+
+        val jvmCommon by creating {
+            dependsOn(commonMain)
+        }
+
+        androidMain.dependsOn(jvmCommon)
+        desktopMain.dependsOn(jvmCommon)
     }
 
     compilerOptions {

@@ -8,26 +8,6 @@ plugins {
 kotlin {
     explicitApi()
 
-    // Workaround for https://youtrack.jetbrains.com/projects/KTIJ/issues/KTIJ-34430/Incorrect-resolution-of-platform-specific-APIs-in-commonMain-in-a-KMP-with-the-JVM-target-and-the-pluggable-target
-    // issue with kotlin serialization with android jvm target in Android studio.
-    // https://dev.to/rsicarelli/the-hidden-cost-of-default-hierarchy-templates-in-kotlin-multiplatform-256a
-    // NEW UPDATE: It is still bad, adding the ios target stabilizes it, but it is still bad.
-    // applyDefaultHierarchyTemplate()
-    applyHierarchyTemplate {
-        common {
-            withAndroidTarget()
-            withJvm()
-            withCompilations { compilation ->
-                compilation.target.platformType == org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.androidJvm
-            }
-            group("ios") {
-                withIosX64()
-                withIosArm64()
-                withIosSimulatorArm64()
-            }
-        }
-    }
-
     androidLibrary {
         namespace = "io.github.arthurkun.generic.datastore"
         compileSdk = libs.versions.compile.sdk.get().toInt()
@@ -55,6 +35,8 @@ kotlin {
             useJUnitPlatform()
         }
     }
+
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         commonMain.dependencies {
@@ -95,6 +77,21 @@ kotlin {
 }
 
 publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/arthurkun/generic-datastore")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+
+//        maven {
+//            name = "JitPack"
+//            url = uri("https://jitpack.io")
+//        }
+    }
     publications {
         withType<MavenPublication> {
             groupId = "com.github.arthurkun"
