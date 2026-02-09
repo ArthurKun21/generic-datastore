@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.preferences.default
+package io.github.arthurkun.generic.datastore.preferences.default.custom
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -18,34 +18,32 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonPrimitive
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * A [Preference] for storing a [List] of custom objects using per-element serialization.
+ * A [Preference] for storing a [List] of custom objects using Kotlin Serialization.
  * The list is serialized to a JSON array string and stored using [stringPreferencesKey].
- * On retrieval, each element in the JSON array is deserialized back via [deserializer].
+ * On retrieval, the JSON array string is deserialized back via the provided [KSerializer].
  *
- * If deserialization of an individual element fails, that element is skipped.
+ * If deserialization fails (e.g., due to corrupted data), the [defaultValue] is returned.
  *
- * @param T The type of each element in the list.
+ * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
  * @param datastore The [DataStore<Preferences>] instance used for storing preferences.
  * @param key The unique String key used to identify this preference within the DataStore.
  * @param defaultValue The default value to be returned if the preference is not set.
- * @param serializer A function to serialize an element of type [T] to its String representation.
- * @param deserializer A function to deserialize a String back to an element of type [T].
+ * @param serializer The [KSerializer] for the type [T].
+ * @param json The [Json] instance to use for serialization/deserialization.
  * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations. Defaults to [Dispatchers.IO].
  */
-internal class SerializedListPrimitive<T>(
+internal class KSerializedListPrimitive<T>(
     private val datastore: DataStore<Preferences>,
     private val key: String,
     override val defaultValue: List<T>,
-    private val serializer: (T) -> String,
-    private val deserializer: (String) -> T,
+    private val serializer: KSerializer<T>,
+    private val json: Json,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : Preference<List<T>> {
 
@@ -56,6 +54,7 @@ internal class SerializedListPrimitive<T>(
     }
 
     private val stringPrefKey = stringPreferencesKey(key)
+    private val listSerializer = ListSerializer(serializer)
 
     override fun key(): String = key
 
@@ -68,7 +67,7 @@ internal class SerializedListPrimitive<T>(
     override suspend fun set(value: List<T>) {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
-                prefs[stringPrefKey] = serializeList(value)
+                prefs[stringPrefKey] = json.encodeToString(listSerializer, value)
             }
         }
     }
@@ -76,9 +75,9 @@ internal class SerializedListPrimitive<T>(
     override suspend fun update(transform: (List<T>) -> List<T>) {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
-                val current = prefs[stringPrefKey]?.let { safeDeserializeList(it) }
-                    ?: this@SerializedListPrimitive.defaultValue
-                prefs[stringPrefKey] = serializeList(transform(current))
+                val current = prefs[stringPrefKey]?.let { safeDeserialize(it) }
+                    ?: this@KSerializedListPrimitive.defaultValue
+                prefs[stringPrefKey] = json.encodeToString(listSerializer, transform(current))
             }
         }
     }
@@ -95,8 +94,8 @@ internal class SerializedListPrimitive<T>(
 
     override fun asFlow(): Flow<List<T>> {
         return datastore.dataOrEmpty.map { prefs ->
-            prefs[stringPrefKey]?.let { safeDeserializeList(it) }
-                ?: this@SerializedListPrimitive.defaultValue
+            prefs[stringPrefKey]?.let { safeDeserialize(it) }
+                ?: this@KSerializedListPrimitive.defaultValue
         }
     }
 
@@ -107,22 +106,9 @@ internal class SerializedListPrimitive<T>(
 
     override fun setBlocking(value: List<T>) = runBlocking { set(value) }
 
-    private fun serializeList(value: List<T>): String {
-        val jsonArray = JsonArray(value.map { JsonPrimitive(serializer(it)) })
-        return jsonArray.toString()
-    }
-
-    private fun safeDeserializeList(value: String): List<T> {
+    private fun safeDeserialize(value: String): List<T> {
         return try {
-            Json.parseToJsonElement(value).jsonArray.mapNotNull { element ->
-                try {
-                    deserializer(element.jsonPrimitive.content)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (_: Exception) {
-                    null
-                }
-            }
+            json.decodeFromString(listSerializer, value)
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
