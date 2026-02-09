@@ -28,6 +28,7 @@ Both library modules target:
 
 - **Android** (`androidMain`)
 - **Desktop / JVM** (`jvm("desktop")`)
+- **iOS** (`iosX64`, `iosArm64`, `iosSimulatorArm64`)
 
 ## Workflow
 
@@ -98,18 +99,20 @@ source sets:
 * `androidDeviceTest` — Android instrumentation tests (platform-specific only)
 * `androidHostTest` — Android unit tests (platform-specific only)
 * `desktopTest` — Desktop/JVM tests (platform-specific only)
+* `iosSimulatorArm64Test` — iOS simulator tests (platform-specific only, requires macOS)
 
 ### Abstract test class pattern
 
 Tests use an abstract base class pattern to avoid duplicating test logic across platforms. Shared
 test methods live in abstract classes in `commonTest`, while platform source sets
-(`androidDeviceTest`, `desktopTest`) provide thin subclasses that only handle DataStore
-initialization and teardown.
+(`androidDeviceTest`, `desktopTest`, `iosSimulatorArm64Test`) provide thin subclasses that only
+handle DataStore initialization and teardown.
 
 - `commonTest` — Abstract base classes (e.g. `AbstractDatastoreInstrumentedTest`,
   `AbstractDatastoreBlockingTest`) containing all test methods.
-- `androidDeviceTest` / `desktopTest` — Concrete subclasses that override abstract properties
-  (`preferenceDatastore`, `dataStore`, `testDispatcher`) and supply platform-specific setup/teardown.
+- `androidDeviceTest` / `desktopTest` / `iosSimulatorArm64Test` — Concrete subclasses that override
+  abstract properties (`preferenceDatastore`, `dataStore`, `testDispatcher`) and supply
+  platform-specific setup/teardown.
 
 When adding new tests, add them to the abstract class in `commonTest` so they run on all platforms
 automatically. Only add tests directly to a platform source set when the test requires
@@ -147,4 +150,12 @@ preference type, create both:
 
     ```shell
     ./gradlew :<module-name>:desktopTest
+    ```
+
+#### KMP modules targeting iOS Test
+
+- Run iOS simulator tests (requires macOS with Xcode):
+
+    ```shell
+    ./gradlew :<module-name>:iosSimulatorArm64Test
     ```
