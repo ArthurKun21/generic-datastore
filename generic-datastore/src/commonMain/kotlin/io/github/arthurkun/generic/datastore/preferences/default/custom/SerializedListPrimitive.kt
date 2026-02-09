@@ -10,6 +10,7 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * A [CustomGenericPreferenceItem] for storing a [List] of custom objects using
@@ -48,6 +49,8 @@ internal class SerializedListPrimitive<T>(
         Json.parseToJsonElement(str).jsonArray.mapNotNull { element ->
             try {
                 elementDeserializer(element.jsonPrimitive.content)
+            } catch (e: CancellationException) {
+                throw e
             } catch (_: Exception) {
                 null
             }
