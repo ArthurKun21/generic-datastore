@@ -1,6 +1,5 @@
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -39,36 +38,24 @@ kotlin {
         }
     }
 
-    linuxX64()
-    linuxArm64()
-    macosX64()
-    macosArm64()
-    mingwX64()
-
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    applyDefaultHierarchyTemplate {
-        common {
-            group("native") {
-                group("unix") {
-                    group("linux")
-                    group("apple")
-                }
-            }
-        }
-    }
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
-        commonMain.dependencies {
-            implementation(project(":generic-datastore"))
-            implementation(project(":generic-datastore-compose"))
-            implementation(libs.bundles.compose)
-            implementation(libs.kotlinx.serialization.json)
-            implementation(libs.androidx.lifecycle.viewmodel.compose)
+        val commonMain by getting {
+            dependencies {
+                implementation(project(":generic-datastore"))
+                implementation(project(":generic-datastore-compose"))
+                implementation(libs.bundles.compose)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.androidx.lifecycle.viewmodel.compose)
+            }
         }
 
-        androidMain.dependencies {
-            implementation(libs.androidx.core.ktx)
-            implementation(libs.activity.compose)
+        val androidMain by getting {
+            dependencies {
+                implementation(libs.androidx.core.ktx)
+                implementation(libs.activity.compose)
+            }
         }
 
         val desktopMain by getting {
@@ -77,6 +64,13 @@ kotlin {
                 implementation(compose.desktop.currentOs)
             }
         }
+
+        val jvmCommon by creating {
+            dependsOn(commonMain)
+        }
+
+        androidMain.dependsOn(jvmCommon)
+        desktopMain.dependsOn(jvmCommon)
     }
 
     compilerOptions {

@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -38,41 +39,17 @@ kotlin {
         }
     }
 
-    linuxX64()
-    linuxArm64()
-    macosX64()
-    macosArm64()
-    mingwX64()
-
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    applyHierarchyTemplate {
-        common {
-            withAndroidTarget()
-            withJvm()
-            withCompilations { compilation ->
-                compilation.target.platformType == org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.androidJvm
-            }
-            group("ios") {
-                withIosX64()
-                withIosArm64()
-                withIosSimulatorArm64()
-            }
-            group("native") {
-                group("unix") {
-                    group("linux")
-                    group("apple")
-                }
-            }
-        }
-    }
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
-        commonMain.dependencies {
-            implementation(libs.coroutines.core)
-            api(libs.datastore.preferences.core)
-            api(libs.datastore.core)
-            api(libs.kotlinx.io.core)
-            implementation(libs.kotlinx.serialization.json)
+        val commonMain by getting {
+            dependencies {
+                implementation(libs.coroutines.core)
+                api(libs.datastore.preferences.core)
+                api(libs.datastore.core)
+                api(libs.kotlinx.io.core)
+                implementation(libs.kotlinx.serialization.json)
+            }
         }
 
         commonTest.dependencies {
@@ -95,6 +72,16 @@ kotlin {
                 implementation(libs.junit5)
             }
         }
+
+        val androidMain by getting
+        val desktopMain by getting
+
+        val jvmCommon by creating {
+            dependsOn(commonMain)
+        }
+
+        androidMain.dependsOn(jvmCommon)
+        desktopMain.dependsOn(jvmCommon)
     }
 
     compilerOptions {
