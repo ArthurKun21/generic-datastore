@@ -7,17 +7,35 @@ Jetpack Compose extensions in `generic-datastore-compose`.
 ## Modules
 
 - `:generic-datastore` – core preference and proto datastore wrapper library.
-  - `core/` – shared interfaces and utilities (`Preference`, `Prefs`, `PrefsImpl`,
-      `MappedPreference`, `Migration`, `PreferenceDefaults`, `PreferenceExtension`).
-  - `preferences/` - DataStore wrapper implementations for `Preference` types.
-  - `preferences/core/` – DataStore Preferences implementation (primitive types, enum types,
-      kotlinx.serialization-backed types, and custom-serializer types).
-  - `preferences/optional/` – nullable preference variants.
-    - `preferences/backup/` – backup/restore support for preferences datastore.
+  - `core/` – shared interfaces and utilities (`Preference`, `Prefs`, `PreferenceDefaults`,
+      `PreferenceExtension`, `SystemFileSystem`).
+  - `preferences/` – DataStore wrapper implementations for `Preference` types
+      (`PreferencesDatastore`, `GenericPreferencesDatastore`, `CreatePreferencesDatastore`,
+      `PreferencesPrefs`).
+  - `preferences/core/` – DataStore Preferences implementation for primitive types
+      (`BooleanPrimitive`, `DoublePrimitive`, `FloatPrimitive`, `IntPrimitive`, `LongPrimitive`,
+      `StringPrimitive`, `StringSetPrimitive`, `GenericPreferenceItem`).
+    - `preferences/core/custom/` – custom-serializer and enum types (`EnumPreference`,
+        `KSerializedPrimitive`, `KSerializedListPrimitive`, `SerializedListPrimitive`,
+        `ObjectPrimitive`, `CustomGenericPreferenceItem`).
+    - `preferences/core/customSet/` – set-based custom types (`EnumSetPreference`,
+        `KSerializedSetPrimitive`, `SerializedSetPrimitive`, `CustomSetGenericPreferenceItem`).
+  - `preferences/optional/` – nullable preference variants (`NullableBooleanPrimitive`,
+      `NullableDoublePrimitive`, `NullableFloatPrimitive`, `NullableIntPrimitive`,
+      `NullableLongPrimitive`, `NullableStringPrimitive`, `NullableStringSetPrimitive`,
+      `NullableGenericPreferenceItem`).
+    - `preferences/optional/custom/` – nullable custom types (`NullableEnumPreference`,
+        `NullableKSerializedPrimitive`, `NullableKSerializedListPrimitive`,
+        `NullableSerializedListPrimitive`, `NullableObjectPrimitive`,
+        `NullableCustomGenericPreferenceItem`).
+  - `preferences/utils/` – preference utility extensions (`MappedPreference`, `Extensions`).
+  - `preferences/backup/` – backup/restore support for preferences datastore
+      (`BackupPreference`, `PreferenceBackupCreator`, `PreferenceBackupRestorer`,
+      `BackupParsingException`, `Migration`).
   - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
-      `GenericProtoDatastore`).
+      `GenericProtoDatastore`, `CreateProtoDatastore`).
   - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
-      `preferences/` and `preferences/core/`.
+      `preferences/`, `preferences/core/custom/`, and `preferences/utils/`.
 - `:generic-datastore-compose` – Compose helpers (e.g. `Prefs<T>.remember()`) built on the core
   module.
 - `:app` and `:composeApp` – sample apps for local development.
