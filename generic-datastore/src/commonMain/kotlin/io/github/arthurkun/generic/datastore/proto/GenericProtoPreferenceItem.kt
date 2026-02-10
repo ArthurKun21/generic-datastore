@@ -24,7 +24,7 @@ import kotlin.reflect.KProperty
  * @param datastore The [DataStore<T>] instance.
  * @param defaultValue The default value for the proto message.
  */
-internal class ProtoPreference<T>(
+internal class GenericProtoPreferenceItem<T>(
     private val datastore: DataStore<T>,
     override val defaultValue: T,
     private val key: String = "proto_data",

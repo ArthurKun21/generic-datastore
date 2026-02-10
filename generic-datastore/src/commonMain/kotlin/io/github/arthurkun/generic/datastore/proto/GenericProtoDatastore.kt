@@ -21,7 +21,7 @@ public class GenericProtoDatastore<T>(
 ) : ProtoDatastore<T> {
 
     override fun data(): DelegatedPreference<T> {
-        return ProtoPreference(
+        return GenericProtoPreferenceItem(
             datastore = datastore,
             defaultValue = defaultValue,
             key = key,
