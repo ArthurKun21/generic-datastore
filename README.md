@@ -28,6 +28,8 @@ Both modules target **Android**, **Desktop (JVM)**, and **iOS** (`iosX64`, `iosA
 
 ## Installation
 
+### JitPack
+
 Add the JitPack repository to your `settings.gradle.kts`:
 
 ```kotlin
@@ -46,6 +48,46 @@ dependencies {
 
     // Optional: Compose extensions
     implementation("com.github.arthurkun:generic-datastore-compose:<version>")
+}
+```
+
+### GitHub Packages
+
+Add the GitHub Packages repository to your `settings.gradle.kts`. Authentication requires a GitHub
+personal access token (classic) with the `read:packages` scope:
+
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/ArthurKun21/generic-datastore")
+            credentials {
+                username = providers.gradleProperty("gpr.user").orNull
+                    ?: System.getenv("GITHUB_ACTOR")
+                password = providers.gradleProperty("gpr.key").orNull
+                    ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+```
+
+Set the credentials in your `~/.gradle/gradle.properties` (or use the environment variables
+`GITHUB_ACTOR` and `GITHUB_TOKEN`):
+
+```properties
+gpr.user=YOUR_GITHUB_USERNAME
+gpr.key=YOUR_GITHUB_TOKEN
+```
+
+Add the dependencies:
+
+```kotlin
+dependencies {
+    implementation("com.github.ArthurKun21:generic-datastore:<version>")
+
+    // Optional: Compose extensions
+    implementation("com.github.ArthurKun21:generic-datastore-compose:<version>")
 }
 ```
 
