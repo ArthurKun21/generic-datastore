@@ -1,19 +1,30 @@
 # Generic Datastore Library
 
-A Kotlin Multiplatform library that provides a thin, convenient wrapper around AndroidX DataStore Preferences and Proto DataStore.
+| Jitpack                                                                                                                 | GitHub Packages                                                                                                                                                                 |
+|-------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![Release](https://jitpack.io/v/ArthurKun21/generic-datastore.svg)](https://jitpack.io/#ArthurKun21/generic-datastore) | [![GitHub Packages](https://img.shields.io/badge/GitHub%20Packages-published-brightgreen?logo=github)](https://github.com/ArthurKun21?tab=packages&repo_name=generic-datastore) |
 
-Inspired by [flow-preferences](https://github.com/tfcporciuncula/flow-preferences) for SharedPreferences.
+| Build                                                                                                                                                                            | Tests                                                                                                                                                                          |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![build](https://github.com/ArthurKun21/generic-datastore/actions/workflows/build.yml/badge.svg)](https://github.com/ArthurKun21/generic-datastore/actions/workflows/build.yml) | [![Tests](https://github.com/ArthurKun21/generic-datastore/actions/workflows/test.yml/badge.svg)](https://github.com/ArthurKun21/generic-datastore/actions/workflows/test.yml) |
+
+A Kotlin Multiplatform library that provides a thin, convenient wrapper around AndroidX DataStore
+Preferences and Proto DataStore.
+
+Inspired by [flow-preferences](https://github.com/tfcporciuncula/flow-preferences) for
+SharedPreferences.
 
 ## Modules
 
-| Module | Description |
-|---|---|
-| `generic-datastore` | Core library with Preferences DataStore and Proto DataStore wrappers |
-| `generic-datastore-compose` | Jetpack Compose extensions (`DelegatedPreference<T>.remember()`) |
+| Module                      | Description                                                          |
+|-----------------------------|----------------------------------------------------------------------|
+| `generic-datastore`         | Core library with Preferences DataStore and Proto DataStore wrappers |
+| `generic-datastore-compose` | Jetpack Compose extensions (`DelegatedPreference<T>.remember()`)     |
 
 ### KMP Targets
 
-Both modules target **Android**, **Desktop (JVM)**, and **iOS** (`iosX64`, `iosArm64`, `iosSimulatorArm64`).
+Both modules target **Android**, **Desktop (JVM)**, and **iOS** (`iosX64`, `iosArm64`,
+`iosSimulatorArm64`).
 
 ## Installation
 
@@ -59,7 +70,8 @@ val datastore = createPreferencesDatastore(
 )
 ```
 
-Optional parameters allow customizing the corruption handler, migrations, coroutine scope, and the default `Json` instance used for serialization-based preferences:
+Optional parameters allow customizing the corruption handler, migrations, coroutine scope, and the
+default `Json` instance used for serialization-based preferences:
 
 ```kotlin
 val datastore = createPreferencesDatastore(
@@ -94,13 +106,13 @@ val datastore = GenericPreferencesDatastore(myExistingDataStore)
 The `GenericPreferencesDatastore` provides factory methods for all supported types:
 
 ```kotlin
-val userName: Preferences<String>      = datastore.string("user_name", "Guest")
-val userScore: Preferences<Int>        = datastore.int("user_score", 0)
-val highScore: Preferences<Long>       = datastore.long("high_score", 0L)
-val volume: Preferences<Float>         = datastore.float("volume", 1.0f)
-val precision: Preferences<Double>     = datastore.double("precision", 0.0)
-val darkMode: Preferences<Boolean>     = datastore.bool("dark_mode", false)
-val tags: Preferences<Set<String>>     = datastore.stringSet("tags")
+val userName: Preferences<String> = datastore.string("user_name", "Guest")
+val userScore: Preferences<Int> = datastore.int("user_score", 0)
+val highScore: Preferences<Long> = datastore.long("high_score", 0L)
+val volume: Preferences<Float> = datastore.float("volume", 1.0f)
+val precision: Preferences<Double> = datastore.double("precision", 0.0)
+val darkMode: Preferences<Boolean> = datastore.bool("dark_mode", false)
+val tags: Preferences<Set<String>> = datastore.stringSet("tags")
 ```
 
 ### Enum Preferences
@@ -193,7 +205,8 @@ val animalSetPref: Preferences<Set<Animal>> = datastore.serializedSet(
 )
 ```
 
-Each element is individually serialized to a String and stored using a `stringSetPreferencesKey`. Elements that fail deserialization are silently skipped.
+Each element is individually serialized to a String and stored using a `stringSetPreferencesKey`.
+Elements that fail deserialization are silently skipped.
 
 ### Kotlin Serialization Set (`kserializedSet`)
 
@@ -209,7 +222,9 @@ val profileSetPref: Preferences<Set<UserProfile>> = datastore.kserializedSet(
 )
 ```
 
-Each element is individually serialized to JSON and stored using a `stringSetPreferencesKey`. Elements that fail deserialization are silently skipped. A custom `Json` instance can be provided if needed.
+Each element is individually serialized to JSON and stored using a `stringSetPreferencesKey`.
+Elements that fail deserialization are silently skipped. A custom `Json` instance can be provided if
+needed.
 
 ### Serialized List
 
@@ -224,7 +239,9 @@ val animalListPref: Preferences<List<Animal>> = datastore.serializedList(
 )
 ```
 
-Each element is individually serialized to a String and stored as a JSON array string using a `stringPreferencesKey`. Elements that fail deserialization are silently skipped. Unlike sets, lists preserve insertion order and allow duplicates.
+Each element is individually serialized to a String and stored as a JSON array string using a
+`stringPreferencesKey`. Elements that fail deserialization are silently skipped. Unlike sets, lists
+preserve insertion order and allow duplicates.
 
 ### Kotlin Serialization List (`kserializedList`)
 
@@ -240,7 +257,9 @@ val profileListPref: Preferences<List<UserProfile>> = datastore.kserializedList(
 )
 ```
 
-The list is serialized to a JSON array string and stored using a `stringPreferencesKey`. If deserialization fails (e.g., due to corrupted data), the default value is returned. A custom `Json` instance can be provided if needed.
+The list is serialized to a JSON array string and stored using a `stringPreferencesKey`. If
+deserialization fails (e.g., due to corrupted data), the default value is returned. A custom `Json`
+instance can be provided if needed.
 
 ### Enum Set
 
@@ -253,23 +272,25 @@ val themeSetPref: Preferences<Set<Theme>> = datastore.enumSet<Theme>(
 )
 ```
 
-Each enum value is stored by its `name`. Unknown enum values encountered during deserialization are skipped.
+Each enum value is stored by its `name`. Unknown enum values encountered during deserialization are
+skipped.
 
 ### Nullable Preferences
 
 Create preferences that return `null` when no value has been set, instead of a default value:
 
 ```kotlin
-val nickname: Preferences<String?>      = datastore.nullableString("nickname")
-val age: Preferences<Int?>              = datastore.nullableInt("age")
-val timestamp: Preferences<Long?>       = datastore.nullableLong("timestamp")
-val weight: Preferences<Float?>         = datastore.nullableFloat("weight")
-val latitude: Preferences<Double?>      = datastore.nullableDouble("latitude")
-val agreed: Preferences<Boolean?>       = datastore.nullableBool("agreed")
-val labels: Preferences<Set<String>?>   = datastore.nullableStringSet("labels")
+val nickname: Preferences<String?> = datastore.nullableString("nickname")
+val age: Preferences<Int?> = datastore.nullableInt("age")
+val timestamp: Preferences<Long?> = datastore.nullableLong("timestamp")
+val weight: Preferences<Float?> = datastore.nullableFloat("weight")
+val latitude: Preferences<Double?> = datastore.nullableDouble("latitude")
+val agreed: Preferences<Boolean?> = datastore.nullableBool("agreed")
+val labels: Preferences<Set<String>?> = datastore.nullableStringSet("labels")
 ```
 
-Setting a nullable preference to `null` removes the key from DataStore. `resetToDefault()` also removes the key, since the default is `null`.
+Setting a nullable preference to `null` removes the key from DataStore. `resetToDefault()` also
+removes the key, since the default is `null`.
 
 ```kotlin
 nickname.get()        // null (not set yet)
@@ -307,7 +328,8 @@ Store a nullable `@Serializable` type:
 @Serializable
 data class UserProfile(val name: String, val age: Int)
 
-val userProfilePref: Preferences<UserProfile?> = datastore.nullableKserialized<UserProfile>("user_profile")
+val userProfilePref: Preferences<UserProfile?> =
+    datastore.nullableKserialized<UserProfile>("user_profile")
 ```
 
 ### Nullable Serialized List (`nullableSerializedList`)
@@ -327,12 +349,14 @@ val animalListPref: Preferences<List<Animal>?> = datastore.nullableSerializedLis
 Store a nullable list of `@Serializable` objects:
 
 ```kotlin
-val profileListPref: Preferences<List<UserProfile>?> = datastore.nullableKserializedList<UserProfile>(
-    key = "profile_list",
-)
+val profileListPref: Preferences<List<UserProfile>?> =
+    datastore.nullableKserializedList<UserProfile>(
+        key = "profile_list",
+    )
 ```
 
-All nullable variants return `null` when the key is not set. Setting `null` removes the key. If deserialization fails, `null` is returned.
+All nullable variants return `null` when the key is not set. Setting `null` removes the key. If
+deserialization fails, `null` is returned.
 
 ### Reading & Writing Values
 
@@ -436,11 +460,13 @@ val scoreAsString2: Preferences<String> = userScore.mapIO(
 )
 ```
 
-`map` catches exceptions in conversions and falls back to defaults. `mapIO` throws if conversion of the default value fails.
+`map` catches exceptions in conversions and falls back to defaults. `mapIO` throws if conversion of
+the default value fails.
 
 ### Backup & Restore
 
-`GenericPreferencesDatastore` supports exporting and importing all preferences using type-safe backup models:
+`GenericPreferencesDatastore` supports exporting and importing all preferences using type-safe
+backup models:
 
 #### Export as structured data
 
@@ -490,11 +516,14 @@ datastore.importDataAsString(
 )
 ```
 
-Import merges into existing preferences. Call `datastore.clearAll()` before import for full replace semantics. A `BackupParsingException` is thrown if the JSON string is invalid or exceeds the 10 MB size limit.
+Import merges into existing preferences. Call `datastore.clearAll()` before import for full replace
+semantics. A `BackupParsingException` is thrown if the JSON string is invalid or exceeds the 10 MB
+size limit.
 
 ### Private & App-State Key Prefixes
 
-Use `BasePreference.privateKey(key)` or `BasePreference.appStateKey(key)` to prefix keys so they can be filtered during backup:
+Use `BasePreference.privateKey(key)` or `BasePreference.appStateKey(key)` to prefix keys so they can
+be filtered during backup:
 
 ```kotlin
 val token = datastore.string(BasePreference.privateKey("auth_token"), "")
@@ -575,7 +604,8 @@ val dataPref: ProtoPreference<MyProtoMessage> = protoDatastore.data()
 
 ## Compose Extensions (`generic-datastore-compose`)
 
-The `remember()` extension turns any `DelegatedPreference<T>` into a lifecycle-aware `MutableState<T>`:
+The `remember()` extension turns any `DelegatedPreference<T>` into a lifecycle-aware
+`MutableState<T>`:
 
 ```kotlin
 import androidx.compose.runtime.getValue
