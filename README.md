@@ -1,12 +1,9 @@
 # Generic Datastore Library
 
-| Jitpack                                                                                                                 | GitHub Packages                                                                                                                                                                 |
-|-------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [![Release](https://jitpack.io/v/ArthurKun21/generic-datastore.svg)](https://jitpack.io/#ArthurKun21/generic-datastore) | [![GitHub Packages](https://img.shields.io/badge/GitHub%20Packages-published-brightgreen?logo=github)](https://github.com/ArthurKun21?tab=packages&repo_name=generic-datastore) |
-
-| Build                                                                                                                                                                            | Tests                                                                                                                                                                          |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [![build](https://github.com/ArthurKun21/generic-datastore/actions/workflows/build.yml/badge.svg)](https://github.com/ArthurKun21/generic-datastore/actions/workflows/build.yml) | [![Tests](https://github.com/ArthurKun21/generic-datastore/actions/workflows/test.yml/badge.svg)](https://github.com/ArthurKun21/generic-datastore/actions/workflows/test.yml) |
+[![Release](https://jitpack.io/v/ArthurKun21/generic-datastore.svg)](https://jitpack.io/#ArthurKun21/generic-datastore)
+[![GitHub Packages](https://img.shields.io/badge/GitHub%20Packages-published-brightgreen?logo=github)](https://github.com/ArthurKun21?tab=packages&repo_name=generic-datastore)
+[![build](https://github.com/ArthurKun21/generic-datastore/actions/workflows/build.yml/badge.svg)](https://github.com/ArthurKun21/generic-datastore/actions/workflows/build.yml)
+[![Tests](https://github.com/ArthurKun21/generic-datastore/actions/workflows/test.yml/badge.svg)](https://github.com/ArthurKun21/generic-datastore/actions/workflows/test.yml)
 
 A Kotlin Multiplatform library that provides a thin, convenient wrapper around AndroidX DataStore
 Preferences and Proto DataStore.
