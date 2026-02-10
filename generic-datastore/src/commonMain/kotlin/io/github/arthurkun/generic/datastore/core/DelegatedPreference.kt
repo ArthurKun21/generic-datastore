@@ -16,4 +16,3 @@ public interface DelegatedPreference<T> : ReadWriteProperty<Any?, T>, BasePrefer
      */
     public fun resetToDefaultBlocking()
 }
-
