@@ -1,7 +1,7 @@
 package io.github.arthurkun.generic.datastore
 
-import io.github.arthurkun.generic.datastore.preferences.AbstractKSerializedBlockingTest
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.core.AbstractKSerializedBlockingTest
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.AfterTest

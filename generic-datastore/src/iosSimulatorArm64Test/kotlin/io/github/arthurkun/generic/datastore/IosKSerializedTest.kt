@@ -2,8 +2,8 @@ package io.github.arthurkun.generic.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import io.github.arthurkun.generic.datastore.preferences.AbstractKSerializedTest
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.core.AbstractKSerializedTest
 import kotlinx.coroutines.test.TestDispatcher
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest

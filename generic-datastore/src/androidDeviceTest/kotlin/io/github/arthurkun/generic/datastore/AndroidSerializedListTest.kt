@@ -3,8 +3,8 @@ package io.github.arthurkun.generic.datastore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import io.github.arthurkun.generic.datastore.preferences.AbstractSerializedListTest
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.core.AbstractSerializedListTest
 import kotlinx.coroutines.test.TestDispatcher
 import org.junit.After
 import org.junit.Before

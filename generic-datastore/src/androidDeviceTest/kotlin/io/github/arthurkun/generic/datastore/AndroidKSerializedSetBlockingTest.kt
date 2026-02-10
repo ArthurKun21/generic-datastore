@@ -1,8 +1,8 @@
 package io.github.arthurkun.generic.datastore
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import io.github.arthurkun.generic.datastore.preferences.AbstractKSerializedSetBlockingTest
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.core.AbstractKSerializedSetBlockingTest
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.runner.RunWith

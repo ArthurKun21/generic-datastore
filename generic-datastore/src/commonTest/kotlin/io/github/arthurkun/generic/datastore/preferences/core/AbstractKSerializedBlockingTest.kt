@@ -1,5 +1,7 @@
-package io.github.arthurkun.generic.datastore.preferences
+package io.github.arthurkun.generic.datastore.preferences.core
 
+import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.kserialized
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
