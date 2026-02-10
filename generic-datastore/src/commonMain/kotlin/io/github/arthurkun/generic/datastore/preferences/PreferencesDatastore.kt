@@ -543,7 +543,7 @@ public inline fun <reified T> PreferencesDatastore.nullableKserializedList(
  * @param T The type of each element in the set.
  * @param item The item to toggle.
  */
-public suspend inline fun <T> Prefs<Set<T>>.toggle(item: T) {
+public suspend inline fun <T> PreferencesPrefs<Set<T>>.toggle(item: T) {
     update { current ->
         if (item in current) current - item else current + item
     }
@@ -554,6 +554,6 @@ public suspend inline fun <T> Prefs<Set<T>>.toggle(item: T) {
  *
  * Flips the current value: `true` becomes `false`, and `false` becomes `true`.
  */
-public suspend inline fun Prefs<Boolean>.toggle() {
+public suspend inline fun PreferencesPrefs<Boolean>.toggle() {
     update { !it }
 }
