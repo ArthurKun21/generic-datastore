@@ -15,5 +15,5 @@ public interface ProtoDatastore<T> {
      *
      * @return A [DelegatedPreference] instance for the proto message.
      */
-    public fun data(): DelegatedPreference<T>
+    public fun data(): ProtoPreference<T>
 }
