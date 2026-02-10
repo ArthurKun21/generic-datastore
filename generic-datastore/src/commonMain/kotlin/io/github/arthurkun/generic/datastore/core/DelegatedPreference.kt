@@ -1,11 +1,11 @@
 package io.github.arthurkun.generic.datastore.core
 
 import androidx.datastore.preferences.core.MutablePreferences
-import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 import io.github.arthurkun.generic.datastore.preferences.Preferences
 import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 
 /**
  * Extends the [BasePreference] interface to support property delegation.

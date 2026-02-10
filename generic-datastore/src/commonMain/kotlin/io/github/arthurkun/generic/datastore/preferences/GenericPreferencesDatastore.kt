@@ -20,6 +20,9 @@ import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackup
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupRestorer
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
 import io.github.arthurkun.generic.datastore.preferences.backup.toJsonElement
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
 import io.github.arthurkun.generic.datastore.preferences.core.BooleanPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.DoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.FloatPrimitive
@@ -44,9 +47,6 @@ import io.github.arthurkun.generic.datastore.preferences.optional.custom.Nullabl
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableKSerializedPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableObjectPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedListPrimitive
-import io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope
-import io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope
-import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

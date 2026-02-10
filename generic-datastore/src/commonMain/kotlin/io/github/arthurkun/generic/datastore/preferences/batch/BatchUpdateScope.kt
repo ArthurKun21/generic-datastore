@@ -1,8 +1,8 @@
 package io.github.arthurkun.generic.datastore.preferences.batch
 
 import androidx.datastore.preferences.core.MutablePreferences
-import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 import io.github.arthurkun.generic.datastore.preferences.Preferences
+import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 
 /**
  * Scope for atomically reading and writing multiple preferences in a single DataStore transaction.
