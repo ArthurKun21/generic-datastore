@@ -13,7 +13,7 @@ Inspired by [flow-preferences](https://github.com/tfcporciuncula/flow-preference
 
 ### KMP Targets
 
-Both modules target **Android** and **Desktop (JVM)**.
+Both modules target **Android**, **Desktop (JVM)**, and **iOS** (`iosX64`, `iosArm64`, `iosSimulatorArm64`).
 
 ## Installation
 
@@ -68,6 +68,18 @@ val datastore = createPreferencesDatastore(
     scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     defaultJson = Json { prettyPrint = true },
     producePath = { context.filesDir.resolve("settings.preferences_pb").absolutePath },
+)
+```
+
+Overloads accepting `okio.Path` and `kotlinx.io.files.Path` are also available:
+
+```kotlin
+val datastore = createPreferencesDatastore(
+    produceOkioPath = { "/data/settings.preferences_pb".toPath() },
+)
+
+val datastore = createPreferencesDatastore(
+    produceKotlinxIoPath = { Path("/data/settings.preferences_pb") },
 )
 ```
 
@@ -248,12 +260,13 @@ Each enum value is stored by its `name`. Unknown enum values encountered during 
 Create preferences that return `null` when no value has been set, instead of a default value:
 
 ```kotlin
-val nickname: Prefs<String?>  = datastore.nullableString("nickname")
-val age: Prefs<Int?>          = datastore.nullableInt("age")
-val timestamp: Prefs<Long?>   = datastore.nullableLong("timestamp")
-val weight: Prefs<Float?>     = datastore.nullableFloat("weight")
-val latitude: Prefs<Double?>  = datastore.nullableDouble("latitude")
-val agreed: Prefs<Boolean?>   = datastore.nullableBool("agreed")
+val nickname: Prefs<String?>      = datastore.nullableString("nickname")
+val age: Prefs<Int?>              = datastore.nullableInt("age")
+val timestamp: Prefs<Long?>       = datastore.nullableLong("timestamp")
+val weight: Prefs<Float?>         = datastore.nullableFloat("weight")
+val latitude: Prefs<Double?>      = datastore.nullableDouble("latitude")
+val agreed: Prefs<Boolean?>       = datastore.nullableBool("agreed")
+val labels: Prefs<Set<String>?>   = datastore.nullableStringSet("labels")
 ```
 
 Setting a nullable preference to `null` removes the key from DataStore. `resetToDefault()` also removes the key, since the default is `null`.
@@ -265,6 +278,61 @@ nickname.get()        // "Alice"
 nickname.set(null)    // removes the key
 nickname.get()        // null
 ```
+
+### Nullable Enum
+
+Store an enum value that returns `null` when not set:
+
+```kotlin
+val themePref: Prefs<Theme?> = datastore.nullableEnum<Theme>("theme")
+```
+
+### Nullable Custom Serialized Objects
+
+Store a nullable custom-serialized object:
+
+```kotlin
+val animalPref: Prefs<Animal?> = datastore.nullableSerialized(
+    key = "animal",
+    serializer = { Animal.to(it) },
+    deserializer = { Animal.from(it) },
+)
+```
+
+### Nullable Kotlin Serialization (`nullableKserialized`)
+
+Store a nullable `@Serializable` type:
+
+```kotlin
+@Serializable
+data class UserProfile(val name: String, val age: Int)
+
+val userProfilePref: Prefs<UserProfile?> = datastore.nullableKserialized<UserProfile>("user_profile")
+```
+
+### Nullable Serialized List (`nullableSerializedList`)
+
+Store a nullable list of custom-serialized objects:
+
+```kotlin
+val animalListPref: Prefs<List<Animal>?> = datastore.nullableSerializedList(
+    key = "animal_list",
+    serializer = { Animal.to(it) },
+    deserializer = { Animal.from(it) },
+)
+```
+
+### Nullable Kotlin Serialization List (`nullableKserializedList`)
+
+Store a nullable list of `@Serializable` objects:
+
+```kotlin
+val profileListPref: Prefs<List<UserProfile>?> = datastore.nullableKserializedList<UserProfile>(
+    key = "profile_list",
+)
+```
+
+All nullable variants return `null` when the key is not set. Setting `null` removes the key. If deserialization fails, `null` is returned.
 
 ### Reading & Writing Values
 
@@ -310,6 +378,28 @@ println(currentUserName)
 currentUserName = "Jane Doe"
 ```
 
+#### Atomic Update
+
+Atomically read-modify-write a preference value in a single DataStore transaction:
+
+```kotlin
+userScore.update { current -> current + 1 }
+```
+
+#### Toggle
+
+Flip a `Boolean` preference:
+
+```kotlin
+darkMode.toggle()
+```
+
+Toggle an item in a `Set` preference (adds if absent, removes if present):
+
+```kotlin
+tags.toggle("kotlin")
+```
+
 #### Reset to Default
 
 ```kotlin
@@ -318,6 +408,14 @@ userName.resetToDefault()
 
 // Blocking — avoid on the main/UI thread
 userName.resetToDefaultBlocking()
+```
+
+#### Key Access
+
+Retrieve the underlying DataStore key name:
+
+```kotlin
+val key: String = userName.key()
 ```
 
 ### Mapped Preferences
@@ -439,6 +537,22 @@ val protoDatastore = createProtoDatastore(
     migrations = listOf(myMigration),
     scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     producePath = { context.filesDir.resolve("my_proto.pb").absolutePath },
+)
+```
+
+Overloads accepting `okio.Path` and `kotlinx.io.files.Path` are also available:
+
+```kotlin
+val protoDatastore = createProtoDatastore(
+    serializer = MyProtoSerializer,
+    defaultValue = MyProtoMessage.getDefaultInstance(),
+    produceOkioPath = { "/data/my_proto.pb".toPath() },
+)
+
+val protoDatastore = createProtoDatastore(
+    serializer = MyProtoSerializer,
+    defaultValue = MyProtoMessage.getDefaultInstance(),
+    produceKotlinxIoPath = { Path("/data/my_proto.pb") },
 )
 ```
 
