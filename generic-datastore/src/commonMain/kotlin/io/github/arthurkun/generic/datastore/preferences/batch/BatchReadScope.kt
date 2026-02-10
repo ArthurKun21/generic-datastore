@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package io.github.arthurkun.generic.datastore.preferences.batch
 
 import io.github.arthurkun.generic.datastore.preferences.Preferences
