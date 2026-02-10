@@ -1,11 +1,6 @@
 package io.github.arthurkun.generic.datastore.core
 
-import androidx.datastore.preferences.core.MutablePreferences
-import io.github.arthurkun.generic.datastore.preferences.Preference
-import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
 import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
-import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 
 /**
  * Extends the [BasePreference] interface to support property delegation.
@@ -22,36 +17,3 @@ public interface DelegatedPreference<T> : ReadWriteProperty<Any?, T>, BasePrefer
     public fun resetToDefaultBlocking()
 }
 
-/**
- * Internal implementation of the [DelegatedPreference] interface.
- *
- * This class delegates the [BasePreference] functionalities to the provided [pref]
- * instance and implements the property delegation methods.
- *
- * @param T The type of the preference value.
- * @property pref The underlying [BasePreference] instance.
- */
-internal class DelegatedPreferenceImpl<T>(
-    private val pref: BasePreference<T>,
-) : Preference<T>,
-    BasePreference<T> by pref,
-    PreferencesAccessor<T> {
-
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T = pref.getBlocking()
-
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = pref.setBlocking(value)
-
-    override fun resetToDefaultBlocking() = pref.setBlocking(pref.defaultValue)
-
-    @Suppress("UNCHECKED_CAST")
-    override fun readFrom(preferences: DataStorePreferences): T =
-        (pref as PreferencesAccessor<T>).readFrom(preferences)
-
-    @Suppress("UNCHECKED_CAST")
-    override fun writeInto(mutablePreferences: MutablePreferences, value: T) =
-        (pref as PreferencesAccessor<T>).writeInto(mutablePreferences, value)
-
-    @Suppress("UNCHECKED_CAST")
-    override fun removeFrom(mutablePreferences: MutablePreferences) =
-        (pref as PreferencesAccessor<T>).removeFrom(mutablePreferences)
-}
