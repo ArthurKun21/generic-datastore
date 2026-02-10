@@ -2,13 +2,13 @@
 
 package io.github.arthurkun.generic.datastore
 
-import io.github.arthurkun.generic.datastore.core.Prefs
-import io.github.arthurkun.generic.datastore.core.map as coreMap
-import io.github.arthurkun.generic.datastore.core.mapIO as coreMapIO
+import io.github.arthurkun.generic.datastore.preferences.Preferences
+import io.github.arthurkun.generic.datastore.preferences.utils.map as coreMap
+import io.github.arthurkun.generic.datastore.preferences.utils.mapIO as coreMapIO
 
 /**
  * Extension for backwards compatibility.
- * @see io.github.arthurkun.generic.datastore.core.mapIO
+ * @see io.github.arthurkun.generic.datastore.preferences.utils.mapIO
  */
 @Deprecated(
     message = "Moved to core package",
@@ -18,14 +18,14 @@ import io.github.arthurkun.generic.datastore.core.mapIO as coreMapIO
     ),
     level = DeprecationLevel.WARNING,
 )
-public fun <T, R> Prefs<T>.mapIO(
+public fun <T, R> Preferences<T>.mapIO(
     convert: (T) -> R,
     reverse: (R) -> T,
-): Prefs<R> = coreMapIO(convert, reverse)
+): Preferences<R> = coreMapIO(convert, reverse)
 
 /**
  * Extension for backwards compatibility.
- * @see io.github.arthurkun.generic.datastore.core.map
+ * @see io.github.arthurkun.generic.datastore.preferences.utils.map
  */
 @Deprecated(
     message = "Moved to core package",
@@ -35,8 +35,8 @@ public fun <T, R> Prefs<T>.mapIO(
     ),
     level = DeprecationLevel.WARNING,
 )
-public fun <T, R> Prefs<T>.map(
+public fun <T, R> Preferences<T>.map(
     defaultValue: R,
     convert: (T) -> R,
     reverse: (R) -> T,
-): Prefs<R> = coreMap(defaultValue, convert, reverse)
+): Preferences<R> = coreMap(defaultValue, convert, reverse)

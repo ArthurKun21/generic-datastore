@@ -2,7 +2,7 @@ package io.github.arthurkun.generic.datastore.preferences.backup
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.core.BasePreference
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 
@@ -26,8 +26,8 @@ internal class PreferenceBackupCreator(private val datastore: DataStore<Preferen
             .first()
             .asMap()
             .filter { (key, _) ->
-                (exportPrivate || !Preference.isPrivate(key.name)) &&
-                    (exportAppState || !Preference.isAppState(key.name))
+                (exportPrivate || !BasePreference.isPrivate(key.name)) &&
+                    (exportAppState || !BasePreference.isAppState(key.name))
             }
             .mapNotNull { (key, value) ->
                 PreferenceValue.fromAny(value)?.let { preferenceValue ->

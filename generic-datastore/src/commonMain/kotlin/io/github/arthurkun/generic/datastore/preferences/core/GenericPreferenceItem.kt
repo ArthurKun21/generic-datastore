@@ -1,0 +1,152 @@
+package io.github.arthurkun.generic.datastore.preferences.core
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import io.github.arthurkun.generic.datastore.core.BasePreference
+import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+
+/**
+ * Represents a generic preference that can be stored in and retrieved from a DataStore.
+ *
+ * This sealed class provides a type-safe way to handle different preference types (String, Int, Long, etc.)
+ * while abstracting the underlying DataStore operations. It defines common operations for a preference,
+ * such as reading, writing, deleting, and observing its value as a Kotlin Flow or StateFlow.
+ *
+ * Each specific preference type (e.g., [StringPrimitive], [IntPrimitive]) is implemented as a nested class
+ * inheriting from [GenericPreferenceItem].
+ *
+ * @param T The data type of the preference value (e.g., String, Int, Boolean).
+ * @property datastore The [DataStore<Preferences>] instance used for storing and retrieving preferences.
+ * @property key The unique String key used to identify this preference within the DataStore.
+ * @property defaultValue The default value to be returned if the preference is not set or an error occurs.
+ * @property preferences The [Preferences.Key] specific to the type `T`, used to access the preference in DataStore.
+ */
+internal sealed class GenericPreferenceItem<T>(
+    internal val datastore: DataStore<Preferences>,
+    private val key: String,
+    override val defaultValue: T,
+    private val preferences: Preferences.Key<T>,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+) : BasePreference<T> {
+
+    init {
+        require(key.isNotBlank()) {
+            "Preference key cannot be blank."
+        }
+    }
+
+    /**
+     * Returns the unique String key used to identify this preference within the DataStore.
+     */
+    override fun key(): String = key
+
+    /**
+     * Retrieves the current value of the preference from DataStore.
+     * If the key is not found in DataStore or an error occurs during retrieval,
+     * this function returns the [defaultValue]. This is a suspending function.
+     */
+    override suspend fun get(): T {
+        return withContext(ioDispatcher) {
+            asFlow().first()
+        }
+    }
+
+    /**
+     * Sets the value of the preference in the DataStore.
+     * This is a suspending function.
+     * @param value The new value to store for this preference.
+     */
+    override suspend fun set(value: T) {
+        withContext(ioDispatcher) {
+            datastore.edit { ds ->
+                ds[preferences] = value
+            }
+        }
+    }
+
+    /**
+     * Atomically reads the current value and applies [transform] to compute a new value,
+     * then writes it back in a single [datastore.edit] transaction.
+     */
+    override suspend fun update(transform: (T) -> T) {
+        withContext(ioDispatcher) {
+            datastore.edit { ds ->
+                val current = ds[preferences] ?: defaultValue
+                ds[preferences] = transform(current)
+            }
+        }
+    }
+
+    /**
+     * Removes the preference from the DataStore.
+     * This is a suspending function.
+     */
+    override suspend fun delete() {
+        withContext(ioDispatcher) {
+            datastore.edit { ds ->
+                ds.remove(preferences)
+            }
+        }
+    }
+
+    override suspend fun resetToDefault() = set(defaultValue)
+
+    /**
+     * Returns a [Flow] that emits the preference's current value and subsequent updates from DataStore.
+     * If the preference is not set in the DataStore or an error occurs during retrieval,
+     * the flow will emit the [defaultValue].
+     */
+    override fun asFlow(): Flow<T> {
+        return datastore
+            .dataOrEmpty
+            .map { preferences ->
+                preferences[this.preferences] ?: defaultValue
+            }
+    }
+
+    /**
+     * Converts the preference [Flow] into a [StateFlow] within the given [scope].
+     * The [StateFlow] is typically started when there are subscribers and shares the most recent value.
+     * It will be initialized with the current preference value (or [defaultValue] if not set or on error).
+     * @param scope The [CoroutineScope] in which to launch the [StateFlow].
+     * @param started The [SharingStarted] strategy that controls when the upstream flow is active.
+     * @return A [StateFlow] representing the preference's value.
+     */
+    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<T> =
+        asFlow().stateIn(scope, started, defaultValue)
+
+    /**
+     * Synchronously retrieves the current value of the preference.
+     * This operation may block the calling thread while accessing DataStore.
+     * If the key is not found or an error occurs, this function returns the [defaultValue].
+     * Use with caution due to potential blocking.
+     */
+    override fun getBlocking(): T = runBlocking {
+        get()
+    }
+
+    /**
+     * Synchronously sets the value of the preference.
+     * This operation may block the calling thread while accessing DataStore.
+     * Use with caution due to potential blocking.
+     * @param value The new value to store for this preference.
+     */
+    override fun setBlocking(value: T) {
+        runBlocking {
+            set(value)
+        }
+    }
+}

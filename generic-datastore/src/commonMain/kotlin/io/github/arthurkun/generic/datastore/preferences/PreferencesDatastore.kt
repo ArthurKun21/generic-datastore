@@ -1,7 +1,7 @@
 package io.github.arthurkun.generic.datastore.preferences
 
+import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
-import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
@@ -19,117 +19,126 @@ public interface PreferencesDatastore {
      *
      * @param key The preference key.
      * @param defaultValue The default String value (defaults to an empty string).
-     * @return A [Prefs] instance for the String preference.
+     * @return A [DelegatedPreference] instance for the String preference.
      */
-    public fun string(key: String, defaultValue: String = ""): Prefs<String>
+    public fun string(key: String, defaultValue: String = ""): Preferences<String>
 
     /**
      * Creates a Long preference.
      *
      * @param key The preference key.
      * @param defaultValue The default Long value (defaults to 0).
-     * @return A [Prefs] instance for the Long preference.
+     * @return A [DelegatedPreference] instance for the Long preference.
      */
-    public fun long(key: String, defaultValue: Long = 0): Prefs<Long>
+    public fun long(key: String, defaultValue: Long = 0): Preferences<Long>
 
     /**
      * Creates an Int preference.
      *
      * @param key The preference key.
      * @param defaultValue The default Int value (defaults to 0).
-     * @return A [Prefs] instance for the Int preference.
+     * @return A [DelegatedPreference] instance for the Int preference.
      */
-    public fun int(key: String, defaultValue: Int = 0): Prefs<Int>
+    public fun int(key: String, defaultValue: Int = 0): Preferences<Int>
 
     /**
      * Creates a Float preference.
      *
      * @param key The preference key.
      * @param defaultValue The default Float value (defaults to 0f).
-     * @return A [Prefs] instance for the Float preference.
+     * @return A [DelegatedPreference] instance for the Float preference.
      */
-    public fun float(key: String, defaultValue: Float = 0f): Prefs<Float>
+    public fun float(key: String, defaultValue: Float = 0f): Preferences<Float>
 
     /**
      * Creates a Double preference.
      *
      * @param key The preference key.
      * @param defaultValue The default Double value (defaults to 0.0).
-     * @return A [Prefs] instance for the Double preference.
+     * @return A [DelegatedPreference] instance for the Double preference.
      */
-    public fun double(key: String, defaultValue: Double = 0.0): Prefs<Double>
+    public fun double(key: String, defaultValue: Double = 0.0): Preferences<Double>
 
     /**
      * Creates a Boolean preference.
      *
      * @param key The preference key.
      * @param defaultValue The default Boolean value (defaults to false).
-     * @return A [Prefs] instance for the Boolean preference.
+     * @return A [DelegatedPreference] instance for the Boolean preference.
      */
-    public fun bool(key: String, defaultValue: Boolean = false): Prefs<Boolean>
+    public fun bool(key: String, defaultValue: Boolean = false): Preferences<Boolean>
 
     /**
      * Creates a nullable String preference.
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [Prefs] instance for the nullable String preference.
+     * @return A [DelegatedPreference] instance for the nullable String preference.
      */
-    public fun nullableString(key: String): Prefs<String?>
+    public fun nullableString(key: String): Preferences<String?>
+
+    /**
+     * Creates a nullable Set<String> preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [DelegatedPreference] instance for the nullable Set<String> preference.
+     */
+    public fun nullableStringSet(key: String): Preferences<Set<String>?>
 
     /**
      * Creates a nullable Int preference.
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [Prefs] instance for the nullable Int preference.
+     * @return A [DelegatedPreference] instance for the nullable Int preference.
      */
-    public fun nullableInt(key: String): Prefs<Int?>
+    public fun nullableInt(key: String): Preferences<Int?>
 
     /**
      * Creates a nullable Long preference.
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [Prefs] instance for the nullable Long preference.
+     * @return A [DelegatedPreference] instance for the nullable Long preference.
      */
-    public fun nullableLong(key: String): Prefs<Long?>
+    public fun nullableLong(key: String): Preferences<Long?>
 
     /**
      * Creates a nullable Float preference.
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [Prefs] instance for the nullable Float preference.
+     * @return A [DelegatedPreference] instance for the nullable Float preference.
      */
-    public fun nullableFloat(key: String): Prefs<Float?>
+    public fun nullableFloat(key: String): Preferences<Float?>
 
     /**
      * Creates a nullable Double preference.
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [Prefs] instance for the nullable Double preference.
+     * @return A [DelegatedPreference] instance for the nullable Double preference.
      */
-    public fun nullableDouble(key: String): Prefs<Double?>
+    public fun nullableDouble(key: String): Preferences<Double?>
 
     /**
      * Creates a nullable Boolean preference.
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [Prefs] instance for the nullable Boolean preference.
+     * @return A [DelegatedPreference] instance for the nullable Boolean preference.
      */
-    public fun nullableBool(key: String): Prefs<Boolean?>
+    public fun nullableBool(key: String): Preferences<Boolean?>
 
     /**
      * Creates a Set<String> preference.
      *
      * @param key The preference key.
      * @param defaultValue The default Set<String> value (defaults to an empty set).
-     * @return A [Prefs] instance for the Set<String> preference.
+     * @return A [DelegatedPreference] instance for the Set<String> preference.
      */
-    public fun stringSet(key: String, defaultValue: Set<String> = emptySet()): Prefs<Set<String>>
+    public fun stringSet(key: String, defaultValue: Set<String> = emptySet()): Preferences<Set<String>>
 
     /**
      * Creates a preference for a custom object that can be serialized to and deserialized from a String.
@@ -139,14 +148,14 @@ public interface PreferencesDatastore {
      * @param defaultValue The default value for the custom object.
      * @param serializer A function to serialize the object to a String.
      * @param deserializer A function to deserialize the String back to the object.
-     * @return A [Prefs] instance for the custom object preference.
+     * @return A [DelegatedPreference] instance for the custom object preference.
      */
     public fun <T> serialized(
         key: String,
         defaultValue: T,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): Prefs<T>
+    ): Preferences<T>
 
     /**
      * Creates a preference for a [Set] of custom objects, stored using a string set preference key.
@@ -157,14 +166,14 @@ public interface PreferencesDatastore {
      * @param defaultValue The default value for the set (defaults to an empty set).
      * @param serializer A function to serialize each element to a String.
      * @param deserializer A function to deserialize each String back to an element.
-     * @return A [Prefs] instance for the Set preference.
+     * @return A [DelegatedPreference] instance for the Set preference.
      */
     public fun <T> serializedSet(
         key: String,
         defaultValue: Set<T> = emptySet(),
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): Prefs<Set<T>>
+    ): Preferences<Set<T>>
 
     /**
      * Creates a preference for a custom object using Kotlin Serialization.
@@ -175,14 +184,14 @@ public interface PreferencesDatastore {
      * @param defaultValue The default value for the custom object.
      * @param serializer The [KSerializer] for the type [T].
      * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
-     * @return A [Prefs] instance for the custom object preference.
+     * @return A [DelegatedPreference] instance for the custom object preference.
      */
     public fun <T> kserialized(
         key: String,
         defaultValue: T,
         serializer: KSerializer<T>,
         json: Json? = null,
-    ): Prefs<T>
+    ): Preferences<T>
 
     /**
      * Creates a preference for a [Set] of custom objects using Kotlin Serialization.
@@ -193,14 +202,14 @@ public interface PreferencesDatastore {
      * @param defaultValue The default value for the set (defaults to an empty set).
      * @param serializer The [KSerializer] for the type [T].
      * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
-     * @return A [Prefs] instance for the Set preference.
+     * @return A [DelegatedPreference] instance for the Set preference.
      */
     public fun <T> kserializedSet(
         key: String,
         defaultValue: Set<T> = emptySet(),
         serializer: KSerializer<T>,
         json: Json? = null,
-    ): Prefs<Set<T>>
+    ): Preferences<Set<T>>
 
     /**
      * Creates a preference for a [List] of custom objects that can be serialized to and
@@ -212,14 +221,14 @@ public interface PreferencesDatastore {
      * @param defaultValue The default value for the list (defaults to an empty list).
      * @param serializer A function to serialize each element to a String.
      * @param deserializer A function to deserialize each String back to an element.
-     * @return A [Prefs] instance for the List preference.
+     * @return A [DelegatedPreference] instance for the List preference.
      */
     public fun <T> serializedList(
         key: String,
         defaultValue: List<T> = emptyList(),
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): Prefs<List<T>>
+    ): Preferences<List<T>>
 
     /**
      * Creates a preference for a [List] of custom objects using Kotlin Serialization.
@@ -230,14 +239,90 @@ public interface PreferencesDatastore {
      * @param defaultValue The default value for the list (defaults to an empty list).
      * @param serializer The [KSerializer] for the type [T].
      * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
-     * @return A [Prefs] instance for the List preference.
+     * @return A [DelegatedPreference] instance for the List preference.
      */
     public fun <T> kserializedList(
         key: String,
         defaultValue: List<T> = emptyList(),
         serializer: KSerializer<T>,
         json: Json? = null,
-    ): Prefs<List<T>>
+    ): Preferences<List<T>>
+
+    /**
+     * Creates a nullable preference for a custom object that can be serialized to and
+     * deserialized from a String.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * If deserialization fails, `null` is returned.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer A function to serialize the object to a String.
+     * @param deserializer A function to deserialize the String back to the object.
+     * @return A [DelegatedPreference] instance for the nullable custom object preference.
+     */
+    public fun <T : Any> nullableSerialized(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preferences<T?>
+
+    /**
+     * Creates a nullable preference for a custom object using Kotlin Serialization.
+     * The object is serialized to JSON for storage.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * If deserialization fails, `null` is returned.
+     *
+     * @param T The non-null type of the custom object. Must be serializable using kotlinx.serialization.
+     * @param key The preference key.
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+     * @return A [DelegatedPreference] instance for the nullable custom object preference.
+     */
+    public fun <T : Any> nullableKserialized(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json? = null,
+    ): Preferences<T?>
+
+    /**
+     * Creates a nullable preference for a [List] of custom objects that can be serialized
+     * to and deserialized from Strings. The list is stored as a JSON array string.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * If deserialization fails, `null` is returned.
+     *
+     * @param T The type of each element in the list.
+     * @param key The preference key.
+     * @param serializer A function to serialize each element to a String.
+     * @param deserializer A function to deserialize each String back to an element.
+     * @return A [DelegatedPreference] instance for the nullable List preference.
+     */
+    public fun <T> nullableSerializedList(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preferences<List<T>?>
+
+    /**
+     * Creates a nullable preference for a [List] of custom objects using Kotlin Serialization.
+     * The list is serialized to a JSON array string for storage.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * If deserialization fails, `null` is returned.
+     *
+     * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
+     * @param key The preference key.
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+     * @return A [DelegatedPreference] instance for the nullable List preference.
+     */
+    public fun <T> nullableKserializedList(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json? = null,
+    ): Preferences<List<T>?>
 
     /**
      * Clears all preferences stored in this datastore.
@@ -350,13 +435,13 @@ public interface PreferencesDatastore {
  * @param key The preference key.
  * @param defaultValue The default value for the custom object.
  * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
- * @return A [Prefs] instance for the custom object preference.
+ * @return A [DelegatedPreference] instance for the custom object preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserialized(
     key: String,
     defaultValue: T,
     json: Json? = null,
-): Prefs<T> = kserialized(
+): Preferences<T> = kserialized(
     key = key,
     defaultValue = defaultValue,
     serializer = serializer<T>(),
@@ -373,13 +458,13 @@ public inline fun <reified T> PreferencesDatastore.kserialized(
  * @param key The preference key.
  * @param defaultValue The default value for the set (defaults to an empty set).
  * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
- * @return A [Prefs] instance for the Set preference.
+ * @return A [DelegatedPreference] instance for the Set preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserializedSet(
     key: String,
     defaultValue: Set<T> = emptySet(),
     json: Json? = null,
-): Prefs<Set<T>> = kserializedSet(
+): Preferences<Set<T>> = kserializedSet(
     key = key,
     defaultValue = defaultValue,
     serializer = serializer<T>(),
@@ -396,15 +481,55 @@ public inline fun <reified T> PreferencesDatastore.kserializedSet(
  * @param key The preference key.
  * @param defaultValue The default value for the list (defaults to an empty list).
  * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
- * @return A [Prefs] instance for the List preference.
+ * @return A [DelegatedPreference] instance for the List preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserializedList(
     key: String,
     defaultValue: List<T> = emptyList(),
     json: Json? = null,
-): Prefs<List<T>> = kserializedList(
+): Preferences<List<T>> = kserializedList(
     key = key,
     defaultValue = defaultValue,
+    serializer = serializer<T>(),
+    json = json,
+)
+
+/**
+ * Creates a nullable preference for a custom object using Kotlin Serialization,
+ * inferring the [KSerializer] from the reified type parameter.
+ *
+ * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ *
+ * @param T The non-null type of the custom object.
+ * @param key The preference key.
+ * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+ * @return A [DelegatedPreference] instance for the nullable custom object preference.
+ */
+public inline fun <reified T : Any> PreferencesDatastore.nullableKserialized(
+    key: String,
+    json: Json? = null,
+): Preferences<T?> = nullableKserialized(
+    key = key,
+    serializer = serializer<T>(),
+    json = json,
+)
+
+/**
+ * Creates a nullable preference for a [List] of custom objects using Kotlin Serialization,
+ * inferring the [KSerializer] from the reified type parameter.
+ *
+ * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ *
+ * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
+ * @param key The preference key.
+ * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+ * @return A [DelegatedPreference] instance for the nullable List preference.
+ */
+public inline fun <reified T> PreferencesDatastore.nullableKserializedList(
+    key: String,
+    json: Json? = null,
+): Preferences<List<T>?> = nullableKserializedList(
+    key = key,
     serializer = serializer<T>(),
     json = json,
 )
@@ -413,12 +538,12 @@ public inline fun <reified T> PreferencesDatastore.kserializedList(
  * Toggles an item in a [Set] preference.
  *
  * If the set contains the item, it is removed; otherwise, it is added.
- * Works with [stringSet], [serializedSet], and [enumSet][io.github.arthurkun.generic.datastore.preferences.default.enumSet] preferences.
+ * Works with [stringSet], [serializedSet], and [enumSet][io.github.arthurkun.generic.datastore.preferences.core.customSet.enumSet] preferences.
  *
  * @param T The type of each element in the set.
  * @param item The item to toggle.
  */
-public suspend inline fun <T> Prefs<Set<T>>.toggle(item: T) {
+public suspend inline fun <T> Preferences<Set<T>>.toggle(item: T) {
     update { current ->
         if (item in current) current - item else current + item
     }
@@ -429,6 +554,6 @@ public suspend inline fun <T> Prefs<Set<T>>.toggle(item: T) {
  *
  * Flips the current value: `true` becomes `false`, and `false` becomes `true`.
  */
-public suspend inline fun Prefs<Boolean>.toggle() {
+public suspend inline fun Preferences<Boolean>.toggle() {
     update { !it }
 }

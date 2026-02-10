@@ -1,6 +1,6 @@
 package io.github.arthurkun.generic.datastore.proto
 
-import io.github.arthurkun.generic.datastore.core.Prefs
+import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 
 /**
  * Defines the contract for a Proto DataStore.
@@ -11,9 +11,9 @@ import io.github.arthurkun.generic.datastore.core.Prefs
  */
 public interface ProtoDatastore<T> {
     /**
-     * Returns the proto message wrapped as a [Prefs] instance.
+     * Returns the proto message wrapped as a [DelegatedPreference] instance.
      *
-     * @return A [Prefs] instance for the proto message.
+     * @return A [DelegatedPreference] instance for the proto message.
      */
-    public fun data(): Prefs<T>
+    public fun data(): ProtoPreference<T>
 }

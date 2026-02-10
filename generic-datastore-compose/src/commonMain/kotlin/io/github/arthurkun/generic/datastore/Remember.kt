@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SnapshotMutationPolicy
 import androidx.compose.runtime.structuralEqualityPolicy
-import io.github.arthurkun.generic.datastore.core.Prefs
+import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -22,7 +22,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @return A [MutableState] representing the preference value.
  */
 @Composable
-public expect fun <T> Prefs<T>.remember(
+public expect fun <T> DelegatedPreference<T>.remember(
     context: CoroutineContext = EmptyCoroutineContext,
     policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
 ): MutableState<T>

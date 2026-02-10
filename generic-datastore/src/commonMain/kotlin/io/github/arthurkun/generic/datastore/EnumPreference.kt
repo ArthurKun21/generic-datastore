@@ -2,13 +2,13 @@
 
 package io.github.arthurkun.generic.datastore
 
-import io.github.arthurkun.generic.datastore.core.Prefs
+import io.github.arthurkun.generic.datastore.preferences.Preferences
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.default.custom.enum as preferencesEnum
+import io.github.arthurkun.generic.datastore.preferences.core.custom.enum as preferencesEnum
 
 /**
  * Extension for backwards compatibility.
- * @see io.github.arthurkun.generic.datastore.preferences.default.custom.enum
+ * @see io.github.arthurkun.generic.datastore.preferences.core.custom.enum
  */
 @Deprecated(
     message = "Moved to preferences package",
@@ -21,4 +21,4 @@ import io.github.arthurkun.generic.datastore.preferences.default.custom.enum as 
 public inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
     key: String,
     defaultValue: T,
-): Prefs<T> = preferencesEnum(key, defaultValue)
+): Preferences<T> = preferencesEnum(key, defaultValue)
