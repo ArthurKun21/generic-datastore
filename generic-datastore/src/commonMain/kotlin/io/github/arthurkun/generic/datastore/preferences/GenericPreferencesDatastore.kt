@@ -74,7 +74,10 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default String value.
      * @return A [DelegatedPreference] instance for the String preference.
      */
-    override fun string(key: String, defaultValue: String): DatastorePreferenceItem<String> =
+    override fun string(
+        key: String,
+        defaultValue: String,
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<String> =
         DelegatedPreferenceImpl(
             StringPrimitive(
                 datastore = datastore,
@@ -90,7 +93,10 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default Long value.
      * @return A [DelegatedPreference] instance for the Long preference.
      */
-    override fun long(key: String, defaultValue: Long): DatastorePreferenceItem<Long> =
+    override fun long(
+        key: String,
+        defaultValue: Long,
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<Long> =
         DelegatedPreferenceImpl(
             LongPrimitive(
                 datastore = datastore,
@@ -106,7 +112,10 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default Int value.
      * @return A [DelegatedPreference] instance for the Int preference.
      */
-    override fun int(key: String, defaultValue: Int): DatastorePreferenceItem<Int> =
+    override fun int(
+        key: String,
+        defaultValue: Int,
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<Int> =
         DelegatedPreferenceImpl(
             IntPrimitive(
                 datastore = datastore,
@@ -122,7 +131,10 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default Float value.
      * @return A [DelegatedPreference] instance for the Float preference.
      */
-    override fun float(key: String, defaultValue: Float): DatastorePreferenceItem<Float> =
+    override fun float(
+        key: String,
+        defaultValue: Float,
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<Float> =
         DelegatedPreferenceImpl(
             FloatPrimitive(
                 datastore = datastore,
@@ -138,7 +150,10 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default Double value.
      * @return A [DelegatedPreference] instance for the Double preference.
      */
-    override fun double(key: String, defaultValue: Double): DatastorePreferenceItem<Double> =
+    override fun double(
+        key: String,
+        defaultValue: Double,
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<Double> =
         DelegatedPreferenceImpl(
             DoublePrimitive(
                 datastore = datastore,
@@ -154,7 +169,10 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default Boolean value.
      * @return A [DelegatedPreference] instance for the Boolean preference.
      */
-    override fun bool(key: String, defaultValue: Boolean): DatastorePreferenceItem<Boolean> =
+    override fun bool(
+        key: String,
+        defaultValue: Boolean,
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<Boolean> =
         DelegatedPreferenceImpl(
             BooleanPrimitive(
                 datastore = datastore,
@@ -170,7 +188,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable String preference.
      */
-    override fun nullableString(key: String): DatastorePreferenceItem<String?> =
+    override fun nullableString(key: String): io.github.arthurkun.generic.datastore.preferences.Preferences<String?> =
         DelegatedPreferenceImpl(
             NullableStringPrimitive(
                 datastore = datastore,
@@ -185,7 +203,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Set<String> preference.
      */
-    override fun nullableStringSet(key: String): DatastorePreferenceItem<Set<String>?> =
+    override fun nullableStringSet(key: String): io.github.arthurkun.generic.datastore.preferences.Preferences<Set<String>?> =
         DelegatedPreferenceImpl(
             NullableStringSetPrimitive(
                 datastore = datastore,
@@ -200,7 +218,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Int preference.
      */
-    override fun nullableInt(key: String): DatastorePreferenceItem<Int?> =
+    override fun nullableInt(key: String): io.github.arthurkun.generic.datastore.preferences.Preferences<Int?> =
         DelegatedPreferenceImpl(
             NullableIntPrimitive(
                 datastore = datastore,
@@ -215,7 +233,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Long preference.
      */
-    override fun nullableLong(key: String): DatastorePreferenceItem<Long?> =
+    override fun nullableLong(key: String): io.github.arthurkun.generic.datastore.preferences.Preferences<Long?> =
         DelegatedPreferenceImpl(
             NullableLongPrimitive(
                 datastore = datastore,
@@ -230,7 +248,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Float preference.
      */
-    override fun nullableFloat(key: String): DatastorePreferenceItem<Float?> =
+    override fun nullableFloat(key: String): io.github.arthurkun.generic.datastore.preferences.Preferences<Float?> =
         DelegatedPreferenceImpl(
             NullableFloatPrimitive(
                 datastore = datastore,
@@ -245,7 +263,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Double preference.
      */
-    override fun nullableDouble(key: String): DatastorePreferenceItem<Double?> =
+    override fun nullableDouble(key: String): io.github.arthurkun.generic.datastore.preferences.Preferences<Double?> =
         DelegatedPreferenceImpl(
             NullableDoublePrimitive(
                 datastore = datastore,
@@ -260,7 +278,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Boolean preference.
      */
-    override fun nullableBool(key: String): DatastorePreferenceItem<Boolean?> =
+    override fun nullableBool(key: String): io.github.arthurkun.generic.datastore.preferences.Preferences<Boolean?> =
         DelegatedPreferenceImpl(
             NullableBooleanPrimitive(
                 datastore = datastore,
@@ -278,7 +296,7 @@ public class GenericPreferencesDatastore(
     override fun stringSet(
         key: String,
         defaultValue: Set<String>,
-    ): DatastorePreferenceItem<Set<String>> =
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<Set<String>> =
         DelegatedPreferenceImpl(
             StringSetPrimitive(
                 datastore = datastore,
@@ -302,7 +320,7 @@ public class GenericPreferencesDatastore(
         defaultValue: T,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): DatastorePreferenceItem<T> = DelegatedPreferenceImpl(
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<T> = DelegatedPreferenceImpl(
         ObjectPrimitive(
             datastore = datastore,
             key = key,
@@ -328,7 +346,7 @@ public class GenericPreferencesDatastore(
         defaultValue: Set<T>,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): DatastorePreferenceItem<Set<T>> = DelegatedPreferenceImpl(
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<Set<T>> = DelegatedPreferenceImpl(
         SerializedSetPrimitive(
             datastore = datastore,
             key = key,
@@ -354,7 +372,7 @@ public class GenericPreferencesDatastore(
         defaultValue: T,
         serializer: KSerializer<T>,
         json: Json?,
-    ): DatastorePreferenceItem<T> = DelegatedPreferenceImpl(
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<T> = DelegatedPreferenceImpl(
         KSerializedPrimitive(
             datastore = datastore,
             key = key,
@@ -380,7 +398,7 @@ public class GenericPreferencesDatastore(
         defaultValue: Set<T>,
         serializer: KSerializer<T>,
         json: Json?,
-    ): DatastorePreferenceItem<Set<T>> = DelegatedPreferenceImpl(
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<Set<T>> = DelegatedPreferenceImpl(
         KSerializedSetPrimitive(
             datastore = datastore,
             key = key,
@@ -406,7 +424,7 @@ public class GenericPreferencesDatastore(
         defaultValue: List<T>,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): DatastorePreferenceItem<List<T>> = DelegatedPreferenceImpl(
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<List<T>> = DelegatedPreferenceImpl(
         SerializedListPrimitive(
             datastore = datastore,
             key = key,
@@ -432,7 +450,7 @@ public class GenericPreferencesDatastore(
         defaultValue: List<T>,
         serializer: KSerializer<T>,
         json: Json?,
-    ): DatastorePreferenceItem<List<T>> = DelegatedPreferenceImpl(
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<List<T>> = DelegatedPreferenceImpl(
         KSerializedListPrimitive(
             datastore = datastore,
             key = key,
@@ -446,7 +464,7 @@ public class GenericPreferencesDatastore(
         key: String,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): DatastorePreferenceItem<T?> = DelegatedPreferenceImpl(
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<T?> = DelegatedPreferenceImpl(
         NullableObjectPrimitive(
             datastore = datastore,
             key = key,
@@ -459,7 +477,7 @@ public class GenericPreferencesDatastore(
         key: String,
         serializer: KSerializer<T>,
         json: Json?,
-    ): DatastorePreferenceItem<T?> = DelegatedPreferenceImpl(
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<T?> = DelegatedPreferenceImpl(
         NullableKSerializedPrimitive(
             datastore = datastore,
             key = key,
@@ -472,7 +490,7 @@ public class GenericPreferencesDatastore(
         key: String,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): DatastorePreferenceItem<List<T>?> = DelegatedPreferenceImpl(
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<List<T>?> = DelegatedPreferenceImpl(
         NullableSerializedListPrimitive(
             datastore = datastore,
             key = key,
@@ -485,7 +503,7 @@ public class GenericPreferencesDatastore(
         key: String,
         serializer: KSerializer<T>,
         json: Json?,
-    ): DatastorePreferenceItem<List<T>?> = DelegatedPreferenceImpl(
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<List<T>?> = DelegatedPreferenceImpl(
         NullableKSerializedListPrimitive(
             datastore = datastore,
             key = key,

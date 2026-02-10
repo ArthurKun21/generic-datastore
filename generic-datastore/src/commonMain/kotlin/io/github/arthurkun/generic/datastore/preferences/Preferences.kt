@@ -10,4 +10,4 @@ import io.github.arthurkun.generic.datastore.core.DelegatedPreference
  *
  * @param T The type of the preference value.
  */
-public interface DatastorePreferenceItem<T> : DelegatedPreference<T>
+public interface Preferences<T> : DelegatedPreference<T>
