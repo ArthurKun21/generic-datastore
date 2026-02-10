@@ -145,13 +145,13 @@ val datastore = GenericPreferencesDatastore(myExistingDataStore)
 The `GenericPreferencesDatastore` provides factory methods for all supported types:
 
 ```kotlin
-val userName: Preferences<String> = datastore.string("user_name", "Guest")
-val userScore: Preferences<Int> = datastore.int("user_score", 0)
-val highScore: Preferences<Long> = datastore.long("high_score", 0L)
-val volume: Preferences<Float> = datastore.float("volume", 1.0f)
-val precision: Preferences<Double> = datastore.double("precision", 0.0)
-val darkMode: Preferences<Boolean> = datastore.bool("dark_mode", false)
-val tags: Preferences<Set<String>> = datastore.stringSet("tags")
+val userName: Preference<String> = datastore.string("user_name", "Guest")
+val userScore: Preference<Int> = datastore.int("user_score", 0)
+val highScore: Preference<Long> = datastore.long("high_score", 0L)
+val volume: Preference<Float> = datastore.float("volume", 1.0f)
+val precision: Preference<Double> = datastore.double("precision", 0.0)
+val darkMode: Preference<Boolean> = datastore.bool("dark_mode", false)
+val tags: Preference<Set<String>> = datastore.stringSet("tags")
 ```
 
 ### Enum Preferences
@@ -161,7 +161,7 @@ Store enum values directly using the `enum()` extension:
 ```kotlin
 enum class Theme { LIGHT, DARK, SYSTEM }
 
-val themePref: Preferences<Theme> = datastore.enum("theme", Theme.SYSTEM)
+val themePref: Preference<Theme> = datastore.enum("theme", Theme.SYSTEM)
 ```
 
 ### Custom Serialized Objects
@@ -172,7 +172,7 @@ Store any object by providing serializer/deserializer functions:
 @Serializable
 data class UserProfile(val id: Int, val email: String)
 
-val userProfilePref: Preferences<UserProfile> = datastore.serialized(
+val userProfilePref: Preference<UserProfile> = datastore.serialized(
     key = "user_profile",
     defaultValue = UserProfile(0, ""),
     serializer = { Json.encodeToString(UserProfile.serializer(), it) },
@@ -213,7 +213,7 @@ Store any `@Serializable` type directly without manual serializer/deserializer f
 @Serializable
 data class UserProfile(val name: String, val age: Int)
 
-val userProfilePref: Preferences<UserProfile> = datastore.kserialized(
+val userProfilePref: Preference<UserProfile> = datastore.kserialized(
     key = "user_profile",
     defaultValue = UserProfile(name = "John", age = 25),
 )
@@ -224,7 +224,7 @@ A custom `Json` instance can be provided if needed:
 ```kotlin
 val customJson = Json { prettyPrint = true }
 
-val userProfilePref: Preferences<UserProfile> = datastore.kserialized(
+val userProfilePref: Preference<UserProfile> = datastore.kserialized(
     key = "user_profile",
     defaultValue = UserProfile(name = "John", age = 25),
     json = customJson,
@@ -236,7 +236,7 @@ val userProfilePref: Preferences<UserProfile> = datastore.kserialized(
 Store a `Set` of custom objects using per-element serialization with `serializedSet()`:
 
 ```kotlin
-val animalSetPref: Preferences<Set<Animal>> = datastore.serializedSet(
+val animalSetPref: Preference<Set<Animal>> = datastore.serializedSet(
     key = "animal_set",
     defaultValue = emptySet(),
     serializer = { Animal.to(it) },
@@ -255,7 +255,7 @@ Store a `Set` of `@Serializable` objects without manual serializer/deserializer 
 @Serializable
 data class UserProfile(val name: String, val age: Int)
 
-val profileSetPref: Preferences<Set<UserProfile>> = datastore.kserializedSet(
+val profileSetPref: Preference<Set<UserProfile>> = datastore.kserializedSet(
     key = "profile_set",
     defaultValue = emptySet(),
 )
@@ -270,7 +270,7 @@ needed.
 Store a `List` of custom objects using per-element serialization with `serializedList()`:
 
 ```kotlin
-val animalListPref: Preferences<List<Animal>> = datastore.serializedList(
+val animalListPref: Preference<List<Animal>> = datastore.serializedList(
     key = "animal_list",
     defaultValue = emptyList(),
     serializer = { Animal.to(it) },
@@ -290,7 +290,7 @@ Store a `List` of `@Serializable` objects without manual serializer/deserializer
 @Serializable
 data class UserProfile(val name: String, val age: Int)
 
-val profileListPref: Preferences<List<UserProfile>> = datastore.kserializedList(
+val profileListPref: Preference<List<UserProfile>> = datastore.kserializedList(
     key = "profile_list",
     defaultValue = emptyList(),
 )
@@ -305,7 +305,7 @@ instance can be provided if needed.
 Store a `Set` of enum values with the `enumSet()` extension:
 
 ```kotlin
-val themeSetPref: Preferences<Set<Theme>> = datastore.enumSet<Theme>(
+val themeSetPref: Preference<Set<Theme>> = datastore.enumSet<Theme>(
     key = "theme_set",
     defaultValue = emptySet(),
 )
@@ -319,13 +319,13 @@ skipped.
 Create preferences that return `null` when no value has been set, instead of a default value:
 
 ```kotlin
-val nickname: Preferences<String?> = datastore.nullableString("nickname")
-val age: Preferences<Int?> = datastore.nullableInt("age")
-val timestamp: Preferences<Long?> = datastore.nullableLong("timestamp")
-val weight: Preferences<Float?> = datastore.nullableFloat("weight")
-val latitude: Preferences<Double?> = datastore.nullableDouble("latitude")
-val agreed: Preferences<Boolean?> = datastore.nullableBool("agreed")
-val labels: Preferences<Set<String>?> = datastore.nullableStringSet("labels")
+val nickname: Preference<String?> = datastore.nullableString("nickname")
+val age: Preference<Int?> = datastore.nullableInt("age")
+val timestamp: Preference<Long?> = datastore.nullableLong("timestamp")
+val weight: Preference<Float?> = datastore.nullableFloat("weight")
+val latitude: Preference<Double?> = datastore.nullableDouble("latitude")
+val agreed: Preference<Boolean?> = datastore.nullableBool("agreed")
+val labels: Preference<Set<String>?> = datastore.nullableStringSet("labels")
 ```
 
 Setting a nullable preference to `null` removes the key from DataStore. `resetToDefault()` also
@@ -344,7 +344,7 @@ nickname.get()        // null
 Store an enum value that returns `null` when not set:
 
 ```kotlin
-val themePref: Preferences<Theme?> = datastore.nullableEnum<Theme>("theme")
+val themePref: Preference<Theme?> = datastore.nullableEnum<Theme>("theme")
 ```
 
 ### Nullable Custom Serialized Objects
@@ -352,7 +352,7 @@ val themePref: Preferences<Theme?> = datastore.nullableEnum<Theme>("theme")
 Store a nullable custom-serialized object:
 
 ```kotlin
-val animalPref: Preferences<Animal?> = datastore.nullableSerialized(
+val animalPref: Preference<Animal?> = datastore.nullableSerialized(
     key = "animal",
     serializer = { Animal.to(it) },
     deserializer = { Animal.from(it) },
@@ -367,7 +367,7 @@ Store a nullable `@Serializable` type:
 @Serializable
 data class UserProfile(val name: String, val age: Int)
 
-val userProfilePref: Preferences<UserProfile?> =
+val userProfilePref: Preference<UserProfile?> =
     datastore.nullableKserialized<UserProfile>("user_profile")
 ```
 
@@ -376,7 +376,7 @@ val userProfilePref: Preferences<UserProfile?> =
 Store a nullable list of custom-serialized objects:
 
 ```kotlin
-val animalListPref: Preferences<List<Animal>?> = datastore.nullableSerializedList(
+val animalListPref: Preference<List<Animal>?> = datastore.nullableSerializedList(
     key = "animal_list",
     serializer = { Animal.to(it) },
     deserializer = { Animal.from(it) },
@@ -388,7 +388,7 @@ val animalListPref: Preferences<List<Animal>?> = datastore.nullableSerializedLis
 Store a nullable list of `@Serializable` objects:
 
 ```kotlin
-val profileListPref: Preferences<List<UserProfile>?> =
+val profileListPref: Preference<List<UserProfile>?> =
     datastore.nullableKserializedList<UserProfile>(
         key = "profile_list",
     )
@@ -399,7 +399,7 @@ deserialization fails, `null` is returned.
 
 ### Reading & Writing Values
 
-Each `Preferences<T>` provides multiple access patterns:
+Each `Preference<T>` provides multiple access patterns:
 
 #### Suspend Functions
 
@@ -483,17 +483,17 @@ val key: String = userName.key()
 
 ### Mapped Preferences
 
-Transform a `Preferences<T>` into a `Preferences<R>` with converter functions:
+Transform a `Preference<T>` into a `Preference<R>` with converter functions:
 
 ```kotlin
-val scoreAsString: Preferences<String> = userScore.map(
+val scoreAsString: Preference<String> = userScore.map(
     defaultValue = "0",
     convert = { it.toString() },
     reverse = { it.toIntOrNull() ?: 0 },
 )
 
 // Or infer the default value from the original preference's default:
-val scoreAsString2: Preferences<String> = userScore.mapIO(
+val scoreAsString2: Preference<String> = userScore.mapIO(
     convert = { it.toString() },
     reverse = { it.toInt() },
 )
