@@ -3,7 +3,7 @@
 package io.github.arthurkun.generic.datastore.preferences.batch
 
 import androidx.datastore.preferences.core.MutablePreferences
-import io.github.arthurkun.generic.datastore.preferences.Preferences
+import io.github.arthurkun.generic.datastore.preferences.Preference
 import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 
 /**
@@ -28,7 +28,7 @@ public class BatchUpdateScope internal constructor(
      * @return The preference value, or its default if the key is absent.
      * @throws IllegalStateException if [preference] does not implement [PreferencesAccessor].
      */
-    public operator fun <T> get(preference: Preferences<T>): T {
+    public operator fun <T> get(preference: Preference<T>): T {
         val accessible = preference as? PreferencesAccessor<T>
             ?: error("Batch operations only support preferences created by this library")
         return accessible.readFrom(snapshot)
@@ -41,7 +41,7 @@ public class BatchUpdateScope internal constructor(
      * @param value The new value to write.
      * @throws IllegalStateException if [preference] does not implement [PreferencesAccessor].
      */
-    public operator fun <T> set(preference: Preferences<T>, value: T) {
+    public operator fun <T> set(preference: Preference<T>, value: T) {
         val accessible = preference as? PreferencesAccessor<T>
             ?: error("Batch operations only support preferences created by this library")
         accessible.writeInto(mutablePreferences, value)
@@ -53,7 +53,7 @@ public class BatchUpdateScope internal constructor(
      * @param preference The preference to update.
      * @param transform A function that receives the current value and returns the new value.
      */
-    public fun <T> update(preference: Preferences<T>, transform: (T) -> T) {
+    public fun <T> update(preference: Preference<T>, transform: (T) -> T) {
         set(preference, transform(get(preference)))
     }
 
@@ -63,18 +63,18 @@ public class BatchUpdateScope internal constructor(
      * @param preference The preference to remove.
      * @throws IllegalStateException if [preference] does not implement [PreferencesAccessor].
      */
-    public fun <T> delete(preference: Preferences<T>) {
+    public fun <T> delete(preference: Preference<T>) {
         val accessible = preference as? PreferencesAccessor<T>
             ?: error("Batch operations only support preferences created by this library")
         accessible.removeFrom(mutablePreferences)
     }
 
     /**
-     * Resets the given preference to its [Preferences.defaultValue] in the shared transaction.
+     * Resets the given preference to its [Preference.defaultValue] in the shared transaction.
      *
      * @param preference The preference to reset.
      */
-    public fun <T> resetToDefault(preference: Preferences<T>) {
+    public fun <T> resetToDefault(preference: Preference<T>) {
         set(preference, preference.defaultValue)
     }
 }

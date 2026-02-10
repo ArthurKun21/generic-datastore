@@ -4,7 +4,7 @@ package io.github.arthurkun.generic.datastore.preferences.utils
 
 import androidx.datastore.preferences.core.MutablePreferences
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
-import io.github.arthurkun.generic.datastore.preferences.Preferences
+import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -36,10 +36,10 @@ import androidx.datastore.preferences.core.Preferences as DataStorePreferences
  * @return A new [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instance of type [R].
  * @throws Exception if `convert(this.defaultValue)` fails.
  */
-public fun <T, R> Preferences<T>.mapIO(
+public fun <T, R> Preference<T>.mapIO(
     convert: (T) -> R,
     reverse: (R) -> T,
-): Preferences<R> =
+): Preference<R> =
     MappedPrefs(
         prefs = this,
         defaultValue = convert(this.defaultValue),
@@ -69,11 +69,11 @@ public fun <T, R> Preferences<T>.mapIO(
  * @return A new [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instance of type [R] that applies the specified conversions
  *   and error handling logic.
  */
-public fun <T, R> Preferences<T>.map(
+public fun <T, R> Preference<T>.map(
     defaultValue: R,
     convert: (T) -> R,
     reverse: (R) -> T,
-): Preferences<R> =
+): Preference<R> =
     MappedPrefs(
         this,
         defaultValue,
@@ -96,7 +96,7 @@ internal class MappedPrefs<T, R>(
     override val defaultValue: R,
     private val convert: (T) -> R,
     private val reverse: (R) -> T,
-) : Preferences<R>, PreferencesAccessor<R> {
+) : Preference<R>, PreferencesAccessor<R> {
     override fun key(): String = prefs.key()
 
     /**

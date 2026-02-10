@@ -2,7 +2,7 @@
 
 package io.github.arthurkun.generic.datastore.preferences.core.customSet
 
-import io.github.arthurkun.generic.datastore.preferences.Preferences
+import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 
 /**
@@ -20,7 +20,7 @@ import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 public inline fun <reified T : Enum<T>> PreferencesDatastore.enumSet(
     key: String,
     defaultValue: Set<T> = emptySet(),
-): Preferences<Set<T>> = serializedSet(
+): Preference<Set<T>> = serializedSet(
     key = key,
     defaultValue = defaultValue,
     serializer = { it.name },

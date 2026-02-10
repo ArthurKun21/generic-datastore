@@ -2,7 +2,7 @@
 
 package io.github.arthurkun.generic.datastore.preferences.batch
 
-import io.github.arthurkun.generic.datastore.preferences.Preferences
+import io.github.arthurkun.generic.datastore.preferences.Preference
 import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 
 /**
@@ -26,7 +26,7 @@ public class BatchReadScope internal constructor(
      * @return The preference value, or its default if the key is absent.
      * @throws IllegalStateException if [preference] does not implement [PreferencesAccessor].
      */
-    public operator fun <T> get(preference: Preferences<T>): T {
+    public operator fun <T> get(preference: Preference<T>): T {
         val accessible = preference as? PreferencesAccessor<T>
             ?: error("Batch operations only support preferences created by this library")
         return accessible.readFrom(snapshot)

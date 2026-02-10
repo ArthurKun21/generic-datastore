@@ -25,7 +25,7 @@ public interface PreferencesDatastore {
      * @param defaultValue The default String value (defaults to an empty string).
      * @return A [DelegatedPreference] instance for the String preference.
      */
-    public fun string(key: String, defaultValue: String = ""): Preferences<String>
+    public fun string(key: String, defaultValue: String = ""): Preference<String>
 
     /**
      * Creates a Long preference.
@@ -34,7 +34,7 @@ public interface PreferencesDatastore {
      * @param defaultValue The default Long value (defaults to 0).
      * @return A [DelegatedPreference] instance for the Long preference.
      */
-    public fun long(key: String, defaultValue: Long = 0): Preferences<Long>
+    public fun long(key: String, defaultValue: Long = 0): Preference<Long>
 
     /**
      * Creates an Int preference.
@@ -43,7 +43,7 @@ public interface PreferencesDatastore {
      * @param defaultValue The default Int value (defaults to 0).
      * @return A [DelegatedPreference] instance for the Int preference.
      */
-    public fun int(key: String, defaultValue: Int = 0): Preferences<Int>
+    public fun int(key: String, defaultValue: Int = 0): Preference<Int>
 
     /**
      * Creates a Float preference.
@@ -52,7 +52,7 @@ public interface PreferencesDatastore {
      * @param defaultValue The default Float value (defaults to 0f).
      * @return A [DelegatedPreference] instance for the Float preference.
      */
-    public fun float(key: String, defaultValue: Float = 0f): Preferences<Float>
+    public fun float(key: String, defaultValue: Float = 0f): Preference<Float>
 
     /**
      * Creates a Double preference.
@@ -61,7 +61,7 @@ public interface PreferencesDatastore {
      * @param defaultValue The default Double value (defaults to 0.0).
      * @return A [DelegatedPreference] instance for the Double preference.
      */
-    public fun double(key: String, defaultValue: Double = 0.0): Preferences<Double>
+    public fun double(key: String, defaultValue: Double = 0.0): Preference<Double>
 
     /**
      * Creates a Boolean preference.
@@ -70,7 +70,7 @@ public interface PreferencesDatastore {
      * @param defaultValue The default Boolean value (defaults to false).
      * @return A [DelegatedPreference] instance for the Boolean preference.
      */
-    public fun bool(key: String, defaultValue: Boolean = false): Preferences<Boolean>
+    public fun bool(key: String, defaultValue: Boolean = false): Preference<Boolean>
 
     /**
      * Creates a nullable String preference.
@@ -79,7 +79,7 @@ public interface PreferencesDatastore {
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable String preference.
      */
-    public fun nullableString(key: String): Preferences<String?>
+    public fun nullableString(key: String): Preference<String?>
 
     /**
      * Creates a nullable Set<String> preference.
@@ -88,7 +88,7 @@ public interface PreferencesDatastore {
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Set<String> preference.
      */
-    public fun nullableStringSet(key: String): Preferences<Set<String>?>
+    public fun nullableStringSet(key: String): Preference<Set<String>?>
 
     /**
      * Creates a nullable Int preference.
@@ -97,7 +97,7 @@ public interface PreferencesDatastore {
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Int preference.
      */
-    public fun nullableInt(key: String): Preferences<Int?>
+    public fun nullableInt(key: String): Preference<Int?>
 
     /**
      * Creates a nullable Long preference.
@@ -106,7 +106,7 @@ public interface PreferencesDatastore {
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Long preference.
      */
-    public fun nullableLong(key: String): Preferences<Long?>
+    public fun nullableLong(key: String): Preference<Long?>
 
     /**
      * Creates a nullable Float preference.
@@ -115,7 +115,7 @@ public interface PreferencesDatastore {
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Float preference.
      */
-    public fun nullableFloat(key: String): Preferences<Float?>
+    public fun nullableFloat(key: String): Preference<Float?>
 
     /**
      * Creates a nullable Double preference.
@@ -124,7 +124,7 @@ public interface PreferencesDatastore {
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Double preference.
      */
-    public fun nullableDouble(key: String): Preferences<Double?>
+    public fun nullableDouble(key: String): Preference<Double?>
 
     /**
      * Creates a nullable Boolean preference.
@@ -133,7 +133,7 @@ public interface PreferencesDatastore {
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Boolean preference.
      */
-    public fun nullableBool(key: String): Preferences<Boolean?>
+    public fun nullableBool(key: String): Preference<Boolean?>
 
     /**
      * Creates a Set<String> preference.
@@ -142,7 +142,7 @@ public interface PreferencesDatastore {
      * @param defaultValue The default Set<String> value (defaults to an empty set).
      * @return A [DelegatedPreference] instance for the Set<String> preference.
      */
-    public fun stringSet(key: String, defaultValue: Set<String> = emptySet()): Preferences<Set<String>>
+    public fun stringSet(key: String, defaultValue: Set<String> = emptySet()): Preference<Set<String>>
 
     /**
      * Creates a preference for a custom object that can be serialized to and deserialized from a String.
@@ -159,7 +159,7 @@ public interface PreferencesDatastore {
         defaultValue: T,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): Preferences<T>
+    ): Preference<T>
 
     /**
      * Creates a preference for a [Set] of custom objects, stored using a string set preference key.
@@ -177,7 +177,7 @@ public interface PreferencesDatastore {
         defaultValue: Set<T> = emptySet(),
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): Preferences<Set<T>>
+    ): Preference<Set<T>>
 
     /**
      * Creates a preference for a custom object using Kotlin Serialization.
@@ -195,7 +195,7 @@ public interface PreferencesDatastore {
         defaultValue: T,
         serializer: KSerializer<T>,
         json: Json? = null,
-    ): Preferences<T>
+    ): Preference<T>
 
     /**
      * Creates a preference for a [Set] of custom objects using Kotlin Serialization.
@@ -213,7 +213,7 @@ public interface PreferencesDatastore {
         defaultValue: Set<T> = emptySet(),
         serializer: KSerializer<T>,
         json: Json? = null,
-    ): Preferences<Set<T>>
+    ): Preference<Set<T>>
 
     /**
      * Creates a preference for a [List] of custom objects that can be serialized to and
@@ -232,7 +232,7 @@ public interface PreferencesDatastore {
         defaultValue: List<T> = emptyList(),
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): Preferences<List<T>>
+    ): Preference<List<T>>
 
     /**
      * Creates a preference for a [List] of custom objects using Kotlin Serialization.
@@ -250,7 +250,7 @@ public interface PreferencesDatastore {
         defaultValue: List<T> = emptyList(),
         serializer: KSerializer<T>,
         json: Json? = null,
-    ): Preferences<List<T>>
+    ): Preference<List<T>>
 
     /**
      * Creates a nullable preference for a custom object that can be serialized to and
@@ -269,7 +269,7 @@ public interface PreferencesDatastore {
         key: String,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): Preferences<T?>
+    ): Preference<T?>
 
     /**
      * Creates a nullable preference for a custom object using Kotlin Serialization.
@@ -288,7 +288,7 @@ public interface PreferencesDatastore {
         key: String,
         serializer: KSerializer<T>,
         json: Json? = null,
-    ): Preferences<T?>
+    ): Preference<T?>
 
     /**
      * Creates a nullable preference for a [List] of custom objects that can be serialized
@@ -307,7 +307,7 @@ public interface PreferencesDatastore {
         key: String,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): Preferences<List<T>?>
+    ): Preference<List<T>?>
 
     /**
      * Creates a nullable preference for a [List] of custom objects using Kotlin Serialization.
@@ -326,7 +326,7 @@ public interface PreferencesDatastore {
         key: String,
         serializer: KSerializer<T>,
         json: Json? = null,
-    ): Preferences<List<T>?>
+    ): Preference<List<T>?>
 
     /**
      * Returns a [Flow] that emits a [BatchReadScope] on every DataStore change,
@@ -508,7 +508,7 @@ public inline fun <reified T> PreferencesDatastore.kserialized(
     key: String,
     defaultValue: T,
     json: Json? = null,
-): Preferences<T> = kserialized(
+): Preference<T> = kserialized(
     key = key,
     defaultValue = defaultValue,
     serializer = serializer<T>(),
@@ -531,7 +531,7 @@ public inline fun <reified T> PreferencesDatastore.kserializedSet(
     key: String,
     defaultValue: Set<T> = emptySet(),
     json: Json? = null,
-): Preferences<Set<T>> = kserializedSet(
+): Preference<Set<T>> = kserializedSet(
     key = key,
     defaultValue = defaultValue,
     serializer = serializer<T>(),
@@ -554,7 +554,7 @@ public inline fun <reified T> PreferencesDatastore.kserializedList(
     key: String,
     defaultValue: List<T> = emptyList(),
     json: Json? = null,
-): Preferences<List<T>> = kserializedList(
+): Preference<List<T>> = kserializedList(
     key = key,
     defaultValue = defaultValue,
     serializer = serializer<T>(),
@@ -575,7 +575,7 @@ public inline fun <reified T> PreferencesDatastore.kserializedList(
 public inline fun <reified T : Any> PreferencesDatastore.nullableKserialized(
     key: String,
     json: Json? = null,
-): Preferences<T?> = nullableKserialized(
+): Preference<T?> = nullableKserialized(
     key = key,
     serializer = serializer<T>(),
     json = json,
@@ -595,7 +595,7 @@ public inline fun <reified T : Any> PreferencesDatastore.nullableKserialized(
 public inline fun <reified T> PreferencesDatastore.nullableKserializedList(
     key: String,
     json: Json? = null,
-): Preferences<List<T>?> = nullableKserializedList(
+): Preference<List<T>?> = nullableKserializedList(
     key = key,
     serializer = serializer<T>(),
     json = json,
@@ -610,7 +610,7 @@ public inline fun <reified T> PreferencesDatastore.nullableKserializedList(
  * @param T The type of each element in the set.
  * @param item The item to toggle.
  */
-public suspend inline fun <T> Preferences<Set<T>>.toggle(item: T) {
+public suspend inline fun <T> Preference<Set<T>>.toggle(item: T) {
     update { current ->
         if (item in current) current - item else current + item
     }
@@ -621,6 +621,6 @@ public suspend inline fun <T> Preferences<Set<T>>.toggle(item: T) {
  *
  * Flips the current value: `true` becomes `false`, and `false` becomes `true`.
  */
-public suspend inline fun Preferences<Boolean>.toggle() {
+public suspend inline fun Preference<Boolean>.toggle() {
     update { !it }
 }
