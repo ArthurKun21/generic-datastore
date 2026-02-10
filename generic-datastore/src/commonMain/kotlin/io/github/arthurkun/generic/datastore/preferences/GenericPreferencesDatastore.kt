@@ -203,7 +203,9 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [DelegatedPreference] instance for the nullable Set<String> preference.
      */
-    override fun nullableStringSet(key: String): io.github.arthurkun.generic.datastore.preferences.Preferences<Set<String>?> =
+    override fun nullableStringSet(
+        key: String,
+    ): io.github.arthurkun.generic.datastore.preferences.Preferences<Set<String>?> =
         DelegatedPreferenceImpl(
             NullableStringSetPrimitive(
                 datastore = datastore,
