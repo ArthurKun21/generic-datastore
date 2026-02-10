@@ -29,7 +29,7 @@ public interface Prefs<T> : ReadWriteProperty<Any?, T>, Preference<T> {
  */
 internal class PrefsImpl<T>(
     private val pref: Preference<T>,
-) : Prefs<T>,
+) : PreferencesPrefs<T>,
     Preference<T> by pref {
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = pref.getBlocking()

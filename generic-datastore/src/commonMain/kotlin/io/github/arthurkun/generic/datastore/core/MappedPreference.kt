@@ -31,10 +31,10 @@ import kotlin.reflect.KProperty
  * @return A new [Prefs] instance of type [R].
  * @throws Exception if `convert(this.defaultValue)` fails.
  */
-public fun <T, R> Prefs<T>.mapIO(
+public fun <T, R> PreferencesPrefs<T>.mapIO(
     convert: (T) -> R,
     reverse: (R) -> T,
-): Prefs<R> =
+): PreferencesPrefs<R> =
     MappedPrefs(
         prefs = this,
         defaultValue = convert(this.defaultValue),
@@ -64,11 +64,11 @@ public fun <T, R> Prefs<T>.mapIO(
  * @return A new [Prefs] instance of type [R] that applies the specified conversions
  *   and error handling logic.
  */
-public fun <T, R> Prefs<T>.map(
+public fun <T, R> PreferencesPrefs<T>.map(
     defaultValue: R,
     convert: (T) -> R,
     reverse: (R) -> T,
-): Prefs<R> =
+): PreferencesPrefs<R> =
     MappedPrefs(
         this,
         defaultValue,
@@ -91,7 +91,7 @@ internal class MappedPrefs<T, R>(
     override val defaultValue: R,
     private val convert: (T) -> R,
     private val reverse: (R) -> T,
-) : Prefs<R> {
+) : PreferencesPrefs<R> {
     override fun key(): String = prefs.key()
 
     /**
