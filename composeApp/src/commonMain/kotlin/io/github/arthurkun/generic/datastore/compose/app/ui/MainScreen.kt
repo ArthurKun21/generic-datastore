@@ -54,7 +54,7 @@ fun MainScreen(
     var animalSet by viewModel.animalSet.remember()
     var themeSet by viewModel.themeSet.remember()
 
-    val (batchText, batchNum, batchBool) = viewModel.datastore.rememberPreferences(
+    val (batchText, batchNum, batchBool) = rememberPreferences(
         viewModel.text,
         viewModel.num,
         viewModel.bool,
