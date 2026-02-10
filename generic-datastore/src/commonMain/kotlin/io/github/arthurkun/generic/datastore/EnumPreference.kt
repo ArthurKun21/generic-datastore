@@ -2,8 +2,8 @@
 
 package io.github.arthurkun.generic.datastore
 
-import io.github.arthurkun.generic.datastore.core.PreferencesPrefs
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.PreferencesPrefs
 import io.github.arthurkun.generic.datastore.preferences.default.custom.enum as preferencesEnum
 
 /**

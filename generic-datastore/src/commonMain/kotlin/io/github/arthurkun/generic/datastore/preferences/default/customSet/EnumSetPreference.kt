@@ -2,8 +2,8 @@
 
 package io.github.arthurkun.generic.datastore.preferences.default.customSet
 
-import io.github.arthurkun.generic.datastore.core.PreferencesPrefs
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.PreferencesPrefs
 
 /**
  * Defines a preference for storing a [Set] of enum values using a string set preference key.

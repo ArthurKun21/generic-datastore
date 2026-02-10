@@ -4,12 +4,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import io.github.arthurkun.generic.datastore.core.distinctFlow
-import io.github.arthurkun.generic.datastore.core.map
-import io.github.arthurkun.generic.datastore.core.mapIO
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.default.custom.enum
 import io.github.arthurkun.generic.datastore.preferences.default.customSet.enumSet
 import io.github.arthurkun.generic.datastore.preferences.toggle
+import io.github.arthurkun.generic.datastore.preferences.utils.map
+import io.github.arthurkun.generic.datastore.preferences.utils.mapIO
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest

@@ -1,5 +1,6 @@
 package io.github.arthurkun.generic.datastore.core
 
+import io.github.arthurkun.generic.datastore.preferences.PreferencesPrefs
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
