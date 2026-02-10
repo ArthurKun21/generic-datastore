@@ -20,6 +20,8 @@ on:
       - 'generic-datastore/build.gradle.kts'
       - 'generic-datastore/src/androidMain/**'
       - 'generic-datastore/src/commonMain/**'
+      - 'generic-datastore/src/desktopMain/**'
+      - 'generic-datastore/src/iosMain/**'
       - 'generic-datastore-compose/src/**'
   workflow_dispatch:
 
