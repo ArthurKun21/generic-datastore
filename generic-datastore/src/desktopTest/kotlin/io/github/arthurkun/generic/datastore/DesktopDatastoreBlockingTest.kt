@@ -1,5 +1,6 @@
 package io.github.arthurkun.generic.datastore
 
+import io.github.arthurkun.generic.datastore.preferences.AbstractDatastoreBlockingTest
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import org.junit.jupiter.api.io.TempDir
 import java.io.File

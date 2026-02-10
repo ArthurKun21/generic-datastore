@@ -1,11 +1,11 @@
-package io.github.arthurkun.generic.datastore
+package io.github.arthurkun.generic.datastore.preferences
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
-import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -36,7 +36,7 @@ abstract class AbstractDataOrEmptyTest {
     fun dataOrEmpty_emitsEmptyPreferencesOnIOException() = runTest(testDispatcher) {
         val errorDataStore = object : DataStore<Preferences> {
             override val data = flow<Preferences> {
-                throw androidx.datastore.core.IOException("disk error")
+                throw IOException("disk error")
             }
 
             override suspend fun updateData(
@@ -73,7 +73,7 @@ abstract class AbstractDataOrEmptyTest {
     fun dataOrEmpty_emitsEmptyOnIOExceptionThenStops() = runTest(testDispatcher) {
         val errorDataStore = object : DataStore<Preferences> {
             override val data = flow<Preferences> {
-                throw androidx.datastore.core.IOException("disk error")
+                throw IOException("disk error")
             }
 
             override suspend fun updateData(

@@ -1,6 +1,9 @@
 package io.github.arthurkun.generic.datastore
 
+import io.github.arthurkun.generic.datastore.proto.AbstractProtoDatastoreBlockingTest
 import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
+import io.github.arthurkun.generic.datastore.proto.TestProtoData
+import io.github.arthurkun.generic.datastore.proto.TestProtoDataSerializer
 import io.github.arthurkun.generic.datastore.proto.createProtoDatastore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

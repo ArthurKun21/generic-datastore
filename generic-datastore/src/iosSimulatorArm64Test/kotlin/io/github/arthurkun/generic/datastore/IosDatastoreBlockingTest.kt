@@ -1,5 +1,6 @@
 package io.github.arthurkun.generic.datastore
 
+import io.github.arthurkun.generic.datastore.preferences.AbstractDatastoreBlockingTest
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest

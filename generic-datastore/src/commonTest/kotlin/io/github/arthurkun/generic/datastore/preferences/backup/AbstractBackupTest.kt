@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore
+package io.github.arthurkun.generic.datastore.preferences.backup
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -6,17 +6,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.backup.BackupParsingException
-import io.github.arthurkun.generic.datastore.preferences.backup.BackupPreference
-import io.github.arthurkun.generic.datastore.preferences.backup.BooleanPreferenceValue
-import io.github.arthurkun.generic.datastore.preferences.backup.DoublePreferenceValue
-import io.github.arthurkun.generic.datastore.preferences.backup.FloatPreferenceValue
-import io.github.arthurkun.generic.datastore.preferences.backup.IntPreferenceValue
-import io.github.arthurkun.generic.datastore.preferences.backup.LongPreferenceValue
-import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceValue
-import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
-import io.github.arthurkun.generic.datastore.preferences.backup.StringPreferenceValue
-import io.github.arthurkun.generic.datastore.preferences.backup.StringSetPreferenceValue
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -172,7 +161,10 @@ abstract class AbstractBackupTest {
         assertEquals(2.718, preferenceDatastore.double("impDouble", 0.0).get())
         assertEquals("hello", preferenceDatastore.string("impString", "").get())
         assertEquals(true, preferenceDatastore.bool("impBool", false).get())
-        assertEquals(setOf("x", "y"), preferenceDatastore.stringSet("impStringSet", emptySet()).get())
+        assertEquals(
+            setOf("x", "y"),
+            preferenceDatastore.stringSet("impStringSet", emptySet()).get(),
+        )
     }
 
     @Test
@@ -286,7 +278,10 @@ abstract class AbstractBackupTest {
         assertEquals(4.0, preferenceDatastore.double("rtDouble", 0.0).get())
         assertEquals("round", preferenceDatastore.string("rtString", "").get())
         assertEquals(true, preferenceDatastore.bool("rtBool", false).get())
-        assertEquals(setOf("r", "t"), preferenceDatastore.stringSet("rtStringSet", emptySet()).get())
+        assertEquals(
+            setOf("r", "t"),
+            preferenceDatastore.stringSet("rtStringSet", emptySet()).get(),
+        )
     }
 
     @Test

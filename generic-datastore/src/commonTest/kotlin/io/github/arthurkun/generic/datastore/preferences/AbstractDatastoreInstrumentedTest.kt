@@ -1,13 +1,13 @@
-package io.github.arthurkun.generic.datastore
+package io.github.arthurkun.generic.datastore.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.distinctFlow
-import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.default.custom.enum
 import io.github.arthurkun.generic.datastore.preferences.default.customSet.enumSet
-import io.github.arthurkun.generic.datastore.preferences.toggle
 import io.github.arthurkun.generic.datastore.preferences.utils.map
 import io.github.arthurkun.generic.datastore.preferences.utils.mapIO
 import kotlinx.coroutines.flow.first
@@ -289,7 +289,7 @@ abstract class AbstractDatastoreInstrumentedTest {
         enumPref.set(TestEnum.VALUE_B)
         assertEquals(enumPref.get(), TestEnum.VALUE_B)
 
-        val stringKey = androidx.datastore.preferences.core.stringPreferencesKey("testEnumUnknown")
+        val stringKey = stringPreferencesKey("testEnumUnknown")
         dataStore.edit { settings ->
             settings[stringKey] = "INVALID_VALUE"
         }
@@ -585,7 +585,7 @@ abstract class AbstractDatastoreInstrumentedTest {
             },
         )
 
-        val stringSetKey = androidx.datastore.preferences.core.stringSetPreferencesKey("testSerializedSetDeserError")
+        val stringSetKey = stringSetPreferencesKey("testSerializedSetDeserError")
         dataStore.edit { settings ->
             settings[stringSetKey] = setOf("1,Valid", "INVALID_DATA")
         }
@@ -648,7 +648,7 @@ abstract class AbstractDatastoreInstrumentedTest {
     fun enumSetPreference_handleUnknownValueSkipsInvalidElements() = runTest(testDispatcher) {
         val pref = preferenceDatastore.enumSet<TestEnum>("testEnumSetUnknown")
 
-        val stringSetKey = androidx.datastore.preferences.core.stringSetPreferencesKey("testEnumSetUnknown")
+        val stringSetKey = stringSetPreferencesKey("testEnumSetUnknown")
         dataStore.edit { settings ->
             settings[stringSetKey] = setOf("VALUE_A", "INVALID_VALUE", "VALUE_C")
         }

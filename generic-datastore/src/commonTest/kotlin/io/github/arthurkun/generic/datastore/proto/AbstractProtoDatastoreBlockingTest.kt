@@ -1,6 +1,5 @@
-package io.github.arthurkun.generic.datastore
+package io.github.arthurkun.generic.datastore.proto
 
-import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

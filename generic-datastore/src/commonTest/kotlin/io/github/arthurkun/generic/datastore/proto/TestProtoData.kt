@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore
+package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.okio.OkioSerializer
 import okio.BufferedSink

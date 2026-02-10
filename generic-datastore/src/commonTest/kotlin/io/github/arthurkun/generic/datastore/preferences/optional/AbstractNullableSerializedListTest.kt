@@ -1,10 +1,11 @@
-package io.github.arthurkun.generic.datastore
+package io.github.arthurkun.generic.datastore.preferences.optional
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.KSerUser
 import io.github.arthurkun.generic.datastore.preferences.nullableKserializedList
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestDispatcher

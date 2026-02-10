@@ -2,6 +2,7 @@ package io.github.arthurkun.generic.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import io.github.arthurkun.generic.datastore.preferences.AbstractSerializedListTest
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import kotlinx.coroutines.test.TestDispatcher
 import org.junit.jupiter.api.io.TempDir

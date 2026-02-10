@@ -1,6 +1,5 @@
-package io.github.arthurkun.generic.datastore
+package io.github.arthurkun.generic.datastore.proto
 
-import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
