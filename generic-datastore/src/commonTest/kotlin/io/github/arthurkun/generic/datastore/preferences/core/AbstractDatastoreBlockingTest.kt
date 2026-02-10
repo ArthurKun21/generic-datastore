@@ -1,8 +1,8 @@
 package io.github.arthurkun.generic.datastore.preferences.core
 
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.default.custom.enum
-import io.github.arthurkun.generic.datastore.preferences.default.customSet.enumSet
+import io.github.arthurkun.generic.datastore.preferences.core.custom.enum
+import io.github.arthurkun.generic.datastore.preferences.core.customSet.enumSet
 import io.github.arthurkun.generic.datastore.preferences.utils.map
 import io.github.arthurkun.generic.datastore.preferences.utils.mapIO
 import kotlin.test.Test

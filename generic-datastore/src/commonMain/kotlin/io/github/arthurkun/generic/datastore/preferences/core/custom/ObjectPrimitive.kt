@@ -1,17 +1,14 @@
-package io.github.arthurkun.generic.datastore.preferences.default.customSet
+package io.github.arthurkun.generic.datastore.preferences.core.custom
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
 /**
- * A [CustomSetGenericPreferenceItem] for storing a [Set] of custom objects using per-element serialization.
- *  Each element is serialized to a String via [serializer] and stored using
- *  [stringSetPreferencesKey]. On retrieval, each String element is deserialized back
- *  via [deserializer].
+ * A [CustomGenericPreferenceItem] for storing custom objects using caller-provided
+ * serialization and deserialization functions.
  *
  * If deserialization fails (e.g., due to corrupted data), the [defaultValue] is returned.
  *
@@ -27,14 +24,14 @@ import kotlinx.coroutines.IO
  * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations.
  *   Defaults to [Dispatchers.IO].
  */
-internal class SerializedSetPrimitive<T>(
+internal class ObjectPrimitive<T>(
     datastore: DataStore<Preferences>,
     key: String,
-    defaultValue: Set<T>,
+    defaultValue: T,
     serializer: (T) -> String,
     deserializer: (String) -> T,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : CustomSetGenericPreferenceItem<T>(
+) : CustomGenericPreferenceItem<T>(
     datastore = datastore,
     key = key,
     defaultValue = defaultValue,

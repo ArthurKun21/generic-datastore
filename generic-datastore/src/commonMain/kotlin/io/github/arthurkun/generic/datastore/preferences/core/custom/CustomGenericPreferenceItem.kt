@@ -1,9 +1,9 @@
-package io.github.arthurkun.generic.datastore.preferences.default.customSet
+package io.github.arthurkun.generic.datastore.preferences.core.custom
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringSetPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.core.Preference
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,7 +22,7 @@ import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Base sealed class for [Preference] implementations that store values as strings
- * via [stringSetPreferencesKey].
+ * via [stringPreferencesKey].
  *
  * Subclasses provide [serializer] and [deserializer] functions to convert between [T]
  * and its [String] representation. If deserialization fails (e.g., due to corrupted data),
@@ -38,14 +38,14 @@ import kotlin.coroutines.cancellation.CancellationException
  * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations.
  *   Defaults to [Dispatchers.IO].
  */
-internal sealed class CustomSetGenericPreferenceItem<T>(
+internal sealed class CustomGenericPreferenceItem<T>(
     private val datastore: DataStore<Preferences>,
     private val key: String,
-    override val defaultValue: Set<T>,
+    override val defaultValue: T,
     private val serializer: (T) -> String,
     private val deserializer: (String) -> T,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : Preference<Set<T>> {
+) : Preference<T> {
 
     init {
         require(key.isNotBlank()) {
@@ -53,67 +53,72 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
         }
     }
 
-    private val stringSetPrefKey = stringSetPreferencesKey(key)
+    private val stringPrefKey = stringPreferencesKey(key)
 
     override fun key(): String = key
 
-    override suspend fun get(): Set<T> {
+    override suspend fun get(): T {
         return withContext(ioDispatcher) {
             asFlow().first()
         }
     }
 
-    override suspend fun set(value: Set<T>) {
+    override suspend fun set(value: T) {
         withContext(ioDispatcher) {
-            datastore.edit { prefs ->
-                prefs[stringSetPrefKey] = value.map { serializer(it) }.toSet()
+            datastore.edit { ds ->
+                ds[stringPrefKey] = serializer(value)
             }
         }
     }
 
-    override suspend fun update(transform: (Set<T>) -> Set<T>) {
+    override suspend fun update(transform: (T) -> T) {
         withContext(ioDispatcher) {
-            datastore.edit { prefs ->
-                val current = prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
-                    ?: defaultValue
-                prefs[stringSetPrefKey] = transform(current).map { serializer(it) }.toSet()
+            datastore.edit { ds ->
+                val current = ds[stringPrefKey]?.let {
+                    safeDeserialize(it)
+                } ?: defaultValue
+                ds[stringPrefKey] = serializer(transform(current))
             }
         }
     }
 
     override suspend fun delete() {
         withContext(ioDispatcher) {
-            datastore.edit { prefs ->
-                prefs.remove(stringSetPrefKey)
+            datastore.edit { ds ->
+                ds.remove(stringPrefKey)
             }
         }
     }
 
     override suspend fun resetToDefault() = set(defaultValue)
 
-    override fun asFlow(): Flow<Set<T>> {
+    override fun asFlow(): Flow<T> {
         return datastore.dataOrEmpty.map { prefs ->
-            prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
+            prefs[stringPrefKey]?.let { safeDeserialize(it) }
                 ?: this.defaultValue
         }
     }
 
-    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<Set<T>> =
+    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<T> =
         asFlow().stateIn(scope, started, defaultValue)
 
-    override fun getBlocking(): Set<T> = runBlocking { get() }
+    override fun getBlocking(): T = runBlocking {
+        get()
+    }
 
-    override fun setBlocking(value: Set<T>) = runBlocking { set(value) }
+    override fun setBlocking(value: T) {
+        runBlocking {
+            set(value)
+        }
+    }
 
-    private fun safeDeserializeSet(values: Set<String>): Set<T> {
-        return values.mapNotNull { value ->
-            try {
-                deserializer(value)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (_: Exception) {
-                null
-            }
-        }.toSet()
+    private fun safeDeserialize(value: String): T {
+        return try {
+            deserializer(value)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            defaultValue
+        }
     }
 }

@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.preferences.default.customSet
+package io.github.arthurkun.generic.datastore.preferences.core.customSet
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
