@@ -2,8 +2,8 @@
 
 package io.github.arthurkun.generic.datastore.preferences.core.customSet
 
+import io.github.arthurkun.generic.datastore.preferences.DatastorePreferenceItem
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.PreferencesPrefs
 
 /**
  * Defines a preference for storing a [Set] of enum values using a string set preference key.
@@ -20,7 +20,7 @@ import io.github.arthurkun.generic.datastore.preferences.PreferencesPrefs
 public inline fun <reified T : Enum<T>> PreferencesDatastore.enumSet(
     key: String,
     defaultValue: Set<T> = emptySet(),
-): PreferencesPrefs<Set<T>> = serializedSet(
+): DatastorePreferenceItem<Set<T>> = serializedSet(
     key = key,
     defaultValue = defaultValue,
     serializer = { it.name },

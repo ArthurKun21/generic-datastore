@@ -1,6 +1,6 @@
 package io.github.arthurkun.generic.datastore.core
 
-import io.github.arthurkun.generic.datastore.preferences.PreferencesPrefs
+import io.github.arthurkun.generic.datastore.preferences.DatastorePreferenceItem
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -30,7 +30,7 @@ public interface Prefs<T> : ReadWriteProperty<Any?, T>, Preference<T> {
  */
 internal class PrefsImpl<T>(
     private val pref: Preference<T>,
-) : PreferencesPrefs<T>,
+) : DatastorePreferenceItem<T>,
     Preference<T> by pref {
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = pref.getBlocking()

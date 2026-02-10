@@ -10,4 +10,4 @@ import io.github.arthurkun.generic.datastore.core.Prefs
  *
  * @param T The type of the preference value.
  */
-public interface PreferencesPrefs<T> : Prefs<T>
+public interface DatastorePreferenceItem<T> : Prefs<T>

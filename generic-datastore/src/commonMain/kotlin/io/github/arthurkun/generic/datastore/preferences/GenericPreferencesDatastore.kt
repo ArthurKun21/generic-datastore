@@ -74,7 +74,7 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default String value.
      * @return A [Prefs] instance for the String preference.
      */
-    override fun string(key: String, defaultValue: String): PreferencesPrefs<String> =
+    override fun string(key: String, defaultValue: String): DatastorePreferenceItem<String> =
         PrefsImpl(
             StringPrimitive(
                 datastore = datastore,
@@ -90,7 +90,7 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default Long value.
      * @return A [Prefs] instance for the Long preference.
      */
-    override fun long(key: String, defaultValue: Long): PreferencesPrefs<Long> =
+    override fun long(key: String, defaultValue: Long): DatastorePreferenceItem<Long> =
         PrefsImpl(
             LongPrimitive(
                 datastore = datastore,
@@ -106,7 +106,7 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default Int value.
      * @return A [Prefs] instance for the Int preference.
      */
-    override fun int(key: String, defaultValue: Int): PreferencesPrefs<Int> =
+    override fun int(key: String, defaultValue: Int): DatastorePreferenceItem<Int> =
         PrefsImpl(
             IntPrimitive(
                 datastore = datastore,
@@ -122,7 +122,7 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default Float value.
      * @return A [Prefs] instance for the Float preference.
      */
-    override fun float(key: String, defaultValue: Float): PreferencesPrefs<Float> =
+    override fun float(key: String, defaultValue: Float): DatastorePreferenceItem<Float> =
         PrefsImpl(
             FloatPrimitive(
                 datastore = datastore,
@@ -138,7 +138,7 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default Double value.
      * @return A [Prefs] instance for the Double preference.
      */
-    override fun double(key: String, defaultValue: Double): PreferencesPrefs<Double> =
+    override fun double(key: String, defaultValue: Double): DatastorePreferenceItem<Double> =
         PrefsImpl(
             DoublePrimitive(
                 datastore = datastore,
@@ -154,7 +154,7 @@ public class GenericPreferencesDatastore(
      * @param defaultValue The default Boolean value.
      * @return A [Prefs] instance for the Boolean preference.
      */
-    override fun bool(key: String, defaultValue: Boolean): PreferencesPrefs<Boolean> =
+    override fun bool(key: String, defaultValue: Boolean): DatastorePreferenceItem<Boolean> =
         PrefsImpl(
             BooleanPrimitive(
                 datastore = datastore,
@@ -170,7 +170,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [Prefs] instance for the nullable String preference.
      */
-    override fun nullableString(key: String): PreferencesPrefs<String?> =
+    override fun nullableString(key: String): DatastorePreferenceItem<String?> =
         PrefsImpl(
             NullableStringPrimitive(
                 datastore = datastore,
@@ -185,7 +185,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [Prefs] instance for the nullable Set<String> preference.
      */
-    override fun nullableStringSet(key: String): PreferencesPrefs<Set<String>?> =
+    override fun nullableStringSet(key: String): DatastorePreferenceItem<Set<String>?> =
         PrefsImpl(
             NullableStringSetPrimitive(
                 datastore = datastore,
@@ -200,7 +200,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [Prefs] instance for the nullable Int preference.
      */
-    override fun nullableInt(key: String): PreferencesPrefs<Int?> =
+    override fun nullableInt(key: String): DatastorePreferenceItem<Int?> =
         PrefsImpl(
             NullableIntPrimitive(
                 datastore = datastore,
@@ -215,7 +215,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [Prefs] instance for the nullable Long preference.
      */
-    override fun nullableLong(key: String): PreferencesPrefs<Long?> =
+    override fun nullableLong(key: String): DatastorePreferenceItem<Long?> =
         PrefsImpl(
             NullableLongPrimitive(
                 datastore = datastore,
@@ -230,7 +230,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [Prefs] instance for the nullable Float preference.
      */
-    override fun nullableFloat(key: String): PreferencesPrefs<Float?> =
+    override fun nullableFloat(key: String): DatastorePreferenceItem<Float?> =
         PrefsImpl(
             NullableFloatPrimitive(
                 datastore = datastore,
@@ -245,7 +245,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [Prefs] instance for the nullable Double preference.
      */
-    override fun nullableDouble(key: String): PreferencesPrefs<Double?> =
+    override fun nullableDouble(key: String): DatastorePreferenceItem<Double?> =
         PrefsImpl(
             NullableDoublePrimitive(
                 datastore = datastore,
@@ -260,7 +260,7 @@ public class GenericPreferencesDatastore(
      * @param key The preference key.
      * @return A [Prefs] instance for the nullable Boolean preference.
      */
-    override fun nullableBool(key: String): PreferencesPrefs<Boolean?> =
+    override fun nullableBool(key: String): DatastorePreferenceItem<Boolean?> =
         PrefsImpl(
             NullableBooleanPrimitive(
                 datastore = datastore,
@@ -278,7 +278,7 @@ public class GenericPreferencesDatastore(
     override fun stringSet(
         key: String,
         defaultValue: Set<String>,
-    ): PreferencesPrefs<Set<String>> =
+    ): DatastorePreferenceItem<Set<String>> =
         PrefsImpl(
             StringSetPrimitive(
                 datastore = datastore,
@@ -302,7 +302,7 @@ public class GenericPreferencesDatastore(
         defaultValue: T,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): PreferencesPrefs<T> = PrefsImpl(
+    ): DatastorePreferenceItem<T> = PrefsImpl(
         ObjectPrimitive(
             datastore = datastore,
             key = key,
@@ -328,7 +328,7 @@ public class GenericPreferencesDatastore(
         defaultValue: Set<T>,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): PreferencesPrefs<Set<T>> = PrefsImpl(
+    ): DatastorePreferenceItem<Set<T>> = PrefsImpl(
         SerializedSetPrimitive(
             datastore = datastore,
             key = key,
@@ -354,7 +354,7 @@ public class GenericPreferencesDatastore(
         defaultValue: T,
         serializer: KSerializer<T>,
         json: Json?,
-    ): PreferencesPrefs<T> = PrefsImpl(
+    ): DatastorePreferenceItem<T> = PrefsImpl(
         KSerializedPrimitive(
             datastore = datastore,
             key = key,
@@ -380,7 +380,7 @@ public class GenericPreferencesDatastore(
         defaultValue: Set<T>,
         serializer: KSerializer<T>,
         json: Json?,
-    ): PreferencesPrefs<Set<T>> = PrefsImpl(
+    ): DatastorePreferenceItem<Set<T>> = PrefsImpl(
         KSerializedSetPrimitive(
             datastore = datastore,
             key = key,
@@ -406,7 +406,7 @@ public class GenericPreferencesDatastore(
         defaultValue: List<T>,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): PreferencesPrefs<List<T>> = PrefsImpl(
+    ): DatastorePreferenceItem<List<T>> = PrefsImpl(
         SerializedListPrimitive(
             datastore = datastore,
             key = key,
@@ -432,7 +432,7 @@ public class GenericPreferencesDatastore(
         defaultValue: List<T>,
         serializer: KSerializer<T>,
         json: Json?,
-    ): PreferencesPrefs<List<T>> = PrefsImpl(
+    ): DatastorePreferenceItem<List<T>> = PrefsImpl(
         KSerializedListPrimitive(
             datastore = datastore,
             key = key,
@@ -446,7 +446,7 @@ public class GenericPreferencesDatastore(
         key: String,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): PreferencesPrefs<T?> = PrefsImpl(
+    ): DatastorePreferenceItem<T?> = PrefsImpl(
         NullableObjectPrimitive(
             datastore = datastore,
             key = key,
@@ -459,7 +459,7 @@ public class GenericPreferencesDatastore(
         key: String,
         serializer: KSerializer<T>,
         json: Json?,
-    ): PreferencesPrefs<T?> = PrefsImpl(
+    ): DatastorePreferenceItem<T?> = PrefsImpl(
         NullableKSerializedPrimitive(
             datastore = datastore,
             key = key,
@@ -472,7 +472,7 @@ public class GenericPreferencesDatastore(
         key: String,
         serializer: (T) -> String,
         deserializer: (String) -> T,
-    ): PreferencesPrefs<List<T>?> = PrefsImpl(
+    ): DatastorePreferenceItem<List<T>?> = PrefsImpl(
         NullableSerializedListPrimitive(
             datastore = datastore,
             key = key,
@@ -485,7 +485,7 @@ public class GenericPreferencesDatastore(
         key: String,
         serializer: KSerializer<T>,
         json: Json?,
-    ): PreferencesPrefs<List<T>?> = PrefsImpl(
+    ): DatastorePreferenceItem<List<T>?> = PrefsImpl(
         NullableKSerializedListPrimitive(
             datastore = datastore,
             key = key,

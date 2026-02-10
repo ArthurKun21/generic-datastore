@@ -3,7 +3,7 @@
 package io.github.arthurkun.generic.datastore.preferences.utils
 
 import io.github.arthurkun.generic.datastore.core.Prefs
-import io.github.arthurkun.generic.datastore.preferences.PreferencesPrefs
+import io.github.arthurkun.generic.datastore.preferences.DatastorePreferenceItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,10 +33,10 @@ import kotlin.reflect.KProperty
  * @return A new [io.github.arthurkun.generic.datastore.core.Prefs] instance of type [R].
  * @throws Exception if `convert(this.defaultValue)` fails.
  */
-public fun <T, R> PreferencesPrefs<T>.mapIO(
+public fun <T, R> DatastorePreferenceItem<T>.mapIO(
     convert: (T) -> R,
     reverse: (R) -> T,
-): PreferencesPrefs<R> =
+): DatastorePreferenceItem<R> =
     MappedPrefs(
         prefs = this,
         defaultValue = convert(this.defaultValue),
@@ -66,11 +66,11 @@ public fun <T, R> PreferencesPrefs<T>.mapIO(
  * @return A new [io.github.arthurkun.generic.datastore.core.Prefs] instance of type [R] that applies the specified conversions
  *   and error handling logic.
  */
-public fun <T, R> PreferencesPrefs<T>.map(
+public fun <T, R> DatastorePreferenceItem<T>.map(
     defaultValue: R,
     convert: (T) -> R,
     reverse: (R) -> T,
-): PreferencesPrefs<R> =
+): DatastorePreferenceItem<R> =
     MappedPrefs(
         this,
         defaultValue,
@@ -93,7 +93,7 @@ internal class MappedPrefs<T, R>(
     override val defaultValue: R,
     private val convert: (T) -> R,
     private val reverse: (R) -> T,
-) : PreferencesPrefs<R> {
+) : DatastorePreferenceItem<R> {
     override fun key(): String = prefs.key()
 
     /**

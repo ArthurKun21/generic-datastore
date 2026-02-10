@@ -2,8 +2,8 @@
 
 package io.github.arthurkun.generic.datastore
 
+import io.github.arthurkun.generic.datastore.preferences.DatastorePreferenceItem
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.PreferencesPrefs
 import io.github.arthurkun.generic.datastore.preferences.core.custom.enum as preferencesEnum
 
 /**
@@ -21,4 +21,4 @@ import io.github.arthurkun.generic.datastore.preferences.core.custom.enum as pre
 public inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
     key: String,
     defaultValue: T,
-): PreferencesPrefs<T> = preferencesEnum(key, defaultValue)
+): DatastorePreferenceItem<T> = preferencesEnum(key, defaultValue)
