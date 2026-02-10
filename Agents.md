@@ -7,17 +7,17 @@ Jetpack Compose extensions in `generic-datastore-compose`.
 ## Modules
 
 - `:generic-datastore` – core preference and proto datastore wrapper library.
-    - `core/` – shared interfaces and utilities (`Preference`, `Prefs`, `PrefsImpl`,
+  - `core/` – shared interfaces and utilities (`Preference`, `Prefs`, `PrefsImpl`,
       `MappedPreference`, `Migration`, `PreferenceDefaults`, `PreferenceExtension`).
-    - `preferences/` - DataStore wrapper implementations for `Preference` types.
-    - `preferences/default/` – DataStore Preferences implementation (primitive types, enum types,
+  - `preferences/` - DataStore wrapper implementations for `Preference` types.
+  - `preferences/core/` – DataStore Preferences implementation (primitive types, enum types,
       kotlinx.serialization-backed types, and custom-serializer types).
-    - `preferences/optional/` – nullable preference variants.
+  - `preferences/optional/` – nullable preference variants.
     - `preferences/backup/` – backup/restore support for preferences datastore.
-    - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
+  - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
       `GenericProtoDatastore`).
-    - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
-      `preferences/` and `preferences/default/`.
+  - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
+      `preferences/` and `preferences/core/`.
 - `:generic-datastore-compose` – Compose helpers (e.g. `Prefs<T>.remember()`) built on the core
   module.
 - `:app` and `:composeApp` – sample apps for local development.
@@ -51,37 +51,15 @@ Ensure the module compiles by running the appropriate Gradle tasks and resolving
 
 #### KMP modules targeting Android Build
 
-- Compile the Android main source set:
+- Compile the Android main source set `./gradlew :<module-name>:compileAndroidMain`
 
-    ```shell
-    ./gradlew :<module-name>:compileAndroidMain
-    ```
-
-- Compile the Android host (unit test) source set:
-
-    ```shell
-    ./gradlew :<module-name>:compileAndroidHostTest
-    ```
-
-- Compile the Android device (instrumentation test) source set:
-
-    ```shell
-    ./gradlew :<module-name>:compileAndroidDeviceTest
-    ```
+- Compile the Android device (instrumentation test) source set `./gradlew :<module-name>:compileAndroidDeviceTest`
 
 #### KMP modules targeting Desktop (JVM) Build
 
-- Compile the Desktop main source set:
+- Compile the Desktop main source set `./gradlew :<module-name>:compileKotlinDesktop`
 
-    ```shell
-    ./gradlew :<module-name>:compileKotlinDesktop
-    ```
-
-- Compile the Desktop test source set:
-
-    ```shell
-    ./gradlew :<module-name>:compileTestKotlinDesktop
-    ```
+- Compile the Desktop test source set `./gradlew :<module-name>:compileTestKotlinDesktop`
 
 ### Running Tests
 
@@ -95,11 +73,11 @@ Confirm all tests pass before merging changes. Resolve failures and add missing 
 Tests should verify expected behavior as well as edge cases, and must be placed in the appropriate
 source sets:
 
-* `commonTest` — Shared tests for all targets (preferred)
-* `androidDeviceTest` — Android instrumentation tests (platform-specific only)
-* `androidHostTest` — Android unit tests (platform-specific only)
-* `desktopTest` — Desktop/JVM tests (platform-specific only)
-* `iosSimulatorArm64Test` — iOS simulator tests (platform-specific only, requires macOS)
+- `commonTest` — Shared tests for all targets (preferred)
+- `androidDeviceTest` — Android instrumentation tests (platform-specific only)
+- `androidHostTest` — Android unit tests (platform-specific only)
+- `desktopTest` — Desktop/JVM tests (platform-specific only)
+- `iosSimulatorArm64Test` — iOS simulator tests (platform-specific only, requires macOS)
 
 ### Abstract test class pattern
 
@@ -212,33 +190,15 @@ class MyFeatureBlockingTest : AbstractMyFeatureBlockingTest() {
 
 #### KMP modules targeting Android Test
 
-- Run Android unit tests:
-
-    ```shell
-    ./gradlew :<module-name>:testAndroidHostTest
-    ```
-
-- Run Android instrumentation tests (requires device/emulator):
-
-    ```shell
-    ./gradlew :<module-name>:connectedAndroidDeviceTest
-    ```
+- Run Android instrumentation tests (requires device/emulator) `./gradlew :<module-name>:connectedAndroidDeviceTest`
 
 #### KMP modules targeting Desktop (JVM) Test
 
-- Run Desktop (JVM) tests (uses JUnit 5):
-
-    ```shell
-    ./gradlew :<module-name>:desktopTest
-    ```
+- Run Desktop (JVM) tests (uses JUnit 5) `./gradlew :<module-name>:desktopTest`
 
 #### KMP modules targeting iOS Test
 
-- Run iOS simulator tests (requires macOS with Xcode):
-
-    ```shell
-    ./gradlew :<module-name>:iosSimulatorArm64Test
-    ```
+- Run iOS simulator tests (requires macOS with Xcode) `./gradlew :<module-name>:iosSimulatorArm64Test`
 
 ## Platform-Specific Notes
 
