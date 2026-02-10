@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param T The type of the preference value.
  */
-public interface Preference<T> {
+public interface BasePreference<T> {
 
     /**
      * Returns the key of the preference.
@@ -111,7 +111,7 @@ public interface Preference<T> {
     public fun setValue(value: T): Unit = setBlocking(value)
 
     /**
-     * Companion object for [Preference] related utility functions.
+     * Companion object for [BasePreference] related utility functions.
      */
     public companion object {
         /**

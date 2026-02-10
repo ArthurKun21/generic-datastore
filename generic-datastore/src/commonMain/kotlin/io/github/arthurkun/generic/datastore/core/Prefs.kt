@@ -5,14 +5,14 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 /**
- * Extends the [Preference] interface to support property delegation.
+ * Extends the [BasePreference] interface to support property delegation.
  *
  * This interface allows a preference to be used as a delegated property,
  * simplifying its usage in classes.
  *
  * @param T The type of the preference value.
  */
-public interface Prefs<T> : ReadWriteProperty<Any?, T>, Preference<T> {
+public interface Prefs<T> : ReadWriteProperty<Any?, T>, BasePreference<T> {
     /**
      * Resets the preference value to its default.
      */
@@ -22,16 +22,16 @@ public interface Prefs<T> : ReadWriteProperty<Any?, T>, Preference<T> {
 /**
  * Internal implementation of the [Prefs] interface.
  *
- * This class delegates the [Preference] functionalities to the provided [pref]
+ * This class delegates the [BasePreference] functionalities to the provided [pref]
  * instance and implements the property delegation methods.
  *
  * @param T The type of the preference value.
- * @property pref The underlying [Preference] instance.
+ * @property pref The underlying [BasePreference] instance.
  */
 internal class PrefsImpl<T>(
-    private val pref: Preference<T>,
+    private val pref: BasePreference<T>,
 ) : DatastorePreferenceItem<T>,
-    Preference<T> by pref {
+    BasePreference<T> by pref {
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = pref.getBlocking()
 

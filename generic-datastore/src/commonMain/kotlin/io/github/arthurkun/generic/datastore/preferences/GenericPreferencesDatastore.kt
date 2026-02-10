@@ -12,7 +12,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.core.Prefs
 import io.github.arthurkun.generic.datastore.core.PrefsImpl
@@ -522,9 +522,9 @@ public class GenericPreferencesDatastore(
             .toPreferences()
             .asMap()
             .mapNotNull { (key, values) ->
-                if (!exportPrivate && Preference.isPrivate(key.name)) {
+                if (!exportPrivate && BasePreference.isPrivate(key.name)) {
                     null
-                } else if (!exportAppState && Preference.isAppState(key.name)) {
+                } else if (!exportAppState && BasePreference.isAppState(key.name)) {
                     null
                 } else {
                     key.name to values.toJsonElement()

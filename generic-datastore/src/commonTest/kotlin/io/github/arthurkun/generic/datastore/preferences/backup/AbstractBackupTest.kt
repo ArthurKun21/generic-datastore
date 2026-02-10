@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -66,7 +66,7 @@ abstract class AbstractBackupTest {
     @Test
     fun exportAsData_excludesPrivateByDefault() = runTest(testDispatcher) {
         preferenceDatastore.string("publicKey", "").set("public")
-        val privateKey = Preference.privateKey("secretKey")
+        val privateKey = BasePreference.privateKey("secretKey")
         dataStore.edit { it[stringPreferencesKey(privateKey)] = "secret" }
 
         val backup = preferenceDatastore.exportAsData()
@@ -78,7 +78,7 @@ abstract class AbstractBackupTest {
     @Test
     fun exportAsData_includesPrivateWhenRequested() = runTest(testDispatcher) {
         preferenceDatastore.string("publicKey2", "").set("public")
-        val privateKey = Preference.privateKey("secretKey2")
+        val privateKey = BasePreference.privateKey("secretKey2")
         dataStore.edit { it[stringPreferencesKey(privateKey)] = "secret" }
 
         val backup = preferenceDatastore.exportAsData(exportPrivate = true)
@@ -90,7 +90,7 @@ abstract class AbstractBackupTest {
     @Test
     fun exportAsData_excludesAppStateByDefault() = runTest(testDispatcher) {
         preferenceDatastore.string("normalKey", "").set("normal")
-        val appStateKey = Preference.appStateKey("stateKey")
+        val appStateKey = BasePreference.appStateKey("stateKey")
         dataStore.edit { it[stringPreferencesKey(appStateKey)] = "state" }
 
         val backup = preferenceDatastore.exportAsData()
@@ -102,7 +102,7 @@ abstract class AbstractBackupTest {
     @Test
     fun exportAsData_includesAppStateWhenRequested() = runTest(testDispatcher) {
         preferenceDatastore.string("normalKey2", "").set("normal")
-        val appStateKey = Preference.appStateKey("stateKey2")
+        val appStateKey = BasePreference.appStateKey("stateKey2")
         dataStore.edit { it[stringPreferencesKey(appStateKey)] = "state" }
 
         val backup = preferenceDatastore.exportAsData(exportAppState = true)
@@ -169,7 +169,7 @@ abstract class AbstractBackupTest {
 
     @Test
     fun importData_skipsPrivateByDefault() = runTest(testDispatcher) {
-        val privateKey = Preference.privateKey("privImport")
+        val privateKey = BasePreference.privateKey("privImport")
         val backup = PreferencesBackup(
             preferences = listOf(
                 BackupPreference(privateKey, StringPreferenceValue("secret")),
@@ -183,7 +183,7 @@ abstract class AbstractBackupTest {
 
     @Test
     fun importData_includesPrivateWhenRequested() = runTest(testDispatcher) {
-        val privateKey = Preference.privateKey("privImport2")
+        val privateKey = BasePreference.privateKey("privImport2")
         val backup = PreferencesBackup(
             preferences = listOf(
                 BackupPreference(privateKey, StringPreferenceValue("secret")),
@@ -197,7 +197,7 @@ abstract class AbstractBackupTest {
 
     @Test
     fun importData_skipsAppStateByDefault() = runTest(testDispatcher) {
-        val appStateKey = Preference.appStateKey("stateImport")
+        val appStateKey = BasePreference.appStateKey("stateImport")
         val backup = PreferencesBackup(
             preferences = listOf(
                 BackupPreference(appStateKey, StringPreferenceValue("state")),
@@ -211,7 +211,7 @@ abstract class AbstractBackupTest {
 
     @Test
     fun importData_includesAppStateWhenRequested() = runTest(testDispatcher) {
-        val appStateKey = Preference.appStateKey("stateImport2")
+        val appStateKey = BasePreference.appStateKey("stateImport2")
         val backup = PreferencesBackup(
             preferences = listOf(
                 BackupPreference(appStateKey, StringPreferenceValue("state")),

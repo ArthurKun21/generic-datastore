@@ -3,7 +3,7 @@ package io.github.arthurkun.generic.datastore.preferences.core
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -40,7 +40,7 @@ internal sealed class GenericPreferenceItem<T>(
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : Preference<T> {
+) : BasePreference<T> {
 
     init {
         require(key.isNotBlank()) {

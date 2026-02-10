@@ -2,7 +2,7 @@ package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
-import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.core.Prefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 import kotlin.reflect.KProperty
 
 /**
- * A [Preference] implementation backed by a Proto DataStore.
+ * A [BasePreference] implementation backed by a Proto DataStore.
  *
  * @param T The proto message type.
  * @param datastore The [DataStore<T>] instance.

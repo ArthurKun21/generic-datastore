@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -21,7 +21,7 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * Base sealed class for [Preference] implementations that store values as strings
+ * Base sealed class for [BasePreference] implementations that store values as strings
  * via [stringSetPreferencesKey].
  *
  * Subclasses provide [serializer] and [deserializer] functions to convert between [T]
@@ -45,7 +45,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
     private val serializer: (T) -> String,
     private val deserializer: (String) -> T,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : Preference<Set<T>> {
+) : BasePreference<Set<T>> {
 
     init {
         require(key.isNotBlank()) {

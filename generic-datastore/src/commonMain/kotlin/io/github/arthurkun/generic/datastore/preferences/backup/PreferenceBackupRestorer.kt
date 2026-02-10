@@ -9,7 +9,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import io.github.arthurkun.generic.datastore.core.Preference
+import io.github.arthurkun.generic.datastore.core.BasePreference
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
@@ -40,8 +40,8 @@ internal class PreferenceBackupRestorer(private val datastore: DataStore<Prefere
             backup.preferences
                 .filter { backupPref ->
                     val backupKey = backupPref.key
-                    (importPrivate || !Preference.isPrivate(backupKey)) &&
-                        (importAppState || !Preference.isAppState(backupKey))
+                    (importPrivate || !BasePreference.isPrivate(backupKey)) &&
+                        (importAppState || !BasePreference.isAppState(backupKey))
                 }
                 .forEach { backupPref ->
                     val backupKey = backupPref.key
