@@ -2,12 +2,12 @@
 
 package io.github.arthurkun.generic.datastore.preferences.optional.custom
 
-import io.github.arthurkun.generic.datastore.core.Prefs
+import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.preferences.DatastorePreferenceItem
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 
 /**
- * Creates a nullable [Prefs] for storing enum values.
+ * Creates a nullable [DelegatedPreference] for storing enum values.
  *
  * The enum is serialized using its [name][Enum.name] and deserialized via
  * [enumValueOf]. If the stored string does not match any enum constant,
@@ -15,7 +15,7 @@ import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
  *
  * @param T The enum type.
  * @param key The unique string key for the preference.
- * @return A [Prefs] instance backed by [PreferencesDatastore.nullableSerialized].
+ * @return A [DelegatedPreference] instance backed by [PreferencesDatastore.nullableSerialized].
  */
 public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnum(
     key: String,

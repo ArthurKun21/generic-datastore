@@ -6,11 +6,11 @@ import androidx.compose.runtime.SnapshotMutationPolicy
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import io.github.arthurkun.generic.datastore.core.Prefs
+import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import kotlin.coroutines.CoroutineContext
 
 /**
- * iOS implementation of [Prefs.remember] that uses [collectAsState]
+ * iOS implementation of [DelegatedPreference.remember] that uses [collectAsState]
  * to observe the preference flow.
  *
  * @param context The [CoroutineContext] to use for collecting the flow.
@@ -18,7 +18,7 @@ import kotlin.coroutines.CoroutineContext
  * @return A [MutableState] representing the preference value.
  */
 @Composable
-public actual fun <T> Prefs<T>.remember(
+public actual fun <T> DelegatedPreference<T>.remember(
     context: CoroutineContext,
     policy: SnapshotMutationPolicy<T>,
 ): MutableState<T> {

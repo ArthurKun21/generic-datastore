@@ -3,7 +3,7 @@ package io.github.arthurkun.generic.datastore.proto
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import io.github.arthurkun.generic.datastore.core.BasePreference
-import io.github.arthurkun.generic.datastore.core.Prefs
+import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -28,7 +28,7 @@ internal class ProtoPreference<T>(
     private val datastore: DataStore<T>,
     override val defaultValue: T,
     private val key: String = "proto_data",
-) : Prefs<T> {
+) : DelegatedPreference<T> {
 
     init {
         require(key.isNotBlank()) {

@@ -12,4 +12,4 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  * @param T The type of the preference value.
  * @return A [Flow] that emits distinct consecutive values.
  */
-public fun <T> Prefs<T>.distinctFlow(): Flow<T> = asFlow().distinctUntilChanged()
+public fun <T> DelegatedPreference<T>.distinctFlow(): Flow<T> = asFlow().distinctUntilChanged()

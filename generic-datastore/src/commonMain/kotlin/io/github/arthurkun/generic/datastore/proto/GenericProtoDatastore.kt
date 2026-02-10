@@ -3,7 +3,7 @@
 package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.DataStore
-import io.github.arthurkun.generic.datastore.core.Prefs
+import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 
 /**
  * A DataStore implementation for Proto DataStore.
@@ -20,7 +20,7 @@ public class GenericProtoDatastore<T>(
     private val key: String = "proto_datastore",
 ) : ProtoDatastore<T> {
 
-    override fun data(): Prefs<T> {
+    override fun data(): DelegatedPreference<T> {
         return ProtoPreference(
             datastore = datastore,
             defaultValue = defaultValue,

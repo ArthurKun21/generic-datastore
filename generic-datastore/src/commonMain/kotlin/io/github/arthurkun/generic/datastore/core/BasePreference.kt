@@ -53,7 +53,7 @@ public interface BasePreference<T> {
     /**
      * Resets the preference value to its [defaultValue].
      *
-     * This is a suspending function equivalent of [Prefs.resetToDefaultBlocking].
+     * This is a suspending function equivalent of [DelegatedPreference.resetToDefaultBlocking].
      */
     public suspend fun resetToDefault()
 

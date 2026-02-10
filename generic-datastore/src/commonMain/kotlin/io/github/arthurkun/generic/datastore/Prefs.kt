@@ -2,11 +2,11 @@
 
 package io.github.arthurkun.generic.datastore
 
-import io.github.arthurkun.generic.datastore.core.Prefs as CorePrefs
+import io.github.arthurkun.generic.datastore.core.DelegatedPreference as CorePrefs
 
 /**
  * Type alias for backwards compatibility.
- * @see io.github.arthurkun.generic.datastore.core.Prefs
+ * @see io.github.arthurkun.generic.datastore.core.DelegatedPreference
  */
 @Deprecated(
     message = "Moved to core package",

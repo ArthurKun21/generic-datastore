@@ -12,7 +12,7 @@ import kotlin.reflect.KProperty
  *
  * @param T The type of the preference value.
  */
-public interface Prefs<T> : ReadWriteProperty<Any?, T>, BasePreference<T> {
+public interface DelegatedPreference<T> : ReadWriteProperty<Any?, T>, BasePreference<T> {
     /**
      * Resets the preference value to its default.
      */
@@ -20,7 +20,7 @@ public interface Prefs<T> : ReadWriteProperty<Any?, T>, BasePreference<T> {
 }
 
 /**
- * Internal implementation of the [Prefs] interface.
+ * Internal implementation of the [DelegatedPreference] interface.
  *
  * This class delegates the [BasePreference] functionalities to the provided [pref]
  * instance and implements the property delegation methods.
@@ -28,7 +28,7 @@ public interface Prefs<T> : ReadWriteProperty<Any?, T>, BasePreference<T> {
  * @param T The type of the preference value.
  * @property pref The underlying [BasePreference] instance.
  */
-internal class PrefsImpl<T>(
+internal class DelegatedPreferenceImpl<T>(
     private val pref: BasePreference<T>,
 ) : DatastorePreferenceItem<T>,
     BasePreference<T> by pref {
