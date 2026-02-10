@@ -9,7 +9,7 @@ Inspired by [flow-preferences](https://github.com/tfcporciuncula/flow-preference
 | Module | Description |
 |---|---|
 | `generic-datastore` | Core library with Preferences DataStore and Proto DataStore wrappers |
-| `generic-datastore-compose` | Jetpack Compose extensions (`Prefs<T>.remember()`) |
+| `generic-datastore-compose` | Jetpack Compose extensions (`DelegatedPreference<T>.remember()`) |
 
 ### KMP Targets
 
@@ -94,13 +94,13 @@ val datastore = GenericPreferencesDatastore(myExistingDataStore)
 The `GenericPreferencesDatastore` provides factory methods for all supported types:
 
 ```kotlin
-val userName: Prefs<String>      = datastore.string("user_name", "Guest")
-val userScore: Prefs<Int>        = datastore.int("user_score", 0)
-val highScore: Prefs<Long>       = datastore.long("high_score", 0L)
-val volume: Prefs<Float>         = datastore.float("volume", 1.0f)
-val precision: Prefs<Double>     = datastore.double("precision", 0.0)
-val darkMode: Prefs<Boolean>     = datastore.bool("dark_mode", false)
-val tags: Prefs<Set<String>>     = datastore.stringSet("tags")
+val userName: Preferences<String>      = datastore.string("user_name", "Guest")
+val userScore: Preferences<Int>        = datastore.int("user_score", 0)
+val highScore: Preferences<Long>       = datastore.long("high_score", 0L)
+val volume: Preferences<Float>         = datastore.float("volume", 1.0f)
+val precision: Preferences<Double>     = datastore.double("precision", 0.0)
+val darkMode: Preferences<Boolean>     = datastore.bool("dark_mode", false)
+val tags: Preferences<Set<String>>     = datastore.stringSet("tags")
 ```
 
 ### Enum Preferences
@@ -110,7 +110,7 @@ Store enum values directly using the `enum()` extension:
 ```kotlin
 enum class Theme { LIGHT, DARK, SYSTEM }
 
-val themePref: Prefs<Theme> = datastore.enum("theme", Theme.SYSTEM)
+val themePref: Preferences<Theme> = datastore.enum("theme", Theme.SYSTEM)
 ```
 
 ### Custom Serialized Objects
@@ -121,7 +121,7 @@ Store any object by providing serializer/deserializer functions:
 @Serializable
 data class UserProfile(val id: Int, val email: String)
 
-val userProfilePref: Prefs<UserProfile> = datastore.serialized(
+val userProfilePref: Preferences<UserProfile> = datastore.serialized(
     key = "user_profile",
     defaultValue = UserProfile(0, ""),
     serializer = { Json.encodeToString(UserProfile.serializer(), it) },
@@ -162,7 +162,7 @@ Store any `@Serializable` type directly without manual serializer/deserializer f
 @Serializable
 data class UserProfile(val name: String, val age: Int)
 
-val userProfilePref: Prefs<UserProfile> = datastore.kserialized(
+val userProfilePref: Preferences<UserProfile> = datastore.kserialized(
     key = "user_profile",
     defaultValue = UserProfile(name = "John", age = 25),
 )
@@ -173,7 +173,7 @@ A custom `Json` instance can be provided if needed:
 ```kotlin
 val customJson = Json { prettyPrint = true }
 
-val userProfilePref: Prefs<UserProfile> = datastore.kserialized(
+val userProfilePref: Preferences<UserProfile> = datastore.kserialized(
     key = "user_profile",
     defaultValue = UserProfile(name = "John", age = 25),
     json = customJson,
@@ -185,7 +185,7 @@ val userProfilePref: Prefs<UserProfile> = datastore.kserialized(
 Store a `Set` of custom objects using per-element serialization with `serializedSet()`:
 
 ```kotlin
-val animalSetPref: Prefs<Set<Animal>> = datastore.serializedSet(
+val animalSetPref: Preferences<Set<Animal>> = datastore.serializedSet(
     key = "animal_set",
     defaultValue = emptySet(),
     serializer = { Animal.to(it) },
@@ -203,7 +203,7 @@ Store a `Set` of `@Serializable` objects without manual serializer/deserializer 
 @Serializable
 data class UserProfile(val name: String, val age: Int)
 
-val profileSetPref: Prefs<Set<UserProfile>> = datastore.kserializedSet(
+val profileSetPref: Preferences<Set<UserProfile>> = datastore.kserializedSet(
     key = "profile_set",
     defaultValue = emptySet(),
 )
@@ -216,7 +216,7 @@ Each element is individually serialized to JSON and stored using a `stringSetPre
 Store a `List` of custom objects using per-element serialization with `serializedList()`:
 
 ```kotlin
-val animalListPref: Prefs<List<Animal>> = datastore.serializedList(
+val animalListPref: Preferences<List<Animal>> = datastore.serializedList(
     key = "animal_list",
     defaultValue = emptyList(),
     serializer = { Animal.to(it) },
@@ -234,7 +234,7 @@ Store a `List` of `@Serializable` objects without manual serializer/deserializer
 @Serializable
 data class UserProfile(val name: String, val age: Int)
 
-val profileListPref: Prefs<List<UserProfile>> = datastore.kserializedList(
+val profileListPref: Preferences<List<UserProfile>> = datastore.kserializedList(
     key = "profile_list",
     defaultValue = emptyList(),
 )
@@ -247,7 +247,7 @@ The list is serialized to a JSON array string and stored using a `stringPreferen
 Store a `Set` of enum values with the `enumSet()` extension:
 
 ```kotlin
-val themeSetPref: Prefs<Set<Theme>> = datastore.enumSet<Theme>(
+val themeSetPref: Preferences<Set<Theme>> = datastore.enumSet<Theme>(
     key = "theme_set",
     defaultValue = emptySet(),
 )
@@ -260,13 +260,13 @@ Each enum value is stored by its `name`. Unknown enum values encountered during 
 Create preferences that return `null` when no value has been set, instead of a default value:
 
 ```kotlin
-val nickname: Prefs<String?>      = datastore.nullableString("nickname")
-val age: Prefs<Int?>              = datastore.nullableInt("age")
-val timestamp: Prefs<Long?>       = datastore.nullableLong("timestamp")
-val weight: Prefs<Float?>         = datastore.nullableFloat("weight")
-val latitude: Prefs<Double?>      = datastore.nullableDouble("latitude")
-val agreed: Prefs<Boolean?>       = datastore.nullableBool("agreed")
-val labels: Prefs<Set<String>?>   = datastore.nullableStringSet("labels")
+val nickname: Preferences<String?>      = datastore.nullableString("nickname")
+val age: Preferences<Int?>              = datastore.nullableInt("age")
+val timestamp: Preferences<Long?>       = datastore.nullableLong("timestamp")
+val weight: Preferences<Float?>         = datastore.nullableFloat("weight")
+val latitude: Preferences<Double?>      = datastore.nullableDouble("latitude")
+val agreed: Preferences<Boolean?>       = datastore.nullableBool("agreed")
+val labels: Preferences<Set<String>?>   = datastore.nullableStringSet("labels")
 ```
 
 Setting a nullable preference to `null` removes the key from DataStore. `resetToDefault()` also removes the key, since the default is `null`.
@@ -284,7 +284,7 @@ nickname.get()        // null
 Store an enum value that returns `null` when not set:
 
 ```kotlin
-val themePref: Prefs<Theme?> = datastore.nullableEnum<Theme>("theme")
+val themePref: Preferences<Theme?> = datastore.nullableEnum<Theme>("theme")
 ```
 
 ### Nullable Custom Serialized Objects
@@ -292,7 +292,7 @@ val themePref: Prefs<Theme?> = datastore.nullableEnum<Theme>("theme")
 Store a nullable custom-serialized object:
 
 ```kotlin
-val animalPref: Prefs<Animal?> = datastore.nullableSerialized(
+val animalPref: Preferences<Animal?> = datastore.nullableSerialized(
     key = "animal",
     serializer = { Animal.to(it) },
     deserializer = { Animal.from(it) },
@@ -307,7 +307,7 @@ Store a nullable `@Serializable` type:
 @Serializable
 data class UserProfile(val name: String, val age: Int)
 
-val userProfilePref: Prefs<UserProfile?> = datastore.nullableKserialized<UserProfile>("user_profile")
+val userProfilePref: Preferences<UserProfile?> = datastore.nullableKserialized<UserProfile>("user_profile")
 ```
 
 ### Nullable Serialized List (`nullableSerializedList`)
@@ -315,7 +315,7 @@ val userProfilePref: Prefs<UserProfile?> = datastore.nullableKserialized<UserPro
 Store a nullable list of custom-serialized objects:
 
 ```kotlin
-val animalListPref: Prefs<List<Animal>?> = datastore.nullableSerializedList(
+val animalListPref: Preferences<List<Animal>?> = datastore.nullableSerializedList(
     key = "animal_list",
     serializer = { Animal.to(it) },
     deserializer = { Animal.from(it) },
@@ -327,7 +327,7 @@ val animalListPref: Prefs<List<Animal>?> = datastore.nullableSerializedList(
 Store a nullable list of `@Serializable` objects:
 
 ```kotlin
-val profileListPref: Prefs<List<UserProfile>?> = datastore.nullableKserializedList<UserProfile>(
+val profileListPref: Preferences<List<UserProfile>?> = datastore.nullableKserializedList<UserProfile>(
     key = "profile_list",
 )
 ```
@@ -336,7 +336,7 @@ All nullable variants return `null` when the key is not set. Setting `null` remo
 
 ### Reading & Writing Values
 
-Each `Prefs<T>` provides multiple access patterns:
+Each `Preferences<T>` provides multiple access patterns:
 
 #### Suspend Functions
 
@@ -366,7 +366,7 @@ userName.setBlocking("John Doe")
 
 #### Property Delegation
 
-`Prefs<T>` implements `ReadWriteProperty`, so you can use it as a delegated property:
+`DelegatedPreference<T>` implements `ReadWriteProperty`, so you can use it as a delegated property:
 
 ```kotlin
 var currentUserName: String by userName
@@ -420,17 +420,17 @@ val key: String = userName.key()
 
 ### Mapped Preferences
 
-Transform a `Prefs<T>` into a `Prefs<R>` with converter functions:
+Transform a `Preferences<T>` into a `Preferences<R>` with converter functions:
 
 ```kotlin
-val scoreAsString: Prefs<String> = userScore.map(
+val scoreAsString: Preferences<String> = userScore.map(
     defaultValue = "0",
     convert = { it.toString() },
     reverse = { it.toIntOrNull() ?: 0 },
 )
 
 // Or infer the default value from the original preference's default:
-val scoreAsString2: Prefs<String> = userScore.mapIO(
+val scoreAsString2: Preferences<String> = userScore.mapIO(
     convert = { it.toString() },
     reverse = { it.toInt() },
 )
@@ -494,11 +494,11 @@ Import merges into existing preferences. Call `datastore.clearAll()` before impo
 
 ### Private & App-State Key Prefixes
 
-Use `Preference.privateKey(key)` or `Preference.appStateKey(key)` to prefix keys so they can be filtered during backup:
+Use `BasePreference.privateKey(key)` or `BasePreference.appStateKey(key)` to prefix keys so they can be filtered during backup:
 
 ```kotlin
-val token = datastore.string(Preference.privateKey("auth_token"), "")
-val onboarded = datastore.bool(Preference.appStateKey("onboarding_done"), false)
+val token = datastore.string(BasePreference.privateKey("auth_token"), "")
+val onboarded = datastore.bool(BasePreference.appStateKey("onboarding_done"), false)
 ```
 
 ## Proto DataStore
@@ -568,14 +568,14 @@ val protoDatastore = GenericProtoDatastore(
 ### Usage
 
 ```kotlin
-val dataPref: Prefs<MyProtoMessage> = protoDatastore.data()
+val dataPref: ProtoPreference<MyProtoMessage> = protoDatastore.data()
 
 // Then use get(), set(), asFlow(), etc. just like Preferences DataStore
 ```
 
 ## Compose Extensions (`generic-datastore-compose`)
 
-The `remember()` extension turns any `Prefs<T>` into a lifecycle-aware `MutableState<T>`:
+The `remember()` extension turns any `DelegatedPreference<T>` into a lifecycle-aware `MutableState<T>`:
 
 ```kotlin
 import androidx.compose.runtime.getValue
