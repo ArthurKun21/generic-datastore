@@ -7,11 +7,11 @@ Jetpack Compose extensions in `generic-datastore-compose`.
 ## Modules
 
 - `:generic-datastore` – core preference and proto datastore wrapper library.
-  - `core/` – shared interfaces and utilities (`Preference`, `Prefs`, `PreferenceDefaults`,
-      `PreferenceExtension`, `SystemFileSystem`).
+  - `core/` – shared interfaces and utilities (`BasePreference`, `DelegatedPreference`,
+      `PreferenceDefaults`, `PreferenceExtension`, `SystemFileSystem`).
   - `preferences/` – DataStore wrapper implementations for `Preference` types
       (`PreferencesDatastore`, `GenericPreferencesDatastore`, `CreatePreferencesDatastore`,
-      `PreferencesPrefs`).
+      `Preferences`).
   - `preferences/core/` – DataStore Preferences implementation for primitive types
       (`BooleanPrimitive`, `DoublePrimitive`, `FloatPrimitive`, `IntPrimitive`, `LongPrimitive`,
       `StringPrimitive`, `StringSetPrimitive`, `GenericPreferenceItem`).
@@ -33,10 +33,10 @@ Jetpack Compose extensions in `generic-datastore-compose`.
       (`BackupPreference`, `PreferenceBackupCreator`, `PreferenceBackupRestorer`,
       `BackupParsingException`, `Migration`).
   - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
-      `GenericProtoDatastore`, `CreateProtoDatastore`).
+      `GenericProtoDatastore`, `CreateProtoDatastore`, `GenericProtoPreferenceItem`).
   - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
       `preferences/`, `preferences/core/custom/`, and `preferences/utils/`.
-- `:generic-datastore-compose` – Compose helpers (e.g. `Prefs<T>.remember()`) built on the core
+- `:generic-datastore-compose` – Compose helpers (e.g. `DelegatedPreference<T>.remember()`) built on the core
   module.
 - `:app` and `:composeApp` – sample apps for local development.
 
