@@ -43,12 +43,15 @@ internal class DelegatedPreferenceImpl<T>(
 
     override fun resetToDefaultBlocking() = pref.setBlocking(pref.defaultValue)
 
+    @Suppress("UNCHECKED_CAST")
     override fun readFrom(preferences: DataStorePreferences): T =
         (pref as PreferencesAccessor<T>).readFrom(preferences)
 
+    @Suppress("UNCHECKED_CAST")
     override fun writeInto(mutablePreferences: MutablePreferences, value: T) =
         (pref as PreferencesAccessor<T>).writeInto(mutablePreferences, value)
 
+    @Suppress("UNCHECKED_CAST")
     override fun removeFrom(mutablePreferences: MutablePreferences) =
         (pref as PreferencesAccessor<T>).removeFrom(mutablePreferences)
 }
