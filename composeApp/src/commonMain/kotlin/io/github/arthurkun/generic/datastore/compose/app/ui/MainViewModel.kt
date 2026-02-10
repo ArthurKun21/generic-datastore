@@ -14,6 +14,8 @@ class MainViewModel(
     private val preferenceStore: PreferenceStore,
 ) : ViewModel() {
 
+    val datastore = preferenceStore.datastore
+
     val text = preferenceStore.text
     val num = preferenceStore.num
     val bool = preferenceStore.bool

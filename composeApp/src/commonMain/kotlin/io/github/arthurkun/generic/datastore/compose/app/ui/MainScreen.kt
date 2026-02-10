@@ -31,6 +31,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import io.github.arthurkun.generic.datastore.batch.rememberPreferences
 import io.github.arthurkun.generic.datastore.compose.app.domain.Animal
 import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
 import io.github.arthurkun.generic.datastore.compose.app.domain.UserProfile
@@ -53,11 +54,36 @@ fun MainScreen(
     var animalSet by viewModel.animalSet.remember()
     var themeSet by viewModel.themeSet.remember()
 
+    val (batchText, batchNum, batchBool) = viewModel.datastore.rememberPreferences(
+        viewModel.text,
+        viewModel.num,
+        viewModel.bool,
+    )
+    var bText by batchText
+    var bNum by batchNum
+    var bBool by batchBool
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
     ) {
+        item {
+            BatchRememberSection(
+                text = bText,
+                onTextChange = { bText = it },
+                num = bNum,
+                onDecrement = { bNum -= 1 },
+                onIncrement = { bNum += 1 },
+                bool = bBool,
+                onBoolChange = { bBool = it },
+            )
+        }
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
         item {
             StringSection(
                 text = text,
@@ -547,6 +573,73 @@ private fun EnumSetSection(
         }
         TextButton(onClick = onReset) {
             Text("Reset to Default")
+        }
+    }
+}
+
+@Composable
+private fun BatchRememberSection(
+    text: String,
+    onTextChange: (String) -> Unit,
+    num: Int,
+    onDecrement: () -> Unit,
+    onIncrement: () -> Unit,
+    bool: Boolean,
+    onBoolChange: (Boolean) -> Unit,
+) {
+    Column {
+        Text(
+            "Batch Remember (rememberPreferences)",
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        Text(
+            "All three preferences below share a single DataStore observation via rememberPreferences.",
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+        OutlinedTextField(
+            value = TextFieldValue(text, TextRange(text.length)),
+            onValueChange = { onTextChange(it.text) },
+            label = { Text("Batch Text") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        ListItem(
+            headlineContent = {
+                Text(
+                    "$num",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                )
+            },
+            leadingContent = {
+                Button(onClick = onDecrement) {
+                    Icon(Icons.Default.Remove, contentDescription = "Decrement")
+                }
+            },
+            trailingContent = {
+                Button(onClick = onIncrement) {
+                    Icon(Icons.Default.Add, contentDescription = "Increment")
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .toggleable(
+                    value = bool,
+                    onValueChange = onBoolChange,
+                )
+                .padding(horizontal = 16.dp),
+        ) {
+            Checkbox(
+                checked = bool,
+                onCheckedChange = null,
+            )
+            Text(
+                "Batch Boolean: $bool",
+                modifier = Modifier.padding(start = 8.dp),
+            )
         }
     }
 }

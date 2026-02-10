@@ -10,7 +10,7 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
 class PreferenceStore(
-    private val datastore: GenericPreferencesDatastore,
+    val datastore: GenericPreferencesDatastore,
 ) {
 
     val theme = datastore.enum(
