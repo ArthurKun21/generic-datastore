@@ -1,25 +1,20 @@
 package io.github.arthurkun.generic.datastore.preferences.batch
 
-import io.github.arthurkun.generic.datastore.DesktopTestHelper
+import io.github.arthurkun.generic.datastore.IosTestHelper
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 private const val TEST_DATASTORE_BLOCKING_NAME = "test_batch_operations_blocking"
 
-class DesktopBatchOperationsBlockingTest : AbstractBatchOperationsBlockingTest() {
+class IosBatchOperationsBlockingTest : AbstractBatchOperationsBlockingTest() {
 
-    @TempDir
-    lateinit var tempFolder: File
-
-    private val helper = DesktopTestHelper.blocking(TEST_DATASTORE_BLOCKING_NAME)
+    private val helper = IosTestHelper.blocking(TEST_DATASTORE_BLOCKING_NAME)
 
     override val preferenceDatastore: GenericPreferencesDatastore get() = helper.preferenceDatastore
 
     @BeforeTest
-    fun setup() = helper.setup(tempFolder.absolutePath)
+    fun setup() = helper.setup()
 
     @AfterTest
     fun tearDown() = helper.tearDown()
