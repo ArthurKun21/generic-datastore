@@ -4,6 +4,9 @@ package io.github.arthurkun.generic.datastore.preferences.utils
 
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.preferences.Preferences
+import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -93,7 +96,7 @@ internal class MappedPrefs<T, R>(
     override val defaultValue: R,
     private val convert: (T) -> R,
     private val reverse: (R) -> T,
-) : Preferences<R> {
+) : Preferences<R>, PreferencesAccessor<R> {
     override fun key(): String = prefs.key()
 
     /**
@@ -162,5 +165,21 @@ internal class MappedPrefs<T, R>(
 
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: R) {
         setBlocking(value)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun readFrom(preferences: DataStorePreferences): R {
+        val raw = (prefs as PreferencesAccessor<T>).readFrom(preferences)
+        return convertFallback(raw)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun writeInto(mutablePreferences: MutablePreferences, value: R) {
+        (prefs as PreferencesAccessor<T>).writeInto(mutablePreferences, reverseFallback(value))
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        (prefs as PreferencesAccessor<T>).removeFrom(mutablePreferences)
     }
 }

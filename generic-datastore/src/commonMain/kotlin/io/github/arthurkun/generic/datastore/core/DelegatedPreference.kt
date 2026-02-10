@@ -1,6 +1,9 @@
 package io.github.arthurkun.generic.datastore.core
 
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 import io.github.arthurkun.generic.datastore.preferences.Preferences
+import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -31,11 +34,21 @@ public interface DelegatedPreference<T> : ReadWriteProperty<Any?, T>, BasePrefer
 internal class DelegatedPreferenceImpl<T>(
     private val pref: BasePreference<T>,
 ) : Preferences<T>,
-    BasePreference<T> by pref {
+    BasePreference<T> by pref,
+    PreferencesAccessor<T> {
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = pref.getBlocking()
 
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = pref.setBlocking(value)
 
     override fun resetToDefaultBlocking() = pref.setBlocking(pref.defaultValue)
+
+    override fun readFrom(preferences: DataStorePreferences): T =
+        (pref as PreferencesAccessor<T>).readFrom(preferences)
+
+    override fun writeInto(mutablePreferences: MutablePreferences, value: T) =
+        (pref as PreferencesAccessor<T>).writeInto(mutablePreferences, value)
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) =
+        (pref as PreferencesAccessor<T>).removeFrom(mutablePreferences)
 }

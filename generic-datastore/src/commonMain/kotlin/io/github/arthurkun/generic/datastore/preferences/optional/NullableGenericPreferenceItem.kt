@@ -3,7 +3,9 @@ package io.github.arthurkun.generic.datastore.preferences.optional
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.MutablePreferences
 import io.github.arthurkun.generic.datastore.core.BasePreference
+import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +37,7 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
     private val key: String,
     private val preferences: Preferences.Key<T>,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : BasePreference<T?> {
+) : BasePreference<T?>, PreferencesAccessor<T?> {
 
     init {
         require(key.isNotBlank()) {
@@ -110,5 +112,20 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
         runBlocking {
             set(value)
         }
+    }
+
+    override fun readFrom(preferences: Preferences): T? =
+        preferences[this.preferences]
+
+    override fun writeInto(mutablePreferences: MutablePreferences, value: T?) {
+        if (value == null) {
+            mutablePreferences.remove(this.preferences)
+        } else {
+            mutablePreferences[this.preferences] = value
+        }
+    }
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        mutablePreferences.remove(this.preferences)
     }
 }

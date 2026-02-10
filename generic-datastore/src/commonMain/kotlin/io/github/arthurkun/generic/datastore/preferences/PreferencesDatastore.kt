@@ -3,6 +3,10 @@ package io.github.arthurkun.generic.datastore.preferences
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -323,6 +327,69 @@ public interface PreferencesDatastore {
         serializer: KSerializer<T>,
         json: Json? = null,
     ): Preferences<List<T>?>
+
+    /**
+     * Returns a [Flow] that emits a [BatchReadScope] on every DataStore change,
+     * allowing multiple preferences to be read from the same snapshot.
+     *
+     * The scope re-emits whenever any preference in the datastore changes.
+     * Use `distinctUntilChanged()` on derived values to filter irrelevant updates.
+     */
+    public fun batchReadFlow(): Flow<BatchReadScope>
+
+    /**
+     * One-shot batch read: collects the latest DataStore snapshot and executes [block]
+     * within a [BatchReadScope].
+     *
+     * @param R The return type of the block.
+     * @param block A lambda with [BatchReadScope] receiver that reads one or more preferences.
+     * @return The value returned by [block].
+     */
+    public suspend fun <R> batchGet(block: BatchReadScope.() -> R): R
+
+    /**
+     * Batch write: executes [block] inside a single DataStore `edit` transaction.
+     *
+     * All [BatchWriteScope.set], [BatchWriteScope.delete], and [BatchWriteScope.resetToDefault]
+     * calls in [block] share the same [MutablePreferences][androidx.datastore.preferences.core.MutablePreferences].
+     *
+     * @param block A lambda with [BatchWriteScope] receiver that writes one or more preferences.
+     */
+    public suspend fun batchWrite(block: BatchWriteScope.() -> Unit)
+
+    /**
+     * Atomic batch update: reads the current snapshot and writes new values in a single
+     * DataStore `edit` transaction.
+     *
+     * [block] can call [BatchUpdateScope.value] to read and [BatchUpdateScope.set] to write,
+     * guaranteeing consistency.
+     *
+     * @param block A lambda with [BatchUpdateScope] receiver that reads and writes preferences.
+     */
+    public suspend fun batchUpdate(block: BatchUpdateScope.() -> Unit)
+
+    /**
+     * Blocking variant of [batchGet].
+     *
+     * @param R The return type of the block.
+     * @param block A lambda with [BatchReadScope] receiver.
+     * @return The value returned by [block].
+     */
+    public fun <R> batchGetBlocking(block: BatchReadScope.() -> R): R
+
+    /**
+     * Blocking variant of [batchWrite].
+     *
+     * @param block A lambda with [BatchWriteScope] receiver.
+     */
+    public fun batchWriteBlocking(block: BatchWriteScope.() -> Unit)
+
+    /**
+     * Blocking variant of [batchUpdate].
+     *
+     * @param block A lambda with [BatchUpdateScope] receiver.
+     */
+    public fun batchUpdateBlocking(block: BatchUpdateScope.() -> Unit)
 
     /**
      * Clears all preferences stored in this datastore.

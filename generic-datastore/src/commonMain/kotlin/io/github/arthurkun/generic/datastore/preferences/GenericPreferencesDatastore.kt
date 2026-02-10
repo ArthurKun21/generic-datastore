@@ -44,7 +44,14 @@ import io.github.arthurkun.generic.datastore.preferences.optional.custom.Nullabl
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableKSerializedPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableObjectPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedListPrimitive
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
+import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -513,6 +520,33 @@ public class GenericPreferencesDatastore(
             json = json ?: defaultJson,
         ),
     )
+
+    override fun batchReadFlow(): Flow<BatchReadScope> =
+        datastore.dataOrEmpty.map { BatchReadScope(it) }
+
+    override suspend fun <R> batchGet(block: BatchReadScope.() -> R): R =
+        batchReadFlow().first().block()
+
+    override suspend fun batchWrite(block: BatchWriteScope.() -> Unit) {
+        datastore.edit { mutablePrefs ->
+            BatchWriteScope(mutablePrefs).block()
+        }
+    }
+
+    override suspend fun batchUpdate(block: BatchUpdateScope.() -> Unit) {
+        datastore.edit { mutablePrefs ->
+            BatchUpdateScope(mutablePrefs.toPreferences(), mutablePrefs).block()
+        }
+    }
+
+    override fun <R> batchGetBlocking(block: BatchReadScope.() -> R): R =
+        runBlocking { batchGet(block) }
+
+    override fun batchWriteBlocking(block: BatchWriteScope.() -> Unit): Unit =
+        runBlocking { batchWrite(block) }
+
+    override fun batchUpdateBlocking(block: BatchUpdateScope.() -> Unit): Unit =
+        runBlocking { batchUpdate(block) }
 
     /**
      * Clears all preferences stored in this datastore.
