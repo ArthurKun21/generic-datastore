@@ -30,7 +30,7 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
         val harness = ComposeRuntimeTestHarness(testDispatcher)
         harness.setContent {
             PlatformProviders {
-                observedState = preferenceDatastore.rememberBatchRead {
+                observedState = preferenceDatastore.rememberBatchRead(context = testDispatcher) {
                     get(stringPref) to get(intPref)
                 }
             }
@@ -62,7 +62,11 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
         val harness = ComposeRuntimeTestHarness(testDispatcher)
         harness.setContent {
             PlatformProviders {
-                val states = preferenceDatastore.rememberPreferences(stringPref, intPref)
+                val states = preferenceDatastore.rememberPreferences(
+                    pref1 = stringPref,
+                    pref2 = intPref,
+                    context = testDispatcher,
+                )
                 stateA = states.component1()
                 stateB = states.component2()
             }
@@ -78,8 +82,9 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
         first.value = "world"
         second.value = 20
 
-        runCurrent()
-        harness.awaitIdle()
+        waitUntil(harness) {
+            stringPref.getBlocking() == "world" && intPref.getBlocking() == 20
+        }
 
         assertEquals("world", stringPref.get())
         assertEquals(20, intPref.get())
@@ -101,7 +106,12 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
         val harness = ComposeRuntimeTestHarness(testDispatcher)
         harness.setContent {
             PlatformProviders {
-                val states = preferenceDatastore.rememberPreferences(pref1, pref2, pref3)
+                val states = preferenceDatastore.rememberPreferences(
+                    pref1 = pref1,
+                    pref2 = pref2,
+                    pref3 = pref3,
+                    context = testDispatcher,
+                )
                 state1 = states.component1()
                 state2 = states.component2()
                 state3 = states.component3()
@@ -121,8 +131,9 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
         pref2.set(2)
         pref3.set(true)
 
-        runCurrent()
-        harness.awaitIdle()
+        waitUntil(harness) {
+            first.value == "b" && second.value == 2 && third.value
+        }
 
         assertEquals("b", first.value)
         assertEquals(2, second.value)
@@ -145,7 +156,13 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
         val harness = ComposeRuntimeTestHarness(testDispatcher)
         harness.setContent {
             PlatformProviders {
-                val states = preferenceDatastore.rememberPreferences(pref1, pref2, pref3, pref4)
+                val states = preferenceDatastore.rememberPreferences(
+                    pref1 = pref1,
+                    pref2 = pref2,
+                    pref3 = pref3,
+                    pref4 = pref4,
+                    context = testDispatcher,
+                )
                 state1 = states.component1()
                 state2 = states.component2()
                 state3 = states.component3()
@@ -183,7 +200,14 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
         val harness = ComposeRuntimeTestHarness(testDispatcher)
         harness.setContent {
             PlatformProviders {
-                val states = preferenceDatastore.rememberPreferences(pref1, pref2, pref3, pref4, pref5)
+                val states = preferenceDatastore.rememberPreferences(
+                    pref1 = pref1,
+                    pref2 = pref2,
+                    pref3 = pref3,
+                    pref4 = pref4,
+                    pref5 = pref5,
+                    context = testDispatcher,
+                )
                 state1 = states.component1()
                 state2 = states.component2()
                 state3 = states.component3()
@@ -218,6 +242,19 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
             if (state.value != null) {
                 return
             }
+        }
+    }
+
+    private suspend fun TestScope.waitUntil(
+        harness: ComposeRuntimeTestHarness,
+        condition: () -> Boolean,
+    ) {
+        repeat(30) {
+            if (condition()) {
+                return
+            }
+            runCurrent()
+            harness.awaitIdle()
         }
     }
 }
