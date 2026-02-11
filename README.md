@@ -481,6 +481,135 @@ Retrieve the underlying DataStore key name:
 val key: String = userName.key()
 ```
 
+### Batch Operations (WIP documentation)
+
+Batch operations let you read or write multiple preferences in a single DataStore transaction,
+avoiding redundant I/O and ensuring atomicity.
+
+#### Batch Read
+
+Read multiple preferences from a single snapshot:
+
+```kotlin
+class SettingsViewModel(
+    private val datastore: GenericPreferencesDatastore,
+) : ViewModel() {
+
+    private val userName = datastore.string("user_name", "Guest")
+    private val darkMode = datastore.bool("dark_mode", false)
+    private val volume = datastore.float("volume", 1.0f)
+
+    fun loadSettings() {
+        viewModelScope.launch {
+            val (name, isDark, vol) = datastore.batchGet {
+                Triple(this[userName], this[darkMode], this[volume])
+            }
+        }
+    }
+}
+```
+
+#### Batch Read Flow
+
+Observe multiple preferences reactively from the same snapshot. The flow re-emits whenever any
+preference in the datastore changes:
+
+```kotlin
+class SettingsViewModel(
+    private val datastore: GenericPreferencesDatastore,
+) : ViewModel() {
+
+    private val userName = datastore.string("user_name", "Guest")
+    private val darkMode = datastore.bool("dark_mode", false)
+
+    val settingsFlow: Flow<Pair<String, Boolean>> = datastore.batchReadFlow().map { scope ->
+        scope[userName] to scope[darkMode]
+    }.distinctUntilChanged()
+}
+```
+
+#### Batch Write
+
+Write multiple preferences in a single atomic transaction:
+
+```kotlin
+class SettingsViewModel(
+    private val datastore: GenericPreferencesDatastore,
+) : ViewModel() {
+
+    private val userName = datastore.string("user_name", "Guest")
+    private val darkMode = datastore.bool("dark_mode", false)
+    private val volume = datastore.float("volume", 1.0f)
+
+    fun resetSettings() {
+        viewModelScope.launch {
+            datastore.batchWrite {
+                this[userName] = "Guest"
+                this[darkMode] = false
+                this[volume] = 1.0f
+            }
+        }
+    }
+}
+```
+
+#### Batch Update
+
+Atomically read current values and write new values in a single transaction, guaranteeing
+consistency when new values depend on current ones:
+
+```kotlin
+class GameViewModel(
+    private val datastore: GenericPreferencesDatastore,
+) : ViewModel() {
+
+    private val userScore = datastore.int("user_score", 0)
+    private val highScore = datastore.long("high_score", 0L)
+
+    fun submitScore(newScore: Int) {
+        viewModelScope.launch {
+            datastore.batchUpdate {
+                this[userScore] = newScore
+                val currentHigh = this[highScore]
+                if (newScore > currentHigh) {
+                    this[highScore] = newScore.toLong()
+                }
+            }
+        }
+    }
+}
+```
+
+The `BatchUpdateScope` also provides `update`, `delete`, and `resetToDefault` helpers:
+
+```kotlin
+datastore.batchUpdate {
+    update(userScore) { current -> current + 10 }
+    delete(nickname)
+    resetToDefault(volume)
+}
+```
+
+#### Blocking Batch Operations
+
+Blocking variants are available for non-coroutine contexts. Avoid calling these on the main/UI
+thread:
+
+```kotlin
+val (name, isDark) = datastore.batchGetBlocking {
+    this[userName] to this[darkMode]
+}
+
+datastore.batchWriteBlocking {
+    this[userName] = "Guest"
+    this[darkMode] = false
+}
+
+datastore.batchUpdateBlocking {
+    update(userScore) { current -> current + 1 }
+}
+```
+
 ### Mapped Preferences
 
 Transform a `Preference<T>` into a `Preference<R>` with converter functions:
