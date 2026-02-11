@@ -599,12 +599,12 @@ thread:
 
 ```kotlin
 val (name, isDark) = datastore.batchGetBlocking {
-    this[userName] to this[darkMode]
+    get[userName] to get[darkMode]
 }
 
 datastore.batchWriteBlocking {
-    this[userName] = "Guest"
-    this[darkMode] = false
+    set(userName, "Guest")
+    set(darkMode, false)
 }
 
 datastore.batchUpdateBlocking {
