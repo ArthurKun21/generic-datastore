@@ -25,7 +25,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  *   snapshot is available.
  */
 @Composable
-public expect fun<R> PreferencesDatastore.rememberBatchRead(
+public expect fun <R> PreferencesDatastore.rememberBatchRead(
     context: CoroutineContext = EmptyCoroutineContext,
-    block: BatchReadScope.() -> R
+    block: BatchReadScope.() -> R,
 ): State<R?>
