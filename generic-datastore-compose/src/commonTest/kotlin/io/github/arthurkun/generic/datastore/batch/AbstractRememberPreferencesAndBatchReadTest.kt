@@ -83,7 +83,7 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
         second.value = 20
 
         waitUntil(harness) {
-            stringPref.getBlocking() == "world" && intPref.getBlocking() == 20
+            stringPref.get() == "world" && intPref.get() == 20
         }
 
         assertEquals("world", stringPref.get())
@@ -247,7 +247,7 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
 
     private suspend fun TestScope.waitUntil(
         harness: ComposeRuntimeTestHarness,
-        condition: () -> Boolean,
+        condition: suspend () -> Boolean,
     ) {
         repeat(30) {
             if (condition()) {

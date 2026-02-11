@@ -18,22 +18,24 @@ internal class ComposeRuntimeTestHarness(
     private val scope = CoroutineScope(Job() + testDispatcher + frameClock)
     private val recomposer = Recomposer(scope.coroutineContext)
     private val composition = Composition(NoOpApplier(), recomposer)
-    private val recomposerJob = scope.launch {
-        recomposer.runRecomposeAndApplyChanges()
+
+    init {
+        scope.launch { recomposer.runRecomposeAndApplyChanges() }
     }
 
     fun setContent(content: @Composable () -> Unit) {
         composition.setContent(content)
     }
 
+    private var frameTimeNanos = 0L
+
     suspend fun awaitIdle() {
-        frameClock.sendFrame(0L)
+        frameClock.sendFrame(frameTimeNanos)
+        frameTimeNanos += 16_000_000L
     }
 
-    suspend fun dispose() {
+    fun dispose() {
         composition.dispose()
-        recomposer.close()
-        recomposerJob.cancel()
         scope.cancel()
     }
 }
