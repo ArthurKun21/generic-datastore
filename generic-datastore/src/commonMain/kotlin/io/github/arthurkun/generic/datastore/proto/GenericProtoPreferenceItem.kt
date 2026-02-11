@@ -1,88 +1,47 @@
 package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.core.IOException
 import io.github.arthurkun.generic.datastore.core.BasePreference
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlin.reflect.KProperty
 
 /**
  * A [BasePreference] implementation backed by a Proto DataStore.
  *
+ * Delegates all [BasePreference] operations to a [ProtoFieldPreference] with identity
+ * getter/updater, and adds [ProtoPreference] (property delegation + resetToDefaultBlocking).
+ *
  * @param T The proto message type.
  * @param datastore The [DataStore<T>] instance.
  * @param defaultValue The default value for the proto message.
+ * @param key The key identifier for this preference.
  */
 internal class GenericProtoPreferenceItem<T>(
-    private val datastore: DataStore<T>,
-    override val defaultValue: T,
-    private val key: String = "proto_data",
-) : ProtoPreference<T> {
+    datastore: DataStore<T>,
+    defaultValue: T,
+    key: String = "proto_data",
+) : ProtoPreference<T>,
+    BasePreference<T> by ProtoFieldPreference(
+        datastore = datastore,
+        key = key,
+        defaultValue = defaultValue,
+        getter = { it },
+        updater = { _, value -> value },
+        defaultProtoValue = defaultValue,
+    ) {
 
-    init {
-        require(key.isNotBlank()) {
-            "Proto key cannot be blank."
-        }
-    }
+    private val delegate = ProtoFieldPreference(
+        datastore = datastore,
+        key = key,
+        defaultValue = defaultValue,
+        getter = { it },
+        updater = { _, value -> value },
+        defaultProtoValue = defaultValue,
+    )
 
-    private val ioDispatcher = Dispatchers.IO
+    override fun resetToDefaultBlocking() = delegate.setBlocking(delegate.defaultValue)
 
-    override fun key(): String = key
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = delegate.getBlocking()
 
-    override suspend fun get(): T = withContext(ioDispatcher) {
-        asFlow().first()
-    }
-
-    override suspend fun set(value: T) {
-        withContext(ioDispatcher) {
-            datastore.updateData { value }
-        }
-    }
-
-    override suspend fun update(transform: (T) -> T) {
-        withContext(ioDispatcher) {
-            datastore.updateData { current -> transform(current) }
-        }
-    }
-
-    override suspend fun resetToDefault() = set(defaultValue)
-
-    override suspend fun delete() {
-        withContext(ioDispatcher) {
-            datastore.updateData { defaultValue }
-        }
-    }
-
-    override fun asFlow(): Flow<T> = datastore
-        .data
-        .catch { e ->
-            if (e is IOException) {
-                emit(defaultValue)
-            } else {
-                throw e
-            }
-        }
-
-    override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<T> =
-        asFlow().stateIn(scope, started, defaultValue)
-
-    override fun getBlocking(): T = runBlocking { get() }
-
-    override fun setBlocking(value: T) = runBlocking { set(value) }
-
-    override fun resetToDefaultBlocking() = setBlocking(defaultValue)
-
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T = getBlocking()
-
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = setBlocking(value)
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) =
+        delegate.setBlocking(value)
 }

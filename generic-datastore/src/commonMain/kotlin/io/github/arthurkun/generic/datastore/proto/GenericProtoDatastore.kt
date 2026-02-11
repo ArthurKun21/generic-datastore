@@ -26,4 +26,20 @@ public class GenericProtoDatastore<T>(
             key = key,
         )
     }
+
+    override fun <F> field(
+        key: String,
+        defaultValue: F,
+        getter: (T) -> F,
+        updater: (T, F) -> T,
+    ): ProtoPreference<F> = ProtoFieldPrefs(
+        ProtoFieldPreference(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        ),
+    )
 }
