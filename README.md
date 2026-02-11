@@ -544,9 +544,9 @@ class SettingsViewModel(
     fun resetSettings() {
         viewModelScope.launch {
             datastore.batchWrite {
-                this[userName] = "Guest"
-                this[darkMode] = false
-                this[volume] = 1.0f
+                set(userName, "Guest")
+                set(darkMode, false)
+                set(volume, 1.0f)
             }
         }
     }
@@ -569,10 +569,10 @@ class GameViewModel(
     fun submitScore(newScore: Int) {
         viewModelScope.launch {
             datastore.batchUpdate {
-                this[userScore] = newScore
-                val currentHigh = this[highScore]
+                set(userScore, newScore)
+                val currentHigh = get(highScore)
                 if (newScore > currentHigh) {
-                    this[highScore] = newScore.toLong()
+                    set(highScore, newScore.toLong())
                 }
             }
         }
