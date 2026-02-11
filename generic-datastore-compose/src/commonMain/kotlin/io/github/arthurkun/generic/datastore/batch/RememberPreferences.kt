@@ -11,19 +11,24 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- * Remembers two preferences, reading from a shared [batchReadFlow][PreferencesDatastore.batchReadFlow]
- * snapshot and writing via [batchWrite][PreferencesDatastore.batchWrite].
+ * Remembers two preferences as [MutableState][androidx.compose.runtime.MutableState] values,
+ * reading from a shared [batchReadFlow][PreferencesDatastore.batchReadFlow] snapshot and
+ * writing via [batchWrite][PreferencesDatastore.batchWrite].
  *
- * All reads share a single DataStore observation. Writes are launched asynchronously.
- * An optimistic local override is applied immediately for responsive UI.
+ * All reads share a single DataStore snapshot, eliminating redundant transactions.
+ * Writes are launched asynchronously with an optimistic local override applied
+ * immediately for responsive UI.
  *
  * Usage:
  * ```
  * val (name, age) = datastore.rememberPreferences(namePref, agePref)
  * ```
  *
+ * @param pref1 The first [Preference] to observe and write.
+ * @param pref2 The second [Preference] to observe and write.
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @return A [PreferencesState2] containing two [MutableState][androidx.compose.runtime.MutableState] values.
  */
 @Composable
 public fun <T1, T2> PreferencesDatastore.rememberPreferences(
@@ -32,7 +37,7 @@ public fun <T1, T2> PreferencesDatastore.rememberPreferences(
     context: CoroutineContext = EmptyCoroutineContext,
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState2<T1, T2> {
-    val batchState = rememberBatchRead(context)
+    val batchState = rememberBatchRead(context) { this }
     val scope = rememberCoroutineScope()
     val datastore = this
     return remember(datastore, pref1, pref2, policy) {
@@ -44,16 +49,25 @@ public fun <T1, T2> PreferencesDatastore.rememberPreferences(
 }
 
 /**
- * Remembers three preferences, reading from a shared [batchReadFlow][PreferencesDatastore.batchReadFlow]
- * snapshot and writing via [batchWrite][PreferencesDatastore.batchWrite].
+ * Remembers three preferences as [MutableState][androidx.compose.runtime.MutableState] values,
+ * reading from a shared [batchReadFlow][PreferencesDatastore.batchReadFlow] snapshot and
+ * writing via [batchWrite][PreferencesDatastore.batchWrite].
+ *
+ * All reads share a single DataStore snapshot, eliminating redundant transactions.
+ * Writes are launched asynchronously with an optimistic local override applied
+ * immediately for responsive UI.
  *
  * Usage:
  * ```
  * val (name, age, enabled) = datastore.rememberPreferences(namePref, agePref, enabledPref)
  * ```
  *
+ * @param pref1 The first [Preference] to observe and write.
+ * @param pref2 The second [Preference] to observe and write.
+ * @param pref3 The third [Preference] to observe and write.
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @return A [PreferencesState3] containing three [MutableState][androidx.compose.runtime.MutableState] values.
  */
 @Composable
 public fun <T1, T2, T3> PreferencesDatastore.rememberPreferences(
@@ -63,7 +77,7 @@ public fun <T1, T2, T3> PreferencesDatastore.rememberPreferences(
     context: CoroutineContext = EmptyCoroutineContext,
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState3<T1, T2, T3> {
-    val batchState = rememberBatchRead(context)
+    val batchState = rememberBatchRead(context) { this }
     val scope = rememberCoroutineScope()
     val datastore = this
     return remember(datastore, pref1, pref2, pref3, policy) {
@@ -76,16 +90,26 @@ public fun <T1, T2, T3> PreferencesDatastore.rememberPreferences(
 }
 
 /**
- * Remembers four preferences, reading from a shared [batchReadFlow][PreferencesDatastore.batchReadFlow]
- * snapshot and writing via [batchWrite][PreferencesDatastore.batchWrite].
+ * Remembers four preferences as [MutableState][androidx.compose.runtime.MutableState] values,
+ * reading from a shared [batchReadFlow][PreferencesDatastore.batchReadFlow] snapshot and
+ * writing via [batchWrite][PreferencesDatastore.batchWrite].
+ *
+ * All reads share a single DataStore snapshot, eliminating redundant transactions.
+ * Writes are launched asynchronously with an optimistic local override applied
+ * immediately for responsive UI.
  *
  * Usage:
  * ```
  * val (a, b, c, d) = datastore.rememberPreferences(pref1, pref2, pref3, pref4)
  * ```
  *
+ * @param pref1 The first [Preference] to observe and write.
+ * @param pref2 The second [Preference] to observe and write.
+ * @param pref3 The third [Preference] to observe and write.
+ * @param pref4 The fourth [Preference] to observe and write.
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @return A [PreferencesState4] containing four [MutableState][androidx.compose.runtime.MutableState] values.
  */
 @Composable
 public fun <T1, T2, T3, T4> PreferencesDatastore.rememberPreferences(
@@ -96,7 +120,7 @@ public fun <T1, T2, T3, T4> PreferencesDatastore.rememberPreferences(
     context: CoroutineContext = EmptyCoroutineContext,
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState4<T1, T2, T3, T4> {
-    val batchState = rememberBatchRead(context)
+    val batchState = rememberBatchRead(context) { this }
     val scope = rememberCoroutineScope()
     val datastore = this
     return remember(datastore, pref1, pref2, pref3, pref4, policy) {
@@ -110,16 +134,27 @@ public fun <T1, T2, T3, T4> PreferencesDatastore.rememberPreferences(
 }
 
 /**
- * Remembers five preferences, reading from a shared [batchReadFlow][PreferencesDatastore.batchReadFlow]
- * snapshot and writing via [batchWrite][PreferencesDatastore.batchWrite].
+ * Remembers five preferences as [MutableState][androidx.compose.runtime.MutableState] values,
+ * reading from a shared [batchReadFlow][PreferencesDatastore.batchReadFlow] snapshot and
+ * writing via [batchWrite][PreferencesDatastore.batchWrite].
+ *
+ * All reads share a single DataStore snapshot, eliminating redundant transactions.
+ * Writes are launched asynchronously with an optimistic local override applied
+ * immediately for responsive UI.
  *
  * Usage:
  * ```
  * val (a, b, c, d, e) = datastore.rememberPreferences(pref1, pref2, pref3, pref4, pref5)
  * ```
  *
+ * @param pref1 The first [Preference] to observe and write.
+ * @param pref2 The second [Preference] to observe and write.
+ * @param pref3 The third [Preference] to observe and write.
+ * @param pref4 The fourth [Preference] to observe and write.
+ * @param pref5 The fifth [Preference] to observe and write.
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @return A [PreferencesState5] containing five [MutableState][androidx.compose.runtime.MutableState] values.
  */
 @Composable
 public fun <T1, T2, T3, T4, T5> PreferencesDatastore.rememberPreferences(
@@ -131,7 +166,7 @@ public fun <T1, T2, T3, T4, T5> PreferencesDatastore.rememberPreferences(
     context: CoroutineContext = EmptyCoroutineContext,
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState5<T1, T2, T3, T4, T5> {
-    val batchState = rememberBatchRead(context)
+    val batchState = rememberBatchRead(context) { this }
     val scope = rememberCoroutineScope()
     val datastore = this
     return remember(datastore, pref1, pref2, pref3, pref4, pref5, policy) {

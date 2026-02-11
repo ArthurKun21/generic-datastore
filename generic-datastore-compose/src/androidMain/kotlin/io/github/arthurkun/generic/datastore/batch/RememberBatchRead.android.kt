@@ -12,11 +12,13 @@ import kotlin.coroutines.CoroutineContext
  * [collectAsStateWithLifecycle] to automatically pause collection when the lifecycle is stopped.
  *
  * @param context The [CoroutineContext] to use for collecting the flow.
+ * @param block A lambda with receiver on [BatchReadScope] to derive the desired state from the batch read snapshot.
  * @return A [State] containing the latest [BatchReadScope], or `null` until the first
  *   snapshot is available.
  */
 @Composable
-public actual fun PreferencesDatastore.rememberBatchRead(
+public actual fun <R> PreferencesDatastore.rememberBatchRead(
     context: CoroutineContext,
-): State<BatchReadScope?> =
-    batchReadFlow().collectAsStateWithLifecycle(initialValue = null, context = context)
+    block: BatchReadScope.() -> R,
+): State<R?> = batchReadFlow(block = block)
+    .collectAsStateWithLifecycle(initialValue = null, context = context)

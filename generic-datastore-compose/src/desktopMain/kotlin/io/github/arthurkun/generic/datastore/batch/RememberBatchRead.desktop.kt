@@ -16,7 +16,7 @@ import kotlin.coroutines.CoroutineContext
  *   snapshot is available.
  */
 @Composable
-public actual fun PreferencesDatastore.rememberBatchRead(
+public actual fun <R> PreferencesDatastore.rememberBatchRead(
     context: CoroutineContext,
-): State<BatchReadScope?> =
-    batchReadFlow().collectAsState(initial = null, context = context)
+    block: BatchReadScope.() -> R,
+): State<R?> = batchReadFlow(block = block).collectAsState(initial = null, context = context)

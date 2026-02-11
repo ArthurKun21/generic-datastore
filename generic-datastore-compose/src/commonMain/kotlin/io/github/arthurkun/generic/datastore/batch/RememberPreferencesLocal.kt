@@ -35,7 +35,7 @@ public fun <T1, T2> rememberPreferences(
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState2<T1, T2> {
     val datastore = LocalPreferencesDatastore.current
-    val batchState = datastore.rememberBatchRead(context)
+    val batchState = datastore.rememberBatchRead(context) { this }
     val scope = rememberCoroutineScope()
     return remember(datastore, pref1, pref2, policy) {
         PreferencesState2(
@@ -69,7 +69,7 @@ public fun <T1, T2, T3> rememberPreferences(
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState3<T1, T2, T3> {
     val datastore = LocalPreferencesDatastore.current
-    val batchState = datastore.rememberBatchRead(context)
+    val batchState = datastore.rememberBatchRead(context) { this }
     val scope = rememberCoroutineScope()
     return remember(datastore, pref1, pref2, pref3, policy) {
         PreferencesState3(
@@ -105,7 +105,7 @@ public fun <T1, T2, T3, T4> rememberPreferences(
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState4<T1, T2, T3, T4> {
     val datastore = LocalPreferencesDatastore.current
-    val batchState = datastore.rememberBatchRead(context)
+    val batchState = datastore.rememberBatchRead(context) { this }
     val scope = rememberCoroutineScope()
     return remember(datastore, pref1, pref2, pref3, pref4, policy) {
         PreferencesState4(
@@ -143,7 +143,7 @@ public fun <T1, T2, T3, T4, T5> rememberPreferences(
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState5<T1, T2, T3, T4, T5> {
     val datastore = LocalPreferencesDatastore.current
-    val batchState = datastore.rememberBatchRead(context)
+    val batchState = datastore.rememberBatchRead(context) { this }
     val scope = rememberCoroutineScope()
     return remember(datastore, pref1, pref2, pref3, pref4, pref5, policy) {
         PreferencesState5(

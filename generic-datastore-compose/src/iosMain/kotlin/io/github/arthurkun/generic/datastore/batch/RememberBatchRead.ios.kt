@@ -12,11 +12,12 @@ import kotlin.coroutines.CoroutineContext
  * [collectAsState] to observe the batch read flow.
  *
  * @param context The [CoroutineContext] to use for collecting the flow.
+ * @param block A lambda with receiver on [BatchReadScope] to derive the desired state from the batch read snapshot.
  * @return A [State] containing the latest [BatchReadScope], or `null` until the first
  *   snapshot is available.
  */
 @Composable
-public actual fun PreferencesDatastore.rememberBatchRead(
+public actual fun <R> PreferencesDatastore.rememberBatchRead(
     context: CoroutineContext,
-): State<BatchReadScope?> =
-    batchReadFlow().collectAsState(initial = null, context = context)
+    block: BatchReadScope.() -> R,
+): State<R?> = batchReadFlow(block = block).collectAsState(initial = null, context = context)
