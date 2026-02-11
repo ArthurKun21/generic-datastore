@@ -17,11 +17,15 @@ public class PreferencesState2<T1, T2> internal constructor(
 ) {
     public var first: T1
         get() = state1.value
-        set(value) { state1.value = value }
+        set(value) {
+            state1.value = value
+        }
 
     public var second: T2
         get() = state2.value
-        set(value) { state2.value = value }
+        set(value) {
+            state2.value = value
+        }
 
     public operator fun component1(): MutableState<T1> = state1
     public operator fun component2(): MutableState<T2> = state2
@@ -44,15 +48,21 @@ public class PreferencesState3<T1, T2, T3> internal constructor(
 ) {
     public var first: T1
         get() = state1.value
-        set(value) { state1.value = value }
+        set(value) {
+            state1.value = value
+        }
 
     public var second: T2
         get() = state2.value
-        set(value) { state2.value = value }
+        set(value) {
+            state2.value = value
+        }
 
     public var third: T3
         get() = state3.value
-        set(value) { state3.value = value }
+        set(value) {
+            state3.value = value
+        }
 
     public operator fun component1(): MutableState<T1> = state1
     public operator fun component2(): MutableState<T2> = state2
@@ -77,19 +87,27 @@ public class PreferencesState4<T1, T2, T3, T4> internal constructor(
 ) {
     public var first: T1
         get() = state1.value
-        set(value) { state1.value = value }
+        set(value) {
+            state1.value = value
+        }
 
     public var second: T2
         get() = state2.value
-        set(value) { state2.value = value }
+        set(value) {
+            state2.value = value
+        }
 
     public var third: T3
         get() = state3.value
-        set(value) { state3.value = value }
+        set(value) {
+            state3.value = value
+        }
 
     public var fourth: T4
         get() = state4.value
-        set(value) { state4.value = value }
+        set(value) {
+            state4.value = value
+        }
 
     public operator fun component1(): MutableState<T1> = state1
     public operator fun component2(): MutableState<T2> = state2
@@ -117,23 +135,33 @@ public class PreferencesState5<T1, T2, T3, T4, T5> internal constructor(
 ) {
     public var first: T1
         get() = state1.value
-        set(value) { state1.value = value }
+        set(value) {
+            state1.value = value
+        }
 
     public var second: T2
         get() = state2.value
-        set(value) { state2.value = value }
+        set(value) {
+            state2.value = value
+        }
 
     public var third: T3
         get() = state3.value
-        set(value) { state3.value = value }
+        set(value) {
+            state3.value = value
+        }
 
     public var fourth: T4
         get() = state4.value
-        set(value) { state4.value = value }
+        set(value) {
+            state4.value = value
+        }
 
     public var fifth: T5
         get() = state5.value
-        set(value) { state5.value = value }
+        set(value) {
+            state5.value = value
+        }
 
     public operator fun component1(): MutableState<T1> = state1
     public operator fun component2(): MutableState<T2> = state2
