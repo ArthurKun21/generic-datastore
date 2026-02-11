@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.proto
+package io.github.arthurkun.generic.datastore.proto.core
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException

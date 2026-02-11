@@ -3,6 +3,8 @@
 package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.DataStore
+import io.github.arthurkun.generic.datastore.proto.core.GenericProtoPreferenceItem
+import io.github.arthurkun.generic.datastore.proto.core.ProtoFieldPreference
 
 /**
  * A DataStore implementation for Proto DataStore.

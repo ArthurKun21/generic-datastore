@@ -1,14 +1,15 @@
-package io.github.arthurkun.generic.datastore.proto
+package io.github.arthurkun.generic.datastore.proto.core
 
 import androidx.datastore.core.DataStore
 import io.github.arthurkun.generic.datastore.core.BasePreference
+import io.github.arthurkun.generic.datastore.proto.ProtoPreference
 import kotlin.reflect.KProperty
 
 /**
  * A [BasePreference] implementation backed by a Proto DataStore.
  *
  * Delegates all [BasePreference] operations to a [ProtoFieldPreference] with identity
- * getter/updater, and adds [ProtoPreference] (property delegation + resetToDefaultBlocking).
+ * getter/updater, and adds [io.github.arthurkun.generic.datastore.proto.ProtoPreference] (property delegation + resetToDefaultBlocking).
  *
  * @param T The proto message type.
  * @param datastore The [DataStore<T>] instance.
