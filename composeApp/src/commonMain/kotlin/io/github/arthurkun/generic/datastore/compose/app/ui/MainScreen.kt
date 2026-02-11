@@ -21,6 +21,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -63,154 +64,157 @@ fun MainScreen(
     var bNum by batchNum
     var bBool by batchBool
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-    ) {
-        item {
-            BatchRememberSection(
-                text = bText,
-                onTextChange = { bText = it },
-                num = bNum,
-                onDecrement = { bNum -= 1 },
-                onIncrement = { bNum += 1 },
-                bool = bBool,
-                onBoolChange = { bBool = it },
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
-        item {
-            StringSection(
-                text = text,
-                onTextChange = { text = it },
-                onReset = { viewModel.resetText() },
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
-        item {
-            IntegerSection(
-                num = num,
-                onDecrement = { num -= 1 },
-                onIncrement = { num += 1 },
-                onReset = { viewModel.resetNum() },
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
-        item {
-            BooleanSection(
-                bool = bool,
-                onBoolChange = { bool = it },
-                onReset = { viewModel.resetBool() },
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
-        item {
-            EnumSection(
-                theme = theme,
-                onThemeChange = { theme = it },
-                onReset = { viewModel.resetTheme() },
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
-        item {
-            SerializerSection(
-                animal = animal,
-                onAnimalChange = { animal = it },
-                onReset = { viewModel.resetCustomObject() },
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
-        item {
-            DurationSection(
-                duration = duration,
-                onUpdate = { duration = Clock.System.now() },
-                onReset = { viewModel.resetDuration() },
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
-        item {
-            KSerializedSection(
-                userProfile = userProfile,
-                onUserProfileChange = { userProfile = it },
-                onReset = { viewModel.resetUserProfile() },
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
-        item {
-            KSerializedSetSection(
-                userProfileSet = userProfileSet,
-                onAdd = { profile -> viewModel.addUserProfile(profile) },
-                onRemove = { profile -> viewModel.removeUserProfile(profile) },
-                onReset = { viewModel.resetUserProfileSet() },
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
-        item {
-            SerializedSetSection(
-                animalSet = animalSet,
-                onToggle = { entry -> viewModel.toggleAnimal(entry) },
-                onReset = { viewModel.resetAnimalSet() },
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
-        item {
-            EnumSetSection(
-                themeSet = themeSet,
-                onToggle = { entry -> viewModel.toggleTheme(entry) },
-                onReset = { viewModel.resetThemeSet() },
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
-        item {
-            ExportImportButtons(
-                onExport = { viewModel.exportPreferences() },
-                onImport = { jsonString -> viewModel.importPreferences(jsonString) },
-            )
+    Scaffold { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(16.dp),
+        ) {
+            item {
+                BatchRememberSection(
+                    text = bText,
+                    onTextChange = { bText = it },
+                    num = bNum,
+                    onDecrement = { bNum -= 1 },
+                    onIncrement = { bNum += 1 },
+                    bool = bBool,
+                    onBoolChange = { bBool = it },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                StringSection(
+                    text = text,
+                    onTextChange = { text = it },
+                    onReset = { viewModel.resetText() },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                IntegerSection(
+                    num = num,
+                    onDecrement = { num -= 1 },
+                    onIncrement = { num += 1 },
+                    onReset = { viewModel.resetNum() },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                BooleanSection(
+                    bool = bool,
+                    onBoolChange = { bool = it },
+                    onReset = { viewModel.resetBool() },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                EnumSection(
+                    theme = theme,
+                    onThemeChange = { theme = it },
+                    onReset = { viewModel.resetTheme() },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                SerializerSection(
+                    animal = animal,
+                    onAnimalChange = { animal = it },
+                    onReset = { viewModel.resetCustomObject() },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                DurationSection(
+                    duration = duration,
+                    onUpdate = { duration = Clock.System.now() },
+                    onReset = { viewModel.resetDuration() },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                KSerializedSection(
+                    userProfile = userProfile,
+                    onUserProfileChange = { userProfile = it },
+                    onReset = { viewModel.resetUserProfile() },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                KSerializedSetSection(
+                    userProfileSet = userProfileSet,
+                    onAdd = { profile -> viewModel.addUserProfile(profile) },
+                    onRemove = { profile -> viewModel.removeUserProfile(profile) },
+                    onReset = { viewModel.resetUserProfileSet() },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                SerializedSetSection(
+                    animalSet = animalSet,
+                    onToggle = { entry -> viewModel.toggleAnimal(entry) },
+                    onReset = { viewModel.resetAnimalSet() },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                EnumSetSection(
+                    themeSet = themeSet,
+                    onToggle = { entry -> viewModel.toggleTheme(entry) },
+                    onReset = { viewModel.resetThemeSet() },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                ExportImportButtons(
+                    onExport = { viewModel.exportPreferences() },
+                    onImport = { jsonString -> viewModel.importPreferences(jsonString) },
+                )
+            }
         }
     }
 }
