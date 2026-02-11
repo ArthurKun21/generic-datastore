@@ -6,11 +6,13 @@ import org.junit.Before
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class AndroidProtoDatastoreBlockingTest : AbstractProtoDatastoreBlockingTest() {
+class AndroidNullableProtoFieldPreferenceBlockingTest :
+    AbstractNullableProtoFieldPreferenceBlockingTest() {
 
-    private val helper = AndroidProtoTestHelper.blocking("test_proto_blocking")
+    private val helper =
+        AndroidNullableProtoTestHelper.blocking("test_nullable_proto_field_blocking")
 
-    override val protoDatastore get() = helper.protoDatastore
+    override val nullableProtoDatastore get() = helper.protoDatastore
 
     @Before
     fun setup() = helper.setup()

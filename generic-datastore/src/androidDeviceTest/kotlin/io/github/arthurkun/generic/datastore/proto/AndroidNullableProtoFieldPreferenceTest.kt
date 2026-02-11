@@ -7,11 +7,11 @@ import org.junit.Before
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class AndroidProtoDatastoreTest : AbstractProtoDatastoreTest() {
+class AndroidNullableProtoFieldPreferenceTest : AbstractNullableProtoFieldPreferenceTest() {
 
-    private val helper = AndroidProtoTestHelper.standard("test_proto")
+    private val helper = AndroidNullableProtoTestHelper.standard("test_nullable_proto_field")
 
-    override val protoDatastore get() = helper.protoDatastore
+    override val nullableProtoDatastore get() = helper.protoDatastore
     override val testDispatcher: TestDispatcher get() = helper.testDispatcher
 
     @Before

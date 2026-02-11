@@ -5,12 +5,12 @@ import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
-class DesktopProtoDatastoreBlockingTest : AbstractProtoDatastoreBlockingTest() {
+class DesktopProtoFieldPreferenceBlockingTest : AbstractProtoFieldPreferenceBlockingTest() {
 
     @TempDir
     lateinit var tempFolder: File
 
-    private val helper = DesktopProtoTestHelper.blocking("test_proto_blocking")
+    private val helper = DesktopProtoTestHelper.blocking("test_proto_field_blocking")
 
     override val protoDatastore get() = helper.protoDatastore
 

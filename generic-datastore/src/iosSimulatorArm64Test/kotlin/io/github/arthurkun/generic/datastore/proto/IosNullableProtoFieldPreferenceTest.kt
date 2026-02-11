@@ -4,11 +4,11 @@ import kotlinx.coroutines.test.TestDispatcher
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
-class IosProtoDatastoreTest : AbstractProtoDatastoreTest() {
+class IosNullableProtoFieldPreferenceTest : AbstractNullableProtoFieldPreferenceTest() {
 
-    private val helper = IosProtoTestHelper.standard("test_proto")
+    private val helper = IosNullableProtoTestHelper.standard("test_nullable_proto_field")
 
-    override val protoDatastore get() = helper.protoDatastore
+    override val nullableProtoDatastore get() = helper.protoDatastore
     override val testDispatcher: TestDispatcher get() = helper.testDispatcher
 
     @BeforeTest

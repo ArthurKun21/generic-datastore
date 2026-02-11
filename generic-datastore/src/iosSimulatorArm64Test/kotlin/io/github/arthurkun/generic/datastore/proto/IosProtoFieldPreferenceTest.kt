@@ -1,13 +1,15 @@
 package io.github.arthurkun.generic.datastore.proto
 
+import kotlinx.coroutines.test.TestDispatcher
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
-class IosProtoDatastoreBlockingTest : AbstractProtoDatastoreBlockingTest() {
+class IosProtoFieldPreferenceTest : AbstractProtoFieldPreferenceTest() {
 
-    private val helper = IosProtoTestHelper.blocking("test_proto_blocking")
+    private val helper = IosProtoTestHelper.standard("test_proto_field")
 
     override val protoDatastore get() = helper.protoDatastore
+    override val testDispatcher: TestDispatcher get() = helper.testDispatcher
 
     @BeforeTest
     fun setup() = helper.setup()

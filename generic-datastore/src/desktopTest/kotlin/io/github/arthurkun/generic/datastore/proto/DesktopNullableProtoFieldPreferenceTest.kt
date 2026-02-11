@@ -6,14 +6,14 @@ import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
-class DesktopProtoDatastoreTest : AbstractProtoDatastoreTest() {
+class DesktopNullableProtoFieldPreferenceTest : AbstractNullableProtoFieldPreferenceTest() {
 
     @TempDir
     lateinit var tempFolder: File
 
-    private val helper = DesktopProtoTestHelper.standard("test_proto")
+    private val helper = DesktopNullableProtoTestHelper.standard("test_nullable_proto_field")
 
-    override val protoDatastore get() = helper.protoDatastore
+    override val nullableProtoDatastore get() = helper.protoDatastore
     override val testDispatcher: TestDispatcher get() = helper.testDispatcher
 
     @BeforeTest

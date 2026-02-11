@@ -6,9 +6,9 @@ import org.junit.Before
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class AndroidProtoDatastoreBlockingTest : AbstractProtoDatastoreBlockingTest() {
+class AndroidProtoFieldPreferenceBlockingTest : AbstractProtoFieldPreferenceBlockingTest() {
 
-    private val helper = AndroidProtoTestHelper.blocking("test_proto_blocking")
+    private val helper = AndroidProtoTestHelper.blocking("test_proto_field_blocking")
 
     override val protoDatastore get() = helper.protoDatastore
 
