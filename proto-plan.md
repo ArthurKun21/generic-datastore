@@ -736,6 +736,8 @@ tests would triple this duplication.
 
 - [ ] **3.7** Per-field preference test scenarios (suspending — in `AbstractProtoFieldPreferenceTest`)
 
+  **Top-level field tests (level 1):**
+
   - [ ] `field()` creates a preference that reads a top-level field (`name` from `TestProtoData`)
   - [ ] `field()` creates a preference that reads another top-level field (`id` from `TestProtoData`)
   - [ ] `field().get()` returns `defaultValue` when proto is at default state
@@ -747,12 +749,78 @@ tests would triple this duplication.
   - [ ] `field().resetToDefault()` resets field to `defaultValue`
   - [ ] `field().key()` returns the configured key
 
+  **Nested field tests (level 2 — `profile.*`):**
+
+  - [ ] `field()` reads `profile.nickname` (level 2)
+    ```kotlin
+    val nicknamePref = protoDatastore.field(
+        key = "profile_nickname",
+        defaultValue = "",
+        getter = { it.profile.nickname },
+        updater = { proto, value ->
+            proto.copy(profile = proto.profile.copy(nickname = value))
+        },
+    )
+    ```
+  - [ ] `field().get()` returns default `""` for `profile.nickname` when proto is at default state
+  - [ ] `field().set()` on `profile.nickname` does not affect `profile.age` or top-level fields
+  - [ ] `field().update()` on `profile.age` atomically increments
+    ```kotlin
+    agePref.update { it + 1 }
+    ```
+
+  **Deeply nested field tests (level 3 — `profile.address.*`):**
+
+  - [ ] `field()` reads `profile.address.city` (level 3)
+    ```kotlin
+    val cityPref = protoDatastore.field(
+        key = "profile_address_city",
+        defaultValue = "",
+        getter = { it.profile.address.city },
+        updater = { proto, value ->
+            proto.copy(
+                profile = proto.profile.copy(
+                    address = proto.profile.address.copy(city = value)
+                )
+            )
+        },
+    )
+    ```
+  - [ ] `field().get()` returns default `""` for `profile.address.city` when proto is at default
+  - [ ] `field().set()` on `profile.address.city` does not affect `profile.address.street`
+    or `profile.address.zipCode`
+  - [ ] `field().set()` on `profile.address.street` does not affect `profile.nickname` (level 2)
+    or `name` (level 1)
+  - [ ] `field().asFlow()` on `profile.address.zipCode` emits when that field changes
+  - [ ] `field().update()` on `profile.address.city` atomically appends suffix
+  - [ ] `field().delete()` on `profile.address.city` resets to `""` without affecting sibling
+    fields
+  - [ ] Multiple field preferences from different nesting levels can coexist and update
+    independently (set `name`, `profile.age`, and `profile.address.city` sequentially, verify
+    all three retain their values)
+
 - [ ] **3.8** Per-field preference test scenarios (blocking — in `AbstractProtoFieldPreferenceBlockingTest`)
+
+  **Top-level (level 1):**
 
   - [ ] `field().getBlocking()` returns default value
   - [ ] `field().setBlocking()` and `getBlocking()` work correctly
   - [ ] `field().resetToDefaultBlocking()` resets to default
   - [ ] `field()` property delegation works (`by` syntax)
+
+  **Nested (level 2 — `profile.*`):**
+
+  - [ ] `field().getBlocking()` returns default for `profile.nickname`
+  - [ ] `field().setBlocking()` on `profile.age` and `getBlocking()` round-trip correctly
+  - [ ] `field()` property delegation works for `profile.nickname` (`by` syntax)
+
+  **Deeply nested (level 3 — `profile.address.*`):**
+
+  - [ ] `field().getBlocking()` returns default for `profile.address.city`
+  - [ ] `field().setBlocking()` on `profile.address.city` and `getBlocking()` round-trip correctly
+  - [ ] `field().resetToDefaultBlocking()` on `profile.address.street` resets without affecting
+    sibling fields
+  - [ ] `field()` property delegation works for `profile.address.zipCode` (`by` syntax)
 
 - [ ] **3.9** Refactor regression tests
 
@@ -763,10 +831,77 @@ tests would triple this duplication.
 
 ### Test data model
 
-The existing `TestProtoData(val id: Int = 0, val name: String = "")` is sufficient for testing
-top-level field access. If nested field tests are desired, a new test data class with nested
-structure can be added later (consider this optional / future work since `TestProtoData` already
-has two fields to validate per-field isolation).
+- [ ] **3.10** Expand `TestProtoData` with 3-level nesting
+
+  The existing `TestProtoData(val id: Int, val name: String)` only has top-level fields.
+  Add nested data classes to support 3-level deep field tests. The existing tests and
+  serializer must continue to work (backward-compatible defaults).
+
+  Location: `commonTest/.../proto/TestProtoData.kt`
+
+  ```kotlin
+  data class TestAddress(
+      val street: String = "",
+      val city: String = "",
+      val zipCode: String = "",
+  )
+
+  data class TestProfile(
+      val nickname: String = "",
+      val age: Int = 0,
+      val address: TestAddress = TestAddress(),
+  )
+
+  data class TestProtoData(
+      val id: Int = 0,
+      val name: String = "",
+      val profile: TestProfile = TestProfile(),
+  )
+  ```
+
+  Nesting depth:
+  - Level 1: `TestProtoData.name`, `TestProtoData.id`
+  - Level 2: `TestProtoData.profile.nickname`, `TestProtoData.profile.age`
+  - Level 3: `TestProtoData.profile.address.city`, `TestProtoData.profile.address.street`,
+    `TestProtoData.profile.address.zipCode`
+
+- [ ] **3.11** Update `TestProtoDataSerializer` for the expanded model
+
+  The CSV-based serializer needs to handle the new nested fields. Use a pipe-delimited format
+  to avoid conflicts with commas in field values:
+
+  ```kotlin
+  object TestProtoDataSerializer : OkioSerializer<TestProtoData> {
+      override val defaultValue: TestProtoData = TestProtoData()
+
+      override suspend fun readFrom(source: BufferedSource): TestProtoData {
+          val line = source.readUtf8()
+          if (line.isBlank()) return defaultValue
+          val parts = line.split("|", limit = 7)
+          return TestProtoData(
+              id = parts[0].toInt(),
+              name = parts[1],
+              profile = TestProfile(
+                  nickname = parts[2],
+                  age = parts[3].toInt(),
+                  address = TestAddress(
+                      street = parts[4],
+                      city = parts[5],
+                      zipCode = parts[6],
+                  ),
+              ),
+          )
+      }
+
+      override suspend fun writeTo(t: TestProtoData, sink: BufferedSink) {
+          sink.writeUtf8(
+              "${t.id}|${t.name}|${t.profile.nickname}|${t.profile.age}" +
+                  "|${t.profile.address.street}|${t.profile.address.city}" +
+                  "|${t.profile.address.zipCode}"
+          )
+      }
+  }
+  ```
 
 ## Edge Cases & Design Decisions
 
