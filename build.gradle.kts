@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.vanniktech.maven.publish) apply false
     alias(libs.plugins.jetbrains.compose) apply false
     alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.wire) apply false
 }
 
 version = providers.environmentVariable("RELEASE_TAG")
