@@ -903,6 +903,262 @@ tests would triple this duplication.
   }
   ```
 
+### Nullable proto3 test model (Wire-style)
+
+Wire-generated Kotlin classes for proto3 follow specific nullability rules:
+- **Scalar fields** (non-optional): non-nullable with identity defaults (`""`, `0`, `false`)
+- **Message fields**: nullable with `null` default (even when not marked `optional`)
+- **`optional` scalar fields**: nullable with `null` default
+- **`oneof` fields**: nullable with `null` default
+
+This means a `field()` preference for a nullable message or optional scalar must use `null` as
+its `defaultValue`, and the `getter`/`updater` must handle the nullable chain.
+
+- [ ] **3.12** Create `TestNullableProtoData` model with Wire-style proto3 nullability
+
+  Location: `commonTest/.../proto/TestNullableProtoData.kt`
+
+  ```kotlin
+  data class TestCoordinates(
+      val latitude: Double = 0.0,
+      val longitude: Double = 0.0,
+  )
+
+  data class TestNullableAddress(
+      val street: String = "",
+      val city: String = "",
+      val coordinates: TestCoordinates? = null,   // message field → nullable
+  )
+
+  data class TestNullableProfile(
+      val nickname: String = "",
+      val age: Int? = null,                        // optional scalar → nullable
+      val address: TestNullableAddress? = null,     // message field → nullable
+  )
+
+  data class TestNullableProtoData(
+      val id: Int = 0,
+      val name: String = "",
+      val label: String? = null,                   // optional scalar → nullable
+      val profile: TestNullableProfile? = null,     // message field → nullable
+  )
+  ```
+
+  Nullability at each nesting level:
+  - Level 1: `name` (non-null `String`), `label` (nullable `String?`),
+    `profile` (nullable `TestNullableProfile?`)
+  - Level 2: `profile?.nickname` (non-null `String` inside nullable parent),
+    `profile?.age` (nullable `Int?`), `profile?.address` (nullable `TestNullableAddress?`)
+  - Level 3: `profile?.address?.city` (non-null `String` inside two nullable parents),
+    `profile?.address?.coordinates` (nullable `TestCoordinates?`)
+  - Level 4: `profile?.address?.coordinates?.latitude` (non-null `Double` inside three
+    nullable parents)
+
+- [ ] **3.13** Create `TestNullableProtoDataSerializer`
+
+  Location: `commonTest/.../proto/TestNullableProtoData.kt`
+
+  Uses JSON-based serialization via `kotlinx.serialization` to avoid complex delimiter escaping
+  with nullable fields. All data classes should be annotated with `@Serializable`:
+
+  ```kotlin
+  @Serializable
+  data class TestCoordinates(...)
+
+  @Serializable
+  data class TestNullableAddress(...)
+
+  @Serializable
+  data class TestNullableProfile(...)
+
+  @Serializable
+  data class TestNullableProtoData(...)
+
+  object TestNullableProtoDataSerializer : OkioSerializer<TestNullableProtoData> {
+      override val defaultValue: TestNullableProtoData = TestNullableProtoData()
+
+      override suspend fun readFrom(source: BufferedSource): TestNullableProtoData {
+          val json = source.readUtf8()
+          if (json.isBlank()) return defaultValue
+          return Json.decodeFromString(json)
+      }
+
+      override suspend fun writeTo(t: TestNullableProtoData, sink: BufferedSink) {
+          sink.writeUtf8(Json.encodeToString(t))
+      }
+  }
+  ```
+
+- [ ] **3.14** Create `<Platform>NullableProtoTestHelper` classes
+
+  Follow the same pattern as `<Platform>ProtoTestHelper` but create a
+  `GenericProtoDatastore<TestNullableProtoData>` instead:
+
+  | Platform | Helper Class                     | Location                                                         |
+  |----------|----------------------------------|------------------------------------------------------------------|
+  | Android  | `AndroidNullableProtoTestHelper` | `androidDeviceTest/.../proto/AndroidNullableProtoTestHelper.kt`  |
+  | Desktop  | `DesktopNullableProtoTestHelper` | `desktopTest/.../proto/DesktopNullableProtoTestHelper.kt`        |
+  | iOS      | `IosNullableProtoTestHelper`     | `iosSimulatorArm64Test/.../proto/IosNullableProtoTestHelper.kt`  |
+
+  Each helper provides `standard(datastoreName)` and `blocking(datastoreName)` factory methods,
+  using `TestNullableProtoDataSerializer` and `TestNullableProtoData()` as the default value.
+
+- [ ] **3.15** Create abstract test classes in `commonTest`
+
+  - `AbstractNullableProtoFieldPreferenceTest` — suspending tests for nullable per-field
+    proto preferences. Requires `nullableProtoDatastore` and `testDispatcher` abstract properties.
+  - `AbstractNullableProtoFieldPreferenceBlockingTest` — blocking tests. Only requires
+    `nullableProtoDatastore`.
+
+- [ ] **3.16** Create platform-specific test subclasses using nullable proto test helpers
+
+  Same pattern as **3.6**, with each platform subclass using the corresponding
+  `<Platform>NullableProtoTestHelper`.
+
+- [ ] **3.17** Nullable per-field preference test scenarios (suspending —
+  in `AbstractNullableProtoFieldPreferenceTest`)
+
+  **Nullable top-level scalar (`label: String?`):**
+
+  - [ ] `field().get()` returns `null` when `label` is not set
+    ```kotlin
+    val labelPref = protoDatastore.field(
+        key = "label",
+        defaultValue = null as String?,
+        getter = { it.label },
+        updater = { proto, value -> proto.copy(label = value) },
+    )
+    ```
+  - [ ] `field().set(value)` sets `label` to a non-null value, `get()` returns it
+  - [ ] `field().set(null)` clears `label` back to `null`
+  - [ ] `field().delete()` resets `label` to `null` (its `defaultValue`)
+  - [ ] `field().asFlow()` emits `null` → `"hello"` → `null` transition
+
+  **Nullable message field (`profile: TestNullableProfile?`):**
+
+  - [ ] `field().get()` returns `null` when `profile` is not set
+    ```kotlin
+    val profilePref = protoDatastore.field(
+        key = "profile",
+        defaultValue = null as TestNullableProfile?,
+        getter = { it.profile },
+        updater = { proto, value -> proto.copy(profile = value) },
+    )
+    ```
+  - [ ] `field().set(value)` sets `profile` to a non-null value
+  - [ ] `field().set(null)` clears `profile` back to `null`
+  - [ ] `field().update()` on nullable message — update only if present
+    ```kotlin
+    profilePref.update { it?.copy(nickname = "updated") }
+    ```
+
+  **Non-null scalar inside nullable parent (`profile?.nickname`):**
+
+  - [ ] `field()` with safe-call getter and default when parent is null
+    ```kotlin
+    val nicknamePref = protoDatastore.field(
+        key = "profile_nickname",
+        defaultValue = "",
+        getter = { it.profile?.nickname ?: "" },
+        updater = { proto, value ->
+            proto.copy(
+                profile = (proto.profile ?: TestNullableProfile()).copy(nickname = value)
+            )
+        },
+    )
+    ```
+  - [ ] `field().get()` returns `""` when `profile` is `null`
+  - [ ] `field().set()` auto-creates `profile` when it was `null`
+  - [ ] `field().set()` on `nickname` does not affect `profile.age`
+
+  **Nullable scalar inside nullable parent (`profile?.age: Int?`):**
+
+  - [ ] `field().get()` returns `null` when both `profile` is `null` and `age` is `null`
+    ```kotlin
+    val agePref = protoDatastore.field(
+        key = "profile_age",
+        defaultValue = null as Int?,
+        getter = { it.profile?.age },
+        updater = { proto, value ->
+            proto.copy(
+                profile = (proto.profile ?: TestNullableProfile()).copy(age = value)
+            )
+        },
+    )
+    ```
+  - [ ] `field().set(25)` sets age, auto-creates `profile` if null
+  - [ ] `field().set(null)` clears age to `null` without clearing `profile`
+  - [ ] `field().delete()` resets to `null`
+
+  **Deeply nested non-null scalar through nullable chain (`profile?.address?.city`):**
+
+  - [ ] `field()` with multi-level safe-call getter
+    ```kotlin
+    val cityPref = protoDatastore.field(
+        key = "profile_address_city",
+        defaultValue = "",
+        getter = { it.profile?.address?.city ?: "" },
+        updater = { proto, value ->
+            val currentProfile = proto.profile ?: TestNullableProfile()
+            val currentAddress = currentProfile.address ?: TestNullableAddress()
+            proto.copy(
+                profile = currentProfile.copy(
+                    address = currentAddress.copy(city = value)
+                )
+            )
+        },
+    )
+    ```
+  - [ ] `field().get()` returns `""` when entire chain is null
+  - [ ] `field().set()` auto-creates both `profile` and `address` when both are null
+  - [ ] `field().set()` on `city` does not affect `address.street` or `address.coordinates`
+  - [ ] `field().update()` appends suffix when chain is already populated
+  - [ ] `field().delete()` resets `city` to `""` without nullifying `address` or `profile`
+
+  **Nullable message at deepest level (`profile?.address?.coordinates: TestCoordinates?`):**
+
+  - [ ] `field().get()` returns `null` when `coordinates` is not set
+    ```kotlin
+    val coordsPref = protoDatastore.field(
+        key = "profile_address_coordinates",
+        defaultValue = null as TestCoordinates?,
+        getter = { it.profile?.address?.coordinates },
+        updater = { proto, value ->
+            val currentProfile = proto.profile ?: TestNullableProfile()
+            val currentAddress = currentProfile.address ?: TestNullableAddress()
+            proto.copy(
+                profile = currentProfile.copy(
+                    address = currentAddress.copy(coordinates = value)
+                )
+            )
+        },
+    )
+    ```
+  - [ ] `field().set(TestCoordinates(1.0, 2.0))` sets coordinates, auto-creates parents
+  - [ ] `field().set(null)` clears coordinates without affecting `address.city`
+  - [ ] `field().delete()` resets to `null`
+
+  **Cross-level isolation with nullable parents:**
+
+  - [ ] Set `label` (nullable level 1), `profile.nickname` (non-null level 2 inside nullable
+    parent), and `profile.address.city` (non-null level 3 inside two nullable parents)
+    sequentially — verify all three retain their values
+  - [ ] Setting `profile` to `null` clears all nested fields, but does not affect `label`
+
+- [ ] **3.18** Nullable per-field preference test scenarios (blocking —
+  in `AbstractNullableProtoFieldPreferenceBlockingTest`)
+
+  - [ ] `field().getBlocking()` returns `null` for nullable field at default
+  - [ ] `field().setBlocking(value)` and `getBlocking()` round-trip for nullable scalar
+  - [ ] `field().setBlocking(null)` clears nullable field
+  - [ ] `field().resetToDefaultBlocking()` on nullable field resets to `null`
+  - [ ] `field()` property delegation works for nullable field (`by` syntax, `var x: String? by pref`)
+  - [ ] `field().getBlocking()` for non-null scalar inside nullable parent returns default when
+    parent is `null`
+  - [ ] `field().setBlocking()` for deeply nested field auto-creates nullable parents
+  - [ ] `field()` property delegation works for deeply nested non-null field through nullable
+    chain (`by` syntax)
+
 ## Edge Cases & Design Decisions
 
 ### Code reuse: `GenericProtoPreferenceItem` as `ProtoFieldPreference<T, T>`
@@ -952,6 +1208,24 @@ and delegate core logic to `ProtoFieldPreference`.
 lacks property delegation and `resetToDefaultBlocking()`. Those methods are added by the wrapper
 classes (`GenericProtoPreferenceItem` and `ProtoFieldPrefs`) that implement the full
 `ProtoPreference<T>` / `DelegatedPreference<T>` contract.
+
+### Nullable fields and Wire-style proto3 models
+
+`ProtoFieldPreference<P, T>` supports nullable `T` out of the box — nothing special is needed
+in the implementation since Kotlin generics allow `T` to be nullable. The complexity lives
+entirely in the user-provided `getter`/`updater` lambdas:
+
+- **Nullable field (`T = String?`)**: `defaultValue = null`, `getter` returns the nullable field
+  directly, `updater` sets it (including to `null`). `delete()` / `resetToDefault()` sets the
+  field back to `null`.
+- **Non-null field inside nullable parent**: `getter` uses safe-call chains with a fallback
+  (`it.profile?.nickname ?: ""`), `updater` auto-creates the parent if null
+  (`(proto.profile ?: TestNullableProfile()).copy(nickname = value)`).
+- **Nullable field inside nullable parent**: Both `getter` and `defaultValue` are nullable,
+  `updater` auto-creates the parent but preserves the null-ability of the field itself.
+
+This design avoids any nullable-specific changes to `ProtoFieldPreference` while fully supporting
+Wire-generated proto3 models where message fields and optional scalars are nullable.
 
 ### `asFlow()` emits `map { getter(it) }` — no `distinctUntilChanged()`
 
