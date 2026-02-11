@@ -5,8 +5,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import kotlinx.coroutines.test.TestDispatcher
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
