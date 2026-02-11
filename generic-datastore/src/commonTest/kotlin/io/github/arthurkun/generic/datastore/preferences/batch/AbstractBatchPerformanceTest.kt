@@ -34,7 +34,8 @@ abstract class AbstractBatchPerformanceTest {
         println("=== $testName ===")
         println("  Normal : ${normal.duration} total, ${normal.perOperation}/op (${normal.operationCount} ops)")
         println("  Batch  : ${batch.duration} total, ${batch.perOperation}/op (${batch.operationCount} ops)")
-        println("  Speedup: %.2fx faster with batch".format(speedup))
+        val rounded = (speedup * 100).toLong() / 100.0
+        println("  Speedup: ${rounded}x faster with batch")
         println()
     }
 
