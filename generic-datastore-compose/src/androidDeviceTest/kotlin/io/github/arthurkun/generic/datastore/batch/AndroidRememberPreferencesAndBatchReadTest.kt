@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import io.github.arthurkun.generic.datastore.AndroidTestHelper
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import kotlinx.coroutines.test.TestDispatcher
@@ -38,8 +39,12 @@ class AndroidRememberPreferencesAndBatchReadTest : AbstractRememberPreferencesAn
 }
 
 private class ResumedLifecycleOwner : LifecycleOwner {
-    private val registry = LifecycleRegistry(this).apply {
-        currentState = Lifecycle.State.RESUMED
+    private val registry = LifecycleRegistry(this)
+
+    init {
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            registry.currentState = Lifecycle.State.RESUMED
+        }
     }
 
     override val lifecycle: Lifecycle get() = registry
