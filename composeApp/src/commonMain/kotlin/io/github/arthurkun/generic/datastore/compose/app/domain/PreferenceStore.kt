@@ -81,9 +81,5 @@ class PreferenceStore(
     suspend fun importPreferences(backupString: String, json: Json? = null) =
         datastore.importDataAsString(backupString = backupString, json = json)
 
-    suspend fun batchWriteBlock(block: BatchWriteScope.() -> Unit) {
-        datastore.batchWrite {
-            block()
-        }
-    }
+    suspend fun batchWriteBlock(block: BatchWriteScope.() -> Unit) = datastore.batchWrite(block)
 }
