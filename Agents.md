@@ -33,7 +33,8 @@ Jetpack Compose extensions in `generic-datastore-compose`.
       (`BackupPreference`, `PreferenceBackupCreator`, `PreferenceBackupRestorer`,
       `BackupParsingException`, `Migration`).
   - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
-      `GenericProtoDatastore`, `CreateProtoDatastore`, `GenericProtoPreferenceItem`).
+      `GenericProtoDatastore`, `CreateProtoDatastore`, `GenericProtoPreferenceItem`,
+      `ProtoFieldPreference`, `ProtoFieldPrefs`).
   - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
       `preferences/`, `preferences/core/custom/`, and `preferences/utils/`.
 - `:generic-datastore-compose` – Compose helpers built on the core module.
@@ -221,6 +222,55 @@ class MyFeatureBlockingTest : AbstractMyFeatureBlockingTest() {
 #### KMP modules targeting iOS Test
 
 - Run iOS simulator tests (requires macOS with Xcode) `./gradlew :<module-name>:iosSimulatorArm64Test`
+
+### Proto DataStore test helpers
+
+Proto DataStore tests follow the same abstract test class pattern but use separate helpers because
+they wrap `GenericProtoDatastore<T>` instead of `GenericPreferencesDatastore`.
+
+| Platform      | Helper Class                   | Proto Type              |
+|---------------|--------------------------------|-------------------------|
+| Android       | `AndroidProtoTestHelper`       | `TestProtoData`         |
+| Desktop (JVM) | `DesktopProtoTestHelper`       | `TestProtoData`         |
+| iOS           | `IosProtoTestHelper`           | `TestProtoData`         |
+| Android       | `AndroidNullableProtoTestHelper` | `TestNullableProtoData` |
+| Desktop (JVM) | `DesktopNullableProtoTestHelper` | `TestNullableProtoData` |
+| iOS           | `IosNullableProtoTestHelper`   | `TestNullableProtoData` |
+
+Each helper provides `standard(datastoreName)` and `blocking(datastoreName)` factory methods,
+identical in contract to the Preferences DataStore helpers. The proto helpers expose
+`protoDatastore` and `testDispatcher` instead of `preferenceDatastore` and `dataStore`.
+
+**Proto abstract test classes in `commonTest`:**
+
+- `AbstractProtoDatastoreTest` / `AbstractProtoDatastoreBlockingTest` — whole-object `data()`
+  tests using `TestProtoData`.
+- `AbstractProtoFieldPreferenceTest` / `AbstractProtoFieldPreferenceBlockingTest` — per-field
+  `field()` tests using `TestProtoData` (non-nullable, 3-level nesting).
+- `AbstractNullableProtoDatastoreTest` / `AbstractNullableProtoDatastoreBlockingTest` —
+  whole-object `data()` and per-field `field()` tests using `TestNullableProtoData`
+  (nullable fields at all nesting levels).
+- `AbstractNullableProtoFieldPreferenceTest` / `AbstractNullableProtoFieldPreferenceBlockingTest`
+  — per-field `field()` tests focused on nullable field edge cases using `TestNullableProtoData`.
+
+### Proto DataStore architecture
+
+The proto module uses a delegation pattern to avoid code duplication:
+
+- `ProtoFieldPreference<P, T>` — internal class that implements `BasePreference<T>` with all
+  DataStore access logic (get, set, update, delete, asFlow, stateIn, getBlocking, setBlocking).
+  Uses `getter: (P) -> T` and `updater: (P, T) -> P` lambdas to map between the proto message
+  and individual field values.
+- `GenericProtoPreferenceItem<T>` — whole-proto wrapper. Delegates `BasePreference<T>` to a
+  `ProtoFieldPreference<T, T>` with identity getter/updater. Adds `DelegatedPreference<T>`
+  contract (`resetToDefaultBlocking()`, `getValue()`, `setValue()` for property delegation).
+- `ProtoFieldPrefs<P, T>` — per-field wrapper. Delegates `BasePreference<T>` by a
+  `ProtoFieldPreference<P, T>`. Adds `ProtoPreference<T>` contract.
+- `GenericProtoDatastore<T>` — factory that creates `GenericProtoPreferenceItem` via `data()`
+  and `ProtoFieldPrefs` via `field()`.
+
+The `delete()` method on field preferences resets the entire proto to its default value. There is
+no concept of removing a single field from a proto message.
 
 ## Platform-Specific Notes
 
