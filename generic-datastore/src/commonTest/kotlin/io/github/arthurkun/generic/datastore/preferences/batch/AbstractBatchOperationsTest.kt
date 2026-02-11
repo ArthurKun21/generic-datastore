@@ -141,16 +141,20 @@ abstract class AbstractBatchOperationsTest {
     fun batchReadFlow_emitsOnChange() = runTest(testDispatcher) {
         val stringPref = preferenceDatastore.string("batch_flow_str", "before")
 
-        val initial = preferenceDatastore.batchReadFlow().first().run {
-            get(stringPref)
-        }
+        val initial = preferenceDatastore
+            .batchReadFlow {
+                get(stringPref)
+            }
+            .first()
         assertEquals("before", initial)
 
         stringPref.set("after")
 
-        val updated = preferenceDatastore.batchReadFlow().first().run {
-            get(stringPref)
-        }
+        val updated = preferenceDatastore
+            .batchReadFlow {
+                get(stringPref)
+            }
+            .first()
         assertEquals("after", updated)
     }
 

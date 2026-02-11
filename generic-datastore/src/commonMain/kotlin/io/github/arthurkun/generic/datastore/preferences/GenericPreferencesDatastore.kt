@@ -520,11 +520,13 @@ public class GenericPreferencesDatastore(
         ),
     )
 
-    override fun batchReadFlow(): Flow<BatchReadScope> =
-        datastore.dataOrEmpty.map { BatchReadScope(it) }
+    override fun <R> batchReadFlow(block: BatchReadScope.() -> R): Flow<R> =
+        datastore.dataOrEmpty.map { mutablePrefs ->
+            BatchReadScope(mutablePrefs).block()
+        }
 
     override suspend fun <R> batchGet(block: BatchReadScope.() -> R): R =
-        batchReadFlow().first().block()
+        batchReadFlow(block).first()
 
     override suspend fun batchWrite(block: BatchWriteScope.() -> Unit) {
         datastore.edit { mutablePrefs ->

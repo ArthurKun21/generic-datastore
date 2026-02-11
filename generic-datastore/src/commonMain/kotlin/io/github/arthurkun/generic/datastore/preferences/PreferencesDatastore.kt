@@ -334,8 +334,12 @@ public interface PreferencesDatastore {
      *
      * The scope re-emits whenever any preference in the datastore changes.
      * Use `distinctUntilChanged()` on derived values to filter irrelevant updates.
+     *
+     * @param R The return type of the block.
+     * @param block A lambda with [BatchReadScope] receiver that reads one or more preferences.
+     * @return A [Flow] emitting the value returned by [block] on every update.
      */
-    public fun batchReadFlow(): Flow<BatchReadScope>
+    public fun <R> batchReadFlow(block: BatchReadScope.() -> R): Flow<R>
 
     /**
      * One-shot batch read: collects the latest DataStore snapshot and executes [block]
