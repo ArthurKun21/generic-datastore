@@ -16,7 +16,7 @@ SharedPreferences.
 | Module                      | Description                                                          |
 |-----------------------------|----------------------------------------------------------------------|
 | `generic-datastore`         | Core library with Preferences DataStore and Proto DataStore wrappers |
-| `generic-datastore-compose` | Jetpack Compose extensions (`DelegatedPreference<T>.remember()`)     |
+| `generic-datastore-compose` | Jetpack Compose extensions (`remember()`, `rememberPreferences()`, `rememberBatchRead()`, `LocalPreferencesDatastore`) |
 
 ### KMP Targets
 
@@ -774,6 +774,8 @@ val dataPref: ProtoPreference<MyProtoMessage> = protoDatastore.data()
 
 ## Compose Extensions (`generic-datastore-compose`)
 
+### `remember()`
+
 The `remember()` extension turns any `DelegatedPreference<T>` into a lifecycle-aware
 `MutableState<T>`:
 
@@ -798,6 +800,105 @@ fun SettingsScreen(datastore: GenericPreferencesDatastore) {
 
 Under the hood, `remember()` uses `collectAsStateWithLifecycle` for lifecycle-safe collection for
 Android while it uses `collectAsState()` for Desktop/JVM. It launches a coroutine for writes.
+An optimistic local override is applied immediately so that synchronous UI inputs reflect the new
+value without waiting for the DataStore round-trip.
+
+### `rememberBatchRead()`
+
+Collects a `batchReadFlow` as a Compose `State`, reading multiple preferences from a single
+DataStore snapshot:
+
+```kotlin
+@Composable
+fun SettingsScreen(datastore: GenericPreferencesDatastore) {
+    val userName = datastore.string("user_name", "Guest")
+    val darkMode = datastore.bool("dark_mode", false)
+
+    val settings by datastore.rememberBatchRead {
+        get(userName) to get(darkMode)
+    }
+
+    settings?.let { (name, isDark) ->
+        Text("User: $name, Dark mode: $isDark")
+    }
+}
+```
+
+The returned `State` is `null` until the first snapshot is available.
+
+### `rememberPreferences()`
+
+Remembers multiple preferences (2–5) as individual `MutableState` values, reading from a shared
+`batchReadFlow` snapshot and writing via `batchWrite`. All reads share a single DataStore
+observation, and writes are launched asynchronously with an optimistic local override:
+
+```kotlin
+@Composable
+fun SettingsScreen(datastore: GenericPreferencesDatastore) {
+    val userName = datastore.string("user_name", "Guest")
+    val darkMode = datastore.bool("dark_mode", false)
+    val volume = datastore.float("volume", 1.0f)
+
+    val (name, isDark, vol) = datastore.rememberPreferences(userName, darkMode, volume)
+
+    Column {
+        var nameValue by name
+        OutlinedTextField(
+            value = nameValue,
+            onValueChange = { nameValue = it },
+            label = { Text("Username") },
+        )
+
+        var isDarkValue by isDark
+        Switch(checked = isDarkValue, onCheckedChange = { isDarkValue = it })
+    }
+}
+```
+
+Overloads are available for 2, 3, 4, and 5 preferences. The returned `PreferencesStateN` also
+supports property delegation:
+
+```kotlin
+val prefs by datastore.rememberPreferences(userName, darkMode)
+Text("User: ${prefs.first}, Dark: ${prefs.second}")
+prefs.first = "New Name" // triggers an async write
+```
+
+### `ProvidePreferencesDatastore` and `LocalPreferencesDatastore`
+
+Use `ProvidePreferencesDatastore` to supply a `PreferencesDatastore` via `CompositionLocal`, then
+call the standalone `rememberPreferences` overloads without an explicit datastore receiver:
+
+```kotlin
+@Composable
+fun App(datastore: GenericPreferencesDatastore) {
+    ProvidePreferencesDatastore(datastore) {
+        SettingsScreen()
+    }
+}
+
+@Composable
+fun SettingsScreen() {
+    val userName = LocalPreferencesDatastore.current.string("user_name", "Guest")
+    val darkMode = LocalPreferencesDatastore.current.bool("dark_mode", false)
+
+    val (name, isDark) = rememberPreferences(userName, darkMode)
+
+    var nameValue by name
+    var isDarkValue by isDark
+
+    Column {
+        OutlinedTextField(
+            value = nameValue,
+            onValueChange = { nameValue = it },
+            label = { Text("Username") },
+        )
+        Switch(checked = isDarkValue, onCheckedChange = { isDarkValue = it })
+    }
+}
+```
+
+Accessing `LocalPreferencesDatastore` without a provider throws an `IllegalStateException`.
 
 ## License
 
