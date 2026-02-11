@@ -289,24 +289,452 @@ The proto module already has the following abstract test class pattern:
 - `desktopTest` — `DesktopProtoDatastoreTest`, `DesktopProtoDatastoreBlockingTest`
 - `iosSimulatorArm64Test` — `IosProtoDatastoreTest`, `IosProtoDatastoreBlockingTest`
 
+**Problem:** The existing proto test subclasses duplicate all setup/teardown boilerplate inline
+(dispatcher creation, scope management, datastore creation via `createProtoDatastore`, file
+cleanup). The existing `AndroidTestHelper` / `DesktopTestHelper` / `IosTestHelper` only handle
+Preferences DataStore setup and cannot be reused for proto tests. Adding per-field preference
+tests would triple this duplication.
+
+### Platform-specific proto test helpers
+
+- [ ] **3.1** Create `AndroidProtoTestHelper`
+
+  Location: `androidDeviceTest/.../proto/AndroidProtoTestHelper.kt`
+
+  Follows the same `standard()` / `blocking()` factory pattern as `AndroidTestHelper`, but
+  creates a `GenericProtoDatastore<TestProtoData>` via `createProtoDatastore()`.
+
+  ```kotlin
+  class AndroidProtoTestHelper private constructor(
+      private val datastoreName: String,
+      private val useStandardDispatcher: Boolean,
+  ) {
+      private lateinit var _protoDatastore: GenericProtoDatastore<TestProtoData>
+      private lateinit var _testDispatcher: TestDispatcher
+      private lateinit var testContext: Context
+      private lateinit var testScope: CoroutineScope
+
+      val protoDatastore: GenericProtoDatastore<TestProtoData> get() = _protoDatastore
+      val testDispatcher: TestDispatcher get() = _testDispatcher
+
+      fun setup() {
+          _testDispatcher = if (useStandardDispatcher) {
+              StandardTestDispatcher()
+          } else {
+              UnconfinedTestDispatcher()
+          }
+          Dispatchers.setMain(_testDispatcher)
+          testContext = ApplicationProvider.getApplicationContext()
+          testScope = CoroutineScope(Job() + _testDispatcher)
+          _protoDatastore = createProtoDatastore(
+              serializer = TestProtoDataSerializer,
+              defaultValue = TestProtoData(),
+              scope = testScope,
+              producePath = {
+                  testContext.filesDir.resolve("datastore/$datastoreName.pb").absolutePath
+              },
+          )
+      }
+
+      fun tearDown() {
+          try {
+              if (::testScope.isInitialized) {
+                  testScope.cancel()
+              }
+          } finally {
+              try {
+                  if (::testContext.isInitialized) {
+                      val dataStoreFile =
+                          File(testContext.filesDir, "datastore/$datastoreName.pb")
+                      if (dataStoreFile.exists()) {
+                          dataStoreFile.delete()
+                      }
+                  }
+              } finally {
+                  Dispatchers.resetMain()
+              }
+          }
+      }
+
+      companion object {
+          fun standard(datastoreName: String): AndroidProtoTestHelper {
+              return AndroidProtoTestHelper(datastoreName, useStandardDispatcher = true)
+          }
+
+          fun blocking(datastoreName: String): AndroidProtoTestHelper {
+              return AndroidProtoTestHelper(datastoreName, useStandardDispatcher = false)
+          }
+      }
+  }
+  ```
+
+- [ ] **3.2** Create `DesktopProtoTestHelper`
+
+  Location: `desktopTest/.../proto/DesktopProtoTestHelper.kt`
+
+  Same pattern, but `setup(tempFolderPath: String)` takes the `@TempDir` path (consistent with
+  `DesktopTestHelper`). JUnit 5 handles file cleanup via `@TempDir`.
+
+  ```kotlin
+  class DesktopProtoTestHelper private constructor(
+      private val datastoreName: String,
+      private val useStandardDispatcher: Boolean,
+  ) {
+      private lateinit var _protoDatastore: GenericProtoDatastore<TestProtoData>
+      private lateinit var _testDispatcher: TestDispatcher
+      private lateinit var testScope: CoroutineScope
+
+      val protoDatastore: GenericProtoDatastore<TestProtoData> get() = _protoDatastore
+      val testDispatcher: TestDispatcher get() = _testDispatcher
+
+      fun setup(tempFolderPath: String) {
+          _testDispatcher = if (useStandardDispatcher) {
+              StandardTestDispatcher()
+          } else {
+              UnconfinedTestDispatcher()
+          }
+          Dispatchers.setMain(_testDispatcher)
+          testScope = CoroutineScope(Job() + _testDispatcher)
+          _protoDatastore = createProtoDatastore(
+              serializer = TestProtoDataSerializer,
+              defaultValue = TestProtoData(),
+              scope = testScope,
+              producePath = {
+                  "$tempFolderPath/$datastoreName.pb"
+              },
+          )
+      }
+
+      fun tearDown() {
+          try {
+              if (::testScope.isInitialized) {
+                  testScope.cancel()
+              }
+          } finally {
+              Dispatchers.resetMain()
+          }
+      }
+
+      companion object {
+          fun standard(datastoreName: String): DesktopProtoTestHelper {
+              return DesktopProtoTestHelper(datastoreName, useStandardDispatcher = true)
+          }
+
+          fun blocking(datastoreName: String): DesktopProtoTestHelper {
+              return DesktopProtoTestHelper(datastoreName, useStandardDispatcher = false)
+          }
+      }
+  }
+  ```
+
+- [ ] **3.3** Create `IosProtoTestHelper`
+
+  Location: `iosSimulatorArm64Test/.../proto/IosProtoTestHelper.kt`
+
+  Same pattern, manages its own `NSTemporaryDirectory` + UUID temp dir (consistent with
+  `IosTestHelper`).
+
+  ```kotlin
+  class IosProtoTestHelper private constructor(
+      private val datastoreName: String,
+      private val useStandardDispatcher: Boolean,
+  ) {
+      private lateinit var tempDir: String
+      private lateinit var _protoDatastore: GenericProtoDatastore<TestProtoData>
+      private lateinit var _testDispatcher: TestDispatcher
+      private lateinit var testScope: CoroutineScope
+
+      val protoDatastore: GenericProtoDatastore<TestProtoData> get() = _protoDatastore
+      val testDispatcher: TestDispatcher get() = _testDispatcher
+
+      fun setup() {
+          tempDir = NSTemporaryDirectory() + NSUUID().UUIDString
+          _testDispatcher = if (useStandardDispatcher) {
+              StandardTestDispatcher()
+          } else {
+              UnconfinedTestDispatcher()
+          }
+          Dispatchers.setMain(_testDispatcher)
+          testScope = CoroutineScope(Job() + _testDispatcher)
+          _protoDatastore = createProtoDatastore(
+              serializer = TestProtoDataSerializer,
+              defaultValue = TestProtoData(),
+              scope = testScope,
+              producePath = {
+                  "$tempDir/$datastoreName.pb"
+              },
+          )
+      }
+
+      fun tearDown() {
+          try {
+              if (::testScope.isInitialized) {
+                  testScope.cancel()
+              }
+          } finally {
+              try {
+                  if (::tempDir.isInitialized) {
+                      NSFileManager.defaultManager.removeItemAtPath(tempDir, null)
+                  }
+              } finally {
+                  Dispatchers.resetMain()
+              }
+          }
+      }
+
+      companion object {
+          fun standard(datastoreName: String): IosProtoTestHelper {
+              return IosProtoTestHelper(datastoreName, useStandardDispatcher = true)
+          }
+
+          fun blocking(datastoreName: String): IosProtoTestHelper {
+              return IosProtoTestHelper(datastoreName, useStandardDispatcher = false)
+          }
+      }
+  }
+  ```
+
+### Proto test helper summary
+
+  | Platform | Helper Class            | Location                                                |
+  |----------|-------------------------|---------------------------------------------------------|
+  | Android  | `AndroidProtoTestHelper` | `androidDeviceTest/.../proto/AndroidProtoTestHelper.kt` |
+  | Desktop  | `DesktopProtoTestHelper` | `desktopTest/.../proto/DesktopProtoTestHelper.kt`       |
+  | iOS      | `IosProtoTestHelper`     | `iosSimulatorArm64Test/.../proto/IosProtoTestHelper.kt` |
+
+  Each helper provides:
+  - `standard(datastoreName)` — `StandardTestDispatcher` + custom `CoroutineScope`. Exposes
+    `protoDatastore` and `testDispatcher`.
+  - `blocking(datastoreName)` — `UnconfinedTestDispatcher` without custom scope. Only exposes
+    `protoDatastore`.
+
+### Refactor existing proto tests to use helpers
+
+- [ ] **3.4** Refactor existing platform-specific proto test subclasses
+
+  Replace the inline setup/teardown boilerplate in the six existing test files with the new
+  proto test helpers.
+
+  **Android standard test (before → after):**
+
+  ```kotlin
+  // Before: ~40 lines of inline setup/teardown
+  // After:
+  @RunWith(AndroidJUnit4::class)
+  class AndroidProtoDatastoreTest : AbstractProtoDatastoreTest() {
+      private val helper = AndroidProtoTestHelper.standard("test_proto")
+
+      override val protoDatastore get() = helper.protoDatastore
+      override val testDispatcher get() = helper.testDispatcher
+
+      @Before
+      fun setup() = helper.setup()
+
+      @After
+      fun tearDown() = helper.tearDown()
+  }
+  ```
+
+  **Android blocking test (before → after):**
+
+  ```kotlin
+  @RunWith(AndroidJUnit4::class)
+  class AndroidProtoDatastoreBlockingTest : AbstractProtoDatastoreBlockingTest() {
+      private val helper = AndroidProtoTestHelper.blocking("test_proto_blocking")
+
+      override val protoDatastore get() = helper.protoDatastore
+
+      @Before
+      fun setup() = helper.setup()
+
+      @After
+      fun tearDown() = helper.tearDown()
+  }
+  ```
+
+  **Desktop standard test (before → after):**
+
+  ```kotlin
+  class DesktopProtoDatastoreTest : AbstractProtoDatastoreTest() {
+      @TempDir
+      lateinit var tempFolder: File
+
+      private val helper = DesktopProtoTestHelper.standard("test_proto")
+
+      override val protoDatastore get() = helper.protoDatastore
+      override val testDispatcher get() = helper.testDispatcher
+
+      @BeforeTest
+      fun setup() = helper.setup(tempFolder.absolutePath)
+
+      @AfterTest
+      fun tearDown() = helper.tearDown()
+  }
+  ```
+
+  **Desktop blocking test (before → after):**
+
+  ```kotlin
+  class DesktopProtoDatastoreBlockingTest : AbstractProtoDatastoreBlockingTest() {
+      @TempDir
+      lateinit var tempFolder: File
+
+      private val helper = DesktopProtoTestHelper.blocking("test_proto_blocking")
+
+      override val protoDatastore get() = helper.protoDatastore
+
+      @BeforeTest
+      fun setup() = helper.setup(tempFolder.absolutePath)
+
+      @AfterTest
+      fun tearDown() = helper.tearDown()
+  }
+  ```
+
+  **iOS standard test (before → after):**
+
+  ```kotlin
+  class IosProtoDatastoreTest : AbstractProtoDatastoreTest() {
+      private val helper = IosProtoTestHelper.standard("test_proto")
+
+      override val protoDatastore get() = helper.protoDatastore
+      override val testDispatcher get() = helper.testDispatcher
+
+      @BeforeTest
+      fun setup() = helper.setup()
+
+      @AfterTest
+      fun tearDown() = helper.tearDown()
+  }
+  ```
+
+  **iOS blocking test (before → after):**
+
+  ```kotlin
+  class IosProtoDatastoreBlockingTest : AbstractProtoDatastoreBlockingTest() {
+      private val helper = IosProtoTestHelper.blocking("test_proto_blocking")
+
+      override val protoDatastore get() = helper.protoDatastore
+
+      @BeforeTest
+      fun setup() = helper.setup()
+
+      @AfterTest
+      fun tearDown() = helper.tearDown()
+  }
+  ```
+
 ### New tests
 
-- [ ] **3.1** Create abstract test classes in `commonTest`
+- [ ] **3.5** Create abstract test classes in `commonTest`
 
   Following the existing abstract test class pattern:
 
   - `AbstractProtoFieldPreferenceTest` — suspending tests for per-field proto preferences.
-    Requires `protoDatastore`, `dataStore`, and `testDispatcher` abstract properties.
+    Requires `protoDatastore` and `testDispatcher` abstract properties.
   - `AbstractProtoFieldPreferenceBlockingTest` — blocking tests for per-field proto preferences.
     Only requires `protoDatastore`.
 
-- [ ] **3.2** Create platform-specific test subclasses
+- [ ] **3.6** Create platform-specific test subclasses using proto test helpers
 
-  - `androidDeviceTest` — concrete subclasses using `AndroidTestHelper`
-  - `desktopTest` — concrete subclasses using `DesktopTestHelper`
-  - `iosSimulatorArm64Test` — concrete subclasses using `IosTestHelper`
+  Each subclass uses the corresponding `<Platform>ProtoTestHelper` with a unique datastore name.
 
-- [ ] **3.3** Per-field preference test scenarios (suspending — in `AbstractProtoFieldPreferenceTest`)
+  **Android:**
+
+  ```kotlin
+  @RunWith(AndroidJUnit4::class)
+  class AndroidProtoFieldPreferenceTest : AbstractProtoFieldPreferenceTest() {
+      private val helper = AndroidProtoTestHelper.standard("test_proto_field")
+
+      override val protoDatastore get() = helper.protoDatastore
+      override val testDispatcher get() = helper.testDispatcher
+
+      @Before
+      fun setup() = helper.setup()
+
+      @After
+      fun tearDown() = helper.tearDown()
+  }
+
+  @RunWith(AndroidJUnit4::class)
+  class AndroidProtoFieldPreferenceBlockingTest : AbstractProtoFieldPreferenceBlockingTest() {
+      private val helper = AndroidProtoTestHelper.blocking("test_proto_field_blocking")
+
+      override val protoDatastore get() = helper.protoDatastore
+
+      @Before
+      fun setup() = helper.setup()
+
+      @After
+      fun tearDown() = helper.tearDown()
+  }
+  ```
+
+  **Desktop:**
+
+  ```kotlin
+  class DesktopProtoFieldPreferenceTest : AbstractProtoFieldPreferenceTest() {
+      @TempDir
+      lateinit var tempFolder: File
+
+      private val helper = DesktopProtoTestHelper.standard("test_proto_field")
+
+      override val protoDatastore get() = helper.protoDatastore
+      override val testDispatcher get() = helper.testDispatcher
+
+      @BeforeTest
+      fun setup() = helper.setup(tempFolder.absolutePath)
+
+      @AfterTest
+      fun tearDown() = helper.tearDown()
+  }
+
+  class DesktopProtoFieldPreferenceBlockingTest : AbstractProtoFieldPreferenceBlockingTest() {
+      @TempDir
+      lateinit var tempFolder: File
+
+      private val helper = DesktopProtoTestHelper.blocking("test_proto_field_blocking")
+
+      override val protoDatastore get() = helper.protoDatastore
+
+      @BeforeTest
+      fun setup() = helper.setup(tempFolder.absolutePath)
+
+      @AfterTest
+      fun tearDown() = helper.tearDown()
+  }
+  ```
+
+  **iOS:**
+
+  ```kotlin
+  class IosProtoFieldPreferenceTest : AbstractProtoFieldPreferenceTest() {
+      private val helper = IosProtoTestHelper.standard("test_proto_field")
+
+      override val protoDatastore get() = helper.protoDatastore
+      override val testDispatcher get() = helper.testDispatcher
+
+      @BeforeTest
+      fun setup() = helper.setup()
+
+      @AfterTest
+      fun tearDown() = helper.tearDown()
+  }
+
+  class IosProtoFieldPreferenceBlockingTest : AbstractProtoFieldPreferenceBlockingTest() {
+      private val helper = IosProtoTestHelper.blocking("test_proto_field_blocking")
+
+      override val protoDatastore get() = helper.protoDatastore
+
+      @BeforeTest
+      fun setup() = helper.setup()
+
+      @AfterTest
+      fun tearDown() = helper.tearDown()
+  }
+  ```
+
+- [ ] **3.7** Per-field preference test scenarios (suspending — in `AbstractProtoFieldPreferenceTest`)
 
   - [ ] `field()` creates a preference that reads a top-level field (`name` from `TestProtoData`)
   - [ ] `field()` creates a preference that reads another top-level field (`id` from `TestProtoData`)
@@ -319,14 +747,14 @@ The proto module already has the following abstract test class pattern:
   - [ ] `field().resetToDefault()` resets field to `defaultValue`
   - [ ] `field().key()` returns the configured key
 
-- [ ] **3.4** Per-field preference test scenarios (blocking — in `AbstractProtoFieldPreferenceBlockingTest`)
+- [ ] **3.8** Per-field preference test scenarios (blocking — in `AbstractProtoFieldPreferenceBlockingTest`)
 
   - [ ] `field().getBlocking()` returns default value
   - [ ] `field().setBlocking()` and `getBlocking()` work correctly
   - [ ] `field().resetToDefaultBlocking()` resets to default
   - [ ] `field()` property delegation works (`by` syntax)
 
-- [ ] **3.5** Refactor regression tests
+- [ ] **3.9** Refactor regression tests
 
   - [ ] Existing `AbstractProtoDatastoreTest` and `AbstractProtoDatastoreBlockingTest` still
     pass after `GenericProtoPreferenceItem` delegation refactor
