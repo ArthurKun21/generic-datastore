@@ -48,9 +48,14 @@ jobs:
       - name: Set up gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Run tests
+      - name: Run Generic Datastore tests
         run: |
           ./gradlew :generic-datastore:cleanDesktopTest :generic-datastore:desktopTest --parallel
+      
+      - name: Run Generic Datastore Compose tests
+        if: ${{ !cancelled() }}
+        run: |
+          ./gradlew :generic-datastore-compose:cleanDesktopTest :generic-datastore-compose:desktopTest --parallel
 
   Test-iOS:
     timeout-minutes: 15
@@ -71,9 +76,14 @@ jobs:
       - name: Set up gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Run tests
+      - name: Run Generic Datastore tests
         run: |
           ./gradlew :generic-datastore:iosSimulatorArm64Test --parallel
+      
+      - name: Run Generic Datastore Compose tests
+        if: ${{ !cancelled() }}
+        run: |
+          ./gradlew :generic-datastore-compose:iosSimulatorArm64Test --parallel
 
   Test-Android:
     timeout-minutes: 15
@@ -81,7 +91,7 @@ jobs:
     env:
       api-level: 35
     steps:
-      - name: checkout
+      - name: Checkout code
         uses: actions/checkout@v6
 
       - name: Enable KVM
@@ -114,7 +124,7 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: run tests
+      - name: Run Generic Datastore tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ env.api-level }}
@@ -124,3 +134,15 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: ./gradlew :generic-datastore:connectedAndroidDeviceTest
+      
+      - name: Run Generic Datastore Compose tests
+        if: ${{ !cancelled() }}
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.api-level }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew :generic-datastore-compose:connectedAndroidDeviceTest

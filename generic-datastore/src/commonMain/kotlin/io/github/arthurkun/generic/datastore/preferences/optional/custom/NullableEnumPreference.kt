@@ -3,7 +3,7 @@
 package io.github.arthurkun.generic.datastore.preferences.optional.custom
 
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
-import io.github.arthurkun.generic.datastore.preferences.Preferences
+import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 
 /**
@@ -19,7 +19,7 @@ import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
  */
 public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnum(
     key: String,
-): Preferences<T?> = nullableSerialized(
+): Preference<T?> = nullableSerialized(
     key = key,
     serializer = { it.name },
     deserializer = {

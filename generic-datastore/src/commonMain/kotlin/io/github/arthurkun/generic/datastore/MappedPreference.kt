@@ -2,7 +2,7 @@
 
 package io.github.arthurkun.generic.datastore
 
-import io.github.arthurkun.generic.datastore.preferences.Preferences
+import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.utils.map as coreMap
 import io.github.arthurkun.generic.datastore.preferences.utils.mapIO as coreMapIO
 
@@ -18,10 +18,10 @@ import io.github.arthurkun.generic.datastore.preferences.utils.mapIO as coreMapI
     ),
     level = DeprecationLevel.WARNING,
 )
-public fun <T, R> Preferences<T>.mapIO(
+public fun <T, R> Preference<T>.mapIO(
     convert: (T) -> R,
     reverse: (R) -> T,
-): Preferences<R> = coreMapIO(convert, reverse)
+): Preference<R> = coreMapIO(convert, reverse)
 
 /**
  * Extension for backwards compatibility.
@@ -35,8 +35,8 @@ public fun <T, R> Preferences<T>.mapIO(
     ),
     level = DeprecationLevel.WARNING,
 )
-public fun <T, R> Preferences<T>.map(
+public fun <T, R> Preference<T>.map(
     defaultValue: R,
     convert: (T) -> R,
     reverse: (R) -> T,
-): Preferences<R> = coreMap(defaultValue, convert, reverse)
+): Preference<R> = coreMap(defaultValue, convert, reverse)

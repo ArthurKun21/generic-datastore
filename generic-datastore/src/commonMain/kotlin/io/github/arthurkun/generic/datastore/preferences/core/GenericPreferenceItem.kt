@@ -1,9 +1,11 @@
 package io.github.arthurkun.generic.datastore.preferences.core
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import io.github.arthurkun.generic.datastore.core.BasePreference
+import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -40,7 +42,7 @@ internal sealed class GenericPreferenceItem<T>(
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : BasePreference<T> {
+) : BasePreference<T>, PreferencesAccessor<T> {
 
     init {
         require(key.isNotBlank()) {
@@ -148,5 +150,16 @@ internal sealed class GenericPreferenceItem<T>(
         runBlocking {
             set(value)
         }
+    }
+
+    override fun readFrom(preferences: Preferences): T =
+        preferences[this.preferences] ?: defaultValue
+
+    override fun writeInto(mutablePreferences: MutablePreferences, value: T) {
+        mutablePreferences[this.preferences] = value
+    }
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        mutablePreferences.remove(this.preferences)
     }
 }

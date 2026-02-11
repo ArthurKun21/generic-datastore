@@ -2,8 +2,10 @@
 
 package io.github.arthurkun.generic.datastore.preferences.utils
 
+import androidx.datastore.preferences.core.MutablePreferences
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
-import io.github.arthurkun.generic.datastore.preferences.Preferences
+import io.github.arthurkun.generic.datastore.preferences.Preference
+import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.reflect.KProperty
+import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 
 /**
  * Maps a [io.github.arthurkun.generic.datastore.core.DelegatedPreference] of type [T] to a [io.github.arthurkun.generic.datastore.core.DelegatedPreference] of type [R], inferring the default value by converting
@@ -33,10 +36,10 @@ import kotlin.reflect.KProperty
  * @return A new [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instance of type [R].
  * @throws Exception if `convert(this.defaultValue)` fails.
  */
-public fun <T, R> Preferences<T>.mapIO(
+public fun <T, R> Preference<T>.mapIO(
     convert: (T) -> R,
     reverse: (R) -> T,
-): Preferences<R> =
+): Preference<R> =
     MappedPrefs(
         prefs = this,
         defaultValue = convert(this.defaultValue),
@@ -66,11 +69,11 @@ public fun <T, R> Preferences<T>.mapIO(
  * @return A new [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instance of type [R] that applies the specified conversions
  *   and error handling logic.
  */
-public fun <T, R> Preferences<T>.map(
+public fun <T, R> Preference<T>.map(
     defaultValue: R,
     convert: (T) -> R,
     reverse: (R) -> T,
-): Preferences<R> =
+): Preference<R> =
     MappedPrefs(
         this,
         defaultValue,
@@ -93,7 +96,7 @@ internal class MappedPrefs<T, R>(
     override val defaultValue: R,
     private val convert: (T) -> R,
     private val reverse: (R) -> T,
-) : Preferences<R> {
+) : Preference<R>, PreferencesAccessor<R> {
     override fun key(): String = prefs.key()
 
     /**
@@ -162,5 +165,21 @@ internal class MappedPrefs<T, R>(
 
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: R) {
         setBlocking(value)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun readFrom(preferences: DataStorePreferences): R {
+        val raw = (prefs as PreferencesAccessor<T>).readFrom(preferences)
+        return convertFallback(raw)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun writeInto(mutablePreferences: MutablePreferences, value: R) {
+        (prefs as PreferencesAccessor<T>).writeInto(mutablePreferences, reverseFallback(value))
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        (prefs as PreferencesAccessor<T>).removeFrom(mutablePreferences)
     }
 }

@@ -1,10 +1,12 @@
 package io.github.arthurkun.generic.datastore.preferences.core.customSet
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.BasePreference
+import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +47,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
     private val serializer: (T) -> String,
     private val deserializer: (String) -> T,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : BasePreference<Set<T>> {
+) : BasePreference<Set<T>>, PreferencesAccessor<Set<T>> {
 
     init {
         require(key.isNotBlank()) {
@@ -115,5 +117,16 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
                 null
             }
         }.toSet()
+    }
+
+    override fun readFrom(preferences: Preferences): Set<T> =
+        preferences[stringSetPrefKey]?.let { safeDeserializeSet(it) } ?: defaultValue
+
+    override fun writeInto(mutablePreferences: MutablePreferences, value: Set<T>) {
+        mutablePreferences[stringSetPrefKey] = value.map { serializer(it) }.toSet()
+    }
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        mutablePreferences.remove(stringSetPrefKey)
     }
 }
