@@ -36,8 +36,12 @@ Jetpack Compose extensions in `generic-datastore-compose`.
       `GenericProtoDatastore`, `CreateProtoDatastore`, `GenericProtoPreferenceItem`).
   - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
       `preferences/`, `preferences/core/custom/`, and `preferences/utils/`.
-- `:generic-datastore-compose` – Compose helpers (e.g. `DelegatedPreference<T>.remember()`) built on the core
-  module.
+- `:generic-datastore-compose` – Compose helpers built on the core module.
+  - `Remember.kt` – `DelegatedPreference<T>.remember()` extension.
+  - `PrefsComposeState.kt` – `MutableState` backed by a `DelegatedPreference`.
+  - `batch/` – batch Compose extensions (`RememberBatchRead`, `RememberPreferences`,
+      `RememberPreferencesLocal`, `BatchPrefsComposeState`, `PreferencesState`,
+      `LocalPreferencesDatastore`).
 - `:app` and `:composeApp` – sample apps for local development.
 
 ## KMP Targets
