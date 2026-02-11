@@ -3,9 +3,11 @@ package io.github.arthurkun.generic.datastore.batch
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SnapshotMutationPolicy
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.structuralEqualityPolicy
 import io.github.arthurkun.generic.datastore.preferences.Preference
@@ -45,19 +47,32 @@ internal class BatchPrefsComposeState<T>(
 
     private var localOverride: Any? by mutableStateOf(Unset)
 
+    private val upstreamState = derivedStateOf {
+        batchState.value?.get(preference) ?: preference.defaultValue
+    }
+
+    init {
+        scope.launch {
+            snapshotFlow { upstreamState.value }
+                .collect { upstream ->
+                    val current = localOverride
+                    if (current !== Unset) {
+                        @Suppress("UNCHECKED_CAST")
+                        if (policy.equivalent(current as T, upstream)) {
+                            localOverride = Unset
+                        }
+                    }
+                }
+        }
+    }
+
     override var value: T
         get() {
-            val upstream = batchState.value?.get(preference) ?: preference.defaultValue
+            val upstream = upstreamState.value
             val current = localOverride
             if (current !== Unset) {
                 @Suppress("UNCHECKED_CAST")
-                val override = current as T
-                return if (!policy.equivalent(override, upstream)) {
-                    override
-                } else {
-                    localOverride = Unset
-                    upstream
-                }
+                return current as T
             }
             return upstream
         }
