@@ -53,6 +53,7 @@ jobs:
           ./gradlew :generic-datastore:cleanDesktopTest :generic-datastore:desktopTest --parallel
       
       - name: Run Generic Datastore Compose tests
+        if: ${{ !cancelled() }}
         run: |
           ./gradlew :generic-datastore-compose:cleanDesktopTest :generic-datastore-compose:desktopTest --parallel
 
@@ -80,6 +81,7 @@ jobs:
           ./gradlew :generic-datastore:iosSimulatorArm64Test --parallel
       
       - name: Run Generic Datastore Compose tests
+        if: ${{ !cancelled() }}
         run: |
           ./gradlew :generic-datastore-compose:iosSimulatorArm64Test --parallel
 
@@ -134,5 +136,6 @@ jobs:
           script: ./gradlew :generic-datastore:connectedAndroidDeviceTest
       
       - name: Run Generic Datastore Compose tests
+        if: ${{ !cancelled() }}
         run: |
           ./gradlew :generic-datastore-compose:connectedAndroidDeviceTest
