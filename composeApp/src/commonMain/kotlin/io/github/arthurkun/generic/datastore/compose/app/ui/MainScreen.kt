@@ -629,26 +629,31 @@ private fun BatchRememberSection(
             },
             modifier = Modifier.fillMaxWidth(),
         )
-        Row(
+        ListItem(
+            headlineContent = {
+                Text(
+                    "Batch Boolean: $bool",
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            },
+            leadingContent = {
+                Checkbox(
+                    checked = bool,
+                    onCheckedChange = null,
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .toggleable(
                     value = bool,
                     onValueChange = onBoolChange,
-                )
-                .padding(horizontal = 16.dp),
-        ) {
-            Checkbox(
-                checked = bool,
-                onCheckedChange = null,
-            )
-            Text(
-                "Batch Boolean: $bool",
-                modifier = Modifier.padding(start = 8.dp),
-            )
-        }
+                ),
+        )
 
-        Button(onClick = onClickRandomize) {
+        Button(
+            onClick = onClickRandomize,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
             Text("Randomize All")
         }
     }

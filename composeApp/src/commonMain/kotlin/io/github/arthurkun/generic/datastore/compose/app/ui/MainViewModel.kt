@@ -95,6 +95,9 @@ class MainViewModel(
 
     fun randomize() = viewModelScope.launch {
         preferenceStore.batchWriteBlock {
+            set(text, "Random Text ${System.currentTimeMillis()}")
+            set(num, (0..100).random())
+            set(bool, listOf(true, false).random())
         }
     }
 }
