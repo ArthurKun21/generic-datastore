@@ -502,7 +502,7 @@ class SettingsViewModel(
     fun loadSettings() {
         viewModelScope.launch {
             val (name, isDark, vol) = datastore.batchGet {
-                Triple(this[userName], this[darkMode], this[volume])
+                Triple(get[userName], get[darkMode], get[volume])
             }
         }
     }
@@ -522,9 +522,11 @@ class SettingsViewModel(
     private val userName = datastore.string("user_name", "Guest")
     private val darkMode = datastore.bool("dark_mode", false)
 
-    val settingsFlow: Flow<Pair<String, Boolean>> = datastore.batchReadFlow().map { scope ->
-        scope[userName] to scope[darkMode]
-    }.distinctUntilChanged()
+    val settingsFlow: Flow<Pair<String, Boolean>> = datastore
+        .batchReadFlow{
+            get(userName) to get(darkMode)
+        }
+        .distinctUntilChanged()
 }
 ```
 
