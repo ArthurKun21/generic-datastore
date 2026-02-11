@@ -57,8 +57,7 @@ internal class BatchPrefsComposeState<T>(
                 .collect { upstream ->
                     val current = localOverride
                     if (current !== Unset) {
-                        @Suppress("UNCHECKED_CAST")
-                        if (policy.equivalent(current as T, upstream)) {
+                        if (policy.equivalent(current, upstream)) {
                             localOverride = Unset
                         }
                     }
@@ -81,7 +80,11 @@ internal class BatchPrefsComposeState<T>(
             if (!policy.equivalent(oldValue, value)) {
                 localOverride = value
                 scope.launch {
-                    datastore.batchWrite { this[preference] = value }
+                    try {
+                        datastore.batchWrite { this[preference] = value }
+                    } catch (_: Exception) {
+                        localOverride = Unset
+                    }
                 }
             }
         }

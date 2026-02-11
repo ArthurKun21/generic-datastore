@@ -35,7 +35,7 @@ public fun <T1, T2> PreferencesDatastore.rememberPreferences(
     val batchState = rememberBatchRead(context)
     val scope = rememberCoroutineScope()
     val datastore = this
-    return remember(pref1, pref2, policy) {
+    return remember(datastore, pref1, pref2, policy) {
         PreferencesState2(
             state1 = BatchPrefsComposeState(pref1, batchState, datastore, scope, policy),
             state2 = BatchPrefsComposeState(pref2, batchState, datastore, scope, policy),
@@ -66,7 +66,7 @@ public fun <T1, T2, T3> PreferencesDatastore.rememberPreferences(
     val batchState = rememberBatchRead(context)
     val scope = rememberCoroutineScope()
     val datastore = this
-    return remember(pref1, pref2, pref3, policy) {
+    return remember(datastore, pref1, pref2, pref3, policy) {
         PreferencesState3(
             state1 = BatchPrefsComposeState(pref1, batchState, datastore, scope, policy),
             state2 = BatchPrefsComposeState(pref2, batchState, datastore, scope, policy),
@@ -99,7 +99,7 @@ public fun <T1, T2, T3, T4> PreferencesDatastore.rememberPreferences(
     val batchState = rememberBatchRead(context)
     val scope = rememberCoroutineScope()
     val datastore = this
-    return remember(pref1, pref2, pref3, pref4) {
+    return remember(datastore, pref1, pref2, pref3, pref4, policy) {
         PreferencesState4(
             state1 = BatchPrefsComposeState(pref1, batchState, datastore, scope, policy),
             state2 = BatchPrefsComposeState(pref2, batchState, datastore, scope, policy),
@@ -134,7 +134,7 @@ public fun <T1, T2, T3, T4, T5> PreferencesDatastore.rememberPreferences(
     val batchState = rememberBatchRead(context)
     val scope = rememberCoroutineScope()
     val datastore = this
-    return remember(pref1, pref2, pref3, pref4, pref5) {
+    return remember(datastore, pref1, pref2, pref3, pref4, pref5, policy) {
         PreferencesState5(
             state1 = BatchPrefsComposeState(pref1, batchState, datastore, scope, policy),
             state2 = BatchPrefsComposeState(pref2, batchState, datastore, scope, policy),
