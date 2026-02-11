@@ -766,11 +766,85 @@ val protoDatastore = GenericProtoDatastore(
 
 ### Usage
 
+#### Whole-Object Access
+
 ```kotlin
 val dataPref: ProtoPreference<MyProtoMessage> = protoDatastore.data()
 
 // Then use get(), set(), asFlow(), etc. just like Preferences DataStore
 ```
+
+#### Per-Field Access
+
+Use `field()` to create a preference for an individual field of the proto message. The `getter`
+extracts the field value from a snapshot, and `updater` returns a new proto with the field updated:
+
+```kotlin
+val namePref: ProtoPreference<String> = protoDatastore.field(
+    key = "name",
+    defaultValue = "",
+    getter = { it.name },
+    updater = { proto, value -> proto.copy(name = value) },
+)
+
+// Suspend
+namePref.set("Alice")
+val name = namePref.get() // "Alice"
+
+// Flow
+namePref.asFlow().collect { value -> /* react to changes */ }
+
+// Blocking
+namePref.setBlocking("Bob")
+val blocking = namePref.getBlocking() // "Bob"
+
+// Delegation
+var userName: String by namePref
+```
+
+For nested fields, chain `copy()` calls in the updater:
+
+```kotlin
+data class Address(val street: String = "", val city: String = "")
+data class Profile(val nickname: String = "", val address: Address = Address())
+data class Settings(val id: Int = 0, val profile: Profile = Profile())
+
+// Access a deeply nested field
+val cityPref: ProtoPreference<String> = protoDatastore.field(
+    key = "city",
+    defaultValue = "",
+    getter = { it.profile.address.city },
+    updater = { proto, value ->
+        proto.copy(
+            profile = proto.profile.copy(
+                address = proto.profile.address.copy(city = value),
+            ),
+        )
+    },
+)
+```
+
+For nullable nested fields, provide fallback defaults in the updater:
+
+```kotlin
+data class NullableProfile(val nickname: String = "", val age: Int? = null)
+data class NullableSettings(val id: Int = 0, val profile: NullableProfile? = null)
+
+val agePref: ProtoPreference<Int?> = protoDatastore.field(
+    key = "age",
+    defaultValue = null,
+    getter = { it.profile?.age },
+    updater = { proto, value ->
+        proto.copy(
+            profile = (proto.profile ?: NullableProfile()).copy(age = value),
+        )
+    },
+)
+```
+
+Field preferences share the same underlying DataStore, so changes through `field()` are visible
+via `data()` and vice versa. `delete()` and `resetToDefault()` on a field reset the entire proto
+to its default value and then apply the field's default.
 
 ## Compose Extensions (`generic-datastore-compose`)
 
