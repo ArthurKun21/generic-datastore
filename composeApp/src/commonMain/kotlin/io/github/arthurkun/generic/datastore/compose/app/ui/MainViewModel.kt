@@ -95,7 +95,6 @@ class MainViewModel(
 
     fun randomize() = viewModelScope.launch {
         preferenceStore.batchWriteBlock {
-
         }
     }
 }
