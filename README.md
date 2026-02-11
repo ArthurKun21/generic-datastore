@@ -481,7 +481,7 @@ Retrieve the underlying DataStore key name:
 val key: String = userName.key()
 ```
 
-### Batch Operations (WIP documentation)
+### Batch Operations
 
 Batch operations let you read or write multiple preferences in a single DataStore transaction,
 avoiding redundant I/O and ensuring atomicity.
