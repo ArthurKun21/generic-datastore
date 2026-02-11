@@ -278,6 +278,19 @@ abstract class AbstractBatchOperationsTest {
     }
 
     @Test
+    fun batchUpdate_readsWritesMadeEarlierInSameTransaction() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.int("batch_u_intra_tx", 1)
+
+        preferenceDatastore.batchUpdate {
+            update(pref) { it + 1 }
+            update(pref) { it + 1 }
+            set(pref, get(pref) + 1)
+        }
+
+        assertEquals(4, pref.get())
+    }
+
+    @Test
     fun batchUpdate_indexOperatorSyntax() = runTest(testDispatcher) {
         val pref = preferenceDatastore.int("batch_u_idx", 5)
 

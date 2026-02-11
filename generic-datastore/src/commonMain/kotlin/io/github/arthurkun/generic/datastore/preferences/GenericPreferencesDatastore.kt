@@ -536,7 +536,7 @@ public class GenericPreferencesDatastore(
 
     override suspend fun batchUpdate(block: BatchUpdateScope.() -> Unit) {
         datastore.edit { mutablePrefs ->
-            BatchUpdateScope(mutablePrefs.toPreferences(), mutablePrefs).block()
+            BatchUpdateScope(mutablePrefs).block()
         }
     }
 

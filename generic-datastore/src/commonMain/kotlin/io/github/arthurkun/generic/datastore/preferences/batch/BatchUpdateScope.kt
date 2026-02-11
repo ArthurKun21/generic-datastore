@@ -4,25 +4,22 @@ package io.github.arthurkun.generic.datastore.preferences.batch
 
 import androidx.datastore.preferences.core.MutablePreferences
 import io.github.arthurkun.generic.datastore.preferences.Preference
-import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 
 /**
  * Scope for atomically reading and writing multiple preferences in a single DataStore transaction.
  *
- * Reads see the snapshot at the start of the `edit` call, and writes are applied to the
- * same [MutablePreferences] — guaranteeing consistency even when values depend on each other.
+ * Reads and writes operate on the same [MutablePreferences] transaction state, so reads
+ * reflect writes that happened earlier in the same block.
  *
  * Use [get]/[set] or indexing operators (`this[pref]`, `this[pref] = value`) to access preferences.
  *
  * Obtain this scope from [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchUpdate].
  */
 public class BatchUpdateScope internal constructor(
-    private val snapshot: DataStorePreferences,
     private val mutablePreferences: MutablePreferences,
 ) {
     /**
-     * Reads the given preference's current value from the snapshot captured at the start
-     * of the transaction.
+     * Reads the given preference's current value from the ongoing transaction state.
      *
      * @param preference The preference to read.
      * @return The preference value, or its default if the key is absent.
@@ -31,7 +28,7 @@ public class BatchUpdateScope internal constructor(
     public operator fun <T> get(preference: Preference<T>): T {
         val accessible = preference as? PreferencesAccessor<T>
             ?: error("Batch operations only support preferences created by this library")
-        return accessible.readFrom(snapshot)
+        return accessible.readFrom(mutablePreferences)
     }
 
     /**

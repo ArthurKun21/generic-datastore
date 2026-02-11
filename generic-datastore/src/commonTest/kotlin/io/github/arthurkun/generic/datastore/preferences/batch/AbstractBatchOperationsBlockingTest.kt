@@ -96,4 +96,17 @@ abstract class AbstractBatchOperationsBlockingTest {
 
         assertEquals(20, pref.getBlocking())
     }
+
+    @Test
+    fun batchUpdateBlocking_readsWritesMadeEarlierInSameTransaction() {
+        val pref = preferenceDatastore.int("batch_bu_intra_tx", 1)
+
+        preferenceDatastore.batchUpdateBlocking {
+            update(pref) { it + 1 }
+            update(pref) { it + 1 }
+            set(pref, get(pref) + 1)
+        }
+
+        assertEquals(4, pref.getBlocking())
+    }
 }
