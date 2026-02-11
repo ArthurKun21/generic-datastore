@@ -80,6 +80,7 @@ fun MainScreen(
                     onIncrement = { bNum += 1 },
                     bool = bBool,
                     onBoolChange = { bBool = it },
+                    onClickRandomize = viewModel::randomize,
                 )
             }
             item {
@@ -590,6 +591,7 @@ private fun BatchRememberSection(
     onIncrement: () -> Unit,
     bool: Boolean,
     onBoolChange: (Boolean) -> Unit,
+    onClickRandomize: () -> Unit,
 ) {
     Column {
         Text(
@@ -644,6 +646,10 @@ private fun BatchRememberSection(
                 "Batch Boolean: $bool",
                 modifier = Modifier.padding(start = 8.dp),
             )
+        }
+
+        Button(onClick = onClickRandomize) {
+            Text("Randomize All")
         }
     }
 }

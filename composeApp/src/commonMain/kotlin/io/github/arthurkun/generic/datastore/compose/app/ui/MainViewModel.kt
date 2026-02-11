@@ -92,4 +92,10 @@ class MainViewModel(
     suspend fun importPreferences(backupString: String) {
         preferenceStore.importPreferences(backupString = backupString)
     }
+
+    fun randomize() = viewModelScope.launch {
+        preferenceStore.batchWriteBlock {
+
+        }
+    }
 }
