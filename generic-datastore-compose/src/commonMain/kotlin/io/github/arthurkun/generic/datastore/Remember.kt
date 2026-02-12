@@ -16,7 +16,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * observe and update the preference value.
  *
  * On Android, this uses `collectAsStateWithLifecycle` for lifecycle-aware collection.
- * On Desktop, this uses `collectAsState`.
+ * On Desktop and IOS, this uses `collectAsState`.
  *
  * @param context The [CoroutineContext] to use for collecting the flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
