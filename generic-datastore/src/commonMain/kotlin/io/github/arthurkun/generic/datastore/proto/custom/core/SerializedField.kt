@@ -1,16 +1,19 @@
-package io.github.arthurkun.generic.datastore.proto.core.custom
+package io.github.arthurkun.generic.datastore.proto.custom.core
 
-import io.github.arthurkun.generic.datastore.proto.ProtoDatastore
-import io.github.arthurkun.generic.datastore.proto.ProtoPreference
+import androidx.datastore.core.DataStore
+import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
 
-internal fun <T, F> ProtoDatastore<T>.serializedFieldInternal(
+internal fun <T, F> serializedFieldInternal(
+    datastore: DataStore<T>,
     key: String,
     defaultValue: F,
     serializer: (F) -> String,
     deserializer: (String) -> F,
     getter: (T) -> String,
     updater: (T, String) -> T,
-): ProtoPreference<F> = field(
+    defaultProtoValue: T,
+): ProtoSerialFieldPreference<T, F> = ProtoSerialFieldPreference(
+    datastore = datastore,
     key = key,
     defaultValue = defaultValue,
     getter = { proto ->
@@ -24,4 +27,5 @@ internal fun <T, F> ProtoDatastore<T>.serializedFieldInternal(
     updater = { proto, value ->
         updater(proto, serializer(value))
     },
+    defaultProtoValue = defaultProtoValue,
 )

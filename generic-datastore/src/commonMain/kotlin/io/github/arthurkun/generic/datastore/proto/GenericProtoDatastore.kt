@@ -6,19 +6,19 @@ import androidx.datastore.core.DataStore
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.proto.core.GenericProtoPreferenceItem
 import io.github.arthurkun.generic.datastore.proto.core.ProtoFieldPreference
-import io.github.arthurkun.generic.datastore.proto.core.custom.enumFieldInternal
-import io.github.arthurkun.generic.datastore.proto.core.custom.kserializedFieldInternal
-import io.github.arthurkun.generic.datastore.proto.core.custom.kserializedListFieldInternal
-import io.github.arthurkun.generic.datastore.proto.core.custom.serializedFieldInternal
-import io.github.arthurkun.generic.datastore.proto.core.custom.serializedListFieldInternal
-import io.github.arthurkun.generic.datastore.proto.core.customSet.enumSetFieldInternal
-import io.github.arthurkun.generic.datastore.proto.core.customSet.kserializedSetFieldInternal
-import io.github.arthurkun.generic.datastore.proto.core.customSet.serializedSetFieldInternal
-import io.github.arthurkun.generic.datastore.proto.optional.custom.nullableEnumFieldInternal
-import io.github.arthurkun.generic.datastore.proto.optional.custom.nullableKserializedFieldInternal
-import io.github.arthurkun.generic.datastore.proto.optional.custom.nullableKserializedListFieldInternal
-import io.github.arthurkun.generic.datastore.proto.optional.custom.nullableSerializedFieldInternal
-import io.github.arthurkun.generic.datastore.proto.optional.custom.nullableSerializedListFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.core.enumFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.core.kserializedFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.core.kserializedListFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.core.serializedFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.core.serializedListFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.optional.nullableEnumFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.optional.nullableKserializedFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.optional.nullableKserializedListFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.optional.nullableSerializedFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.optional.nullableSerializedListFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.set.enumSetFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.set.kserializedSetFieldInternal
+import io.github.arthurkun.generic.datastore.proto.custom.set.serializedSetFieldInternal
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
@@ -76,6 +76,7 @@ public class GenericProtoDatastore<T>(
             enumValues = enumValues,
             getter = getter,
             updater = updater,
+            defaultProtoValue = this.defaultValue,
         )
     )
 
@@ -84,11 +85,15 @@ public class GenericProtoDatastore<T>(
         enumValues: Array<F>,
         getter: (T) -> String?,
         updater: (T, String?) -> T,
-    ): ProtoPreference<F?> = nullableEnumFieldInternal(
-        key = key,
-        enumValues = enumValues,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<F?> = ProtoFieldPrefs(
+        nullableEnumFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            enumValues = enumValues,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 
     override fun <F : Enum<F>> enumSetField(
@@ -97,12 +102,16 @@ public class GenericProtoDatastore<T>(
         enumValues: Array<F>,
         getter: (T) -> Set<String>,
         updater: (T, Set<String>) -> T,
-    ): ProtoPreference<Set<F>> = enumSetFieldInternal(
-        key = key,
-        defaultValue = defaultValue,
-        enumValues = enumValues,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<Set<F>> = ProtoFieldPrefs(
+        enumSetFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            defaultValue = defaultValue,
+            enumValues = enumValues,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 
     // --- KSerialized fields ---
@@ -114,13 +123,17 @@ public class GenericProtoDatastore<T>(
         json: Json?,
         getter: (T) -> String,
         updater: (T, String) -> T,
-    ): ProtoPreference<F> = kserializedFieldInternal(
-        key = key,
-        defaultValue = defaultValue,
-        serializer = serializer,
-        json = json ?: defaultJson,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<F> = ProtoFieldPrefs(
+        kserializedFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            json = json ?: defaultJson,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 
     override fun <F : Any> nullableKserializedField(
@@ -129,12 +142,16 @@ public class GenericProtoDatastore<T>(
         json: Json?,
         getter: (T) -> String?,
         updater: (T, String?) -> T,
-    ): ProtoPreference<F?> = nullableKserializedFieldInternal(
-        key = key,
-        serializer = serializer,
-        json = json ?: defaultJson,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<F?> = ProtoFieldPrefs(
+        nullableKserializedFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            serializer = serializer,
+            json = json ?: defaultJson,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 
     override fun <F> kserializedListField(
@@ -144,13 +161,17 @@ public class GenericProtoDatastore<T>(
         json: Json?,
         getter: (T) -> String,
         updater: (T, String) -> T,
-    ): ProtoPreference<List<F>> = kserializedListFieldInternal(
-        key = key,
-        defaultValue = defaultValue,
-        serializer = serializer,
-        json = json ?: defaultJson,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<List<F>> = ProtoFieldPrefs(
+        kserializedListFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            json = json ?: defaultJson,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 
     override fun <F> nullableKserializedListField(
@@ -159,12 +180,16 @@ public class GenericProtoDatastore<T>(
         json: Json?,
         getter: (T) -> String?,
         updater: (T, String?) -> T,
-    ): ProtoPreference<List<F>?> = nullableKserializedListFieldInternal(
-        key = key,
-        serializer = serializer,
-        json = json ?: defaultJson,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<List<F>?> = ProtoFieldPrefs(
+        nullableKserializedListFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            serializer = serializer,
+            json = json ?: defaultJson,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 
     override fun <F> kserializedSetField(
@@ -174,13 +199,17 @@ public class GenericProtoDatastore<T>(
         json: Json?,
         getter: (T) -> Set<String>,
         updater: (T, Set<String>) -> T,
-    ): ProtoPreference<Set<F>> = kserializedSetFieldInternal(
-        key = key,
-        defaultValue = defaultValue,
-        serializer = serializer,
-        json = json ?: defaultJson,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<Set<F>> = ProtoFieldPrefs(
+        kserializedSetFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            json = json ?: defaultJson,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 
     // --- Serialized fields (caller-provided functions) ---
@@ -192,13 +221,17 @@ public class GenericProtoDatastore<T>(
         deserializer: (String) -> F,
         getter: (T) -> String,
         updater: (T, String) -> T,
-    ): ProtoPreference<F> = serializedFieldInternal(
-        key = key,
-        defaultValue = defaultValue,
-        serializer = serializer,
-        deserializer = deserializer,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<F> = ProtoFieldPrefs(
+        serializedFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 
     override fun <F : Any> nullableSerializedField(
@@ -207,12 +240,16 @@ public class GenericProtoDatastore<T>(
         deserializer: (String) -> F,
         getter: (T) -> String?,
         updater: (T, String?) -> T,
-    ): ProtoPreference<F?> = nullableSerializedFieldInternal(
-        key = key,
-        serializer = serializer,
-        deserializer = deserializer,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<F?> = ProtoFieldPrefs(
+        nullableSerializedFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 
     override fun <F> serializedListField(
@@ -222,13 +259,17 @@ public class GenericProtoDatastore<T>(
         elementDeserializer: (String) -> F,
         getter: (T) -> String,
         updater: (T, String) -> T,
-    ): ProtoPreference<List<F>> = serializedListFieldInternal(
-        key = key,
-        defaultValue = defaultValue,
-        elementSerializer = elementSerializer,
-        elementDeserializer = elementDeserializer,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<List<F>> = ProtoFieldPrefs(
+        serializedListFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            defaultValue = defaultValue,
+            elementSerializer = elementSerializer,
+            elementDeserializer = elementDeserializer,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 
     override fun <F> nullableSerializedListField(
@@ -237,12 +278,16 @@ public class GenericProtoDatastore<T>(
         elementDeserializer: (String) -> F,
         getter: (T) -> String?,
         updater: (T, String?) -> T,
-    ): ProtoPreference<List<F>?> = nullableSerializedListFieldInternal(
-        key = key,
-        elementSerializer = elementSerializer,
-        elementDeserializer = elementDeserializer,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<List<F>?> = ProtoFieldPrefs(
+        nullableSerializedListFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            elementSerializer = elementSerializer,
+            elementDeserializer = elementDeserializer,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 
     override fun <F> serializedSetField(
@@ -251,12 +296,16 @@ public class GenericProtoDatastore<T>(
         deserializer: (String) -> F,
         getter: (T) -> Set<String>,
         updater: (T, Set<String>) -> T,
-    ): ProtoPreference<Set<F>> = serializedSetFieldInternal(
-        key = key,
-        defaultValue = defaultValue,
-        serializer = serializer,
-        deserializer = deserializer,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<Set<F>> = ProtoFieldPrefs(
+        serializedSetFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+            getter = getter,
+            updater = updater,
+            defaultProtoValue = this.defaultValue,
+        )
     )
 }

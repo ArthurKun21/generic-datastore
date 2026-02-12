@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.proto.core.custom
+package io.github.arthurkun.generic.datastore.proto.custom.core
 
 import kotlinx.coroutines.CancellationException
 

@@ -2,12 +2,15 @@ package io.github.arthurkun.generic.datastore.proto.custom.core
 
 import androidx.datastore.core.DataStore
 import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
 
-internal fun <T, F : Enum<F>> enumFieldInternal(
+internal fun <T, F> kserializedFieldInternal(
     datastore: DataStore<T>,
     key: String,
     defaultValue: F,
-    enumValues: Array<F>,
+    serializer: KSerializer<F>,
+    json: Json,
     getter: (T) -> String,
     updater: (T, String) -> T,
     defaultProtoValue: T,
@@ -17,12 +20,14 @@ internal fun <T, F : Enum<F>> enumFieldInternal(
     defaultValue = defaultValue,
     getter = { proto ->
         val raw = getter(proto)
-        safeDeserialize<F>(raw, defaultValue) { name -> enumValues.first { e -> e.name == name } }
+        if (raw.isBlank()) {
+            defaultValue
+        } else {
+            safeDeserialize(raw, defaultValue) { json.decodeFromString(serializer, it) }
+        }
     },
     updater = { proto, value ->
-        updater(proto, value.name)
+        updater(proto, json.encodeToString(serializer, value))
     },
     defaultProtoValue = defaultProtoValue,
 )
-
-

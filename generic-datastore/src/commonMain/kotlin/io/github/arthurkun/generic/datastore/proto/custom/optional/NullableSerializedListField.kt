@@ -1,19 +1,22 @@
-package io.github.arthurkun.generic.datastore.proto.optional.custom
+package io.github.arthurkun.generic.datastore.proto.custom.optional
 
+import androidx.datastore.core.DataStore
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
-import io.github.arthurkun.generic.datastore.proto.ProtoDatastore
-import io.github.arthurkun.generic.datastore.proto.ProtoPreference
-import io.github.arthurkun.generic.datastore.proto.core.custom.safeDeserialize
+import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
+import io.github.arthurkun.generic.datastore.proto.custom.core.safeDeserialize
 
-internal fun <T, F> ProtoDatastore<T>.nullableSerializedListFieldInternal(
+internal fun <T, F> nullableSerializedListFieldInternal(
+    datastore: DataStore<T>,
     key: String,
     elementSerializer: (F) -> String,
     elementDeserializer: (String) -> F,
     getter: (T) -> String?,
     updater: (T, String?) -> T,
-): ProtoPreference<List<F>?> {
+    defaultProtoValue: T,
+): ProtoSerialFieldPreference<T, List<F>?> {
     val jsonInstance = PreferenceDefaults.defaultJson
-    return field(
+    return ProtoSerialFieldPreference(
+        datastore = datastore,
         key = key,
         defaultValue = null,
         getter = { proto ->
@@ -34,5 +37,6 @@ internal fun <T, F> ProtoDatastore<T>.nullableSerializedListFieldInternal(
                 },
             )
         },
+        defaultProtoValue = defaultProtoValue,
     )
 }

@@ -1,21 +1,24 @@
-package io.github.arthurkun.generic.datastore.proto.core.custom
+package io.github.arthurkun.generic.datastore.proto.custom.core
 
-import io.github.arthurkun.generic.datastore.proto.ProtoDatastore
-import io.github.arthurkun.generic.datastore.proto.ProtoPreference
+import androidx.datastore.core.DataStore
+import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
-internal fun <T, F> ProtoDatastore<T>.kserializedListFieldInternal(
+internal fun <T, F> kserializedListFieldInternal(
+    datastore: DataStore<T>,
     key: String,
     defaultValue: List<F>,
     serializer: KSerializer<F>,
     json: Json,
     getter: (T) -> String,
     updater: (T, String) -> T,
-): ProtoPreference<List<F>> {
+    defaultProtoValue: T,
+): ProtoSerialFieldPreference<T, List<F>> {
     val listSerializer = ListSerializer(serializer)
-    return field(
+    return ProtoSerialFieldPreference(
+        datastore = datastore,
         key = key,
         defaultValue = defaultValue,
         getter = { proto ->
@@ -29,5 +32,6 @@ internal fun <T, F> ProtoDatastore<T>.kserializedListFieldInternal(
         updater = { proto, value ->
             updater(proto, json.encodeToString(listSerializer, value))
         },
+        defaultProtoValue = defaultProtoValue,
     )
 }
