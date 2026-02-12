@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Proto Sample App",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/gradlew",
+      "runtimeArgs": [":samples:protoApp:run"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Run Compose App",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/gradlew",
+      "runtimeArgs": [":composeApp:run"],
+      "console": "integratedTerminal"
+    }
+  ]
+}
