@@ -47,7 +47,6 @@ public class GenericProtoDatastore<T>(
     }
 
     override fun <F> field(
-        key: String,
         defaultValue: F,
         getter: (T) -> F,
         updater: (T, F) -> T,
@@ -65,21 +64,23 @@ public class GenericProtoDatastore<T>(
     // --- Enum fields ---
 
     override fun <F : Enum<F>> enumField(
-        key: String,
         defaultValue: F,
         enumValues: Array<F>,
         getter: (T) -> String,
         updater: (T, String) -> T,
-    ): ProtoPreference<F> = enumFieldInternal(
-        key = key,
-        defaultValue = defaultValue,
-        enumValues = enumValues,
-        getter = getter,
-        updater = updater,
+    ): ProtoPreference<F> = ProtoFieldPrefs(
+        enumFieldInternal(
+            datastore = this.datastore,
+            key = key,
+            defaultValue = defaultValue,
+            enumValues = enumValues,
+            getter = getter,
+            updater = updater,
+        )
     )
 
     override fun <F : Enum<F>> nullableEnumField(
-        key: String,
+
         enumValues: Array<F>,
         getter: (T) -> String?,
         updater: (T, String?) -> T,
@@ -91,7 +92,7 @@ public class GenericProtoDatastore<T>(
     )
 
     override fun <F : Enum<F>> enumSetField(
-        key: String,
+
         defaultValue: Set<F>,
         enumValues: Array<F>,
         getter: (T) -> Set<String>,
@@ -107,7 +108,7 @@ public class GenericProtoDatastore<T>(
     // --- KSerialized fields ---
 
     override fun <F> kserializedField(
-        key: String,
+
         defaultValue: F,
         serializer: KSerializer<F>,
         json: Json?,
@@ -123,7 +124,7 @@ public class GenericProtoDatastore<T>(
     )
 
     override fun <F : Any> nullableKserializedField(
-        key: String,
+
         serializer: KSerializer<F>,
         json: Json?,
         getter: (T) -> String?,
@@ -137,7 +138,7 @@ public class GenericProtoDatastore<T>(
     )
 
     override fun <F> kserializedListField(
-        key: String,
+
         defaultValue: List<F>,
         serializer: KSerializer<F>,
         json: Json?,
@@ -153,7 +154,7 @@ public class GenericProtoDatastore<T>(
     )
 
     override fun <F> nullableKserializedListField(
-        key: String,
+
         serializer: KSerializer<F>,
         json: Json?,
         getter: (T) -> String?,
@@ -167,7 +168,7 @@ public class GenericProtoDatastore<T>(
     )
 
     override fun <F> kserializedSetField(
-        key: String,
+
         defaultValue: Set<F>,
         serializer: KSerializer<F>,
         json: Json?,
@@ -185,7 +186,7 @@ public class GenericProtoDatastore<T>(
     // --- Serialized fields (caller-provided functions) ---
 
     override fun <F> serializedField(
-        key: String,
+
         defaultValue: F,
         serializer: (F) -> String,
         deserializer: (String) -> F,
@@ -201,7 +202,7 @@ public class GenericProtoDatastore<T>(
     )
 
     override fun <F : Any> nullableSerializedField(
-        key: String,
+
         serializer: (F) -> String,
         deserializer: (String) -> F,
         getter: (T) -> String?,
@@ -215,7 +216,7 @@ public class GenericProtoDatastore<T>(
     )
 
     override fun <F> serializedListField(
-        key: String,
+
         defaultValue: List<F>,
         elementSerializer: (F) -> String,
         elementDeserializer: (String) -> F,
@@ -231,7 +232,7 @@ public class GenericProtoDatastore<T>(
     )
 
     override fun <F> nullableSerializedListField(
-        key: String,
+
         elementSerializer: (F) -> String,
         elementDeserializer: (String) -> F,
         getter: (T) -> String?,
@@ -245,7 +246,6 @@ public class GenericProtoDatastore<T>(
     )
 
     override fun <F> serializedSetField(
-        key: String,
         defaultValue: Set<F>,
         serializer: (F) -> String,
         deserializer: (String) -> F,

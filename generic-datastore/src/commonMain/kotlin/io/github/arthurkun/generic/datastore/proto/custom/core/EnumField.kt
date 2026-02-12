@@ -1,18 +1,18 @@
-package io.github.arthurkun.generic.datastore.proto.core.custom
+package io.github.arthurkun.generic.datastore.proto.custom.core
 
 import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.proto.ProtoDatastore
-import io.github.arthurkun.generic.datastore.proto.ProtoPreference
-import io.github.arthurkun.generic.datastore.proto.core.ProtoFieldPreference
+import io.github.arthurkun.generic.datastore.proto.core.custom.safeDeserialize
+import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
 
-internal fun <P, T, F : Enum<F>, S: String> enumFieldInternal(
+internal fun <P, T, F : Enum<F>> enumFieldInternal(
     datastore: ProtoDatastore<P>,
     key: String,
     defaultValue: F,
     enumValues: Array<F>,
-    getter: (T) -> S,
-    updater: (T, S) -> T,
-): BasePreference<F> = ProtoFieldPreference(
+    getter: (T) -> String,
+    updater: (T, String) -> T,
+): BasePreference<F> = ProtoSerialFieldPreference(
     datastore = datastore,
     key = key,
     defaultValue = defaultValue,
