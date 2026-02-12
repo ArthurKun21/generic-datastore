@@ -10,7 +10,6 @@ import kotlin.coroutines.EmptyCoroutineContext
 @Composable
 public expect fun <T> StateFlow<T>.collectAsStatePlatform(): State<T>
 
-
 @Composable
 public expect fun <T> Flow<T>.collectAsStatePlatform(
     initialValue: T,
