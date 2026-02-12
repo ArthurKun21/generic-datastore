@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
@@ -76,6 +77,7 @@ internal class ProtoFieldPreference<P, T>(
             if (e is IOException) emit(defaultProtoValue) else throw e
         }
         .map { getter(it) }
+        .distinctUntilChanged()
 
     override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<T> =
         asFlow().stateIn(scope, started, defaultValue)
