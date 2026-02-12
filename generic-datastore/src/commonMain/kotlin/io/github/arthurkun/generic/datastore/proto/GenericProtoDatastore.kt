@@ -3,13 +3,23 @@
 package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.DataStore
-import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.proto.core.GenericProtoPreferenceItem
 import io.github.arthurkun.generic.datastore.proto.core.ProtoFieldPreference
+import io.github.arthurkun.generic.datastore.proto.core.custom.enumFieldInternal
+import io.github.arthurkun.generic.datastore.proto.core.custom.kserializedFieldInternal
+import io.github.arthurkun.generic.datastore.proto.core.custom.kserializedListFieldInternal
+import io.github.arthurkun.generic.datastore.proto.core.custom.serializedFieldInternal
+import io.github.arthurkun.generic.datastore.proto.core.custom.serializedListFieldInternal
+import io.github.arthurkun.generic.datastore.proto.core.customSet.enumSetFieldInternal
+import io.github.arthurkun.generic.datastore.proto.core.customSet.kserializedSetFieldInternal
+import io.github.arthurkun.generic.datastore.proto.core.customSet.serializedSetFieldInternal
+import io.github.arthurkun.generic.datastore.proto.optional.custom.nullableEnumFieldInternal
+import io.github.arthurkun.generic.datastore.proto.optional.custom.nullableKserializedFieldInternal
+import io.github.arthurkun.generic.datastore.proto.optional.custom.nullableKserializedListFieldInternal
+import io.github.arthurkun.generic.datastore.proto.optional.custom.nullableSerializedFieldInternal
+import io.github.arthurkun.generic.datastore.proto.optional.custom.nullableSerializedListFieldInternal
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * A DataStore implementation for Proto DataStore.
@@ -58,18 +68,12 @@ public class GenericProtoDatastore<T>(
         enumValues: Array<F>,
         getter: (T) -> String,
         updater: (T, String) -> T,
-    ): ProtoPreference<F> = field(
+    ): ProtoPreference<F> = enumFieldInternal(
         key = key,
         defaultValue = defaultValue,
-        getter = { proto ->
-            val raw = getter(proto)
-            safeDeserialize(raw, defaultValue) { name ->
-                enumValues.first { it.name == name }
-            }
-        },
-        updater = { proto, value ->
-            updater(proto, value.name)
-        },
+        enumValues = enumValues,
+        getter = getter,
+        updater = updater,
     )
 
     override fun <F : Enum<F>> nullableEnumField(
@@ -77,16 +81,11 @@ public class GenericProtoDatastore<T>(
         enumValues: Array<F>,
         getter: (T) -> String?,
         updater: (T, String?) -> T,
-    ): ProtoPreference<F?> = field(
+    ): ProtoPreference<F?> = nullableEnumFieldInternal(
         key = key,
-        defaultValue = null,
-        getter = { proto ->
-            val raw = getter(proto)
-            raw?.let { safeDeserialize<F?>(it, null) { name -> enumValues.first { e -> e.name == name } } }
-        },
-        updater = { proto, value ->
-            updater(proto, value?.name)
-        },
+        enumValues = enumValues,
+        getter = getter,
+        updater = updater,
     )
 
     override fun <F : Enum<F>> enumSetField(
@@ -95,17 +94,12 @@ public class GenericProtoDatastore<T>(
         enumValues: Array<F>,
         getter: (T) -> Set<String>,
         updater: (T, Set<String>) -> T,
-    ): ProtoPreference<Set<F>> = field(
+    ): ProtoPreference<Set<F>> = enumSetFieldInternal(
         key = key,
         defaultValue = defaultValue,
-        getter = { proto ->
-            getter(proto).mapNotNull { raw ->
-                safeDeserialize<F?>(raw, null) { name -> enumValues.first { it.name == name } }
-            }.toSet()
-        },
-        updater = { proto, value ->
-            updater(proto, value.map { it.name }.toSet())
-        },
+        enumValues = enumValues,
+        getter = getter,
+        updater = updater,
     )
 
     // --- KSerialized fields ---
@@ -117,24 +111,14 @@ public class GenericProtoDatastore<T>(
         json: Json?,
         getter: (T) -> String,
         updater: (T, String) -> T,
-    ): ProtoPreference<F> {
-        val jsonInstance = json ?: PreferenceDefaults.defaultJson
-        return field(
-            key = key,
-            defaultValue = defaultValue,
-            getter = { proto ->
-                val raw = getter(proto)
-                if (raw.isBlank()) {
-                    defaultValue
-                } else {
-                    safeDeserialize(raw, defaultValue) { jsonInstance.decodeFromString(serializer, it) }
-                }
-            },
-            updater = { proto, value ->
-                updater(proto, jsonInstance.encodeToString(serializer, value))
-            },
-        )
-    }
+    ): ProtoPreference<F> = kserializedFieldInternal(
+        key = key,
+        defaultValue = defaultValue,
+        serializer = serializer,
+        json = json,
+        getter = getter,
+        updater = updater,
+    )
 
     override fun <F : Any> nullableKserializedField(
         key: String,
@@ -142,20 +126,13 @@ public class GenericProtoDatastore<T>(
         json: Json?,
         getter: (T) -> String?,
         updater: (T, String?) -> T,
-    ): ProtoPreference<F?> {
-        val jsonInstance = json ?: PreferenceDefaults.defaultJson
-        return field(
-            key = key,
-            defaultValue = null,
-            getter = { proto ->
-                val raw = getter(proto)
-                raw?.let { safeDeserialize<F?>(it, null) { s -> jsonInstance.decodeFromString(serializer, s) } }
-            },
-            updater = { proto, value ->
-                updater(proto, value?.let { jsonInstance.encodeToString(serializer, it) })
-            },
-        )
-    }
+    ): ProtoPreference<F?> = nullableKserializedFieldInternal(
+        key = key,
+        serializer = serializer,
+        json = json,
+        getter = getter,
+        updater = updater,
+    )
 
     override fun <F> kserializedListField(
         key: String,
@@ -164,25 +141,14 @@ public class GenericProtoDatastore<T>(
         json: Json?,
         getter: (T) -> String,
         updater: (T, String) -> T,
-    ): ProtoPreference<List<F>> {
-        val jsonInstance = json ?: PreferenceDefaults.defaultJson
-        val listSerializer = ListSerializer(serializer)
-        return field(
-            key = key,
-            defaultValue = defaultValue,
-            getter = { proto ->
-                val raw = getter(proto)
-                if (raw.isBlank()) {
-                    defaultValue
-                } else {
-                    safeDeserialize(raw, defaultValue) { jsonInstance.decodeFromString(listSerializer, it) }
-                }
-            },
-            updater = { proto, value ->
-                updater(proto, jsonInstance.encodeToString(listSerializer, value))
-            },
-        )
-    }
+    ): ProtoPreference<List<F>> = kserializedListFieldInternal(
+        key = key,
+        defaultValue = defaultValue,
+        serializer = serializer,
+        json = json,
+        getter = getter,
+        updater = updater,
+    )
 
     override fun <F> nullableKserializedListField(
         key: String,
@@ -190,23 +156,13 @@ public class GenericProtoDatastore<T>(
         json: Json?,
         getter: (T) -> String?,
         updater: (T, String?) -> T,
-    ): ProtoPreference<List<F>?> {
-        val jsonInstance = json ?: PreferenceDefaults.defaultJson
-        val listSerializer = ListSerializer(serializer)
-        return field(
-            key = key,
-            defaultValue = null,
-            getter = { proto ->
-                val raw = getter(proto)
-                raw?.let {
-                    safeDeserialize<List<F>?>(it, null) { s -> jsonInstance.decodeFromString(listSerializer, s) }
-                }
-            },
-            updater = { proto, value ->
-                updater(proto, value?.let { jsonInstance.encodeToString(listSerializer, it) })
-            },
-        )
-    }
+    ): ProtoPreference<List<F>?> = nullableKserializedListFieldInternal(
+        key = key,
+        serializer = serializer,
+        json = json,
+        getter = getter,
+        updater = updater,
+    )
 
     override fun <F> kserializedSetField(
         key: String,
@@ -215,21 +171,14 @@ public class GenericProtoDatastore<T>(
         json: Json?,
         getter: (T) -> Set<String>,
         updater: (T, Set<String>) -> T,
-    ): ProtoPreference<Set<F>> {
-        val jsonInstance = json ?: PreferenceDefaults.defaultJson
-        return field(
-            key = key,
-            defaultValue = defaultValue,
-            getter = { proto ->
-                getter(proto).mapNotNull { raw ->
-                    safeDeserialize<F?>(raw, null) { jsonInstance.decodeFromString(serializer, it) }
-                }.toSet()
-            },
-            updater = { proto, value ->
-                updater(proto, value.map { jsonInstance.encodeToString(serializer, it) }.toSet())
-            },
-        )
-    }
+    ): ProtoPreference<Set<F>> = kserializedSetFieldInternal(
+        key = key,
+        defaultValue = defaultValue,
+        serializer = serializer,
+        json = json,
+        getter = getter,
+        updater = updater,
+    )
 
     // --- Serialized fields (caller-provided functions) ---
 
@@ -240,20 +189,13 @@ public class GenericProtoDatastore<T>(
         deserializer: (String) -> F,
         getter: (T) -> String,
         updater: (T, String) -> T,
-    ): ProtoPreference<F> = field(
+    ): ProtoPreference<F> = serializedFieldInternal(
         key = key,
         defaultValue = defaultValue,
-        getter = { proto ->
-            val raw = getter(proto)
-            if (raw.isBlank()) {
-                defaultValue
-            } else {
-                safeDeserialize(raw, defaultValue) { deserializer(it) }
-            }
-        },
-        updater = { proto, value ->
-            updater(proto, serializer(value))
-        },
+        serializer = serializer,
+        deserializer = deserializer,
+        getter = getter,
+        updater = updater,
     )
 
     override fun <F : Any> nullableSerializedField(
@@ -262,16 +204,12 @@ public class GenericProtoDatastore<T>(
         deserializer: (String) -> F,
         getter: (T) -> String?,
         updater: (T, String?) -> T,
-    ): ProtoPreference<F?> = field(
+    ): ProtoPreference<F?> = nullableSerializedFieldInternal(
         key = key,
-        defaultValue = null,
-        getter = { proto ->
-            val raw = getter(proto)
-            raw?.let { safeDeserialize<F?>(it, null) { s -> deserializer(s) } }
-        },
-        updater = { proto, value ->
-            updater(proto, value?.let { serializer(it) })
-        },
+        serializer = serializer,
+        deserializer = deserializer,
+        getter = getter,
+        updater = updater,
     )
 
     override fun <F> serializedListField(
@@ -281,28 +219,14 @@ public class GenericProtoDatastore<T>(
         elementDeserializer: (String) -> F,
         getter: (T) -> String,
         updater: (T, String) -> T,
-    ): ProtoPreference<List<F>> {
-        val jsonInstance = PreferenceDefaults.defaultJson
-        return field(
-            key = key,
-            defaultValue = defaultValue,
-            getter = { proto ->
-                val raw = getter(proto)
-                if (raw.isBlank()) {
-                    defaultValue
-                } else {
-                    safeDeserialize(raw, defaultValue) { rawStr ->
-                        val jsonArray = jsonInstance.decodeFromString<List<String>>(rawStr)
-                        jsonArray.map { elementDeserializer(it) }
-                    }
-                }
-            },
-            updater = { proto, value ->
-                val jsonArray = value.map { elementSerializer(it) }
-                updater(proto, jsonInstance.encodeToString(jsonArray))
-            },
-        )
-    }
+    ): ProtoPreference<List<F>> = serializedListFieldInternal(
+        key = key,
+        defaultValue = defaultValue,
+        elementSerializer = elementSerializer,
+        elementDeserializer = elementDeserializer,
+        getter = getter,
+        updater = updater,
+    )
 
     override fun <F> nullableSerializedListField(
         key: String,
@@ -310,31 +234,13 @@ public class GenericProtoDatastore<T>(
         elementDeserializer: (String) -> F,
         getter: (T) -> String?,
         updater: (T, String?) -> T,
-    ): ProtoPreference<List<F>?> {
-        val jsonInstance = PreferenceDefaults.defaultJson
-        return field(
-            key = key,
-            defaultValue = null,
-            getter = { proto ->
-                val raw = getter(proto)
-                raw?.let {
-                    safeDeserialize<List<F>?>(it, null) { rawStr ->
-                        val jsonArray = jsonInstance.decodeFromString<List<String>>(rawStr)
-                        jsonArray.map { elem -> elementDeserializer(elem) }
-                    }
-                }
-            },
-            updater = { proto, value ->
-                updater(
-                    proto,
-                    value?.let { list ->
-                        val jsonArray = list.map { elementSerializer(it) }
-                        jsonInstance.encodeToString(jsonArray)
-                    },
-                )
-            },
-        )
-    }
+    ): ProtoPreference<List<F>?> = nullableSerializedListFieldInternal(
+        key = key,
+        elementSerializer = elementSerializer,
+        elementDeserializer = elementDeserializer,
+        getter = getter,
+        updater = updater,
+    )
 
     override fun <F> serializedSetField(
         key: String,
@@ -343,28 +249,12 @@ public class GenericProtoDatastore<T>(
         deserializer: (String) -> F,
         getter: (T) -> Set<String>,
         updater: (T, Set<String>) -> T,
-    ): ProtoPreference<Set<F>> = field(
+    ): ProtoPreference<Set<F>> = serializedSetFieldInternal(
         key = key,
         defaultValue = defaultValue,
-        getter = { proto ->
-            getter(proto).mapNotNull { raw ->
-                safeDeserialize<F?>(raw, null) { deserializer(it) }
-            }.toSet()
-        },
-        updater = { proto, value ->
-            updater(proto, value.map { serializer(it) }.toSet())
-        },
+        serializer = serializer,
+        deserializer = deserializer,
+        getter = getter,
+        updater = updater,
     )
-}
-
-private inline fun <T> safeDeserialize(
-    raw: String,
-    fallback: T,
-    deserialize: (String) -> T,
-): T = try {
-    deserialize(raw)
-} catch (e: CancellationException) {
-    throw e
-} catch (_: Exception) {
-    fallback
 }
