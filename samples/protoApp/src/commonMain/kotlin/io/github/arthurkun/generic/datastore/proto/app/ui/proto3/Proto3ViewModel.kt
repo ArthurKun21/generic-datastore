@@ -27,28 +27,24 @@ class Proto3ViewModel(
     // --- Top-level fields ---
 
     val appNamePref: ProtoPreference<String> = datastore.field(
-        key = "app_name",
         defaultValue = "",
         getter = { it.app_name },
         updater = { proto, value -> proto.copy(app_name = value) },
     )
 
     val maxRetriesPref: ProtoPreference<Int> = datastore.field(
-        key = "max_retries",
         defaultValue = 0,
         getter = { it.max_retries },
         updater = { proto, value -> proto.copy(max_retries = value) },
     )
 
     val debugModePref: ProtoPreference<Boolean> = datastore.field(
-        key = "debug_mode",
         defaultValue = false,
         getter = { it.debug_mode },
         updater = { proto, value -> proto.copy(debug_mode = value) },
     )
 
     val refreshIntervalPref: ProtoPreference<Double> = datastore.field(
-        key = "refresh_interval",
         defaultValue = 0.0,
         getter = { it.refresh_interval },
         updater = { proto, value -> proto.copy(refresh_interval = value) },
@@ -57,14 +53,12 @@ class Proto3ViewModel(
     // --- Nested NetworkConfig fields ---
 
     val networkPref: ProtoPreference<AppConfig.NetworkConfig?> = datastore.field(
-        key = "network",
         defaultValue = null,
         getter = { it.network },
         updater = { proto, value -> proto.copy(network = value) },
     )
 
     val baseUrlPref: ProtoPreference<String> = datastore.field(
-        key = "network.base_url",
         defaultValue = "",
         getter = { it.network?.base_url ?: "" },
         updater = { proto, value ->
@@ -75,7 +69,6 @@ class Proto3ViewModel(
     )
 
     val timeoutMsPref: ProtoPreference<Int> = datastore.field(
-        key = "network.timeout_ms",
         defaultValue = 0,
         getter = { it.network?.timeout_ms ?: 0 },
         updater = { proto, value ->
@@ -88,7 +81,6 @@ class Proto3ViewModel(
     // --- Deeply nested RetryPolicy fields (3 levels) ---
 
     val maxAttemptsPref: ProtoPreference<Int> = datastore.field(
-        key = "network.retry_policy.max_attempts",
         defaultValue = 0,
         getter = { it.network?.retry_policy?.max_attempts ?: 0 },
         updater = { proto, value ->
@@ -103,7 +95,6 @@ class Proto3ViewModel(
     )
 
     val backoffMsPref: ProtoPreference<Long> = datastore.field(
-        key = "network.retry_policy.backoff_ms",
         defaultValue = 0L,
         getter = { it.network?.retry_policy?.backoff_ms ?: 0L },
         updater = { proto, value ->
@@ -118,7 +109,6 @@ class Proto3ViewModel(
     )
 
     val exponentialPref: ProtoPreference<Boolean> = datastore.field(
-        key = "network.retry_policy.exponential",
         defaultValue = false,
         getter = { it.network?.retry_policy?.exponential ?: false },
         updater = { proto, value ->

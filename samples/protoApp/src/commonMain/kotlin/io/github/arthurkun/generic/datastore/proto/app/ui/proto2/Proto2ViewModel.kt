@@ -31,28 +31,24 @@ class Proto2ViewModel(
 
     /** Individual field preferences via `field()` */
     val usernamePref: ProtoPreference<String?> = datastore.field(
-        key = "username",
         defaultValue = null,
         getter = { it.username },
         updater = { proto, value -> proto.copy(username = value) },
     )
 
     val agePref: ProtoPreference<Int?> = datastore.field(
-        key = "age",
         defaultValue = null,
         getter = { it.age },
         updater = { proto, value -> proto.copy(age = value) },
     )
 
     val darkModePref: ProtoPreference<Boolean?> = datastore.field(
-        key = "dark_mode",
         defaultValue = null,
         getter = { it.dark_mode },
         updater = { proto, value -> proto.copy(dark_mode = value) },
     )
 
     val themePref: ProtoPreference<UserSettings.Theme?> = datastore.field(
-        key = "theme",
         defaultValue = null,
         getter = { it.theme },
         updater = { proto, value -> proto.copy(theme = value) },
@@ -60,7 +56,6 @@ class Proto2ViewModel(
 
     /** Nested field: address object */
     val addressPref: ProtoPreference<UserSettings.Address?> = datastore.field(
-        key = "address",
         defaultValue = null,
         getter = { it.address },
         updater = { proto, value -> proto.copy(address = value) },
@@ -68,7 +63,6 @@ class Proto2ViewModel(
 
     /** Deeply nested field: address.street via copy() chain */
     val streetPref: ProtoPreference<String?> = datastore.field(
-        key = "address.street",
         defaultValue = null,
         getter = { it.address?.street },
         updater = { proto, value ->
@@ -79,7 +73,6 @@ class Proto2ViewModel(
     )
 
     val cityPref: ProtoPreference<String?> = datastore.field(
-        key = "address.city",
         defaultValue = null,
         getter = { it.address?.city },
         updater = { proto, value ->
@@ -90,7 +83,6 @@ class Proto2ViewModel(
     )
 
     val zipCodePref: ProtoPreference<String?> = datastore.field(
-        key = "address.zip_code",
         defaultValue = null,
         getter = { it.address?.zip_code },
         updater = { proto, value ->
