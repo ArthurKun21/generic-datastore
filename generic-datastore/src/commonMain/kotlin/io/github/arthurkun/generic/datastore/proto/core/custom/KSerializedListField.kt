@@ -10,11 +10,10 @@ internal fun <T, F> ProtoDatastore<T>.kserializedListFieldInternal(
     key: String,
     defaultValue: List<F>,
     serializer: KSerializer<F>,
-    json: Json?,
+    json: Json,
     getter: (T) -> String,
     updater: (T, String) -> T,
 ): ProtoPreference<List<F>> {
-    val jsonInstance = resolveJson(json)
     val listSerializer = ListSerializer(serializer)
     return field(
         key = key,
@@ -24,11 +23,11 @@ internal fun <T, F> ProtoDatastore<T>.kserializedListFieldInternal(
             if (raw.isBlank()) {
                 defaultValue
             } else {
-                safeDeserialize(raw, defaultValue) { jsonInstance.decodeFromString(listSerializer, it) }
+                safeDeserialize(raw, defaultValue) { json.decodeFromString(listSerializer, it) }
             }
         },
         updater = { proto, value ->
-            updater(proto, jsonInstance.encodeToString(listSerializer, value))
+            updater(proto, json.encodeToString(listSerializer, value))
         },
     )
 }

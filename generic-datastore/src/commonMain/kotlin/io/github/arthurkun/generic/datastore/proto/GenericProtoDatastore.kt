@@ -3,6 +3,7 @@
 package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.DataStore
+import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.proto.core.GenericProtoPreferenceItem
 import io.github.arthurkun.generic.datastore.proto.core.ProtoFieldPreference
 import io.github.arthurkun.generic.datastore.proto.core.custom.enumFieldInternal
@@ -34,6 +35,7 @@ public class GenericProtoDatastore<T>(
     internal val datastore: DataStore<T>,
     private val defaultValue: T,
     private val key: String = "proto_datastore",
+    private val defaultJson: Json = PreferenceDefaults.defaultJson,
 ) : ProtoDatastore<T> {
 
     override fun data(): ProtoPreference<T> {
@@ -115,7 +117,7 @@ public class GenericProtoDatastore<T>(
         key = key,
         defaultValue = defaultValue,
         serializer = serializer,
-        json = json,
+        json = json ?: defaultJson,
         getter = getter,
         updater = updater,
     )
@@ -129,7 +131,7 @@ public class GenericProtoDatastore<T>(
     ): ProtoPreference<F?> = nullableKserializedFieldInternal(
         key = key,
         serializer = serializer,
-        json = json,
+        json = json ?: defaultJson,
         getter = getter,
         updater = updater,
     )
@@ -145,7 +147,7 @@ public class GenericProtoDatastore<T>(
         key = key,
         defaultValue = defaultValue,
         serializer = serializer,
-        json = json,
+        json = json ?: defaultJson,
         getter = getter,
         updater = updater,
     )
@@ -159,7 +161,7 @@ public class GenericProtoDatastore<T>(
     ): ProtoPreference<List<F>?> = nullableKserializedListFieldInternal(
         key = key,
         serializer = serializer,
-        json = json,
+        json = json ?: defaultJson,
         getter = getter,
         updater = updater,
     )
@@ -175,7 +177,7 @@ public class GenericProtoDatastore<T>(
         key = key,
         defaultValue = defaultValue,
         serializer = serializer,
-        json = json,
+        json = json ?: defaultJson,
         getter = getter,
         updater = updater,
     )
