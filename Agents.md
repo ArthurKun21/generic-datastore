@@ -265,12 +265,14 @@ The proto module uses a delegation pattern to avoid code duplication:
   `ProtoFieldPreference<T, T>` with identity getter/updater. Adds `DelegatedPreference<T>`
   contract (`resetToDefaultBlocking()`, `getValue()`, `setValue()` for property delegation).
 - `ProtoFieldPrefs<P, T>` — per-field wrapper. Delegates `BasePreference<T>` by a
-  `ProtoFieldPreference<P, T>`. Adds `ProtoPreference<T>` contract.
+  `ProtoSerialFieldPreference<P, T>`. Adds `ProtoPreference<T>` contract.
 - `GenericProtoDatastore<T>` — factory that creates `GenericProtoPreferenceItem` via `data()`
   and `ProtoFieldPrefs` via `field()`.
 
-The `delete()` method on field preferences resets the entire proto to its default value. There is
-no concept of removing a single field from a proto message.
+The `delete()` method on field preferences resets only the targeted field to its default value
+(via `resetToDefault()` → `set(defaultValue)` → `updater(current, fieldDefault)`). It does not
+reset the entire proto to its default. There is no concept of removing a single field from a proto
+message.
 
 ## Platform-Specific Notes
 
