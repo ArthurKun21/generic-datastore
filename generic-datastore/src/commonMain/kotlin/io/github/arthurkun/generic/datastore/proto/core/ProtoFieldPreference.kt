@@ -27,11 +27,11 @@ internal class ProtoFieldPreference<P, T>(
     defaultProtoValue: P,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ProtoSerialFieldPreference<P, T>(
-        datastore = datastore,
-        key = key,
-        defaultValue = defaultValue,
-        getter = getter,
-        updater = updater,
-        defaultProtoValue = defaultProtoValue,
-        ioDispatcher = ioDispatcher,
-    )
+    datastore = datastore,
+    key = key,
+    defaultValue = defaultValue,
+    getter = getter,
+    updater = updater,
+    defaultProtoValue = defaultProtoValue,
+    ioDispatcher = ioDispatcher,
+)

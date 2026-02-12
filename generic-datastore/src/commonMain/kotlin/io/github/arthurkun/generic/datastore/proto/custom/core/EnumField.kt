@@ -24,5 +24,3 @@ internal fun <T, F : Enum<F>> enumFieldInternal(
     },
     defaultProtoValue = defaultProtoValue,
 )
-
-

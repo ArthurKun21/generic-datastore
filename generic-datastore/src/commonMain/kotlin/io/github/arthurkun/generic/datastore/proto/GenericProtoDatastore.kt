@@ -77,7 +77,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     override fun <F : Enum<F>> nullableEnumField(
@@ -93,7 +93,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     override fun <F : Enum<F>> enumSetField(
@@ -111,7 +111,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     // --- KSerialized fields ---
@@ -133,7 +133,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     override fun <F : Any> nullableKserializedField(
@@ -151,7 +151,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     override fun <F> kserializedListField(
@@ -171,7 +171,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     override fun <F> nullableKserializedListField(
@@ -189,7 +189,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     override fun <F> kserializedSetField(
@@ -209,7 +209,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     // --- Serialized fields (caller-provided functions) ---
@@ -231,7 +231,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     override fun <F : Any> nullableSerializedField(
@@ -249,7 +249,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     override fun <F> serializedListField(
@@ -269,7 +269,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     override fun <F> nullableSerializedListField(
@@ -287,7 +287,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 
     override fun <F> serializedSetField(
@@ -306,6 +306,6 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
-        )
+        ),
     )
 }
