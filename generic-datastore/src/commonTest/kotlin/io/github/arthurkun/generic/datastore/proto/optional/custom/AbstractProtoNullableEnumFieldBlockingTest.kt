@@ -16,7 +16,6 @@ abstract class AbstractProtoNullableEnumFieldBlockingTest {
     @Test
     fun nullableEnumField_getBlockingReturnsNull() {
         val colorPref: ProtoPreference<TestColor?> = protoDatastore.nullableEnumField(
-            key = "nullable_color",
             getter = { it.nullableEnumRaw },
             updater = { proto, raw -> proto.copy(nullableEnumRaw = raw) },
         )
@@ -26,7 +25,6 @@ abstract class AbstractProtoNullableEnumFieldBlockingTest {
     @Test
     fun nullableEnumField_setBlockingAndGetBlocking() {
         val colorPref: ProtoPreference<TestColor?> = protoDatastore.nullableEnumField(
-            key = "nullable_color",
             getter = { it.nullableEnumRaw },
             updater = { proto, raw -> proto.copy(nullableEnumRaw = raw) },
         )
@@ -37,7 +35,6 @@ abstract class AbstractProtoNullableEnumFieldBlockingTest {
     @Test
     fun nullableEnumField_setBlockingNull() {
         val colorPref: ProtoPreference<TestColor?> = protoDatastore.nullableEnumField(
-            key = "nullable_color",
             getter = { it.nullableEnumRaw },
             updater = { proto, raw -> proto.copy(nullableEnumRaw = raw) },
         )
@@ -49,7 +46,6 @@ abstract class AbstractProtoNullableEnumFieldBlockingTest {
     @Test
     fun nullableEnumField_resetToDefaultBlocking() {
         val colorPref: ProtoPreference<TestColor?> = protoDatastore.nullableEnumField(
-            key = "nullable_color",
             getter = { it.nullableEnumRaw },
             updater = { proto, raw -> proto.copy(nullableEnumRaw = raw) },
         )
@@ -61,7 +57,6 @@ abstract class AbstractProtoNullableEnumFieldBlockingTest {
     @Test
     fun nullableEnumField_propertyDelegation() {
         val colorPref: ProtoPreference<TestColor?> = protoDatastore.nullableEnumField(
-            key = "nullable_color",
             getter = { it.nullableEnumRaw },
             updater = { proto, raw -> proto.copy(nullableEnumRaw = raw) },
         )

@@ -16,7 +16,6 @@ abstract class AbstractProtoKserializedListFieldTest {
     @Test
     fun kserializedListField_getReturnsEmptyDefault() = runTest(testDispatcher) {
         val listPref = protoDatastore.kserializedListField(
-            key = "item_list",
             defaultValue = emptyList<TestItem>(),
             getter = { it.jsonListRaw },
             updater = { proto, raw -> proto.copy(jsonListRaw = raw) },
@@ -27,7 +26,6 @@ abstract class AbstractProtoKserializedListFieldTest {
     @Test
     fun kserializedListField_setAndGetRoundTrip() = runTest(testDispatcher) {
         val listPref = protoDatastore.kserializedListField(
-            key = "item_list",
             defaultValue = emptyList<TestItem>(),
             getter = { it.jsonListRaw },
             updater = { proto, raw -> proto.copy(jsonListRaw = raw) },
@@ -40,7 +38,6 @@ abstract class AbstractProtoKserializedListFieldTest {
     @Test
     fun kserializedListField_asFlowEmitsUpdates() = runTest(testDispatcher) {
         val listPref = protoDatastore.kserializedListField(
-            key = "item_list",
             defaultValue = emptyList<TestItem>(),
             getter = { it.jsonListRaw },
             updater = { proto, raw -> proto.copy(jsonListRaw = raw) },
@@ -53,7 +50,6 @@ abstract class AbstractProtoKserializedListFieldTest {
     @Test
     fun kserializedListField_updateAppendsElement() = runTest(testDispatcher) {
         val listPref = protoDatastore.kserializedListField(
-            key = "item_list",
             defaultValue = emptyList<TestItem>(),
             getter = { it.jsonListRaw },
             updater = { proto, raw -> proto.copy(jsonListRaw = raw) },
@@ -66,7 +62,6 @@ abstract class AbstractProtoKserializedListFieldTest {
     @Test
     fun kserializedListField_deleteResetsToEmptyDefault() = runTest(testDispatcher) {
         val listPref = protoDatastore.kserializedListField(
-            key = "item_list",
             defaultValue = emptyList<TestItem>(),
             getter = { it.jsonListRaw },
             updater = { proto, raw -> proto.copy(jsonListRaw = raw) },
@@ -79,7 +74,6 @@ abstract class AbstractProtoKserializedListFieldTest {
     @Test
     fun kserializedListField_resetToDefault() = runTest(testDispatcher) {
         val listPref = protoDatastore.kserializedListField(
-            key = "item_list",
             defaultValue = emptyList<TestItem>(),
             getter = { it.jsonListRaw },
             updater = { proto, raw -> proto.copy(jsonListRaw = raw) },

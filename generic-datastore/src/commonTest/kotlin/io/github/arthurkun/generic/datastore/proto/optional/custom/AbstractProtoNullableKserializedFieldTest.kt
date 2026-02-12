@@ -20,7 +20,6 @@ abstract class AbstractProtoNullableKserializedFieldTest {
     @Test
     fun nullableKserializedField_getReturnsNullWhenNotSet() = runTest(testDispatcher) {
         val itemPref: ProtoPreference<TestItem?> = protoDatastore.nullableKserializedField(
-            key = "nullable_item",
             getter = { it.nullableJsonRaw },
             updater = { proto, raw -> proto.copy(nullableJsonRaw = raw) },
         )
@@ -30,7 +29,6 @@ abstract class AbstractProtoNullableKserializedFieldTest {
     @Test
     fun nullableKserializedField_setToNonNull() = runTest(testDispatcher) {
         val itemPref: ProtoPreference<TestItem?> = protoDatastore.nullableKserializedField(
-            key = "nullable_item",
             getter = { it.nullableJsonRaw },
             updater = { proto, raw -> proto.copy(nullableJsonRaw = raw) },
         )
@@ -42,7 +40,6 @@ abstract class AbstractProtoNullableKserializedFieldTest {
     @Test
     fun nullableKserializedField_setToNull() = runTest(testDispatcher) {
         val itemPref: ProtoPreference<TestItem?> = protoDatastore.nullableKserializedField(
-            key = "nullable_item",
             getter = { it.nullableJsonRaw },
             updater = { proto, raw -> proto.copy(nullableJsonRaw = raw) },
         )
@@ -54,7 +51,6 @@ abstract class AbstractProtoNullableKserializedFieldTest {
     @Test
     fun nullableKserializedField_deleteResetsToNull() = runTest(testDispatcher) {
         val itemPref: ProtoPreference<TestItem?> = protoDatastore.nullableKserializedField(
-            key = "nullable_item",
             getter = { it.nullableJsonRaw },
             updater = { proto, raw -> proto.copy(nullableJsonRaw = raw) },
         )
@@ -66,7 +62,6 @@ abstract class AbstractProtoNullableKserializedFieldTest {
     @Test
     fun nullableKserializedField_asFlowNullTransitions() = runTest(testDispatcher) {
         val itemPref: ProtoPreference<TestItem?> = protoDatastore.nullableKserializedField(
-            key = "nullable_item",
             getter = { it.nullableJsonRaw },
             updater = { proto, raw -> proto.copy(nullableJsonRaw = raw) },
         )
@@ -80,7 +75,6 @@ abstract class AbstractProtoNullableKserializedFieldTest {
     @Test
     fun nullableKserializedField_updateFromNullToValue() = runTest(testDispatcher) {
         val itemPref: ProtoPreference<TestItem?> = protoDatastore.nullableKserializedField(
-            key = "nullable_item",
             getter = { it.nullableJsonRaw },
             updater = { proto, raw -> proto.copy(nullableJsonRaw = raw) },
         )

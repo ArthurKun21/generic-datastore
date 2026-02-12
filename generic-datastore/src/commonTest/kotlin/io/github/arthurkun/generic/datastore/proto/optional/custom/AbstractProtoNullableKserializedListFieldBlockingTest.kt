@@ -16,7 +16,6 @@ abstract class AbstractProtoNullableKserializedListFieldBlockingTest {
     @Test
     fun nullableKserializedListField_getBlockingReturnsNull() {
         val listPref: ProtoPreference<List<TestItem>?> = protoDatastore.nullableKserializedListField(
-            key = "nullable_item_list",
             getter = { it.nullableJsonListRaw },
             updater = { proto, raw -> proto.copy(nullableJsonListRaw = raw) },
         )
@@ -26,7 +25,6 @@ abstract class AbstractProtoNullableKserializedListFieldBlockingTest {
     @Test
     fun nullableKserializedListField_setBlockingAndGetBlocking() {
         val listPref: ProtoPreference<List<TestItem>?> = protoDatastore.nullableKserializedListField(
-            key = "nullable_item_list",
             getter = { it.nullableJsonListRaw },
             updater = { proto, raw -> proto.copy(nullableJsonListRaw = raw) },
         )
@@ -38,7 +36,6 @@ abstract class AbstractProtoNullableKserializedListFieldBlockingTest {
     @Test
     fun nullableKserializedListField_setBlockingNull() {
         val listPref: ProtoPreference<List<TestItem>?> = protoDatastore.nullableKserializedListField(
-            key = "nullable_item_list",
             getter = { it.nullableJsonListRaw },
             updater = { proto, raw -> proto.copy(nullableJsonListRaw = raw) },
         )
@@ -50,7 +47,6 @@ abstract class AbstractProtoNullableKserializedListFieldBlockingTest {
     @Test
     fun nullableKserializedListField_resetToDefaultBlocking() {
         val listPref: ProtoPreference<List<TestItem>?> = protoDatastore.nullableKserializedListField(
-            key = "nullable_item_list",
             getter = { it.nullableJsonListRaw },
             updater = { proto, raw -> proto.copy(nullableJsonListRaw = raw) },
         )
@@ -62,7 +58,6 @@ abstract class AbstractProtoNullableKserializedListFieldBlockingTest {
     @Test
     fun nullableKserializedListField_propertyDelegation() {
         val listPref: ProtoPreference<List<TestItem>?> = protoDatastore.nullableKserializedListField(
-            key = "nullable_item_list",
             getter = { it.nullableJsonListRaw },
             updater = { proto, raw -> proto.copy(nullableJsonListRaw = raw) },
         )

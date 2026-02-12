@@ -22,7 +22,6 @@ abstract class AbstractProtoNullableSerializedFieldTest {
     @Test
     fun nullableSerializedField_getReturnsNullWhenNotSet() = runTest(testDispatcher) {
         val itemPref = protoDatastore.nullableSerializedField(
-            key = "nullable_ser_item",
             serializer = itemSerializer,
             deserializer = itemDeserializer,
             getter = { it.nullableJsonRaw },
@@ -34,7 +33,6 @@ abstract class AbstractProtoNullableSerializedFieldTest {
     @Test
     fun nullableSerializedField_setToNonNull() = runTest(testDispatcher) {
         val itemPref = protoDatastore.nullableSerializedField(
-            key = "nullable_ser_item",
             serializer = itemSerializer,
             deserializer = itemDeserializer,
             getter = { it.nullableJsonRaw },
@@ -48,7 +46,6 @@ abstract class AbstractProtoNullableSerializedFieldTest {
     @Test
     fun nullableSerializedField_setToNull() = runTest(testDispatcher) {
         val itemPref = protoDatastore.nullableSerializedField(
-            key = "nullable_ser_item",
             serializer = itemSerializer,
             deserializer = itemDeserializer,
             getter = { it.nullableJsonRaw },
@@ -62,7 +59,6 @@ abstract class AbstractProtoNullableSerializedFieldTest {
     @Test
     fun nullableSerializedField_deleteResetsToNull() = runTest(testDispatcher) {
         val itemPref = protoDatastore.nullableSerializedField(
-            key = "nullable_ser_item",
             serializer = itemSerializer,
             deserializer = itemDeserializer,
             getter = { it.nullableJsonRaw },
@@ -76,7 +72,6 @@ abstract class AbstractProtoNullableSerializedFieldTest {
     @Test
     fun nullableSerializedField_asFlowNullTransitions() = runTest(testDispatcher) {
         val itemPref = protoDatastore.nullableSerializedField(
-            key = "nullable_ser_item",
             serializer = itemSerializer,
             deserializer = itemDeserializer,
             getter = { it.nullableJsonRaw },
@@ -92,7 +87,6 @@ abstract class AbstractProtoNullableSerializedFieldTest {
     @Test
     fun nullableSerializedField_updateFromNullToValue() = runTest(testDispatcher) {
         val itemPref = protoDatastore.nullableSerializedField(
-            key = "nullable_ser_item",
             serializer = itemSerializer,
             deserializer = itemDeserializer,
             getter = { it.nullableJsonRaw },

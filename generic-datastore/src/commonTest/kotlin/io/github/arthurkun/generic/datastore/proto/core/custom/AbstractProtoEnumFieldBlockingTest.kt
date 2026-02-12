@@ -12,7 +12,6 @@ abstract class AbstractProtoEnumFieldBlockingTest {
     @Test
     fun enumField_getBlockingReturnsDefault() {
         val colorPref = protoDatastore.enumField(
-            key = "color",
             defaultValue = TestColor.RED,
             getter = { it.enumRaw },
             updater = { proto, raw -> proto.copy(enumRaw = raw) },
@@ -23,7 +22,6 @@ abstract class AbstractProtoEnumFieldBlockingTest {
     @Test
     fun enumField_setBlockingAndGetBlocking() {
         val colorPref = protoDatastore.enumField(
-            key = "color",
             defaultValue = TestColor.RED,
             getter = { it.enumRaw },
             updater = { proto, raw -> proto.copy(enumRaw = raw) },
@@ -35,7 +33,6 @@ abstract class AbstractProtoEnumFieldBlockingTest {
     @Test
     fun enumField_resetToDefaultBlocking() {
         val colorPref = protoDatastore.enumField(
-            key = "color",
             defaultValue = TestColor.RED,
             getter = { it.enumRaw },
             updater = { proto, raw -> proto.copy(enumRaw = raw) },
@@ -48,7 +45,6 @@ abstract class AbstractProtoEnumFieldBlockingTest {
     @Test
     fun enumField_propertyDelegation() {
         val colorPref = protoDatastore.enumField(
-            key = "color",
             defaultValue = TestColor.RED,
             getter = { it.enumRaw },
             updater = { proto, raw -> proto.copy(enumRaw = raw) },

@@ -12,7 +12,6 @@ abstract class AbstractProtoKserializedFieldBlockingTest {
     @Test
     fun kserializedField_getBlockingReturnsDefault() {
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
@@ -23,7 +22,6 @@ abstract class AbstractProtoKserializedFieldBlockingTest {
     @Test
     fun kserializedField_setBlockingAndGetBlocking() {
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
@@ -36,7 +34,6 @@ abstract class AbstractProtoKserializedFieldBlockingTest {
     @Test
     fun kserializedField_resetToDefaultBlocking() {
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
@@ -49,7 +46,6 @@ abstract class AbstractProtoKserializedFieldBlockingTest {
     @Test
     fun kserializedField_propertyDelegation() {
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },

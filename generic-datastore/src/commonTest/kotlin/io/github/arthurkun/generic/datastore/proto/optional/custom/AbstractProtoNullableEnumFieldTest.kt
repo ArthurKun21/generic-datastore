@@ -20,7 +20,6 @@ abstract class AbstractProtoNullableEnumFieldTest {
     @Test
     fun nullableEnumField_getReturnsNullWhenNotSet() = runTest(testDispatcher) {
         val colorPref: ProtoPreference<TestColor?> = protoDatastore.nullableEnumField(
-            key = "nullable_color",
             getter = { it.nullableEnumRaw },
             updater = { proto, raw -> proto.copy(nullableEnumRaw = raw) },
         )
@@ -30,7 +29,6 @@ abstract class AbstractProtoNullableEnumFieldTest {
     @Test
     fun nullableEnumField_setToNonNull() = runTest(testDispatcher) {
         val colorPref: ProtoPreference<TestColor?> = protoDatastore.nullableEnumField(
-            key = "nullable_color",
             getter = { it.nullableEnumRaw },
             updater = { proto, raw -> proto.copy(nullableEnumRaw = raw) },
         )
@@ -41,7 +39,6 @@ abstract class AbstractProtoNullableEnumFieldTest {
     @Test
     fun nullableEnumField_setToNull() = runTest(testDispatcher) {
         val colorPref: ProtoPreference<TestColor?> = protoDatastore.nullableEnumField(
-            key = "nullable_color",
             getter = { it.nullableEnumRaw },
             updater = { proto, raw -> proto.copy(nullableEnumRaw = raw) },
         )
@@ -53,7 +50,6 @@ abstract class AbstractProtoNullableEnumFieldTest {
     @Test
     fun nullableEnumField_deleteResetsToNull() = runTest(testDispatcher) {
         val colorPref: ProtoPreference<TestColor?> = protoDatastore.nullableEnumField(
-            key = "nullable_color",
             getter = { it.nullableEnumRaw },
             updater = { proto, raw -> proto.copy(nullableEnumRaw = raw) },
         )
@@ -65,7 +61,6 @@ abstract class AbstractProtoNullableEnumFieldTest {
     @Test
     fun nullableEnumField_asFlowNullTransitions() = runTest(testDispatcher) {
         val colorPref: ProtoPreference<TestColor?> = protoDatastore.nullableEnumField(
-            key = "nullable_color",
             getter = { it.nullableEnumRaw },
             updater = { proto, raw -> proto.copy(nullableEnumRaw = raw) },
         )
@@ -79,7 +74,6 @@ abstract class AbstractProtoNullableEnumFieldTest {
     @Test
     fun nullableEnumField_updateFromNullToValue() = runTest(testDispatcher) {
         val colorPref: ProtoPreference<TestColor?> = protoDatastore.nullableEnumField(
-            key = "nullable_color",
             getter = { it.nullableEnumRaw },
             updater = { proto, raw -> proto.copy(nullableEnumRaw = raw) },
         )

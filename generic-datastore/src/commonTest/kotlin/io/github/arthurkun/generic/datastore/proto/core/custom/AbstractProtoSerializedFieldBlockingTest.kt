@@ -15,7 +15,6 @@ abstract class AbstractProtoSerializedFieldBlockingTest {
     @Test
     fun serializedField_getBlockingReturnsDefault() {
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,
@@ -28,7 +27,6 @@ abstract class AbstractProtoSerializedFieldBlockingTest {
     @Test
     fun serializedField_setBlockingAndGetBlocking() {
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,
@@ -43,7 +41,6 @@ abstract class AbstractProtoSerializedFieldBlockingTest {
     @Test
     fun serializedField_resetToDefaultBlocking() {
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,
@@ -58,7 +55,6 @@ abstract class AbstractProtoSerializedFieldBlockingTest {
     @Test
     fun serializedField_propertyDelegation() {
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,

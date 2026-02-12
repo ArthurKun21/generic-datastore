@@ -17,7 +17,6 @@ abstract class AbstractProtoSerializedSetFieldBlockingTest {
     @Test
     fun serializedSetField_getBlockingReturnsEmptySet() {
         val setPref = protoDatastore.serializedSetField(
-            key = "ser_item_set",
             serializer = elemSerializer,
             deserializer = elemDeserializer,
             getter = { it.jsonSetRaw },
@@ -29,7 +28,6 @@ abstract class AbstractProtoSerializedSetFieldBlockingTest {
     @Test
     fun serializedSetField_setBlockingAndGetBlocking() {
         val setPref = protoDatastore.serializedSetField(
-            key = "ser_item_set",
             serializer = elemSerializer,
             deserializer = elemDeserializer,
             getter = { it.jsonSetRaw },
@@ -43,7 +41,6 @@ abstract class AbstractProtoSerializedSetFieldBlockingTest {
     @Test
     fun serializedSetField_resetToDefaultBlocking() {
         val setPref = protoDatastore.serializedSetField(
-            key = "ser_item_set",
             serializer = elemSerializer,
             deserializer = elemDeserializer,
             getter = { it.jsonSetRaw },
@@ -57,7 +54,6 @@ abstract class AbstractProtoSerializedSetFieldBlockingTest {
     @Test
     fun serializedSetField_propertyDelegation() {
         val setPref = protoDatastore.serializedSetField(
-            key = "ser_item_set",
             serializer = elemSerializer,
             deserializer = elemDeserializer,
             getter = { it.jsonSetRaw },

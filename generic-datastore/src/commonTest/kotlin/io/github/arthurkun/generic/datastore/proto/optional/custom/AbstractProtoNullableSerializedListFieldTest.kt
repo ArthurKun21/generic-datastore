@@ -22,7 +22,6 @@ abstract class AbstractProtoNullableSerializedListFieldTest {
     @Test
     fun nullableSerializedListField_getReturnsNull() = runTest(testDispatcher) {
         val listPref = protoDatastore.nullableSerializedListField(
-            key = "nullable_ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.nullableJsonListRaw },
@@ -34,7 +33,6 @@ abstract class AbstractProtoNullableSerializedListFieldTest {
     @Test
     fun nullableSerializedListField_setNonNullList() = runTest(testDispatcher) {
         val listPref = protoDatastore.nullableSerializedListField(
-            key = "nullable_ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.nullableJsonListRaw },
@@ -48,7 +46,6 @@ abstract class AbstractProtoNullableSerializedListFieldTest {
     @Test
     fun nullableSerializedListField_setNull() = runTest(testDispatcher) {
         val listPref = protoDatastore.nullableSerializedListField(
-            key = "nullable_ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.nullableJsonListRaw },
@@ -62,7 +59,6 @@ abstract class AbstractProtoNullableSerializedListFieldTest {
     @Test
     fun nullableSerializedListField_deleteResetsToNull() = runTest(testDispatcher) {
         val listPref = protoDatastore.nullableSerializedListField(
-            key = "nullable_ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.nullableJsonListRaw },
@@ -76,7 +72,6 @@ abstract class AbstractProtoNullableSerializedListFieldTest {
     @Test
     fun nullableSerializedListField_asFlowNullTransitions() = runTest(testDispatcher) {
         val listPref = protoDatastore.nullableSerializedListField(
-            key = "nullable_ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.nullableJsonListRaw },

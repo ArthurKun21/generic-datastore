@@ -14,7 +14,6 @@ abstract class AbstractProtoKserializedSetFieldBlockingTest {
     @Test
     fun kserializedSetField_getBlockingReturnsEmptySet() {
         val setPref = protoDatastore.kserializedSetField(
-            key = "item_set",
             defaultValue = emptySet<TestItem>(),
             getter = { it.jsonSetRaw },
             updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },
@@ -25,7 +24,6 @@ abstract class AbstractProtoKserializedSetFieldBlockingTest {
     @Test
     fun kserializedSetField_setBlockingAndGetBlocking() {
         val setPref = protoDatastore.kserializedSetField(
-            key = "item_set",
             defaultValue = emptySet<TestItem>(),
             getter = { it.jsonSetRaw },
             updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },
@@ -38,7 +36,6 @@ abstract class AbstractProtoKserializedSetFieldBlockingTest {
     @Test
     fun kserializedSetField_resetToDefaultBlocking() {
         val setPref = protoDatastore.kserializedSetField(
-            key = "item_set",
             defaultValue = emptySet<TestItem>(),
             getter = { it.jsonSetRaw },
             updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },
@@ -51,7 +48,6 @@ abstract class AbstractProtoKserializedSetFieldBlockingTest {
     @Test
     fun kserializedSetField_propertyDelegation() {
         val setPref = protoDatastore.kserializedSetField(
-            key = "item_set",
             defaultValue = emptySet<TestItem>(),
             getter = { it.jsonSetRaw },
             updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },

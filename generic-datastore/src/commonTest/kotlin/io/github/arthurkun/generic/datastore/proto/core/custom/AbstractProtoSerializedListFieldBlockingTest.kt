@@ -15,7 +15,6 @@ abstract class AbstractProtoSerializedListFieldBlockingTest {
     @Test
     fun serializedListField_getBlockingReturnsEmptyList() {
         val listPref = protoDatastore.serializedListField(
-            key = "ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.jsonListRaw },
@@ -27,7 +26,6 @@ abstract class AbstractProtoSerializedListFieldBlockingTest {
     @Test
     fun serializedListField_setBlockingAndGetBlocking() {
         val listPref = protoDatastore.serializedListField(
-            key = "ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.jsonListRaw },
@@ -41,7 +39,6 @@ abstract class AbstractProtoSerializedListFieldBlockingTest {
     @Test
     fun serializedListField_resetToDefaultBlocking() {
         val listPref = protoDatastore.serializedListField(
-            key = "ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.jsonListRaw },
@@ -55,7 +52,6 @@ abstract class AbstractProtoSerializedListFieldBlockingTest {
     @Test
     fun serializedListField_propertyDelegation() {
         val listPref = protoDatastore.serializedListField(
-            key = "ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.jsonListRaw },

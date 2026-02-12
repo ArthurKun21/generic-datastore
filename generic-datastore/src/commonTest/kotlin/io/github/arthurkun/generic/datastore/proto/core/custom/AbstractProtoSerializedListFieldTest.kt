@@ -19,7 +19,6 @@ abstract class AbstractProtoSerializedListFieldTest {
     @Test
     fun serializedListField_getReturnsEmptyDefault() = runTest(testDispatcher) {
         val listPref = protoDatastore.serializedListField(
-            key = "ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.jsonListRaw },
@@ -31,7 +30,6 @@ abstract class AbstractProtoSerializedListFieldTest {
     @Test
     fun serializedListField_setAndGetRoundTrip() = runTest(testDispatcher) {
         val listPref = protoDatastore.serializedListField(
-            key = "ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.jsonListRaw },
@@ -45,7 +43,6 @@ abstract class AbstractProtoSerializedListFieldTest {
     @Test
     fun serializedListField_asFlowEmitsUpdates() = runTest(testDispatcher) {
         val listPref = protoDatastore.serializedListField(
-            key = "ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.jsonListRaw },
@@ -59,7 +56,6 @@ abstract class AbstractProtoSerializedListFieldTest {
     @Test
     fun serializedListField_updateAppendsElement() = runTest(testDispatcher) {
         val listPref = protoDatastore.serializedListField(
-            key = "ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.jsonListRaw },
@@ -73,7 +69,6 @@ abstract class AbstractProtoSerializedListFieldTest {
     @Test
     fun serializedListField_deleteResetsToEmptyDefault() = runTest(testDispatcher) {
         val listPref = protoDatastore.serializedListField(
-            key = "ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.jsonListRaw },
@@ -87,7 +82,6 @@ abstract class AbstractProtoSerializedListFieldTest {
     @Test
     fun serializedListField_resetToDefault() = runTest(testDispatcher) {
         val listPref = protoDatastore.serializedListField(
-            key = "ser_item_list",
             elementSerializer = elemSerializer,
             elementDeserializer = elemDeserializer,
             getter = { it.jsonListRaw },

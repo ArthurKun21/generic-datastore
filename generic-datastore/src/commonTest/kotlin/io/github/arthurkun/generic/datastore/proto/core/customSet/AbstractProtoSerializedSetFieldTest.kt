@@ -21,7 +21,6 @@ abstract class AbstractProtoSerializedSetFieldTest {
     @Test
     fun serializedSetField_getReturnsEmptyDefault() = runTest(testDispatcher) {
         val setPref = protoDatastore.serializedSetField(
-            key = "ser_item_set",
             serializer = elemSerializer,
             deserializer = elemDeserializer,
             getter = { it.jsonSetRaw },
@@ -33,7 +32,6 @@ abstract class AbstractProtoSerializedSetFieldTest {
     @Test
     fun serializedSetField_setAndGetRoundTrip() = runTest(testDispatcher) {
         val setPref = protoDatastore.serializedSetField(
-            key = "ser_item_set",
             serializer = elemSerializer,
             deserializer = elemDeserializer,
             getter = { it.jsonSetRaw },
@@ -47,7 +45,6 @@ abstract class AbstractProtoSerializedSetFieldTest {
     @Test
     fun serializedSetField_asFlowEmitsUpdates() = runTest(testDispatcher) {
         val setPref = protoDatastore.serializedSetField(
-            key = "ser_item_set",
             serializer = elemSerializer,
             deserializer = elemDeserializer,
             getter = { it.jsonSetRaw },
@@ -61,7 +58,6 @@ abstract class AbstractProtoSerializedSetFieldTest {
     @Test
     fun serializedSetField_updateAddsElement() = runTest(testDispatcher) {
         val setPref = protoDatastore.serializedSetField(
-            key = "ser_item_set",
             serializer = elemSerializer,
             deserializer = elemDeserializer,
             getter = { it.jsonSetRaw },
@@ -75,7 +71,6 @@ abstract class AbstractProtoSerializedSetFieldTest {
     @Test
     fun serializedSetField_deleteResetsToEmpty() = runTest(testDispatcher) {
         val setPref = protoDatastore.serializedSetField(
-            key = "ser_item_set",
             serializer = elemSerializer,
             deserializer = elemDeserializer,
             getter = { it.jsonSetRaw },
@@ -89,7 +84,6 @@ abstract class AbstractProtoSerializedSetFieldTest {
     @Test
     fun serializedSetField_resetToDefault() = runTest(testDispatcher) {
         val setPref = protoDatastore.serializedSetField(
-            key = "ser_item_set",
             serializer = elemSerializer,
             deserializer = elemDeserializer,
             getter = { it.jsonSetRaw },

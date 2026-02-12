@@ -16,7 +16,6 @@ abstract class AbstractProtoKserializedFieldTest {
     @Test
     fun kserializedField_getReturnsDefaultWhenNotSet() = runTest(testDispatcher) {
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
@@ -27,7 +26,6 @@ abstract class AbstractProtoKserializedFieldTest {
     @Test
     fun kserializedField_setAndGetRoundTrip() = runTest(testDispatcher) {
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
@@ -40,7 +38,6 @@ abstract class AbstractProtoKserializedFieldTest {
     @Test
     fun kserializedField_asFlowEmitsUpdates() = runTest(testDispatcher) {
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
@@ -53,7 +50,6 @@ abstract class AbstractProtoKserializedFieldTest {
     @Test
     fun kserializedField_updateAtomically() = runTest(testDispatcher) {
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
@@ -66,7 +62,6 @@ abstract class AbstractProtoKserializedFieldTest {
     @Test
     fun kserializedField_deleteResetsToDefault() = runTest(testDispatcher) {
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
@@ -79,7 +74,6 @@ abstract class AbstractProtoKserializedFieldTest {
     @Test
     fun kserializedField_resetToDefault() = runTest(testDispatcher) {
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
@@ -92,14 +86,12 @@ abstract class AbstractProtoKserializedFieldTest {
     @Test
     fun kserializedField_corruptedDataFallsBackToDefault() = runTest(testDispatcher) {
         val rawPref = protoDatastore.field(
-            key = "json_raw_direct",
             defaultValue = "",
             getter = { it.jsonRaw },
             updater = { proto, value -> proto.copy(jsonRaw = value) },
         )
         rawPref.set("{not valid json!!")
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
@@ -110,13 +102,11 @@ abstract class AbstractProtoKserializedFieldTest {
     @Test
     fun kserializedField_doesNotAffectOtherFields() = runTest(testDispatcher) {
         val itemPref = protoDatastore.kserializedField(
-            key = "item",
             defaultValue = TestItem(),
             getter = { it.jsonRaw },
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
         )
         val enumRawPref = protoDatastore.field(
-            key = "enum_raw",
             defaultValue = "",
             getter = { it.enumRaw },
             updater = { proto, value -> proto.copy(enumRaw = value) },

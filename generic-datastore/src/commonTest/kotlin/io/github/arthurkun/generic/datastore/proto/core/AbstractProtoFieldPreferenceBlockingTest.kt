@@ -13,7 +13,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
     @Test
     fun field_getBlockingReturnsDefault() {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -24,7 +23,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
     @Test
     fun field_setBlockingAndGetBlocking() {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -36,7 +34,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
     @Test
     fun field_resetToDefaultBlocking() {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -49,7 +46,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
     @Test
     fun field_propertyDelegation() {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -64,7 +60,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
     @Test
     fun field_getBlockingReturnsDefaultForNickname() {
         val nicknamePref = protoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile.nickname },
             updater = { proto, value ->
@@ -77,7 +72,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
     @Test
     fun field_setBlockingAgeRoundTrip() {
         val agePref = protoDatastore.field(
-            key = "profile_age",
             defaultValue = 0,
             getter = { it.profile.age },
             updater = { proto, value ->
@@ -91,7 +85,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
     @Test
     fun field_propertyDelegationForNickname() {
         val nicknamePref = protoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile.nickname },
             updater = { proto, value ->
@@ -108,7 +101,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
     @Test
     fun field_getBlockingReturnsDefaultForCity() {
         val cityPref = protoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile.address.city },
             updater = { proto, value ->
@@ -125,7 +117,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
     @Test
     fun field_setBlockingCityRoundTrip() {
         val cityPref = protoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile.address.city },
             updater = { proto, value ->
@@ -143,7 +134,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
     @Test
     fun field_resetToDefaultBlockingOnStreetDoesNotAffectSiblings() {
         val streetPref = protoDatastore.field(
-            key = "profile_address_street",
             defaultValue = "",
             getter = { it.profile.address.street },
             updater = { proto, value ->
@@ -155,7 +145,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
             },
         )
         val cityPref = protoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile.address.city },
             updater = { proto, value ->
@@ -176,7 +165,6 @@ abstract class AbstractProtoFieldPreferenceBlockingTest {
     @Test
     fun field_propertyDelegationForZipCode() {
         val zipPref = protoDatastore.field(
-            key = "profile_address_zip",
             defaultValue = "",
             getter = { it.profile.address.zipCode },
             updater = { proto, value ->

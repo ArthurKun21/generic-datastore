@@ -16,7 +16,6 @@ abstract class AbstractProtoNullableKserializedFieldBlockingTest {
     @Test
     fun nullableKserializedField_getBlockingReturnsNull() {
         val itemPref: ProtoPreference<TestItem?> = protoDatastore.nullableKserializedField(
-            key = "nullable_item",
             getter = { it.nullableJsonRaw },
             updater = { proto, raw -> proto.copy(nullableJsonRaw = raw) },
         )
@@ -26,7 +25,6 @@ abstract class AbstractProtoNullableKserializedFieldBlockingTest {
     @Test
     fun nullableKserializedField_setBlockingAndGetBlocking() {
         val itemPref: ProtoPreference<TestItem?> = protoDatastore.nullableKserializedField(
-            key = "nullable_item",
             getter = { it.nullableJsonRaw },
             updater = { proto, raw -> proto.copy(nullableJsonRaw = raw) },
         )
@@ -38,7 +36,6 @@ abstract class AbstractProtoNullableKserializedFieldBlockingTest {
     @Test
     fun nullableKserializedField_setBlockingNull() {
         val itemPref: ProtoPreference<TestItem?> = protoDatastore.nullableKserializedField(
-            key = "nullable_item",
             getter = { it.nullableJsonRaw },
             updater = { proto, raw -> proto.copy(nullableJsonRaw = raw) },
         )
@@ -50,7 +47,6 @@ abstract class AbstractProtoNullableKserializedFieldBlockingTest {
     @Test
     fun nullableKserializedField_resetToDefaultBlocking() {
         val itemPref: ProtoPreference<TestItem?> = protoDatastore.nullableKserializedField(
-            key = "nullable_item",
             getter = { it.nullableJsonRaw },
             updater = { proto, raw -> proto.copy(nullableJsonRaw = raw) },
         )
@@ -62,7 +58,6 @@ abstract class AbstractProtoNullableKserializedFieldBlockingTest {
     @Test
     fun nullableKserializedField_propertyDelegation() {
         val itemPref: ProtoPreference<TestItem?> = protoDatastore.nullableKserializedField(
-            key = "nullable_item",
             getter = { it.nullableJsonRaw },
             updater = { proto, raw -> proto.copy(nullableJsonRaw = raw) },
         )

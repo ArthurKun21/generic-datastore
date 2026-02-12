@@ -6,7 +6,6 @@ import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 abstract class AbstractProtoFieldPreferenceTest {
 
@@ -18,7 +17,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_readsTopLevelName() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -30,7 +28,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_readsTopLevelId() = runTest(testDispatcher) {
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, value -> proto.copy(id = value) },
@@ -42,7 +39,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_getReturnsDefaultWhenProtoAtDefault() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -53,13 +49,11 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_setUpdatesOnlyTargetedField() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
         )
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, value -> proto.copy(id = value) },
@@ -73,7 +67,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_asFlowEmitsWhenFieldChanges() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -86,13 +79,11 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_asFlowReEmitsWhenUnrelatedFieldChanges() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
         )
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, value -> proto.copy(id = value) },
@@ -106,7 +97,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_updateAtomicallyReadsAndWrites() = runTest(testDispatcher) {
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, value -> proto.copy(id = value) },
@@ -119,7 +109,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_deleteResetsToDefault() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -132,7 +121,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_resetToDefaultResetsToDefault() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -145,24 +133,21 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_keyReturnsConfiguredKey() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "my_name_key",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
         )
-        assertEquals("my_name_key", namePref.key())
+        assertEquals("proto_datastore", namePref.key())
     }
 
     @Test
-    fun field_blankKeyThrows() {
-        assertFailsWith<IllegalArgumentException> {
-            protoDatastore.field(
-                key = " ",
-                defaultValue = "",
-                getter = { it.name },
-                updater = { proto, value -> proto.copy(name = value) },
-            )
-        }
+    fun field_usesDatastoreKey() {
+        val namePref = protoDatastore.field(
+            defaultValue = "",
+            getter = { it.name },
+            updater = { proto, value -> proto.copy(name = value) },
+        )
+        assertEquals("proto_datastore", namePref.key())
     }
 
     // ---- Nested field tests (level 2 — profile.*) ----
@@ -170,7 +155,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_readsProfileNickname() = runTest(testDispatcher) {
         val nicknamePref = protoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile.nickname },
             updater = { proto, value ->
@@ -184,7 +168,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_getReturnsDefaultForProfileNickname() = runTest(testDispatcher) {
         val nicknamePref = protoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile.nickname },
             updater = { proto, value ->
@@ -197,7 +180,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_setOnNicknameDoesNotAffectAgeOrTopLevel() = runTest(testDispatcher) {
         val nicknamePref = protoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile.nickname },
             updater = { proto, value ->
@@ -205,7 +187,6 @@ abstract class AbstractProtoFieldPreferenceTest {
             },
         )
         val agePref = protoDatastore.field(
-            key = "profile_age",
             defaultValue = 0,
             getter = { it.profile.age },
             updater = { proto, value ->
@@ -213,7 +194,6 @@ abstract class AbstractProtoFieldPreferenceTest {
             },
         )
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -228,7 +208,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_updateOnAgeAtomicallyIncrements() = runTest(testDispatcher) {
         val agePref = protoDatastore.field(
-            key = "profile_age",
             defaultValue = 0,
             getter = { it.profile.age },
             updater = { proto, value ->
@@ -245,7 +224,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_readsProfileAddressCity() = runTest(testDispatcher) {
         val cityPref = protoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile.address.city },
             updater = { proto, value ->
@@ -263,7 +241,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_getReturnsDefaultForCity() = runTest(testDispatcher) {
         val cityPref = protoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile.address.city },
             updater = { proto, value ->
@@ -280,7 +257,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_setOnCityDoesNotAffectStreetOrZipCode() = runTest(testDispatcher) {
         val cityPref = protoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile.address.city },
             updater = { proto, value ->
@@ -292,7 +268,6 @@ abstract class AbstractProtoFieldPreferenceTest {
             },
         )
         val streetPref = protoDatastore.field(
-            key = "profile_address_street",
             defaultValue = "",
             getter = { it.profile.address.street },
             updater = { proto, value ->
@@ -304,7 +279,6 @@ abstract class AbstractProtoFieldPreferenceTest {
             },
         )
         val zipPref = protoDatastore.field(
-            key = "profile_address_zip",
             defaultValue = "",
             getter = { it.profile.address.zipCode },
             updater = { proto, value ->
@@ -325,7 +299,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_setOnStreetDoesNotAffectNicknameOrName() = runTest(testDispatcher) {
         val streetPref = protoDatastore.field(
-            key = "profile_address_street",
             defaultValue = "",
             getter = { it.profile.address.street },
             updater = { proto, value ->
@@ -337,7 +310,6 @@ abstract class AbstractProtoFieldPreferenceTest {
             },
         )
         val nicknamePref = protoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile.nickname },
             updater = { proto, value ->
@@ -345,7 +317,6 @@ abstract class AbstractProtoFieldPreferenceTest {
             },
         )
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -360,7 +331,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_asFlowOnZipCodeEmitsWhenChanged() = runTest(testDispatcher) {
         val zipPref = protoDatastore.field(
-            key = "profile_address_zip",
             defaultValue = "",
             getter = { it.profile.address.zipCode },
             updater = { proto, value ->
@@ -379,7 +349,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_updateOnCityAtomicallyAppendsSuffix() = runTest(testDispatcher) {
         val cityPref = protoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile.address.city },
             updater = { proto, value ->
@@ -398,7 +367,6 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_deleteOnCityResetsWithoutAffectingSiblings() = runTest(testDispatcher) {
         val cityPref = protoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile.address.city },
             updater = { proto, value ->
@@ -410,7 +378,6 @@ abstract class AbstractProtoFieldPreferenceTest {
             },
         )
         val streetPref = protoDatastore.field(
-            key = "profile_address_street",
             defaultValue = "",
             getter = { it.profile.address.street },
             updater = { proto, value ->
@@ -431,13 +398,11 @@ abstract class AbstractProtoFieldPreferenceTest {
     @Test
     fun field_multipleFieldsFromDifferentLevelsCoexist() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
         )
         val agePref = protoDatastore.field(
-            key = "profile_age",
             defaultValue = 0,
             getter = { it.profile.age },
             updater = { proto, value ->
@@ -445,7 +410,6 @@ abstract class AbstractProtoFieldPreferenceTest {
             },
         )
         val cityPref = protoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile.address.city },
             updater = { proto, value ->

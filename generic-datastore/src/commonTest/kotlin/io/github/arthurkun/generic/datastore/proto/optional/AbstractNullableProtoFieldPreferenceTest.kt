@@ -18,7 +18,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_getNullLabelWhenNotSet() = runTest(testDispatcher) {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -29,7 +28,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setLabelToNonNull() = runTest(testDispatcher) {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -41,7 +39,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setLabelToNull() = runTest(testDispatcher) {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -54,7 +51,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_deleteLabelResetsToNull() = runTest(testDispatcher) {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -67,7 +63,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_asFlowLabelNullTransitions() = runTest(testDispatcher) {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -84,7 +79,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_getNullProfileWhenNotSet() = runTest(testDispatcher) {
         val profilePref = nullableProtoDatastore.field(
-            key = "profile",
             defaultValue = null as TestNullableProfile?,
             getter = { it.profile },
             updater = { proto, value -> proto.copy(profile = value) },
@@ -95,7 +89,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setProfileToNonNull() = runTest(testDispatcher) {
         val profilePref = nullableProtoDatastore.field(
-            key = "profile",
             defaultValue = null as TestNullableProfile?,
             getter = { it.profile },
             updater = { proto, value -> proto.copy(profile = value) },
@@ -108,7 +101,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setProfileToNull() = runTest(testDispatcher) {
         val profilePref = nullableProtoDatastore.field(
-            key = "profile",
             defaultValue = null as TestNullableProfile?,
             getter = { it.profile },
             updater = { proto, value -> proto.copy(profile = value) },
@@ -121,7 +113,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_updateNullableMessage() = runTest(testDispatcher) {
         val profilePref = nullableProtoDatastore.field(
-            key = "profile",
             defaultValue = null as TestNullableProfile?,
             getter = { it.profile },
             updater = { proto, value -> proto.copy(profile = value) },
@@ -136,7 +127,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_getNicknameDefaultWhenProfileNull() = runTest(testDispatcher) {
         val nicknamePref = nullableProtoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile?.nickname ?: "" },
             updater = { proto, value ->
@@ -151,7 +141,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setNicknameAutoCreatesProfile() = runTest(testDispatcher) {
         val nicknamePref = nullableProtoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile?.nickname ?: "" },
             updater = { proto, value ->
@@ -167,7 +156,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setNicknameDoesNotAffectAge() = runTest(testDispatcher) {
         val nicknamePref = nullableProtoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile?.nickname ?: "" },
             updater = { proto, value ->
@@ -177,7 +165,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
             },
         )
         val agePref = nullableProtoDatastore.field(
-            key = "profile_age",
             defaultValue = null as Int?,
             getter = { it.profile?.age },
             updater = { proto, value ->
@@ -196,7 +183,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_getNullAgeWhenProfileNull() = runTest(testDispatcher) {
         val agePref = nullableProtoDatastore.field(
-            key = "profile_age",
             defaultValue = null as Int?,
             getter = { it.profile?.age },
             updater = { proto, value ->
@@ -211,7 +197,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setAgeAutoCreatesProfile() = runTest(testDispatcher) {
         val agePref = nullableProtoDatastore.field(
-            key = "profile_age",
             defaultValue = null as Int?,
             getter = { it.profile?.age },
             updater = { proto, value ->
@@ -227,7 +212,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setAgeNullWithoutClearingProfile() = runTest(testDispatcher) {
         val agePref = nullableProtoDatastore.field(
-            key = "profile_age",
             defaultValue = null as Int?,
             getter = { it.profile?.age },
             updater = { proto, value ->
@@ -237,7 +221,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
             },
         )
         val nicknamePref = nullableProtoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile?.nickname ?: "" },
             updater = { proto, value ->
@@ -256,7 +239,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_deleteAgeResetsToNull() = runTest(testDispatcher) {
         val agePref = nullableProtoDatastore.field(
-            key = "profile_age",
             defaultValue = null as Int?,
             getter = { it.profile?.age },
             updater = { proto, value ->
@@ -275,7 +257,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_getCityDefaultWhenChainNull() = runTest(testDispatcher) {
         val cityPref = nullableProtoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile?.address?.city ?: "" },
             updater = { proto, value ->
@@ -294,7 +275,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setCityAutoCreatesBothParents() = runTest(testDispatcher) {
         val cityPref = nullableProtoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile?.address?.city ?: "" },
             updater = { proto, value ->
@@ -314,7 +294,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setCityDoesNotAffectStreetOrCoordinates() = runTest(testDispatcher) {
         val cityPref = nullableProtoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile?.address?.city ?: "" },
             updater = { proto, value ->
@@ -328,7 +307,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
             },
         )
         val streetPref = nullableProtoDatastore.field(
-            key = "profile_address_street",
             defaultValue = "",
             getter = { it.profile?.address?.street ?: "" },
             updater = { proto, value ->
@@ -342,7 +320,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
             },
         )
         val coordsPref = nullableProtoDatastore.field(
-            key = "profile_address_coordinates",
             defaultValue = null as TestCoordinates?,
             getter = { it.profile?.address?.coordinates },
             updater = { proto, value ->
@@ -365,7 +342,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_updateCityAppendsSuffix() = runTest(testDispatcher) {
         val cityPref = nullableProtoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile?.address?.city ?: "" },
             updater = { proto, value ->
@@ -386,7 +362,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_deleteCityWithoutNullifyingParents() = runTest(testDispatcher) {
         val cityPref = nullableProtoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile?.address?.city ?: "" },
             updater = { proto, value ->
@@ -400,7 +375,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
             },
         )
         val streetPref = nullableProtoDatastore.field(
-            key = "profile_address_street",
             defaultValue = "",
             getter = { it.profile?.address?.street ?: "" },
             updater = { proto, value ->
@@ -425,7 +399,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_getCoordinatesNullWhenNotSet() = runTest(testDispatcher) {
         val coordsPref = nullableProtoDatastore.field(
-            key = "profile_address_coordinates",
             defaultValue = null as TestCoordinates?,
             getter = { it.profile?.address?.coordinates },
             updater = { proto, value ->
@@ -444,7 +417,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setCoordinatesAutoCreatesParents() = runTest(testDispatcher) {
         val coordsPref = nullableProtoDatastore.field(
-            key = "profile_address_coordinates",
             defaultValue = null as TestCoordinates?,
             getter = { it.profile?.address?.coordinates },
             updater = { proto, value ->
@@ -464,7 +436,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setCoordinatesNullWithoutAffectingCity() = runTest(testDispatcher) {
         val coordsPref = nullableProtoDatastore.field(
-            key = "profile_address_coordinates",
             defaultValue = null as TestCoordinates?,
             getter = { it.profile?.address?.coordinates },
             updater = { proto, value ->
@@ -478,7 +449,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
             },
         )
         val cityPref = nullableProtoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile?.address?.city ?: "" },
             updater = { proto, value ->
@@ -501,7 +471,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_deleteCoordinatesResetsToNull() = runTest(testDispatcher) {
         val coordsPref = nullableProtoDatastore.field(
-            key = "profile_address_coordinates",
             defaultValue = null as TestCoordinates?,
             getter = { it.profile?.address?.coordinates },
             updater = { proto, value ->
@@ -524,13 +493,11 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_crossLevelIsolation() = runTest(testDispatcher) {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
         )
         val nicknamePref = nullableProtoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile?.nickname ?: "" },
             updater = { proto, value ->
@@ -540,7 +507,6 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
             },
         )
         val cityPref = nullableProtoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile?.address?.city ?: "" },
             updater = { proto, value ->
@@ -564,19 +530,16 @@ abstract class AbstractNullableProtoFieldPreferenceTest {
     @Test
     fun field_setProfileNullClearsNestedButNotLabel() = runTest(testDispatcher) {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
         )
         val profilePref = nullableProtoDatastore.field(
-            key = "profile",
             defaultValue = null as TestNullableProfile?,
             getter = { it.profile },
             updater = { proto, value -> proto.copy(profile = value) },
         )
         val nicknamePref = nullableProtoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile?.nickname ?: "" },
             updater = { proto, value ->

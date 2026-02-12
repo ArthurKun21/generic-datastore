@@ -18,7 +18,6 @@ abstract class AbstractProtoEnumSetFieldTest {
     @Test
     fun enumSetField_getReturnsEmptyDefault() = runTest(testDispatcher) {
         val colorsPref = protoDatastore.enumSetField(
-            key = "colors",
             defaultValue = emptySet<TestColor>(),
             getter = { it.enumSetRaw },
             updater = { proto, raw -> proto.copy(enumSetRaw = raw) },
@@ -29,7 +28,6 @@ abstract class AbstractProtoEnumSetFieldTest {
     @Test
     fun enumSetField_setAndGetRoundTrip() = runTest(testDispatcher) {
         val colorsPref = protoDatastore.enumSetField(
-            key = "colors",
             defaultValue = emptySet<TestColor>(),
             getter = { it.enumSetRaw },
             updater = { proto, raw -> proto.copy(enumSetRaw = raw) },
@@ -41,7 +39,6 @@ abstract class AbstractProtoEnumSetFieldTest {
     @Test
     fun enumSetField_asFlowEmitsUpdates() = runTest(testDispatcher) {
         val colorsPref = protoDatastore.enumSetField(
-            key = "colors",
             defaultValue = emptySet<TestColor>(),
             getter = { it.enumSetRaw },
             updater = { proto, raw -> proto.copy(enumSetRaw = raw) },
@@ -54,7 +51,6 @@ abstract class AbstractProtoEnumSetFieldTest {
     @Test
     fun enumSetField_updateAddsElement() = runTest(testDispatcher) {
         val colorsPref = protoDatastore.enumSetField(
-            key = "colors",
             defaultValue = emptySet<TestColor>(),
             getter = { it.enumSetRaw },
             updater = { proto, raw -> proto.copy(enumSetRaw = raw) },
@@ -67,7 +63,6 @@ abstract class AbstractProtoEnumSetFieldTest {
     @Test
     fun enumSetField_updateRemovesElement() = runTest(testDispatcher) {
         val colorsPref = protoDatastore.enumSetField(
-            key = "colors",
             defaultValue = emptySet<TestColor>(),
             getter = { it.enumSetRaw },
             updater = { proto, raw -> proto.copy(enumSetRaw = raw) },
@@ -80,7 +75,6 @@ abstract class AbstractProtoEnumSetFieldTest {
     @Test
     fun enumSetField_deleteResetsToEmpty() = runTest(testDispatcher) {
         val colorsPref = protoDatastore.enumSetField(
-            key = "colors",
             defaultValue = emptySet<TestColor>(),
             getter = { it.enumSetRaw },
             updater = { proto, raw -> proto.copy(enumSetRaw = raw) },
@@ -93,7 +87,6 @@ abstract class AbstractProtoEnumSetFieldTest {
     @Test
     fun enumSetField_resetToDefault() = runTest(testDispatcher) {
         val colorsPref = protoDatastore.enumSetField(
-            key = "colors",
             defaultValue = emptySet<TestColor>(),
             getter = { it.enumSetRaw },
             updater = { proto, raw -> proto.copy(enumSetRaw = raw) },

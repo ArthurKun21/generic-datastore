@@ -12,7 +12,6 @@ abstract class AbstractNullableProtoFieldPreferenceBlockingTest {
     @Test
     fun field_getBlockingNullForNullableDefault() {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -23,7 +22,6 @@ abstract class AbstractNullableProtoFieldPreferenceBlockingTest {
     @Test
     fun field_setBlockingAndGetBlockingNullableScalar() {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -35,7 +33,6 @@ abstract class AbstractNullableProtoFieldPreferenceBlockingTest {
     @Test
     fun field_setBlockingNullClearsNullableField() {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -48,7 +45,6 @@ abstract class AbstractNullableProtoFieldPreferenceBlockingTest {
     @Test
     fun field_resetToDefaultBlockingNullableField() {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -61,7 +57,6 @@ abstract class AbstractNullableProtoFieldPreferenceBlockingTest {
     @Test
     fun field_propertyDelegationNullableField() {
         val labelPref = nullableProtoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -77,7 +72,6 @@ abstract class AbstractNullableProtoFieldPreferenceBlockingTest {
     @Test
     fun field_getBlockingNonNullInsideNullableParent() {
         val nicknamePref = nullableProtoDatastore.field(
-            key = "profile_nickname",
             defaultValue = "",
             getter = { it.profile?.nickname ?: "" },
             updater = { proto, value ->
@@ -92,7 +86,6 @@ abstract class AbstractNullableProtoFieldPreferenceBlockingTest {
     @Test
     fun field_setBlockingDeeplyNestedAutoCreatesParents() {
         val cityPref = nullableProtoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile?.address?.city ?: "" },
             updater = { proto, value ->
@@ -112,7 +105,6 @@ abstract class AbstractNullableProtoFieldPreferenceBlockingTest {
     @Test
     fun field_propertyDelegationDeeplyNested() {
         val cityPref = nullableProtoDatastore.field(
-            key = "profile_address_city",
             defaultValue = "",
             getter = { it.profile?.address?.city ?: "" },
             updater = { proto, value ->

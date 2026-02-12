@@ -12,7 +12,6 @@ abstract class AbstractProtoKserializedListFieldBlockingTest {
     @Test
     fun kserializedListField_getBlockingReturnsEmptyList() {
         val listPref = protoDatastore.kserializedListField(
-            key = "item_list",
             defaultValue = emptyList<TestItem>(),
             getter = { it.jsonListRaw },
             updater = { proto, raw -> proto.copy(jsonListRaw = raw) },
@@ -23,7 +22,6 @@ abstract class AbstractProtoKserializedListFieldBlockingTest {
     @Test
     fun kserializedListField_setBlockingAndGetBlocking() {
         val listPref = protoDatastore.kserializedListField(
-            key = "item_list",
             defaultValue = emptyList<TestItem>(),
             getter = { it.jsonListRaw },
             updater = { proto, raw -> proto.copy(jsonListRaw = raw) },
@@ -36,7 +34,6 @@ abstract class AbstractProtoKserializedListFieldBlockingTest {
     @Test
     fun kserializedListField_resetToDefaultBlocking() {
         val listPref = protoDatastore.kserializedListField(
-            key = "item_list",
             defaultValue = emptyList<TestItem>(),
             getter = { it.jsonListRaw },
             updater = { proto, raw -> proto.copy(jsonListRaw = raw) },
@@ -49,7 +46,6 @@ abstract class AbstractProtoKserializedListFieldBlockingTest {
     @Test
     fun kserializedListField_propertyDelegation() {
         val listPref = protoDatastore.kserializedListField(
-            key = "item_list",
             defaultValue = emptyList<TestItem>(),
             getter = { it.jsonListRaw },
             updater = { proto, raw -> proto.copy(jsonListRaw = raw) },

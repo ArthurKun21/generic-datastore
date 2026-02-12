@@ -95,7 +95,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_idGetBlockingDefault() {
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, value -> proto.copy(id = value) },
@@ -106,7 +105,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_idSetBlockingAndGetBlocking() {
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, value -> proto.copy(id = value) },
@@ -118,7 +116,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_nameSetBlockingAndGetBlocking() {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -130,7 +127,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_nameResetToDefaultBlocking() {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -143,7 +139,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_nameDelegation() {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -163,7 +158,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_labelBlockingDefaultIsNull() {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -174,7 +168,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_labelBlockingSetAndGet() {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -186,7 +179,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_labelBlockingSetToNull() {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -199,7 +191,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_labelBlockingResetToDefaultNull() {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -212,7 +203,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_labelBlockingDelegation() {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -232,7 +222,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_profileBlockingSetAndGet() {
         val profilePref = protoDatastore.field(
-            key = "profile",
             defaultValue = null as TestNullableProfile?,
             getter = { it.profile },
             updater = { proto, value -> proto.copy(profile = value) },
@@ -252,7 +241,6 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_coordinatesBlockingRoundTrip() {
         val coordsPref = protoDatastore.field(
-            key = "coords",
             defaultValue = null as TestCoordinates?,
             getter = { it.profile?.address?.coordinates },
             updater = { proto, value ->
@@ -275,13 +263,11 @@ abstract class AbstractNullableProtoDatastoreBlockingTest {
     @Test
     fun field_blockingCrossFieldIsolation() {
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, value -> proto.copy(id = value) },
         )
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },

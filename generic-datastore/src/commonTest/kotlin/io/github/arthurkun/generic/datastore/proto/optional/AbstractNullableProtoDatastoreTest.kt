@@ -157,13 +157,12 @@ abstract class AbstractNullableProtoDatastoreTest {
 
     @Test
     fun protoPreference_blankKeyThrows() = runTest(testDispatcher) {
-        val blankKeyDatastore = GenericProtoDatastore(
-            datastore = protoDatastore.datastore,
-            defaultValue = TestNullableProtoData(),
-            key = " ",
-        )
         assertFailsWith<IllegalArgumentException> {
-            blankKeyDatastore.data()
+            GenericProtoDatastore(
+                datastore = protoDatastore.datastore,
+                defaultValue = TestNullableProtoData(),
+                key = " ",
+            ).data()
         }
     }
 
@@ -172,7 +171,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_idDefaultValue() = runTest(testDispatcher) {
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, value -> proto.copy(id = value) },
@@ -183,7 +181,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_idSetAndGet() = runTest(testDispatcher) {
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, value -> proto.copy(id = value) },
@@ -195,7 +192,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_nameSetAndGet() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -207,7 +203,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_nameObserveFlow() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -219,7 +214,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_nameUpdate() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -232,7 +226,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_nameDeleteResetsToDefault() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -245,7 +238,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_nameResetToDefault() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
@@ -258,24 +250,21 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_keyReturnsConfiguredKey() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "my_name_key",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
         )
-        assertEquals("my_name_key", namePref.key())
+        assertEquals("proto_datastore", namePref.key())
     }
 
     @Test
-    fun field_blankKeyThrows() = runTest(testDispatcher) {
-        assertFailsWith<IllegalArgumentException> {
-            protoDatastore.field(
-                key = " ",
-                defaultValue = "",
-                getter = { it.name },
-                updater = { proto, value -> proto.copy(name = value) },
-            )
-        }
+    fun field_usesDatastoreKey() = runTest(testDispatcher) {
+        val namePref = protoDatastore.field(
+            defaultValue = "",
+            getter = { it.name },
+            updater = { proto, value -> proto.copy(name = value) },
+        )
+        assertEquals("proto_datastore", namePref.key())
     }
 
     // ── field() – top-level nullable fields ─────────────────────────────
@@ -283,7 +272,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_labelDefaultIsNull() = runTest(testDispatcher) {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -294,7 +282,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_labelSetNonNull() = runTest(testDispatcher) {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -306,7 +293,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_labelSetNullExplicitly() = runTest(testDispatcher) {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -321,7 +307,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_labelObserveNull() = runTest(testDispatcher) {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -332,7 +317,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_labelUpdateFromNullToValue() = runTest(testDispatcher) {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -345,7 +329,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_labelUpdateFromValueToNull() = runTest(testDispatcher) {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -358,7 +341,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_labelDeleteResetsToDefaultNull() = runTest(testDispatcher) {
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -373,7 +355,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_profileDefaultIsNull() = runTest(testDispatcher) {
         val profilePref = protoDatastore.field(
-            key = "profile",
             defaultValue = null as TestNullableProfile?,
             getter = { it.profile },
             updater = { proto, value -> proto.copy(profile = value) },
@@ -384,7 +365,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_profileSetAndGet() = runTest(testDispatcher) {
         val profilePref = protoDatastore.field(
-            key = "profile",
             defaultValue = null as TestNullableProfile?,
             getter = { it.profile },
             updater = { proto, value -> proto.copy(profile = value) },
@@ -397,7 +377,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_profileSetToNull() = runTest(testDispatcher) {
         val profilePref = protoDatastore.field(
-            key = "profile",
             defaultValue = null as TestNullableProfile?,
             getter = { it.profile },
             updater = { proto, value -> proto.copy(profile = value) },
@@ -410,7 +389,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_profileUpdateNested() = runTest(testDispatcher) {
         val profilePref = protoDatastore.field(
-            key = "profile",
             defaultValue = null as TestNullableProfile?,
             getter = { it.profile },
             updater = { proto, value -> proto.copy(profile = value) },
@@ -423,7 +401,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_profileResetToDefaultNull() = runTest(testDispatcher) {
         val profilePref = protoDatastore.field(
-            key = "profile",
             defaultValue = null as TestNullableProfile?,
             getter = { it.profile },
             updater = { proto, value -> proto.copy(profile = value) },
@@ -438,7 +415,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_nestedAddressDefaultIsNull() = runTest(testDispatcher) {
         val addressPref = protoDatastore.field(
-            key = "profile_address",
             defaultValue = null as TestNullableAddress?,
             getter = { it.profile?.address },
             updater = { proto, value ->
@@ -453,7 +429,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_nestedAddressSetWhenProfileIsNull() = runTest(testDispatcher) {
         val addressPref = protoDatastore.field(
-            key = "profile_address",
             defaultValue = null as TestNullableAddress?,
             getter = { it.profile?.address },
             updater = { proto, value ->
@@ -484,7 +459,6 @@ abstract class AbstractNullableProtoDatastoreTest {
         )
 
         val addressPref = protoDatastore.field(
-            key = "profile_address",
             defaultValue = null as TestNullableAddress?,
             getter = { it.profile?.address },
             updater = { proto, value ->
@@ -510,7 +484,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_coordinatesDefaultIsNull() = runTest(testDispatcher) {
         val coordsPref = protoDatastore.field(
-            key = "coords",
             defaultValue = null as TestCoordinates?,
             getter = { it.profile?.address?.coordinates },
             updater = { proto, value ->
@@ -529,7 +502,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_coordinatesSetWhenAllParentsNull() = runTest(testDispatcher) {
         val coordsPref = protoDatastore.field(
-            key = "coords",
             defaultValue = null as TestCoordinates?,
             getter = { it.profile?.address?.coordinates },
             updater = { proto, value ->
@@ -565,7 +537,6 @@ abstract class AbstractNullableProtoDatastoreTest {
         )
 
         val coordsPref = protoDatastore.field(
-            key = "coords",
             defaultValue = null as TestCoordinates?,
             getter = { it.profile?.address?.coordinates },
             updater = { proto, value ->
@@ -593,7 +564,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_nicknameViaProfile() = runTest(testDispatcher) {
         val nicknamePref = protoDatastore.field(
-            key = "nickname",
             defaultValue = "",
             getter = { it.profile?.nickname ?: "" },
             updater = { proto, value ->
@@ -611,7 +581,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_ageViaProfile() = runTest(testDispatcher) {
         val agePref = protoDatastore.field(
-            key = "age",
             defaultValue = null as Int?,
             getter = { it.profile?.age },
             updater = { proto, value ->
@@ -634,19 +603,16 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_settingOneFieldDoesNotAffectAnother() = runTest(testDispatcher) {
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, value -> proto.copy(id = value) },
         )
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
         )
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, value -> proto.copy(label = value) },
@@ -690,19 +656,16 @@ abstract class AbstractNullableProtoDatastoreTest {
 
         // Read individual fields
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, v -> proto.copy(id = v) },
         )
         val labelPref = protoDatastore.field(
-            key = "label",
             defaultValue = null as String?,
             getter = { it.label },
             updater = { proto, v -> proto.copy(label = v) },
         )
         val coordsPref = protoDatastore.field(
-            key = "coords",
             defaultValue = null as TestCoordinates?,
             getter = { it.profile?.address?.coordinates },
             updater = { proto, v ->
@@ -722,7 +685,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_stateIn() = runTest(testDispatcher) {
         val namePref = protoDatastore.field(
-            key = "name",
             defaultValue = "",
             getter = { it.name },
             updater = { proto, v -> proto.copy(name = v) },
@@ -762,7 +724,6 @@ abstract class AbstractNullableProtoDatastoreTest {
         )
 
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, v -> proto.copy(id = v) },
@@ -775,7 +736,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun data_reflectsFieldUpdate() = runTest(testDispatcher) {
         val idPref = protoDatastore.field(
-            key = "id",
             defaultValue = 0,
             getter = { it.id },
             updater = { proto, v -> proto.copy(id = v) },
@@ -791,7 +751,6 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun field_nullableFieldWithNonNullDefault() = runTest(testDispatcher) {
         val labelPref = protoDatastore.field(
-            key = "label_with_default",
             defaultValue = "fallback",
             getter = { it.label ?: "fallback" },
             updater = { proto, value -> proto.copy(label = value) },

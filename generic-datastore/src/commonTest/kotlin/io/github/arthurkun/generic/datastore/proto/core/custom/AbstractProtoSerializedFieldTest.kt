@@ -19,7 +19,6 @@ abstract class AbstractProtoSerializedFieldTest {
     @Test
     fun serializedField_getReturnsDefaultWhenNotSet() = runTest(testDispatcher) {
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,
@@ -32,7 +31,6 @@ abstract class AbstractProtoSerializedFieldTest {
     @Test
     fun serializedField_setAndGetRoundTrip() = runTest(testDispatcher) {
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,
@@ -47,7 +45,6 @@ abstract class AbstractProtoSerializedFieldTest {
     @Test
     fun serializedField_asFlowEmitsUpdates() = runTest(testDispatcher) {
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,
@@ -62,7 +59,6 @@ abstract class AbstractProtoSerializedFieldTest {
     @Test
     fun serializedField_updateAtomically() = runTest(testDispatcher) {
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,
@@ -77,7 +73,6 @@ abstract class AbstractProtoSerializedFieldTest {
     @Test
     fun serializedField_deleteResetsToDefault() = runTest(testDispatcher) {
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,
@@ -92,7 +87,6 @@ abstract class AbstractProtoSerializedFieldTest {
     @Test
     fun serializedField_resetToDefault() = runTest(testDispatcher) {
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,
@@ -107,14 +101,12 @@ abstract class AbstractProtoSerializedFieldTest {
     @Test
     fun serializedField_corruptedDataFallsBackToDefault() = runTest(testDispatcher) {
         val rawPref = protoDatastore.field(
-            key = "json_raw_direct",
             defaultValue = "",
             getter = { it.jsonRaw },
             updater = { proto, value -> proto.copy(jsonRaw = value) },
         )
         rawPref.set("{not valid json!!")
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,
@@ -127,7 +119,6 @@ abstract class AbstractProtoSerializedFieldTest {
     @Test
     fun serializedField_doesNotAffectOtherFields() = runTest(testDispatcher) {
         val itemPref = protoDatastore.serializedField(
-            key = "ser_item",
             defaultValue = TestItem(),
             serializer = itemSerializer,
             deserializer = itemDeserializer,
@@ -135,7 +126,6 @@ abstract class AbstractProtoSerializedFieldTest {
             updater = { proto, raw -> proto.copy(jsonRaw = raw) },
         )
         val enumRawPref = protoDatastore.field(
-            key = "enum_raw",
             defaultValue = "",
             getter = { it.enumRaw },
             updater = { proto, value -> proto.copy(enumRaw = value) },

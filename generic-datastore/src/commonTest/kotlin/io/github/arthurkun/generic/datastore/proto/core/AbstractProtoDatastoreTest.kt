@@ -96,13 +96,12 @@ abstract class AbstractProtoDatastoreTest {
 
     @Test
     fun protoPreference_blankKeyThrows() = runTest(testDispatcher) {
-        val blankKeyDatastore = GenericProtoDatastore(
-            datastore = protoDatastore.datastore,
-            defaultValue = TestProtoData(),
-            key = " ",
-        )
         assertFailsWith<IllegalArgumentException> {
-            blankKeyDatastore.data()
+            GenericProtoDatastore(
+                datastore = protoDatastore.datastore,
+                defaultValue = TestProtoData(),
+                key = " ",
+            ).data()
         }
     }
 }

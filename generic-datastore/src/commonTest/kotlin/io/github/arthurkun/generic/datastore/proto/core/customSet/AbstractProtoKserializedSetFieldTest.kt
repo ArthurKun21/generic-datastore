@@ -18,7 +18,6 @@ abstract class AbstractProtoKserializedSetFieldTest {
     @Test
     fun kserializedSetField_getReturnsEmptyDefault() = runTest(testDispatcher) {
         val setPref = protoDatastore.kserializedSetField(
-            key = "item_set",
             defaultValue = emptySet<TestItem>(),
             getter = { it.jsonSetRaw },
             updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },
@@ -29,7 +28,6 @@ abstract class AbstractProtoKserializedSetFieldTest {
     @Test
     fun kserializedSetField_setAndGetRoundTrip() = runTest(testDispatcher) {
         val setPref = protoDatastore.kserializedSetField(
-            key = "item_set",
             defaultValue = emptySet<TestItem>(),
             getter = { it.jsonSetRaw },
             updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },
@@ -42,7 +40,6 @@ abstract class AbstractProtoKserializedSetFieldTest {
     @Test
     fun kserializedSetField_asFlowEmitsUpdates() = runTest(testDispatcher) {
         val setPref = protoDatastore.kserializedSetField(
-            key = "item_set",
             defaultValue = emptySet<TestItem>(),
             getter = { it.jsonSetRaw },
             updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },
@@ -55,7 +52,6 @@ abstract class AbstractProtoKserializedSetFieldTest {
     @Test
     fun kserializedSetField_updateAddsElement() = runTest(testDispatcher) {
         val setPref = protoDatastore.kserializedSetField(
-            key = "item_set",
             defaultValue = emptySet<TestItem>(),
             getter = { it.jsonSetRaw },
             updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },
@@ -68,7 +64,6 @@ abstract class AbstractProtoKserializedSetFieldTest {
     @Test
     fun kserializedSetField_deleteResetsToEmpty() = runTest(testDispatcher) {
         val setPref = protoDatastore.kserializedSetField(
-            key = "item_set",
             defaultValue = emptySet<TestItem>(),
             getter = { it.jsonSetRaw },
             updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },
@@ -81,7 +76,6 @@ abstract class AbstractProtoKserializedSetFieldTest {
     @Test
     fun kserializedSetField_resetToDefault() = runTest(testDispatcher) {
         val setPref = protoDatastore.kserializedSetField(
-            key = "item_set",
             defaultValue = emptySet<TestItem>(),
             getter = { it.jsonSetRaw },
             updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },

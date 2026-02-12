@@ -18,7 +18,6 @@ abstract class AbstractProtoNullableSerializedFieldBlockingTest {
     @Test
     fun nullableSerializedField_getBlockingReturnsNull() {
         val itemPref = protoDatastore.nullableSerializedField(
-            key = "nullable_ser_item",
             serializer = itemSerializer,
             deserializer = itemDeserializer,
             getter = { it.nullableJsonRaw },
@@ -30,7 +29,6 @@ abstract class AbstractProtoNullableSerializedFieldBlockingTest {
     @Test
     fun nullableSerializedField_setBlockingAndGetBlocking() {
         val itemPref = protoDatastore.nullableSerializedField(
-            key = "nullable_ser_item",
             serializer = itemSerializer,
             deserializer = itemDeserializer,
             getter = { it.nullableJsonRaw },
@@ -44,7 +42,6 @@ abstract class AbstractProtoNullableSerializedFieldBlockingTest {
     @Test
     fun nullableSerializedField_setBlockingNull() {
         val itemPref = protoDatastore.nullableSerializedField(
-            key = "nullable_ser_item",
             serializer = itemSerializer,
             deserializer = itemDeserializer,
             getter = { it.nullableJsonRaw },
@@ -58,7 +55,6 @@ abstract class AbstractProtoNullableSerializedFieldBlockingTest {
     @Test
     fun nullableSerializedField_resetToDefaultBlocking() {
         val itemPref = protoDatastore.nullableSerializedField(
-            key = "nullable_ser_item",
             serializer = itemSerializer,
             deserializer = itemDeserializer,
             getter = { it.nullableJsonRaw },
@@ -72,7 +68,6 @@ abstract class AbstractProtoNullableSerializedFieldBlockingTest {
     @Test
     fun nullableSerializedField_propertyDelegation() {
         val itemPref = protoDatastore.nullableSerializedField(
-            key = "nullable_ser_item",
             serializer = itemSerializer,
             deserializer = itemDeserializer,
             getter = { it.nullableJsonRaw },

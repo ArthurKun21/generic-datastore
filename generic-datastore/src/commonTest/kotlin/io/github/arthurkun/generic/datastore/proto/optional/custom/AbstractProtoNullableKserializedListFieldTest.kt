@@ -20,7 +20,6 @@ abstract class AbstractProtoNullableKserializedListFieldTest {
     @Test
     fun nullableKserializedListField_getReturnsNull() = runTest(testDispatcher) {
         val listPref: ProtoPreference<List<TestItem>?> = protoDatastore.nullableKserializedListField(
-            key = "nullable_item_list",
             getter = { it.nullableJsonListRaw },
             updater = { proto, raw -> proto.copy(nullableJsonListRaw = raw) },
         )
@@ -30,7 +29,6 @@ abstract class AbstractProtoNullableKserializedListFieldTest {
     @Test
     fun nullableKserializedListField_setNonNullList() = runTest(testDispatcher) {
         val listPref: ProtoPreference<List<TestItem>?> = protoDatastore.nullableKserializedListField(
-            key = "nullable_item_list",
             getter = { it.nullableJsonListRaw },
             updater = { proto, raw -> proto.copy(nullableJsonListRaw = raw) },
         )
@@ -42,7 +40,6 @@ abstract class AbstractProtoNullableKserializedListFieldTest {
     @Test
     fun nullableKserializedListField_setNull() = runTest(testDispatcher) {
         val listPref: ProtoPreference<List<TestItem>?> = protoDatastore.nullableKserializedListField(
-            key = "nullable_item_list",
             getter = { it.nullableJsonListRaw },
             updater = { proto, raw -> proto.copy(nullableJsonListRaw = raw) },
         )
@@ -54,7 +51,6 @@ abstract class AbstractProtoNullableKserializedListFieldTest {
     @Test
     fun nullableKserializedListField_deleteResetsToNull() = runTest(testDispatcher) {
         val listPref: ProtoPreference<List<TestItem>?> = protoDatastore.nullableKserializedListField(
-            key = "nullable_item_list",
             getter = { it.nullableJsonListRaw },
             updater = { proto, raw -> proto.copy(nullableJsonListRaw = raw) },
         )
@@ -66,7 +62,6 @@ abstract class AbstractProtoNullableKserializedListFieldTest {
     @Test
     fun nullableKserializedListField_asFlowNullTransitions() = runTest(testDispatcher) {
         val listPref: ProtoPreference<List<TestItem>?> = protoDatastore.nullableKserializedListField(
-            key = "nullable_item_list",
             getter = { it.nullableJsonListRaw },
             updater = { proto, raw -> proto.copy(nullableJsonListRaw = raw) },
         )
