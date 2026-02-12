@@ -65,6 +65,7 @@ Both library modules target:
 - Follow Spotless + ktlint rules configured in the root `build.gradle.kts`.
 - Keep APIs small, predictable, and documented in README when public behavior changes.
 - Do not use wildcard imports (e.g., import foo.bar.*).
+- Use `kotlinx.coroutines.IO` for CoroutineDispatcher instead of `kotlinx.coroutines.Dispatchers.IO` due to iOS compatibility.
 
 ## Testing and Quality Assurance
 
