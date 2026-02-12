@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 
 /**
  * A [BasePreference] implementation for an individual field within a Proto DataStore.
