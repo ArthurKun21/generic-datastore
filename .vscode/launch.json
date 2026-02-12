@@ -5,16 +5,16 @@
       "name": "Run Proto Sample App",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "${workspaceFolder}/gradlew",
-      "runtimeArgs": [":samples:protoApp:run"],
+      "program": "${workspaceFolder}/.vscode/run.js",
+      "args": [".\\gradlew", ":samples:protoApp:run"],
       "console": "integratedTerminal"
     },
     {
       "name": "Run Compose App",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "${workspaceFolder}/gradlew",
-      "runtimeArgs": [":composeApp:run"],
+      "program": "${workspaceFolder}/.vscode/run.js",
+      "args": [".\\gradlew", ":composeApp:run"],
       "console": "integratedTerminal"
     }
   ]
