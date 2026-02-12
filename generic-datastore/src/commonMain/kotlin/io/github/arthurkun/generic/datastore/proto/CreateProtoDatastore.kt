@@ -41,6 +41,7 @@ import kotlinx.io.files.Path as KotlinxIoPath
  *   // When done:
  *   scope.cancel()
  *   ```
+ * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based fields in this proto datastore.
  * @param producePath A lambda that returns the full file path as a [String].
  * @return A new [GenericProtoDatastore] instance.
  */
@@ -91,6 +92,7 @@ public fun <T> createProtoDatastore(
  *   // When done:
  *   scope.cancel()
  *   ```
+ * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based fields in this proto datastore.
  * @param produceOkioPath A lambda that returns the file path as an [okio.Path].
  * @return A new [GenericProtoDatastore] instance.
  */
@@ -143,6 +145,7 @@ public fun <T> createProtoDatastore(
  *   // When done:
  *   scope.cancel()
  *   ```
+ * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based fields in this proto datastore.
  * @param produceKotlinxIoPath A lambda that returns the file path as a [kotlinx.io.files.Path].
  * @return A new [GenericProtoDatastore] instance.
  */
@@ -198,6 +201,7 @@ public fun <T> createProtoDatastore(
  *   // When done:
  *   scope.cancel()
  *   ```
+ * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based fields in this proto datastore.
  * @param producePath A lambda that returns the directory path as a [String].
  * @return A new [GenericProtoDatastore] instance.
  */
