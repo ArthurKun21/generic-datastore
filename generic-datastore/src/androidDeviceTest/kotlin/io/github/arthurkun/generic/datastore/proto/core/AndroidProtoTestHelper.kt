@@ -1,9 +1,9 @@
 package io.github.arthurkun.generic.datastore.proto.core
 
-import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
-import io.github.arthurkun.generic.datastore.proto.createProtoDatastore
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
+import io.github.arthurkun.generic.datastore.proto.createProtoDatastore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

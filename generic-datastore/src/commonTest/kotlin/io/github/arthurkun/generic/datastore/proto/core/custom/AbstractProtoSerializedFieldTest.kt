@@ -1,8 +1,8 @@
 package io.github.arthurkun.generic.datastore.proto.core.custom
 
+import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestDispatcher
-import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.Test

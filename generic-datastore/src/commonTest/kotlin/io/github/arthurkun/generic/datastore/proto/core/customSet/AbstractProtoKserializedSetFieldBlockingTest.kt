@@ -1,9 +1,9 @@
 package io.github.arthurkun.generic.datastore.proto.core.customSet
 
 import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
-import io.github.arthurkun.generic.datastore.proto.kserializedSetField
 import io.github.arthurkun.generic.datastore.proto.core.custom.TestCustomFieldProtoData
 import io.github.arthurkun.generic.datastore.proto.core.custom.TestItem
+import io.github.arthurkun.generic.datastore.proto.kserializedSetField
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

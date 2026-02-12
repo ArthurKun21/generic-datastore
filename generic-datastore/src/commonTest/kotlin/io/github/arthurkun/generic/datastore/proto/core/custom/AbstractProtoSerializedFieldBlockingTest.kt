@@ -1,8 +1,8 @@
 package io.github.arthurkun.generic.datastore.proto.core.custom
 
+import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
-import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
 import kotlin.test.assertEquals
 
 abstract class AbstractProtoSerializedFieldBlockingTest {

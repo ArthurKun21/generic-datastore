@@ -1,9 +1,9 @@
 package io.github.arthurkun.generic.datastore.proto.core.custom
 
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.TestDispatcher
 import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
 import io.github.arthurkun.generic.datastore.proto.enumField
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

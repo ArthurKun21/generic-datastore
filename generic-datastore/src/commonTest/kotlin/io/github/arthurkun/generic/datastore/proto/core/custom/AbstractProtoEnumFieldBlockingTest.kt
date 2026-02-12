@@ -1,8 +1,8 @@
 package io.github.arthurkun.generic.datastore.proto.core.custom
 
-import kotlin.test.Test
 import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
 import io.github.arthurkun.generic.datastore.proto.enumField
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 abstract class AbstractProtoEnumFieldBlockingTest {
