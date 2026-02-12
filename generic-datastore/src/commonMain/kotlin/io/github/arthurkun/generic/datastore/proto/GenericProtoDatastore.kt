@@ -5,7 +5,7 @@ package io.github.arthurkun.generic.datastore.proto
 import androidx.datastore.core.DataStore
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.proto.core.GenericProtoPreferenceItem
-import io.github.arthurkun.generic.datastore.proto.core.ProtoFieldPreference
+import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
 import io.github.arthurkun.generic.datastore.proto.custom.core.enumFieldInternal
 import io.github.arthurkun.generic.datastore.proto.custom.core.kserializedFieldInternal
 import io.github.arthurkun.generic.datastore.proto.custom.core.kserializedListFieldInternal
@@ -38,20 +38,22 @@ public class GenericProtoDatastore<T>(
     private val defaultJson: Json = PreferenceDefaults.defaultJson,
 ) : ProtoDatastore<T> {
 
-    override fun data(): ProtoPreference<T> {
-        return GenericProtoPreferenceItem(
+    private val cachedData: ProtoPreference<T> by lazy {
+        GenericProtoPreferenceItem(
             datastore = datastore,
             defaultValue = defaultValue,
             key = key,
         )
     }
 
+    override fun data(): ProtoPreference<T> = cachedData
+
     override fun <F> field(
         defaultValue: F,
         getter: (T) -> F,
         updater: (T, F) -> T,
     ): ProtoPreference<F> = ProtoFieldPrefs(
-        ProtoFieldPreference(
+        ProtoSerialFieldPreference(
             datastore = datastore,
             key = key,
             defaultValue = defaultValue,
@@ -259,6 +261,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
+            json = defaultJson,
         ),
     )
 
@@ -276,6 +279,7 @@ public class GenericProtoDatastore<T>(
             getter = getter,
             updater = updater,
             defaultProtoValue = this.defaultValue,
+            json = defaultJson,
         ),
     )
 

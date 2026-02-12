@@ -2,7 +2,6 @@ package io.github.arthurkun.generic.datastore.proto.custom.set
 
 import androidx.datastore.core.DataStore
 import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
-import io.github.arthurkun.generic.datastore.proto.custom.core.safeDeserialize
 
 internal fun <T, F : Enum<F>> enumSetFieldInternal(
     datastore: DataStore<T>,
@@ -18,7 +17,7 @@ internal fun <T, F : Enum<F>> enumSetFieldInternal(
     defaultValue = defaultValue,
     getter = { proto ->
         getter(proto).mapNotNull { raw ->
-            safeDeserialize<F?>(raw, null) { name -> enumValues.first { it.name == name } }
+            enumValues.firstOrNull { it.name == raw }
         }.toSet()
     },
     updater = { proto, value ->

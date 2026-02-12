@@ -5,7 +5,7 @@ import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPrefer
 import kotlin.reflect.KProperty
 
 /**
- * Wraps a [io.github.arthurkun.generic.datastore.proto.core.ProtoFieldPreference] to satisfy the [ProtoPreference] / [DelegatedPreference]
+ * Wraps a [io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference] to satisfy the [ProtoPreference] / [DelegatedPreference]
  * contract, adding property delegation and [resetToDefaultBlocking].
  *
  * @param P The proto/data class type.

@@ -17,7 +17,7 @@ internal fun <T, F : Enum<F>> enumFieldInternal(
     defaultValue = defaultValue,
     getter = { proto ->
         val raw = getter(proto)
-        safeDeserialize<F>(raw, defaultValue) { name -> enumValues.first { e -> e.name == name } }
+        enumValues.firstOrNull { e -> e.name == raw } ?: defaultValue
     },
     updater = { proto, value ->
         updater(proto, value.name)
