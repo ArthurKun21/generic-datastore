@@ -30,19 +30,9 @@ internal class GenericProtoPreferenceItem<T>(
         defaultProtoValue = defaultValue,
     ) {
 
-    private val delegate = ProtoFieldPreference(
-        datastore = datastore,
-        key = key,
-        defaultValue = defaultValue,
-        getter = { it },
-        updater = { _, value -> value },
-        defaultProtoValue = defaultValue,
-    )
+    override fun resetToDefaultBlocking() = setBlocking(defaultValue)
 
-    override fun resetToDefaultBlocking() = delegate.setBlocking(delegate.defaultValue)
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = getBlocking()
 
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T = delegate.getBlocking()
-
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) =
-        delegate.setBlocking(value)
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = setBlocking(value)
 }
