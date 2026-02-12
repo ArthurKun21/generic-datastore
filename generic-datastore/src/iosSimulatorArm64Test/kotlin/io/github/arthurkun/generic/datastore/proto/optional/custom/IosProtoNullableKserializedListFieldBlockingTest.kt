@@ -1,5 +1,6 @@
 package io.github.arthurkun.generic.datastore.proto.optional.custom
 
+import io.github.arthurkun.generic.datastore.proto.core.custom.IosCustomFieldProtoTestHelper
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
