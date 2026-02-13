@@ -3,8 +3,11 @@ package io.github.arthurkun.generic.datastore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SnapshotMutationPolicy
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.structuralEqualityPolicy
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
+import io.github.arthurkun.generic.datastore.utils.collectAsStatePlatform
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -13,7 +16,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * observe and update the preference value.
  *
  * On Android, this uses `collectAsStateWithLifecycle` for lifecycle-aware collection.
- * On Desktop, this uses `collectAsState`.
+ * On Desktop and IOS, this uses `collectAsState`.
  *
  * @param context The [CoroutineContext] to use for collecting the flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
@@ -22,7 +25,18 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @return A [MutableState] representing the preference value.
  */
 @Composable
-public expect fun <T> DelegatedPreference<T>.remember(
+public fun <T> DelegatedPreference<T>.remember(
     context: CoroutineContext = EmptyCoroutineContext,
     policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
-): MutableState<T>
+): MutableState<T> {
+    val state = this.asFlow().collectAsStatePlatform(defaultValue, context = context)
+    val scope = rememberCoroutineScope()
+    return remember(this, policy) {
+        PrefsComposeState(
+            prefs = this,
+            state = state,
+            scope = scope,
+            policy = policy,
+        )
+    }
+}

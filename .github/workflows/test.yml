@@ -75,6 +75,15 @@ jobs:
 
       - name: Set up gradle
         uses: gradle/actions/setup-gradle@v5
+      
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v5
+        with:
+          path: ~/.konan
+          key: konan-test-ios-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            konan-test-ios
+
 
       - name: Run Generic Datastore tests
         run: |

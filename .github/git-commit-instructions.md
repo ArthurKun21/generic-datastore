@@ -42,6 +42,14 @@
 
 * `refactor: extract network retry logic`
 
+### Updating Markdown
+
+* `docs: update README with new setup instructions`
+
+### Updating Code Comments
+
+* `docs: clarify parameter usage in DataStore class`
+
 ---
 
 ## Dependency Changes

@@ -725,7 +725,8 @@ val protoDatastore = createProtoDatastore(
 )
 ```
 
-Optional parameters allow customizing the key, corruption handler, migrations, and coroutine scope:
+Optional parameters allow customizing the key, corruption handler, migrations, coroutine scope, and
+the default `Json` instance used for serialization-based field preferences:
 
 ```kotlin
 val protoDatastore = createProtoDatastore(
@@ -735,6 +736,7 @@ val protoDatastore = createProtoDatastore(
     corruptionHandler = ReplaceFileCorruptionHandler { MyProtoMessage.getDefaultInstance() },
     migrations = listOf(myMigration),
     scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    defaultJson = Json { prettyPrint = true },
     producePath = { context.filesDir.resolve("my_proto.pb").absolutePath },
 )
 ```
@@ -766,11 +768,274 @@ val protoDatastore = GenericProtoDatastore(
 
 ### Usage
 
+#### Whole-Object Access
+
 ```kotlin
 val dataPref: ProtoPreference<MyProtoMessage> = protoDatastore.data()
 
 // Then use get(), set(), asFlow(), etc. just like Preferences DataStore
 ```
+
+#### Per-Field Access
+
+Use `field()` to create a preference for an individual field of the proto message. The `getter`
+extracts the field value from a snapshot, and `updater` returns a new proto with the field updated:
+
+```kotlin
+val namePref: ProtoPreference<String> = protoDatastore.field(
+    defaultValue = "",
+    getter = { it.name },
+    updater = { proto, value -> proto.copy(name = value) },
+)
+
+// Suspend
+namePref.set("Alice")
+val name = namePref.get() // "Alice"
+
+// Flow
+namePref.asFlow().collect { value -> /* react to changes */ }
+
+// Blocking
+namePref.setBlocking("Bob")
+val blocking = namePref.getBlocking() // "Bob"
+
+// Delegation
+var userName: String by namePref
+```
+
+For nested fields, chain `copy()` calls in the updater:
+
+```kotlin
+data class Address(val street: String = "", val city: String = "")
+data class Profile(val nickname: String = "", val address: Address = Address())
+data class Settings(val id: Int = 0, val profile: Profile = Profile())
+
+// Access a deeply nested field
+val cityPref: ProtoPreference<String> = protoDatastore.field(
+    defaultValue = "",
+    getter = { it.profile.address.city },
+    updater = { proto, value ->
+        proto.copy(
+            profile = proto.profile.copy(
+                address = proto.profile.address.copy(city = value),
+            ),
+        )
+    },
+)
+```
+
+For nullable nested fields, provide fallback defaults in the updater:
+
+```kotlin
+data class NullableProfile(val nickname: String = "", val age: Int? = null)
+data class NullableSettings(val id: Int = 0, val profile: NullableProfile? = null)
+
+val agePref: ProtoPreference<Int?> = protoDatastore.field(
+    defaultValue = null,
+    getter = { it.profile?.age },
+    updater = { proto, value ->
+        proto.copy(
+            profile = (proto.profile ?: NullableProfile()).copy(age = value),
+        )
+    },
+)
+```
+
+Field preferences share the same underlying DataStore, so changes through `field()` are visible
+via `data()` and vice versa. `delete()` and `resetToDefault()` on a field reset only the targeted
+field to its default value (via `set(defaultValue)` → `updater(current, fieldDefault)`). It does
+not reset the entire proto to its default.
+
+#### Enum Field
+
+Store an enum value in a proto `String` field using `enumField()`:
+
+```kotlin
+enum class Theme { LIGHT, DARK, SYSTEM }
+
+val themePref: ProtoPreference<Theme> = protoDatastore.enumField(
+    defaultValue = Theme.SYSTEM,
+    getter = { it.theme },
+    updater = { proto, value -> proto.copy(theme = value) },
+)
+```
+
+The reified overload infers `enumValues` automatically. Unknown enum names encountered during
+deserialization fall back to the default value.
+
+#### Nullable Enum Field
+
+Store a nullable enum field using `nullableEnumField()`:
+
+```kotlin
+val themePref: ProtoPreference<Theme?> = protoDatastore.nullableEnumField<Settings, Theme>(
+    getter = { it.theme },
+    updater = { proto, value -> proto.copy(theme = value) },
+)
+```
+
+Returns `null` when the proto field is `null`. Unknown enum names also return `null`.
+
+#### Enum Set Field
+
+Store a `Set` of enum values backed by a `Set<String>` proto field:
+
+```kotlin
+val themesPref: ProtoPreference<Set<Theme>> = protoDatastore.enumSetField<Settings, Theme>(
+    defaultValue = emptySet(),
+    getter = { it.themes },
+    updater = { proto, value -> proto.copy(themes = value) },
+)
+```
+
+Each enum value is stored by its `name`. Unknown enum names are skipped during deserialization.
+
+#### Serialized Field
+
+Store a custom-serialized object in a proto `String` field:
+
+```kotlin
+@Serializable
+data class UserProfile(val id: Int, val email: String)
+
+val profilePref: ProtoPreference<UserProfile> = protoDatastore.serializedField(
+    defaultValue = UserProfile(0, ""),
+    serializer = { Json.encodeToString(UserProfile.serializer(), it) },
+    deserializer = { Json.decodeFromString(UserProfile.serializer(), it) },
+    getter = { it.profileJson },
+    updater = { proto, value -> proto.copy(profileJson = value) },
+)
+```
+
+If the raw string is blank or deserialization fails, the default value is returned.
+
+#### Nullable Serialized Field
+
+Store a nullable custom-serialized object:
+
+```kotlin
+val profilePref: ProtoPreference<UserProfile?> = protoDatastore.nullableSerializedField(
+    serializer = { Json.encodeToString(UserProfile.serializer(), it) },
+    deserializer = { Json.decodeFromString(UserProfile.serializer(), it) },
+    getter = { it.profileJson },
+    updater = { proto, value -> proto.copy(profileJson = value) },
+)
+```
+
+Returns `null` when the proto field is `null`. Setting `null` writes `null` to the proto field.
+
+#### Kotlin Serialization Field (`kserializedField`)
+
+Store any `@Serializable` type in a proto `String` field using Kotlin Serialization directly:
+
+```kotlin
+val profilePref: ProtoPreference<UserProfile> = protoDatastore.kserializedField(
+    defaultValue = UserProfile(0, ""),
+    getter = { it.profileJson },
+    updater = { proto, value -> proto.copy(profileJson = value) },
+)
+```
+
+The reified overload infers `KSerializer` automatically. A custom `Json` instance can be provided
+if needed.
+
+#### Nullable Kotlin Serialization Field (`nullableKserializedField`)
+
+Store a nullable `@Serializable` type:
+
+```kotlin
+val profilePref: ProtoPreference<UserProfile?> =
+    protoDatastore.nullableKserializedField<Settings, UserProfile>(
+        getter = { it.profileJson },
+        updater = { proto, value -> proto.copy(profileJson = value) },
+    )
+```
+
+#### Serialized List Field
+
+Store a `List` of custom objects using per-element serialization in a proto `String` field:
+
+```kotlin
+val animalListPref: ProtoPreference<List<Animal>> = protoDatastore.serializedListField(
+    defaultValue = emptyList(),
+    elementSerializer = { Animal.to(it) },
+    elementDeserializer = { Animal.from(it) },
+    getter = { it.animalsJson },
+    updater = { proto, value -> proto.copy(animalsJson = value) },
+)
+```
+
+Each element is individually serialized and stored as a JSON array string.
+
+#### Nullable Serialized List Field
+
+Store a nullable list of custom-serialized objects:
+
+```kotlin
+val animalListPref: ProtoPreference<List<Animal>?> = protoDatastore.nullableSerializedListField(
+    elementSerializer = { Animal.to(it) },
+    elementDeserializer = { Animal.from(it) },
+    getter = { it.animalsJson },
+    updater = { proto, value -> proto.copy(animalsJson = value) },
+)
+```
+
+#### Kotlin Serialization List Field (`kserializedListField`)
+
+Store a `List` of `@Serializable` objects using Kotlin Serialization:
+
+```kotlin
+val profileListPref: ProtoPreference<List<UserProfile>> = protoDatastore.kserializedListField(
+    defaultValue = emptyList(),
+    getter = { it.profilesJson },
+    updater = { proto, value -> proto.copy(profilesJson = value) },
+)
+```
+
+#### Nullable Kotlin Serialization List Field (`nullableKserializedListField`)
+
+Store a nullable list of `@Serializable` objects:
+
+```kotlin
+val profileListPref: ProtoPreference<List<UserProfile>?> =
+    protoDatastore.nullableKserializedListField<Settings, UserProfile>(
+        getter = { it.profilesJson },
+        updater = { proto, value -> proto.copy(profilesJson = value) },
+    )
+```
+
+#### Serialized Set Field
+
+Store a `Set` of custom objects using per-element serialization backed by a `Set<String>` proto
+field:
+
+```kotlin
+val animalSetPref: ProtoPreference<Set<Animal>> = protoDatastore.serializedSetField(
+    defaultValue = emptySet(),
+    serializer = { Animal.to(it) },
+    deserializer = { Animal.from(it) },
+    getter = { it.animalNames },
+    updater = { proto, value -> proto.copy(animalNames = value) },
+)
+```
+
+Elements that fail deserialization are silently skipped.
+
+#### Kotlin Serialization Set Field (`kserializedSetField`)
+
+Store a `Set` of `@Serializable` objects with per-element JSON serialization backed by a
+`Set<String>` proto field:
+
+```kotlin
+val profileSetPref: ProtoPreference<Set<UserProfile>> = protoDatastore.kserializedSetField(
+    defaultValue = emptySet(),
+    getter = { it.profileNames },
+    updater = { proto, value -> proto.copy(profileNames = value) },
+)
+```
+
+Elements that fail deserialization are silently skipped. A custom `Json` instance can be provided
+if needed.
 
 ## Compose Extensions (`generic-datastore-compose`)
 

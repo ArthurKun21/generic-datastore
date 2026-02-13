@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+package protoapp;
+
+option java_package = "io.github.arthurkun.generic.datastore.proto.app.wire";
+
+message UserSettings {
+  optional string username = 1;
+  optional int32 age = 2;
+  optional bool dark_mode = 3;
+  optional Theme theme = 4;
+  optional Address address = 5;
+
+  enum Theme {
+    SYSTEM = 0;
+    LIGHT = 1;
+    DARK = 2;
+  }
+
+  message Address {
+    optional string street = 1;
+    optional string city = 2;
+    optional string zip_code = 3;
+  }
+}
