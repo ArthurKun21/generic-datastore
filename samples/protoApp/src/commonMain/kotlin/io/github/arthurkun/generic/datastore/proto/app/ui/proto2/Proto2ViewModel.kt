@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
  *
  * Demonstrates all [ProtoDatastore] features:
  * - `data()` for whole-object operations
- * - `field()` for per-field access including nested fields
+ * - `field()` / `nullableEnumField()` for per-field access including nested fields
  * - `asFlow()`, `get()`, `set()`, `update()`, `delete()`, `resetToDefault()`
  * - `getBlocking()`, `setBlocking()`, `resetToDefaultBlocking()`
  * - `stateIn()` for StateFlow conversion
@@ -48,10 +48,16 @@ class Proto2ViewModel(
         updater = { proto, value -> proto.copy(dark_mode = value) },
     )
 
-    val themePref: ProtoPreference<UserSettings.Theme?> = datastore.field(
-        defaultValue = null,
-        getter = { it.theme },
-        updater = { proto, value -> proto.copy(theme = value) },
+    val themePref: ProtoPreference<UserSettings.Theme?> = datastore.nullableEnumField(
+        enumValues = UserSettings.Theme.entries.toTypedArray(),
+        getter = { it.theme?.name },
+        updater = { proto, value ->
+            proto.copy(
+                theme = value?.let { raw ->
+                    UserSettings.Theme.entries.firstOrNull { entry -> entry.name == raw }
+                },
+            )
+        },
     )
 
     /** Nested field: address object */

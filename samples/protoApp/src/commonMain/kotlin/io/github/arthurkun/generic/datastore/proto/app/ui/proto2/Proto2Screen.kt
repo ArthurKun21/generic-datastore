@@ -191,7 +191,7 @@ private fun ThemeSection(
     onThemeChange: (UserSettings.Theme) -> Unit,
 ) {
     Column {
-        Text("Theme (field enum)", style = MaterialTheme.typography.titleSmall)
+        Text("Theme (nullableEnumField)", style = MaterialTheme.typography.titleSmall)
         UserSettings.Theme.entries.forEach { entry ->
             Row(
                 modifier = Modifier
