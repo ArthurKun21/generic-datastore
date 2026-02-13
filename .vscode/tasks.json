@@ -4,7 +4,8 @@
     {
       "label": "Run Proto Sample App",
       "type": "shell",
-      "command": ".\\gradlew :samples:protoApp:run",
+      "command": "${workspaceFolder}/.vscode/run.js",
+      "args": [":samples:protoApp:run"],
       "group": {
         "kind": "build",
         "isDefault": true
@@ -19,7 +20,8 @@
     {
       "label": "Run Compose App",
       "type": "shell",
-      "command": ".\\gradlew :composeApp:run",
+      "command": "${workspaceFolder}/.vscode/run.js",
+      "args": [":composeApp:run"],
       "group": "build",
       "problemMatcher": [],
       "presentation": {

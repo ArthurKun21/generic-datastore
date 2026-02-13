@@ -6,7 +6,7 @@
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/.vscode/run.js",
-      "args": [".\\gradlew", ":samples:protoApp:run"],
+      "args": [":samples:protoApp:run"],
       "console": "integratedTerminal"
     },
     {
@@ -14,7 +14,7 @@
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/.vscode/run.js",
-      "args": [".\\gradlew", ":composeApp:run"],
+      "args": [":composeApp:run"],
       "console": "integratedTerminal"
     }
   ]
