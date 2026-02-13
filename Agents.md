@@ -33,8 +33,18 @@ Jetpack Compose extensions in `generic-datastore-compose`.
       (`BackupPreference`, `PreferenceBackupCreator`, `PreferenceBackupRestorer`,
       `BackupParsingException`, `Migration`).
   - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
-      `GenericProtoDatastore`, `CreateProtoDatastore`, `GenericProtoPreferenceItem`,
-      `ProtoFieldPreference`, `ProtoFieldPrefs`).
+      `GenericProtoDatastore`, `CreateProtoDatastore`, `ProtoFieldPrefs`).
+    - `proto/core/` – core proto internals (`GenericProtoPreferenceItem`,
+        `ProtoFieldPreference`).
+    - `proto/custom/` – custom-serializer proto field types (`ProtoSerialFieldPreference`).
+      - `proto/custom/core/` – non-nullable custom field implementations (`EnumField`,
+          `KSerializedField`, `KSerializedListField`, `SerializedField`, `SerializedListField`,
+          `DecodeUtils`).
+      - `proto/custom/optional/` – nullable custom field implementations (`NullableEnumField`,
+          `NullableKSerializedField`, `NullableKSerializedListField`, `NullableSerializedField`,
+          `NullableSerializedListField`).
+      - `proto/custom/set/` – set-based custom field implementations (`EnumSetField`,
+          `KSerializedSetField`, `SerializedSetField`).
   - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
       `preferences/`, `preferences/core/custom/`, and `preferences/utils/`.
 - `:generic-datastore-compose` – Compose helpers built on the core module.
@@ -253,6 +263,25 @@ identical in contract to the Preferences DataStore helpers. The proto helpers ex
   (nullable fields at all nesting levels).
 - `AbstractNullableProtoFieldPreferenceTest` / `AbstractNullableProtoFieldPreferenceBlockingTest`
   — per-field `field()` tests focused on nullable field edge cases using `TestNullableProtoData`.
+
+**Proto custom field abstract test classes in `commonTest`:**
+
+- `proto/custom/core/` — non-nullable custom field tests:
+  - `AbstractProtoEnumFieldTest` / `AbstractProtoEnumFieldBlockingTest`
+  - `AbstractProtoSerializedFieldTest` / `AbstractProtoSerializedFieldBlockingTest`
+  - `AbstractProtoKserializedFieldTest` / `AbstractProtoKserializedFieldBlockingTest`
+  - `AbstractProtoSerializedListFieldTest` / `AbstractProtoSerializedListFieldBlockingTest`
+  - `AbstractProtoKserializedListFieldTest` / `AbstractProtoKserializedListFieldBlockingTest`
+- `proto/custom/optional/` — nullable custom field tests:
+  - `AbstractProtoNullableEnumFieldTest` / `AbstractProtoNullableEnumFieldBlockingTest`
+  - `AbstractProtoNullableSerializedFieldTest` / `AbstractProtoNullableSerializedFieldBlockingTest`
+  - `AbstractProtoNullableKserializedFieldTest` / `AbstractProtoNullableKserializedFieldBlockingTest`
+  - `AbstractProtoNullableSerializedListFieldTest` / `AbstractProtoNullableSerializedListFieldBlockingTest`
+  - `AbstractProtoNullableKserializedListFieldTest` / `AbstractProtoNullableKserializedListFieldBlockingTest`
+- `proto/custom/set/` — set-based custom field tests:
+  - `AbstractProtoEnumSetFieldTest` / `AbstractProtoEnumSetFieldBlockingTest`
+  - `AbstractProtoSerializedSetFieldTest` / `AbstractProtoSerializedSetFieldBlockingTest`
+  - `AbstractProtoKserializedSetFieldTest` / `AbstractProtoKserializedSetFieldBlockingTest`
 
 ### Proto DataStore architecture
 
