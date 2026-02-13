@@ -5,6 +5,7 @@
         }
     ],
     "chat.tools.terminal.autoApprove": {
-        ".\\gradlew": true
+        ".\\gradlew": true,
+        "./gradlew": true
     },
 }
