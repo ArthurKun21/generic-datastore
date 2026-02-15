@@ -4,4 +4,8 @@
             "file": ".github/git-commit-instructions.md"
         }
     ],
+    "chat.tools.terminal.autoApprove": {
+        ".\\gradlew": true,
+        "./gradlew": true
+    },
 }
