@@ -33,6 +33,6 @@ plugins {
 rootProject.name = "GenericDataStore"
 include(":samples:preferenceAndroidApp")
 include(":samples:preferenceComposeApp")
-include(":samples:protoApp")
+include(":samples:protoComposeApp")
 include(":generic-datastore")
 include(":generic-datastore-compose")
