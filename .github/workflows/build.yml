@@ -91,10 +91,6 @@ jobs:
   
   Compile-IOS:
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        commands: [ publishIosArm64PublicationToMavenLocal, publishIosSimulatorArm64PublicationToMavenLocal, publishIosX64PublicationToMavenLocal ]
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -114,8 +110,8 @@ jobs:
 
       - name: Create Release for Generic Datastore
         run: |
-          ./gradlew :generic-datastore:${{ matrix.commands }}
+          ./gradlew :generic-datastore:publishIosArm64PublicationToMavenLocal
 
       - name: Create Release for Generic Datastore Compose
         run: |
-          ./gradlew :generic-datastore-compose:${{ matrix.commands }}
+          ./gradlew :generic-datastore-compose:publishIosArm64PublicationToMavenLocal
