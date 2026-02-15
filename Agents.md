@@ -60,7 +60,7 @@ Jetpack Compose extensions in `generic-datastore-compose`.
 Both library modules target:
 
 - **Android** (`androidMain`)
-- **Desktop / JVM** (`jvm("desktop")`)
+- **JVM** (`jvmMain`)
 - **iOS** (`iosX64`, `iosArm64`, `iosSimulatorArm64`)
 
 ## Workflow
@@ -89,11 +89,11 @@ Ensure the module compiles by running the appropriate Gradle tasks and resolving
 
 - Compile the Android device (instrumentation test) source set `./gradlew :<module-name>:compileAndroidDeviceTest`
 
-#### KMP modules targeting Desktop (JVM) Build
+#### KMP modules targeting JVM Build
 
-- Compile the Desktop main source set `./gradlew :<module-name>:compileKotlinDesktop`
+- Compile the JVM main source set `./gradlew :<module-name>:compileKotlinJvm`
 
-- Compile the Desktop test source set `./gradlew :<module-name>:compileTestKotlinDesktop`
+- Compile the JVM test source set `./gradlew :<module-name>:compileTestKotlinJvm`
 
 ### Running Tests
 
@@ -110,19 +110,19 @@ source sets:
 - `commonTest` — Shared tests for all targets (preferred)
 - `androidDeviceTest` — Android instrumentation tests (platform-specific only)
 - `androidHostTest` — Android unit tests (platform-specific only)
-- `desktopTest` — Desktop/JVM tests (platform-specific only)
+- `jvmTest` — JVM tests (platform-specific only)
 - `iosSimulatorArm64Test` — iOS simulator tests (platform-specific only, requires macOS)
 
 ### Abstract test class pattern
 
 Tests use an abstract base class pattern to avoid duplicating test logic across platforms. Shared
 test methods live in abstract classes in `commonTest`, while platform source sets
-(`androidDeviceTest`, `desktopTest`, `iosSimulatorArm64Test`) provide thin subclasses that only
+(`androidDeviceTest`, `jvmTest`, `iosSimulatorArm64Test`) provide thin subclasses that only
 handle DataStore initialization and teardown.
 
 - `commonTest` — Abstract base classes (e.g. `AbstractDatastoreInstrumentedTest`,
   `AbstractDatastoreBlockingTest`) containing all test methods.
-- `androidDeviceTest` / `desktopTest` / `iosSimulatorArm64Test` — Concrete subclasses that override
+- `androidDeviceTest` / `jvmTest` / `iosSimulatorArm64Test` — Concrete subclasses that override
   abstract properties (`preferenceDatastore`, `dataStore`, `testDispatcher`) and supply
   platform-specific setup/teardown.
 
@@ -151,7 +151,7 @@ and centralize platform-specific initialization code.
 | Platform      | Helper Class        | Location                                     |
 |---------------|---------------------|----------------------------------------------|
 | Android       | `AndroidTestHelper` | `androidDeviceTest/.../AndroidTestHelper.kt` |
-| Desktop (JVM) | `DesktopTestHelper` | `desktopTest/.../DesktopTestHelper.kt`       |
+| JVM           | `JvmTestHelper`     | `jvmTest/.../JvmTestHelper.kt`               |
 | iOS           | `IosTestHelper`     | `iosSimulatorArm64Test/.../IosTestHelper.kt` |
 
 Each helper provides two factory methods:
@@ -181,14 +181,14 @@ class MyFeatureTest : AbstractMyFeatureTest() {
 }
 ```
 
-**Standard test (Desktop — requires temp folder from JUnit's `@TempDir`):**
+**Standard test (JVM — requires temp folder from JUnit's `@TempDir`):**
 
 ```kotlin
 class MyFeatureTest : AbstractMyFeatureTest() {
     @TempDir
     lateinit var tempFolder: File
 
-    private val helper = DesktopTestHelper.standard("test_my_feature")
+    private val helper = JvmTestHelper.standard("test_my_feature")
 
     override val preferenceDatastore get() = helper.preferenceDatastore
     override val dataStore get() = helper.dataStore
@@ -226,9 +226,9 @@ class MyFeatureBlockingTest : AbstractMyFeatureBlockingTest() {
 
 - Run Android instrumentation tests (requires device/emulator) `./gradlew :<module-name>:connectedAndroidDeviceTest`
 
-#### KMP modules targeting Desktop (JVM) Test
+#### KMP modules targeting JVM Test
 
-- Run Desktop (JVM) tests (uses JUnit 5) `./gradlew :<module-name>:desktopTest`
+- Run JVM tests (uses JUnit 5) `./gradlew :<module-name>:jvmTest`
 
 #### KMP modules targeting iOS Test
 
@@ -242,10 +242,10 @@ they wrap `GenericProtoDatastore<T>` instead of `GenericPreferencesDatastore`.
 | Platform      | Helper Class                   | Proto Type              |
 |---------------|--------------------------------|-------------------------|
 | Android       | `AndroidProtoTestHelper`       | `TestProtoData`         |
-| Desktop (JVM) | `DesktopProtoTestHelper`       | `TestProtoData`         |
+| JVM           | `JvmProtoTestHelper`           | `TestProtoData`         |
 | iOS           | `IosProtoTestHelper`           | `TestProtoData`         |
 | Android       | `AndroidNullableProtoTestHelper` | `TestNullableProtoData` |
-| Desktop (JVM) | `DesktopNullableProtoTestHelper` | `TestNullableProtoData` |
+| JVM           | `JvmNullableProtoTestHelper`     | `TestNullableProtoData` |
 | iOS           | `IosNullableProtoTestHelper`   | `TestNullableProtoData` |
 
 Each helper provides `standard(datastoreName)` and `blocking(datastoreName)` factory methods,
@@ -312,7 +312,7 @@ Okio's `FileSystem.SYSTEM` cannot be referenced directly in `commonMain` when co
 targets. The compiler reports `Unresolved reference 'SYSTEM'` during iOS publication or compilation.
 
 **Workaround:** Use the `expect`/`actual` pattern. Declare an `internal expect val` in `commonMain`
-and provide `actual` implementations in each platform source set (`androidMain`, `desktopMain`,
+and provide `actual` implementations in each platform source set (`androidMain`, `jvmMain`,
 `iosMain`) that return `FileSystem.SYSTEM`. The `iosMain` source set covers all three iOS targets
 (`iosX64`, `iosArm64`, `iosSimulatorArm64`) via `applyDefaultHierarchyTemplate()`.
 
@@ -320,7 +320,7 @@ Files involved:
 
 - `commonMain/.../core/SystemFileSystem.kt` — `expect` declaration
 - `androidMain/.../core/SystemFileSystem.android.kt` — Android `actual`
-- `desktopMain/.../core/SystemFileSystem.desktop.kt` — Desktop/JVM `actual`
+- `jvmMain/.../core/SystemFileSystem.jvm.kt` — JVM `actual`
 - `iosMain/.../core/SystemFileSystem.ios.kt` — iOS `actual`
 
 When adding new code in `commonMain` that needs `FileSystem.SYSTEM`, use the `systemFileSystem`
