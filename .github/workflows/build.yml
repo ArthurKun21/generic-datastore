@@ -13,8 +13,7 @@ on:
     paths:
       - '.github/workflows/**'
       - 'gradle/**'
-      - 'app/**'
-      - 'composeApp/**'
+      - 'samples/**'
       - 'build.gradle.kts'
       - 'settings.gradle.kts'
       - 'generic-datastore/build.gradle.kts'
