@@ -28,7 +28,7 @@ kotlin {
         }
     }
 
-    jvm("desktop") {
+    jvm {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }
@@ -64,7 +64,7 @@ kotlin {
             }
         }
 
-        named("desktopTest") {
+        named("jvmTest") {
             dependencies {
                 implementation(libs.junit5)
             }
