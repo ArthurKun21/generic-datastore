@@ -53,7 +53,7 @@ Jetpack Compose extensions in `generic-datastore-compose`.
   - `batch/` – batch Compose extensions (`RememberBatchRead`, `RememberPreferences`,
       `RememberPreferencesLocal`, `BatchPrefsComposeState`, `PreferencesState`,
       `LocalPreferencesDatastore`).
-- `:app` and `:composeApp` – sample apps for local development.
+- `:samples` – contains sample apps for local development.
 
 ## KMP Targets
 

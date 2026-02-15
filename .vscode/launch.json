@@ -6,15 +6,15 @@
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/.vscode/run.js",
-      "args": [":samples:protoApp:run"],
+      "args": [":samples:protoComposeApp:run"],
       "console": "integratedTerminal"
     },
     {
-      "name": "Run Compose App",
+      "name": "Run Preference Sample App",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/.vscode/run.js",
-      "args": [":composeApp:run"],
+      "args": [":samples:preferenceComposeApp:run"],
       "console": "integratedTerminal"
     }
   ]
