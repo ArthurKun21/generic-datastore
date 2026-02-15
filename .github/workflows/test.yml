@@ -50,12 +50,12 @@ jobs:
 
       - name: Run Generic Datastore tests
         run: |
-          ./gradlew :generic-datastore:cleanDesktopTest :generic-datastore:desktopTest --parallel
+          ./gradlew :generic-datastore:jvmTest --parallel
       
       - name: Run Generic Datastore Compose tests
         if: ${{ !cancelled() }}
         run: |
-          ./gradlew :generic-datastore-compose:cleanDesktopTest :generic-datastore-compose:desktopTest --parallel
+          ./gradlew :generic-datastore-compose:jvmTest --parallel
 
   Test-iOS:
     timeout-minutes: 15
