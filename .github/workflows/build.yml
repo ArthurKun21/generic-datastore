@@ -54,7 +54,7 @@ jobs:
 
       - name: Build app
         run: |
-          ./gradlew assembleRelease --parallel
+          ./gradlew :samples:preferenceAndroidApp:assembleRelease --parallel
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v6
@@ -87,7 +87,7 @@ jobs:
 
       - name: Create distributable
         run: |
-          ./gradlew :composeApp:createReleaseDistributable
+          ./gradlew :samples:protoComposeApp:createReleaseDistributable
   
   Compile-IOS:
     timeout-minutes: 60
