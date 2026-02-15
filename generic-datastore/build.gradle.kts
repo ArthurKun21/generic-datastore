@@ -32,7 +32,7 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    jvm("desktop") {
+    jvm {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }
@@ -64,7 +64,7 @@ kotlin {
                 implementation(libs.androidx.test.espresso)
             }
         }
-        named("desktopTest") {
+        named("jvmTest") {
             dependencies {
                 implementation(libs.junit5)
             }
