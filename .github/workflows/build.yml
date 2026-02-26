@@ -56,7 +56,7 @@ jobs:
           ./gradlew :samples:preferenceAndroidApp:assembleRelease --parallel
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: app-${{ github.run_number }}
           path: app/build/outputs/apk/release/app-release.apk
