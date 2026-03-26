@@ -1,4 +1,4 @@
-import io.github.arthurkun.generic.datastore.configureMavenPublish
+import generic.datastore.buildlogic.configureMavenPublish
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

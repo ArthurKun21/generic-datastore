@@ -1,9 +1,8 @@
-package io.github.arthurkun.generic.datastore
+package generic.datastore.buildlogic
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 internal fun Project.configureKmpLibrary(

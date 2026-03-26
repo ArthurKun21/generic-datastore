@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore
+package generic.datastore.buildlogic
 
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import org.gradle.api.Project

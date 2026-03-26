@@ -1,4 +1,4 @@
-import io.github.arthurkun.generic.datastore.configureKmpLibrary
+import generic.datastore.buildlogic.configureKmpLibrary
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
