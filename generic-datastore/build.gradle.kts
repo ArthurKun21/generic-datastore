@@ -7,8 +7,6 @@ plugins {
 kotlin {
     android {
         namespace = "io.github.arthurkun.generic.datastore"
-        compileSdk = libs.versions.compile.sdk.get().toInt()
-        minSdk = libs.versions.min.sdk.get().toInt()
 
         withJava()
 
