@@ -10,7 +10,10 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 class KmpSampleConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply("org.jetbrains.kotlin.multiplatform")
+            with(pluginManager) {
+                apply("org.jetbrains.kotlin.multiplatform")
+                apply("gd.compose")
+            }
 
             extensions.configure<KotlinMultiplatformExtension> {
                 applyDefaultHierarchyTemplate()

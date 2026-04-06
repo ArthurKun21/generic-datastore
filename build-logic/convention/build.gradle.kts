@@ -28,11 +28,11 @@ gradlePlugin {
             implementationClass = "ComposeConventionPlugin"
         }
         register("kmpSample") {
-            id = "generic-datastore.kmp-sample"
+            id = "gd.kmp.sample"
             implementationClass = "KmpSampleConventionPlugin"
         }
         register("androidSampleApp") {
-            id = "generic-datastore.android-sample-app"
+            id = "gd.android.sample"
             implementationClass = "AndroidSampleAppConventionPlugin"
         }
     }

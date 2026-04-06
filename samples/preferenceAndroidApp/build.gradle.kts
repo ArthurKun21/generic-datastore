@@ -1,5 +1,5 @@
 plugins {
-    id("generic-datastore.android-sample-app")
+    id("gd.android.sample")
 }
 
 android {

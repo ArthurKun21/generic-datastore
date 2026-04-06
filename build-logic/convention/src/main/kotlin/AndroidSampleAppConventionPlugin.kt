@@ -9,8 +9,10 @@ import org.gradle.kotlin.dsl.configure
 class AndroidSampleAppConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply("com.android.application")
-            pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
+            with(pluginManager) {
+                apply("com.android.application")
+                apply("gd.compose")
+            }
 
             extensions.configure<ApplicationExtension> {
                 configureAndroid(this)

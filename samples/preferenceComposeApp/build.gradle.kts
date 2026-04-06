@@ -3,8 +3,7 @@ import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    id("generic-datastore.kmp-sample")
-    id("gd.compose")
+    id("gd.kmp.sample")
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.serialization)
 }
