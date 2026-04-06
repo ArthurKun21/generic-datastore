@@ -19,6 +19,10 @@ gradlePlugin {
             id = "gd.kmp.library"
             implementationClass = "KmpLibraryConventionPlugin"
         }
+        register("kmpLibraryTest") {
+            id = "gd.kmp.library.test"
+            implementationClass = "KmpLibraryTestConventionPlugin"
+        }
         register("mavenPublish") {
             id = "gd.maven.publish"
             implementationClass = "MavenPublishConventionPlugin"

@@ -1,5 +1,6 @@
 plugins {
     id("gd.kmp.library")
+    id("gd.kmp.library.test")
     id("gd.maven.publish")
     id("gd.compose")
 }
@@ -12,23 +13,12 @@ kotlin {
         optimization {
             consumerKeepRules.file("consumer-rules.pro")
         }
-
-        withDeviceTestBuilder {
-            sourceSetTreeName = "test"
-        }.configure {
-            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        }
     }
 
     sourceSets {
         commonMain.dependencies {
             api(project(":generic-datastore"))
             implementation(libs.compose.runtime)
-        }
-
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-            implementation(libs.coroutines.test)
         }
 
         androidMain.dependencies {
@@ -43,12 +33,6 @@ kotlin {
                 implementation(libs.junit4)
                 implementation(libs.androidx.test.junit)
                 implementation(libs.androidx.test.espresso)
-            }
-        }
-
-        named("jvmTest") {
-            dependencies {
-                implementation(libs.junit5)
             }
         }
     }

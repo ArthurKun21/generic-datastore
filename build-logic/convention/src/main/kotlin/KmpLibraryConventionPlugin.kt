@@ -2,6 +2,8 @@ import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import gd.buildlogic.AndroidConfig
 import gd.buildlogic.configureCommonKotlinCompileOptions
 import gd.buildlogic.configureKmpLibrary
+import gd.buildlogic.libs
+import gd.buildlogic.pluginId
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -13,8 +15,8 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply("org.jetbrains.kotlin.multiplatform")
-                apply("com.android.kotlin.multiplatform.library")
+                apply(libs.pluginId("kotlin-multiplatform"))
+                apply(libs.pluginId("android-library"))
                 apply("gd.spotless")
             }
 
