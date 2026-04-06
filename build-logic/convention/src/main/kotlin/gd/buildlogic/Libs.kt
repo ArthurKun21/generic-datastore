@@ -1,4 +1,4 @@
-package generic.datastore.buildlogic
+package gd.buildlogic
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.MinimalExternalModuleDependency

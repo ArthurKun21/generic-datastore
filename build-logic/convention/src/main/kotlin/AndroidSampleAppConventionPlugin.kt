@@ -1,6 +1,6 @@
 import com.android.build.api.dsl.ApplicationExtension
-import generic.datastore.buildlogic.AndroidConfig
-import generic.datastore.buildlogic.configureCommonKotlinCompileOptions
+import gd.buildlogic.AndroidConfig
+import gd.buildlogic.configureCommonKotlinCompileOptions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

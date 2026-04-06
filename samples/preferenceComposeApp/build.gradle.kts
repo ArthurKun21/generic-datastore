@@ -1,4 +1,4 @@
-import generic.datastore.buildlogic.AndroidConfig
+import gd.buildlogic.AndroidConfig
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 

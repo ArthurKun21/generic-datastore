@@ -1,5 +1,5 @@
-import generic.datastore.buildlogic.libs
-import generic.datastore.buildlogic.pluginId
+import gd.buildlogic.libs
+import gd.buildlogic.pluginId
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

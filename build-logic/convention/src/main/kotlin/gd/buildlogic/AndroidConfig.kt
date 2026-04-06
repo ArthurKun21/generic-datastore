@@ -1,4 +1,4 @@
-package generic.datastore.buildlogic
+package gd.buildlogic
 
 import org.gradle.api.JavaVersion as GradleJavaVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget as KotlinJvmTarget

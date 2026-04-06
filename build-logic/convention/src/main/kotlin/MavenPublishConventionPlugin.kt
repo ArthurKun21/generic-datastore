@@ -1,4 +1,4 @@
-import generic.datastore.buildlogic.configureMavenPublish
+import gd.buildlogic.configureMavenPublish
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

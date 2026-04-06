@@ -1,4 +1,4 @@
-package generic.datastore.buildlogic
+package gd.buildlogic
 
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import org.gradle.api.Project
