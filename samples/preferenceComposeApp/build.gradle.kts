@@ -1,20 +1,14 @@
-import gd.buildlogic.AndroidConfig
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     id("gd.kmp.sample")
-    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
     android {
         namespace = "io.github.arthurkun.generic.datastore.compose.app"
-        compileSdk = AndroidConfig.COMPILE_SDK
-        minSdk = AndroidConfig.MIN_SDK
-
-        withJava()
 
         optimization {
             consumerKeepRules.file("consumer-rules.pro")

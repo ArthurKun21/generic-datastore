@@ -7,6 +7,9 @@ plugins {
 }
 
 kotlin {
+    android {
+        namespace = "io.github.arthurkun.generic.datastore.proto.app"
+    }
     jvm("desktop") {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
