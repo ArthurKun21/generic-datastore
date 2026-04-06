@@ -26,7 +26,6 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
                     minSdk = AndroidConfig.MIN_SDK
                 }
 
-                iosX64()
                 iosArm64()
                 iosSimulatorArm64()
 
