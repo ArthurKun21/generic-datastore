@@ -3,13 +3,13 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     id("gd.kmp.sample")
-    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
     android {
         namespace = "io.github.arthurkun.generic.datastore.compose.app"
 
+        @Suppress("UnstableApiUsage")
         optimization {
             consumerKeepRules.file("consumer-rules.pro")
         }
