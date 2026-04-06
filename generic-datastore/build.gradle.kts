@@ -27,7 +27,7 @@ kotlin {
             implementation(libs.coroutines.core)
             api(libs.datastore.preferences.core)
             api(libs.datastore.core)
-            api(libs.kotlinx.io.core)
+            implementation(libs.kotlinx.io.core)
             implementation(libs.kotlinx.serialization.json)
         }
 
