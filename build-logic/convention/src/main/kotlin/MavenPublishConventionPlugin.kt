@@ -2,6 +2,7 @@ import generic.datastore.buildlogic.configureMavenPublish
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+@Suppress("unused")
 class MavenPublishConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
