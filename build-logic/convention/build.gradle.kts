@@ -12,7 +12,7 @@ dependencies {
 gradlePlugin {
     plugins {
         register("spotless") {
-            id = "generic-datastore.spotless"
+            id = "gd.spotless"
             implementationClass = "SpotlessConventionPlugin"
         }
         register("kmpLibrary") {

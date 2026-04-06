@@ -15,6 +15,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply("com.android.kotlin.multiplatform.library")
+                apply("gd.spotless")
             }
 
             extensions.configure<KotlinMultiplatformExtension> {

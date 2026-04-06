@@ -12,6 +12,7 @@ class AndroidSampleAppConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("com.android.application")
                 apply("gd.compose")
+                apply("gd.spotless")
             }
 
             extensions.configure<ApplicationExtension> {

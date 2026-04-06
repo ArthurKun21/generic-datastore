@@ -7,9 +7,5 @@ plugins {
     alias(libs.plugins.jetbrains.compose) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.wire) apply false
-    id("generic-datastore.spotless") apply false
-}
-
-subprojects {
-    apply(plugin = "generic-datastore.spotless")
+    alias(libs.plugins.spotless) apply false
 }

@@ -18,6 +18,7 @@ class KmpSampleConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply(libs.pluginId("android-library"))
                 apply("gd.compose")
+                apply("gd.spotless")
             }
 
             extensions.configure<KotlinMultiplatformExtension> {
