@@ -25,17 +25,6 @@ kotlin {
             implementation(libs.kotlinx.io.core)
             implementation(libs.kotlinx.serialization.json)
         }
-
-        getByName("androidDeviceTest") {
-            dependencies {
-                implementation(libs.kotlin.test)
-                implementation(libs.coroutines.test)
-                implementation(libs.datastore.preferences)
-                implementation(libs.junit4)
-                implementation(libs.androidx.test.junit)
-                implementation(libs.androidx.test.espresso)
-            }
-        }
     }
 }
 

@@ -34,6 +34,17 @@ class KmpLibraryTestConventionPlugin : Plugin<Project> {
                         implementation(libs.library("coroutines-test"))
                     }
 
+                    getByName("androidDeviceTest") {
+                        dependencies {
+                            implementation(libs.library("kotlin-test"))
+                            implementation(libs.library("coroutines-test"))
+                            implementation(libs.library("datastore-preferences"))
+                            implementation(libs.library("junit4"))
+                            implementation(libs.library("androidx-test-junit"))
+                            implementation(libs.library("androidx-test-espresso"))
+                        }
+                    }
+
                     jvmTest.dependencies {
                         implementation(libs.library("junit5"))
                     }
