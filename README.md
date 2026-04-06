@@ -20,7 +20,7 @@ SharedPreferences.
 
 ### KMP Targets
 
-Both modules target **Android**, **Desktop (JVM)**, and **iOS** (`iosX64`, `iosArm64`,
+Both modules target **Android**, **Desktop (JVM)**, and **iOS** (`iosArm64`,
 `iosSimulatorArm64`).
 
 ## Installation
