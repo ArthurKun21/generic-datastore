@@ -1,5 +1,5 @@
 import com.android.build.api.dsl.ApplicationExtension
-import gd.buildlogic.AndroidConfig
+import gd.buildlogic.configureAndroid
 import gd.buildlogic.configureCommonKotlinCompileOptions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -13,20 +13,10 @@ class AndroidSampleAppConventionPlugin : Plugin<Project> {
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
             extensions.configure<ApplicationExtension> {
-                compileSdk = AndroidConfig.COMPILE_SDK
+                configureAndroid(this)
 
                 defaultConfig {
-                    minSdk = AndroidConfig.MIN_SDK
-                    targetSdk = AndroidConfig.TARGET_SDK
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-                    vectorDrawables {
-                        useSupportLibrary = true
-                    }
-                }
-
-                compileOptions {
-                    sourceCompatibility = AndroidConfig.JavaVersion
-                    targetCompatibility = AndroidConfig.JavaVersion
                 }
 
                 buildFeatures {
