@@ -1,6 +1,6 @@
 plugins {
-    id("generic-datastore.kmp-library")
-    id("generic-datastore.maven-publish")
+    id("gd.kmp.library")
+    id("gd.maven.publish")
     alias(libs.plugins.compose.compiler)
 }
 

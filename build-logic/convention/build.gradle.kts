@@ -16,11 +16,11 @@ gradlePlugin {
             implementationClass = "SpotlessConventionPlugin"
         }
         register("kmpLibrary") {
-            id = "generic-datastore.kmp-library"
+            id = "gd.kmp.library"
             implementationClass = "KmpLibraryConventionPlugin"
         }
         register("mavenPublish") {
-            id = "generic-datastore.maven-publish"
+            id = "gd.maven.publish"
             implementationClass = "MavenPublishConventionPlugin"
         }
         register("compose") {
