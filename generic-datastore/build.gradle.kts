@@ -54,7 +54,11 @@ kotlin {
 }
 
 mavenPublishing {
-    coordinates("com.github.ArthurKun21", "generic-datastore", version.toString())
+    coordinates(
+        groupId = "com.github.ArthurKun21",
+        artifactId = "generic-datastore",
+        version = version.toString(),
+    )
 
     pom {
         name.set("Generic Datastore Library")
