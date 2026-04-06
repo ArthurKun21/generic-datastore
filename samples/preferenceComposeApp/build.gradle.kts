@@ -1,19 +1,19 @@
+import generic.datastore.buildlogic.AndroidConfig
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
+    id("generic-datastore.kmp-sample")
+    id("gd.compose")
     alias(libs.plugins.android.library)
-    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.jetbrains.compose)
 }
 
 kotlin {
     android {
         namespace = "io.github.arthurkun.generic.datastore.compose.app"
-        compileSdk = libs.versions.compile.sdk.get().toInt()
-        minSdk = libs.versions.min.sdk.get().toInt()
+        compileSdk = AndroidConfig.COMPILE_SDK
+        minSdk = AndroidConfig.MIN_SDK
 
         withJava()
 
@@ -37,8 +37,6 @@ kotlin {
             useJUnitPlatform()
         }
     }
-
-    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {
@@ -71,12 +69,6 @@ kotlin {
 
         androidMain.dependsOn(jvmCommon)
         desktopMain.dependsOn(jvmCommon)
-    }
-
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-Xexpect-actual-classes",
-        )
     }
 }
 

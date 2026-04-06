@@ -2,9 +2,8 @@ import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.jetbrains.compose)
+    id("generic-datastore.kmp-sample")
+    id("gd.compose")
     alias(libs.plugins.wire)
 }
 
@@ -14,8 +13,6 @@ kotlin {
             useJUnitPlatform()
         }
     }
-
-    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {
@@ -34,12 +31,6 @@ kotlin {
                 implementation(compose.desktop.currentOs)
             }
         }
-    }
-
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-Xexpect-actual-classes",
-        )
     }
 }
 

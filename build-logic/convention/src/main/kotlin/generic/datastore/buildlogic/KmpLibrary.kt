@@ -27,6 +27,10 @@ internal fun Project.configureCommonKotlinCompileOptions() {
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(AndroidConfig.JvmTarget)
+            freeCompilerArgs.addAll(
+                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-opt-in=kotlin.time.ExperimentalTime",
+            )
         }
     }
 }

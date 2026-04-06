@@ -1,23 +1,14 @@
 plugins {
-    id("com.android.application")
-    alias(libs.plugins.compose.compiler)
+    id("generic-datastore.android-sample-app")
 }
 
 android {
     namespace = "io.github.arthurkun.generic.datastore.app"
-    compileSdk = libs.versions.compile.sdk.get().toInt()
 
     defaultConfig {
         applicationId = "io.github.arthurkun.generic.datastore.app"
-        minSdk = libs.versions.min.sdk.get().toInt()
-        targetSdk = libs.versions.target.sdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
     }
 
     buildTypes {
@@ -28,18 +19,6 @@ android {
                 "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("debug")
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    buildFeatures {
-        compose = true
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
 }

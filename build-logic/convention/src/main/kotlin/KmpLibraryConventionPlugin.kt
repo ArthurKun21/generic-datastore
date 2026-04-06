@@ -1,5 +1,6 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import generic.datastore.buildlogic.AndroidConfig
+import generic.datastore.buildlogic.configureCommonKotlinCompileOptions
 import generic.datastore.buildlogic.configureKmpLibrary
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -43,6 +44,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
             val kmpExtension =
                 extensions.getByType(KotlinMultiplatformExtension::class.java)
             configureKmpLibrary(kmpExtension)
+            configureCommonKotlinCompileOptions()
         }
     }
 }

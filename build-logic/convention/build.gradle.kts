@@ -23,5 +23,17 @@ gradlePlugin {
             id = "generic-datastore.maven-publish"
             implementationClass = "MavenPublishConventionPlugin"
         }
+        register("compose") {
+            id = "gd.compose"
+            implementationClass = "ComposeConventionPlugin"
+        }
+        register("kmpSample") {
+            id = "generic-datastore.kmp-sample"
+            implementationClass = "KmpSampleConventionPlugin"
+        }
+        register("androidSampleApp") {
+            id = "generic-datastore.android-sample-app"
+            implementationClass = "AndroidSampleAppConventionPlugin"
+        }
     }
 }
