@@ -4,7 +4,6 @@ import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
@@ -35,10 +34,7 @@ internal fun Project.configureCommonKotlinCompileOptions() {
     }
 }
 
-internal fun Project.configureKmpLibrary(
-    kmpExtension: KotlinMultiplatformExtension,
-) {
-
+internal fun Project.configureKmpLibrary() {
 
     tasks.withType(Test::class.java).configureEach {
         useJUnitPlatform()

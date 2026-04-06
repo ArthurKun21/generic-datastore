@@ -23,7 +23,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
             }
 
             extensions.configure<KotlinMultiplatformExtension> {
-                configureKmpLibrary(this)
+                configureKmpLibrary()
                 explicitApi()
 
                 applyDefaultHierarchyTemplate()
