@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -30,9 +31,13 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
+val isJitPack = System.getenv("JITPACK") == "true"
+
 rootProject.name = "GenericDataStore"
-include(":samples:preferenceAndroidApp")
-include(":samples:preferenceComposeApp")
-include(":samples:protoComposeApp")
 include(":generic-datastore")
 include(":generic-datastore-compose")
+if (!isJitPack) {
+    include(":samples:preferenceAndroidApp")
+    include(":samples:preferenceComposeApp")
+    include(":samples:protoComposeApp")
+}

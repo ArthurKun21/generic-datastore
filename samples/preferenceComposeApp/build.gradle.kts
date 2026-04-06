@@ -1,22 +1,12 @@
-import org.gradle.jvm.tasks.Jar
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.jetbrains.compose)
+    id("gd.kmp.sample")
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "io.github.arthurkun.generic.datastore.compose.app"
-        compileSdk = libs.versions.compile.sdk.get().toInt()
-        minSdk = libs.versions.min.sdk.get().toInt()
 
-        withJava()
-
+        @Suppress("UnstableApiUsage")
         optimization {
             consumerKeepRules.file("consumer-rules.pro")
         }
@@ -31,14 +21,6 @@ kotlin {
             }
         }
     }
-
-    jvm("desktop") {
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
-
-    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {
@@ -58,25 +40,14 @@ kotlin {
             }
         }
 
-        val desktopMain by getting {
-            dependencies {
-                implementation(libs.coroutines.swing)
-                implementation(compose.desktop.currentOs)
-            }
-        }
-
         val jvmCommon by creating {
             dependsOn(commonMain)
         }
 
         androidMain.dependsOn(jvmCommon)
-        desktopMain.dependsOn(jvmCommon)
-    }
-
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-Xexpect-actual-classes",
-        )
+        named("desktopMain") {
+            dependsOn(jvmCommon)
+        }
     }
 }
 
@@ -84,28 +55,8 @@ compose.desktop {
     application {
         mainClass = "io.github.arthurkun.generic.datastore.compose.app.MainKt"
 
-        buildTypes {
-            release {
-                proguard {
-                    configurationFiles.from(project.file("proguard-rules.pro"))
-                }
-            }
-        }
-
         nativeDistributions {
-            modules("jdk.unsupported")
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "generic-datastore-sample"
-            packageVersion = "1.0.0"
         }
     }
-}
-
-tasks.withType<Jar>().configureEach {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    exclude("META-INF/AL2.0")
-    exclude("META-INF/LGPL2.1")
-
-    exclude("META-INF/MANIFEST.MF")
 }

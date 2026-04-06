@@ -61,7 +61,7 @@ Both library modules target:
 
 - **Android** (`androidMain`)
 - **JVM** (`jvmMain`)
-- **iOS** (`iosX64`, `iosArm64`, `iosSimulatorArm64`)
+- **iOS** (`iosArm64`, `iosSimulatorArm64`)
 
 ## Workflow
 
@@ -313,8 +313,8 @@ targets. The compiler reports `Unresolved reference 'SYSTEM'` during iOS publica
 
 **Workaround:** Use the `expect`/`actual` pattern. Declare an `internal expect val` in `commonMain`
 and provide `actual` implementations in each platform source set (`androidMain`, `jvmMain`,
-`iosMain`) that return `FileSystem.SYSTEM`. The `iosMain` source set covers all three iOS targets
-(`iosX64`, `iosArm64`, `iosSimulatorArm64`) via `applyDefaultHierarchyTemplate()`.
+`iosMain`) that return `FileSystem.SYSTEM`. The `iosMain` source set covers all two iOS targets
+(`iosArm64`, `iosSimulatorArm64`) via `applyDefaultHierarchyTemplate()`.
 
 Files involved:
 
