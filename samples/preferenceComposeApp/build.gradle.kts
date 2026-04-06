@@ -1,6 +1,3 @@
-import org.gradle.jvm.tasks.Jar
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-
 plugins {
     id("gd.kmp.sample")
 }
@@ -25,8 +22,6 @@ kotlin {
         }
     }
 
-    jvm("desktop")
-
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -45,19 +40,14 @@ kotlin {
             }
         }
 
-        val desktopMain by getting {
-            dependencies {
-                implementation(libs.coroutines.swing)
-                implementation(compose.desktop.currentOs)
-            }
-        }
-
         val jvmCommon by creating {
             dependsOn(commonMain)
         }
 
         androidMain.dependsOn(jvmCommon)
-        desktopMain.dependsOn(jvmCommon)
+        named("desktopMain") {
+            dependsOn(jvmCommon)
+        }
     }
 }
 
@@ -65,28 +55,8 @@ compose.desktop {
     application {
         mainClass = "io.github.arthurkun.generic.datastore.compose.app.MainKt"
 
-        buildTypes {
-            release {
-                proguard {
-                    configurationFiles.from(project.file("proguard-rules.pro"))
-                }
-            }
-        }
-
         nativeDistributions {
-            modules("jdk.unsupported")
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "generic-datastore-sample"
-            packageVersion = "1.0.0"
         }
     }
-}
-
-tasks.withType<Jar>().configureEach {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    exclude("META-INF/AL2.0")
-    exclude("META-INF/LGPL2.1")
-
-    exclude("META-INF/MANIFEST.MF")
 }
