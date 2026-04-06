@@ -1,7 +1,7 @@
 plugins {
     id("gd.kmp.library")
     id("gd.maven.publish")
-    alias(libs.plugins.compose.compiler)
+    id("gd.compose")
 }
 
 kotlin {
