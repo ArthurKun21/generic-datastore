@@ -1,13 +1,14 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import gd.buildlogic.AndroidConfig
 import gd.buildlogic.configureCommonKotlinCompileOptions
+import gd.buildlogic.configureKmpLibrary
 import gd.buildlogic.library
 import gd.buildlogic.libs
 import gd.buildlogic.pluginId
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.testing.Test
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
@@ -21,6 +22,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 class KmpSampleConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
+            configureCommonKotlinCompileOptions()
+
             with(pluginManager) {
                 apply(libs.pluginId("kotlin-multiplatform"))
                 apply(libs.pluginId("android-library"))
@@ -30,6 +33,8 @@ class KmpSampleConventionPlugin : Plugin<Project> {
             }
 
             extensions.configure<KotlinMultiplatformExtension> {
+                configureKmpLibrary()
+
                 applyDefaultHierarchyTemplate()
 
                 targets.withType<KotlinMultiplatformAndroidLibraryTarget>().configureEach {
