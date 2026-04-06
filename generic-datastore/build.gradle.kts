@@ -10,6 +10,7 @@ kotlin {
 
         withJava()
 
+        @Suppress("UnstableApiUsage")
         optimization {
             consumerKeepRules.file("consumer-rules.pro")
         }

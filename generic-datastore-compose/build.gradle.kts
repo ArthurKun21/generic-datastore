@@ -8,6 +8,7 @@ kotlin {
     android {
         namespace = "io.github.arthurkun.generic.datastore.compose"
 
+        @Suppress("UnstableApiUsage")
         optimization {
             consumerKeepRules.file("consumer-rules.pro")
         }
