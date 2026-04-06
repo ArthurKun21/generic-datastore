@@ -14,6 +14,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 class KmpLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
+            configureCommonKotlinCompileOptions()
+
             with(pluginManager) {
                 apply(libs.pluginId("kotlin-multiplatform"))
                 apply(libs.pluginId("android-library"))
@@ -21,6 +23,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
             }
 
             extensions.configure<KotlinMultiplatformExtension> {
+                configureKmpLibrary(this)
                 explicitApi()
 
                 applyDefaultHierarchyTemplate()
@@ -42,12 +45,6 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
                     )
                 }
             }
-
-
-            val kmpExtension =
-                extensions.getByType(KotlinMultiplatformExtension::class.java)
-            configureKmpLibrary(kmpExtension)
-            configureCommonKotlinCompileOptions()
         }
     }
 }
