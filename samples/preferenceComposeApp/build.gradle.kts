@@ -25,11 +25,7 @@ kotlin {
         }
     }
 
-    jvm("desktop") {
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
+    jvm("desktop")
 
     sourceSets {
         val commonMain by getting {
