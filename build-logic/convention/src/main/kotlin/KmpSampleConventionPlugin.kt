@@ -15,8 +15,9 @@ class KmpSampleConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply("org.jetbrains.kotlin.multiplatform")
+                apply(libs.pluginId("kotlin-multiplatform"))
                 apply(libs.pluginId("android-library"))
+                apply(libs.pluginId("kotlin-serialization"))
                 apply("gd.compose")
                 apply("gd.spotless")
             }
