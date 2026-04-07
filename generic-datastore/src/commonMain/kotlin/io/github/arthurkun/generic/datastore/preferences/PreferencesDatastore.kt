@@ -329,8 +329,8 @@ public interface PreferencesDatastore {
     ): Preference<List<T>?>
 
     /**
-     * Returns a [Flow] that emits a [BatchReadScope] on every DataStore change,
-     * allowing multiple preferences to be read from the same snapshot.
+    * Returns a [Flow] that emits a [BatchReadScope] on every DataStore change,
+    * allowing multiple library-created preferences to be read from the same snapshot.
      *
      * The scope re-emits whenever any preference in the datastore changes.
      * Use `distinctUntilChanged()` on derived values to filter irrelevant updates.
@@ -342,8 +342,8 @@ public interface PreferencesDatastore {
     public fun <R> batchReadFlow(block: BatchReadScope.() -> R): Flow<R>
 
     /**
-     * One-shot batch read: collects the latest DataStore snapshot and executes [block]
-     * within a [BatchReadScope].
+    * One-shot batch read: collects the latest DataStore snapshot and executes [block]
+    * within a [BatchReadScope].
      *
      * @param R The return type of the block.
      * @param block A lambda with [BatchReadScope] receiver that reads one or more preferences.
@@ -352,21 +352,23 @@ public interface PreferencesDatastore {
     public suspend fun <R> batchGet(block: BatchReadScope.() -> R): R
 
     /**
-     * Batch write: executes [block] inside a single DataStore `edit` transaction.
+    * Batch write: executes [block] inside a single DataStore `edit` transaction.
      *
-     * All [BatchWriteScope.set], [BatchWriteScope.delete], and [BatchWriteScope.resetToDefault]
-     * calls in [block] share the same [MutablePreferences][androidx.datastore.preferences.core.MutablePreferences].
+    * All [BatchWriteScope.set], [BatchWriteScope.delete], and [BatchWriteScope.resetToDefault]
+    * calls in [block] share the same [MutablePreferences][androidx.datastore.preferences.core.MutablePreferences].
+    * The scope accepts [Preference] instances produced by this library, including mapped
+    * preferences created from them.
      *
      * @param block A lambda with [BatchWriteScope] receiver that writes one or more preferences.
      */
     public suspend fun batchWrite(block: BatchWriteScope.() -> Unit)
 
     /**
-     * Atomic batch update: reads the current snapshot and writes new values in a single
-     * DataStore `edit` transaction.
+    * Atomic batch update: reads the current snapshot and writes new values in a single
+    * DataStore `edit` transaction.
      *
-     * [block] can call [BatchUpdateScope.value] to read and [BatchUpdateScope.set] to write,
-     * guaranteeing consistency.
+    * [block] can call [BatchUpdateScope.value] to read and [BatchUpdateScope.set] to write,
+    * guaranteeing consistency for [Preference] instances produced by this library.
      *
      * @param block A lambda with [BatchUpdateScope] receiver that reads and writes preferences.
      */

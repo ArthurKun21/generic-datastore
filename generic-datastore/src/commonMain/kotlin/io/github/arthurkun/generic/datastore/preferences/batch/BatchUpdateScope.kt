@@ -11,7 +11,8 @@ import io.github.arthurkun.generic.datastore.preferences.Preference
  * Reads and writes operate on the same [MutablePreferences] transaction state, so reads
  * reflect writes that happened earlier in the same block.
  *
- * Use [get]/[set] or indexing operators (`this[pref]`, `this[pref] = value`) to access preferences.
+ * Use [get]/[set] or indexing operators (`this[pref]`, `this[pref] = value`) to access
+ * preferences created by this library.
  *
  * Obtain this scope from [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchUpdate].
  */
@@ -21,27 +22,21 @@ public class BatchUpdateScope internal constructor(
     /**
      * Reads the given preference's current value from the ongoing transaction state.
      *
-     * @param preference The preference to read.
+     * @param preference The library-created preference to read.
      * @return The preference value, or its default if the key is absent.
-     * @throws IllegalStateException if [preference] does not implement [PreferencesAccessor].
      */
     public operator fun <T> get(preference: Preference<T>): T {
-        val accessible = preference as? PreferencesAccessor<T>
-            ?: error("Batch operations only support preferences created by this library")
-        return accessible.readFrom(mutablePreferences)
+        return (preference as PreferencesAccessor<T>).readFrom(mutablePreferences)
     }
 
     /**
      * Sets the given preference's value in the shared transaction.
      *
-     * @param preference The preference to write.
+     * @param preference The library-created preference to write.
      * @param value The new value to write.
-     * @throws IllegalStateException if [preference] does not implement [PreferencesAccessor].
      */
     public operator fun <T> set(preference: Preference<T>, value: T) {
-        val accessible = preference as? PreferencesAccessor<T>
-            ?: error("Batch operations only support preferences created by this library")
-        accessible.writeInto(mutablePreferences, value)
+        (preference as PreferencesAccessor<T>).writeInto(mutablePreferences, value)
     }
 
     /**
@@ -57,13 +52,10 @@ public class BatchUpdateScope internal constructor(
     /**
      * Removes the given preference's key from the shared transaction.
      *
-     * @param preference The preference to remove.
-     * @throws IllegalStateException if [preference] does not implement [PreferencesAccessor].
+     * @param preference The library-created preference to remove.
      */
     public fun <T> delete(preference: Preference<T>) {
-        val accessible = preference as? PreferencesAccessor<T>
-            ?: error("Batch operations only support preferences created by this library")
-        accessible.removeFrom(mutablePreferences)
+        (preference as PreferencesAccessor<T>).removeFrom(mutablePreferences)
     }
 
     /**

@@ -11,7 +11,8 @@ import io.github.arthurkun.generic.datastore.preferences.Preference
  * All [set], [delete], and [resetToDefault] calls within this scope write into the
  * same [MutablePreferences] instance, collapsing N writes into one atomic transaction.
  *
- * Use [set] or the indexing operator (`this[pref] = value`) to write preference values.
+ * Use [set] or the indexing operator (`this[pref] = value`) to write preference values created by
+ * this library.
  *
  * Obtain this scope from [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchWrite].
  */
@@ -21,26 +22,20 @@ public class BatchWriteScope internal constructor(
     /**
      * Sets the given preference's value in the shared transaction.
      *
-     * @param preference The preference to write.
+     * @param preference The library-created preference to write.
      * @param value The new value to write.
-     * @throws IllegalStateException if [preference] does not implement [PreferencesAccessor].
      */
     public operator fun <T> set(preference: Preference<T>, value: T) {
-        val accessible = preference as? PreferencesAccessor<T>
-            ?: error("Batch operations only support preferences created by this library")
-        accessible.writeInto(mutablePreferences, value)
+        (preference as PreferencesAccessor<T>).writeInto(mutablePreferences, value)
     }
 
     /**
      * Removes the given preference's key from the shared transaction.
      *
-     * @param preference The preference to remove.
-     * @throws IllegalStateException if [preference] does not implement [PreferencesAccessor].
+     * @param preference The library-created preference to remove.
      */
     public fun <T> delete(preference: Preference<T>) {
-        val accessible = preference as? PreferencesAccessor<T>
-            ?: error("Batch operations only support preferences created by this library")
-        accessible.removeFrom(mutablePreferences)
+        (preference as PreferencesAccessor<T>).removeFrom(mutablePreferences)
     }
 
     /**

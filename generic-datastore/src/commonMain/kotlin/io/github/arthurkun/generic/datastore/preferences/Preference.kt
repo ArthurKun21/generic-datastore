@@ -8,14 +8,15 @@ import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccess
 import kotlin.reflect.KProperty
 
 /**
- * A marker interface for [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instances backed by a Preferences DataStore.
+ * A sealed [DelegatedPreference] backed by a Preferences DataStore.
  *
- * This interface restricts certain extension functions (such as [io.github.arthurkun.generic.datastore.preferences.utils.map] and [io.github.arthurkun.generic.datastore.preferences.utils.mapIO])
- * to preferences-backed implementations only, preventing their use with Proto DataStore.
+ * Only this library can create implementations of [Preference]. This keeps batch APIs limited to
+ * library-owned preferences while still allowing all preference wrappers produced by this module,
+ * such as mapped preferences, to participate in batch reads and writes.
  *
  * @param T The type of the preference value.
  */
-public interface Preference<T> : DelegatedPreference<T>
+public sealed interface Preference<T> : DelegatedPreference<T>
 
 /**
  * Internal implementation of the [Preference] interface.
