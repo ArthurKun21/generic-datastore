@@ -64,7 +64,11 @@ internal class PrefsComposeState<T>(
             if (!policy.equivalent(oldValue, value)) {
                 localOverride = value
                 scope.launch {
-                    prefs.set(value)
+                    try {
+                        prefs.set(value)
+                    } catch (_: Exception) {
+                        localOverride = Unset
+                    }
                 }
             }
         }
