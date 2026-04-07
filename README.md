@@ -509,6 +509,10 @@ class SettingsViewModel(
 }
 ```
 
+Batch scopes accept `Preference<T>` instances created by this library, including mapped
+preferences returned by `map()` and `mapIO()`. They are intentionally not open to arbitrary custom
+`Preference` implementations.
+
 #### Batch Read Flow
 
 Observe multiple preferences reactively from the same snapshot. The flow re-emits whenever any
@@ -1119,6 +1123,9 @@ fun SettingsScreen(datastore: GenericPreferencesDatastore) {
     }
 }
 ```
+
+Like the underlying batch APIs, these helpers accept library-created `Preference<T>` instances,
+including mapped preferences produced by `map()` and `mapIO()`.
 
 Overloads are available for 2, 3, 4, and 5 preferences. The returned `PreferencesStateN` also
 supports property delegation:
