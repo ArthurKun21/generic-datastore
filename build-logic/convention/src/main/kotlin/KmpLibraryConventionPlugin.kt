@@ -26,6 +26,11 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
                 configureKmpLibrary()
                 explicitApi()
 
+                @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
+                extensions.configure<org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationMultiplatformExtension> {
+                    enabled.set(true)
+                }
+
                 applyDefaultHierarchyTemplate()
 
                 targets.withType<KotlinMultiplatformAndroidLibraryTarget>().configureEach {
