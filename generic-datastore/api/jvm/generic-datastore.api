@@ -1,0 +1,579 @@
+public final class io/github/arthurkun/generic/datastore/MappedPreferenceKt {
+	public static final fun map (Lio/github/arthurkun/generic/datastore/preferences/Preference;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static final fun mapIO (Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+}
+
+public final class io/github/arthurkun/generic/datastore/MigrationKt {
+	public static final fun toJsonElement (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+	public static final fun toJsonMap (Ljava/lang/String;)Ljava/util/Map;
+}
+
+public abstract interface class io/github/arthurkun/generic/datastore/core/BasePreference {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/core/BasePreference$Companion;
+	public abstract fun asFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun get (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getBlocking ()Ljava/lang/Object;
+	public abstract fun getDefaultValue ()Ljava/lang/Object;
+	public fun getValue ()Ljava/lang/Object;
+	public abstract fun key ()Ljava/lang/String;
+	public abstract fun resetToDefault (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun set (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun setBlocking (Ljava/lang/Object;)V
+	public fun setValue (Ljava/lang/Object;)V
+	public abstract fun stateIn (Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/SharingStarted;)Lkotlinx/coroutines/flow/StateFlow;
+	public static synthetic fun stateIn$default (Lio/github/arthurkun/generic/datastore/core/BasePreference;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/SharingStarted;ILjava/lang/Object;)Lkotlinx/coroutines/flow/StateFlow;
+	public abstract fun update (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/arthurkun/generic/datastore/core/BasePreference$Companion {
+	public final fun appStateKey (Ljava/lang/String;)Ljava/lang/String;
+	public final fun isAppState (Ljava/lang/String;)Z
+	public final fun isPrivate (Ljava/lang/String;)Z
+	public final fun privateKey (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class io/github/arthurkun/generic/datastore/core/BasePreference$DefaultImpls {
+	public static fun getValue (Lio/github/arthurkun/generic/datastore/core/BasePreference;)Ljava/lang/Object;
+	public static fun setValue (Lio/github/arthurkun/generic/datastore/core/BasePreference;Ljava/lang/Object;)V
+	public static synthetic fun stateIn$default (Lio/github/arthurkun/generic/datastore/core/BasePreference;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/SharingStarted;ILjava/lang/Object;)Lkotlinx/coroutines/flow/StateFlow;
+}
+
+public abstract interface class io/github/arthurkun/generic/datastore/core/DelegatedPreference : io/github/arthurkun/generic/datastore/core/BasePreference, kotlin/properties/ReadWriteProperty {
+	public abstract fun resetToDefaultBlocking ()V
+}
+
+public final class io/github/arthurkun/generic/datastore/core/DelegatedPreference$DefaultImpls {
+	public static fun getValue (Lio/github/arthurkun/generic/datastore/core/DelegatedPreference;)Ljava/lang/Object;
+	public static fun setValue (Lio/github/arthurkun/generic/datastore/core/DelegatedPreference;Ljava/lang/Object;)V
+}
+
+public final class io/github/arthurkun/generic/datastore/core/PreferenceDefaults {
+	public static final field INSTANCE Lio/github/arthurkun/generic/datastore/core/PreferenceDefaults;
+	public final fun getDefaultJson ()Lkotlinx/serialization/json/Json;
+}
+
+public final class io/github/arthurkun/generic/datastore/core/PreferenceExtensionKt {
+	public static final fun distinctFlow (Lio/github/arthurkun/generic/datastore/core/DelegatedPreference;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/CreatePreferencesDatastoreKt {
+	public static final fun createPreferencesDatastore (Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;)Lio/github/arthurkun/generic/datastore/preferences/GenericPreferencesDatastore;
+	public static final fun createPreferencesDatastore (Ljava/lang/String;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;)Lio/github/arthurkun/generic/datastore/preferences/GenericPreferencesDatastore;
+	public static synthetic fun createPreferencesDatastore$default (Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/GenericPreferencesDatastore;
+	public static synthetic fun createPreferencesDatastore$default (Ljava/lang/String;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/GenericPreferencesDatastore;
+	public static final fun createPreferencesDatastoreWithKotlinxIoPath (Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;)Lio/github/arthurkun/generic/datastore/preferences/GenericPreferencesDatastore;
+	public static synthetic fun createPreferencesDatastoreWithKotlinxIoPath$default (Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/GenericPreferencesDatastore;
+	public static final fun createPreferencesDatastoreWithOkioPath (Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;)Lio/github/arthurkun/generic/datastore/preferences/GenericPreferencesDatastore;
+	public static synthetic fun createPreferencesDatastoreWithOkioPath$default (Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/GenericPreferencesDatastore;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/GenericPreferencesDatastore : io/github/arthurkun/generic/datastore/preferences/PreferencesDatastore {
+	public fun <init> (Landroidx/datastore/core/DataStore;Lkotlinx/serialization/json/Json;)V
+	public synthetic fun <init> (Landroidx/datastore/core/DataStore;Lkotlinx/serialization/json/Json;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun batchGet (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun batchGetBlocking (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun batchReadFlow (Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public fun batchUpdate (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun batchUpdateBlocking (Lkotlin/jvm/functions/Function1;)V
+	public fun batchWrite (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun batchWriteBlocking (Lkotlin/jvm/functions/Function1;)V
+	public fun bool (Ljava/lang/String;Z)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun clearAll (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun double (Ljava/lang/String;D)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun export (ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun exportAsData (ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun exportAsString (ZZLkotlinx/serialization/json/Json;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun float (Ljava/lang/String;F)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun import (Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun importData (Lio/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup;ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun importDataAsString (Ljava/lang/String;ZZLkotlinx/serialization/json/Json;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun int (Ljava/lang/String;I)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun kserialized (Ljava/lang/String;Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun kserializedList (Ljava/lang/String;Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun kserializedSet (Ljava/lang/String;Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun long (Ljava/lang/String;J)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableBool (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableDouble (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableFloat (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableInt (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableKserialized (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableKserializedList (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableLong (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableSerialized (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableSerializedList (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableString (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableStringSet (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun serialized (Ljava/lang/String;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun serializedList (Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun serializedSet (Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun string (Ljava/lang/String;Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun stringSet (Ljava/lang/String;Ljava/util/Set;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+}
+
+public abstract interface class io/github/arthurkun/generic/datastore/preferences/Preference : io/github/arthurkun/generic/datastore/core/DelegatedPreference {
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/Preference$DefaultImpls {
+	public static fun getValue (Lio/github/arthurkun/generic/datastore/preferences/Preference;)Ljava/lang/Object;
+	public static fun setValue (Lio/github/arthurkun/generic/datastore/preferences/Preference;Ljava/lang/Object;)V
+}
+
+public abstract interface class io/github/arthurkun/generic/datastore/preferences/PreferencesDatastore {
+	public abstract fun batchGet (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun batchGetBlocking (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public abstract fun batchReadFlow (Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun batchUpdate (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun batchUpdateBlocking (Lkotlin/jvm/functions/Function1;)V
+	public abstract fun batchWrite (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun batchWriteBlocking (Lkotlin/jvm/functions/Function1;)V
+	public abstract fun bool (Ljava/lang/String;Z)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun bool$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun clearAll (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun double (Ljava/lang/String;D)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun double$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;DILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun export (ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun export$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun exportAsData (ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun exportAsData$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun exportAsString (ZZLkotlinx/serialization/json/Json;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun exportAsString$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZZLkotlinx/serialization/json/Json;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun float (Ljava/lang/String;F)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun float$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;FILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun import (Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun importData (Lio/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup;ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun importData$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Lio/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup;ZZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun importDataAsString (Ljava/lang/String;ZZLkotlinx/serialization/json/Json;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun importDataAsString$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;ZZLkotlinx/serialization/json/Json;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun int (Ljava/lang/String;I)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun int$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;IILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun kserialized (Ljava/lang/String;Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun kserialized$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun kserializedList (Ljava/lang/String;Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun kserializedList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun kserializedSet (Ljava/lang/String;Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun kserializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun long (Ljava/lang/String;J)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun long$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;JILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableBool (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableDouble (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableFloat (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableInt (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableKserialized (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun nullableKserialized$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableKserializedList (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun nullableKserializedList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableLong (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableSerialized (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableSerializedList (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableString (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableStringSet (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun serialized (Ljava/lang/String;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun serializedList (Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun serializedList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun serializedSet (Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun serializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun string (Ljava/lang/String;Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun string$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun stringSet (Ljava/lang/String;Ljava/util/Set;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun stringSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/Set;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/PreferencesDatastore$DefaultImpls {
+	public static synthetic fun bool$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun double$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;DILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun export$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun exportAsData$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun exportAsString$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZZLkotlinx/serialization/json/Json;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun float$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;FILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun importData$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Lio/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup;ZZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun importDataAsString$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;ZZLkotlinx/serialization/json/Json;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun int$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;IILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun kserialized$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun kserializedList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun kserializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun long$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;JILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun nullableKserialized$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun nullableKserializedList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun serializedList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun serializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun string$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun stringSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/Set;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/PreferencesDatastoreKt {
+	public static final fun toggle (Lio/github/arthurkun/generic/datastore/preferences/Preference;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun toggle (Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/BackupParsingException : java/lang/Exception {
+	public fun <init> (Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/BackupPreference {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/preferences/backup/BackupPreference$Companion;
+	public fun <init> (Ljava/lang/String;Lio/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue;
+	public final fun copy (Ljava/lang/String;Lio/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue;)Lio/github/arthurkun/generic/datastore/preferences/backup/BackupPreference;
+	public static synthetic fun copy$default (Lio/github/arthurkun/generic/datastore/preferences/backup/BackupPreference;Ljava/lang/String;Lio/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/backup/BackupPreference;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getValue ()Lio/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/arthurkun/generic/datastore/preferences/backup/BackupPreference$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/arthurkun/generic/datastore/preferences/backup/BackupPreference$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/arthurkun/generic/datastore/preferences/backup/BackupPreference;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/arthurkun/generic/datastore/preferences/backup/BackupPreference;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/BackupPreference$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/BooleanPreferenceValue : io/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/preferences/backup/BooleanPreferenceValue$Companion;
+	public fun <init> (Z)V
+	public final fun component1 ()Z
+	public final fun copy (Z)Lio/github/arthurkun/generic/datastore/preferences/backup/BooleanPreferenceValue;
+	public static synthetic fun copy$default (Lio/github/arthurkun/generic/datastore/preferences/backup/BooleanPreferenceValue;ZILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/backup/BooleanPreferenceValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getValue ()Ljava/lang/Object;
+	public final fun getValue ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/arthurkun/generic/datastore/preferences/backup/BooleanPreferenceValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/arthurkun/generic/datastore/preferences/backup/BooleanPreferenceValue$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/arthurkun/generic/datastore/preferences/backup/BooleanPreferenceValue;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/arthurkun/generic/datastore/preferences/backup/BooleanPreferenceValue;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/BooleanPreferenceValue$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/DoublePreferenceValue : io/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/preferences/backup/DoublePreferenceValue$Companion;
+	public fun <init> (D)V
+	public final fun component1 ()D
+	public final fun copy (D)Lio/github/arthurkun/generic/datastore/preferences/backup/DoublePreferenceValue;
+	public static synthetic fun copy$default (Lio/github/arthurkun/generic/datastore/preferences/backup/DoublePreferenceValue;DILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/backup/DoublePreferenceValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()D
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/arthurkun/generic/datastore/preferences/backup/DoublePreferenceValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/arthurkun/generic/datastore/preferences/backup/DoublePreferenceValue$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/arthurkun/generic/datastore/preferences/backup/DoublePreferenceValue;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/arthurkun/generic/datastore/preferences/backup/DoublePreferenceValue;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/DoublePreferenceValue$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/FloatPreferenceValue : io/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/preferences/backup/FloatPreferenceValue$Companion;
+	public fun <init> (F)V
+	public final fun component1 ()F
+	public final fun copy (F)Lio/github/arthurkun/generic/datastore/preferences/backup/FloatPreferenceValue;
+	public static synthetic fun copy$default (Lio/github/arthurkun/generic/datastore/preferences/backup/FloatPreferenceValue;FILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/backup/FloatPreferenceValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()F
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/arthurkun/generic/datastore/preferences/backup/FloatPreferenceValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/arthurkun/generic/datastore/preferences/backup/FloatPreferenceValue$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/arthurkun/generic/datastore/preferences/backup/FloatPreferenceValue;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/arthurkun/generic/datastore/preferences/backup/FloatPreferenceValue;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/FloatPreferenceValue$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/IntPreferenceValue : io/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/preferences/backup/IntPreferenceValue$Companion;
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/arthurkun/generic/datastore/preferences/backup/IntPreferenceValue;
+	public static synthetic fun copy$default (Lio/github/arthurkun/generic/datastore/preferences/backup/IntPreferenceValue;IILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/backup/IntPreferenceValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()I
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/arthurkun/generic/datastore/preferences/backup/IntPreferenceValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/arthurkun/generic/datastore/preferences/backup/IntPreferenceValue$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/arthurkun/generic/datastore/preferences/backup/IntPreferenceValue;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/arthurkun/generic/datastore/preferences/backup/IntPreferenceValue;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/IntPreferenceValue$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/LongPreferenceValue : io/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/preferences/backup/LongPreferenceValue$Companion;
+	public fun <init> (J)V
+	public final fun component1 ()J
+	public final fun copy (J)Lio/github/arthurkun/generic/datastore/preferences/backup/LongPreferenceValue;
+	public static synthetic fun copy$default (Lio/github/arthurkun/generic/datastore/preferences/backup/LongPreferenceValue;JILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/backup/LongPreferenceValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()J
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/arthurkun/generic/datastore/preferences/backup/LongPreferenceValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/arthurkun/generic/datastore/preferences/backup/LongPreferenceValue$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/arthurkun/generic/datastore/preferences/backup/LongPreferenceValue;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/arthurkun/generic/datastore/preferences/backup/LongPreferenceValue;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/LongPreferenceValue$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/MigrationKt {
+	public static final fun toJsonElement (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+	public static final fun toJsonMap (Ljava/lang/String;)Ljava/util/Map;
+}
+
+public abstract interface class io/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue$Companion;
+	public abstract fun getValue ()Ljava/lang/Object;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue$Companion {
+	public final fun fromAny (Ljava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup$Companion;
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup;
+	public static synthetic fun copy$default (Lio/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup;Ljava/util/List;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPreferences ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/PreferencesBackup$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/StringPreferenceValue : io/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/preferences/backup/StringPreferenceValue$Companion;
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/backup/StringPreferenceValue;
+	public static synthetic fun copy$default (Lio/github/arthurkun/generic/datastore/preferences/backup/StringPreferenceValue;Ljava/lang/String;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/backup/StringPreferenceValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getValue ()Ljava/lang/Object;
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/arthurkun/generic/datastore/preferences/backup/StringPreferenceValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/arthurkun/generic/datastore/preferences/backup/StringPreferenceValue$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/arthurkun/generic/datastore/preferences/backup/StringPreferenceValue;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/arthurkun/generic/datastore/preferences/backup/StringPreferenceValue;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/StringPreferenceValue$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/StringSetPreferenceValue : io/github/arthurkun/generic/datastore/preferences/backup/PreferenceValue {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/preferences/backup/StringSetPreferenceValue$Companion;
+	public fun <init> (Ljava/util/Set;)V
+	public final fun component1 ()Ljava/util/Set;
+	public final fun copy (Ljava/util/Set;)Lio/github/arthurkun/generic/datastore/preferences/backup/StringSetPreferenceValue;
+	public static synthetic fun copy$default (Lio/github/arthurkun/generic/datastore/preferences/backup/StringSetPreferenceValue;Ljava/util/Set;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/backup/StringSetPreferenceValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getValue ()Ljava/lang/Object;
+	public final fun getValue ()Ljava/util/Set;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/arthurkun/generic/datastore/preferences/backup/StringSetPreferenceValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/arthurkun/generic/datastore/preferences/backup/StringSetPreferenceValue$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/arthurkun/generic/datastore/preferences/backup/StringSetPreferenceValue;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/arthurkun/generic/datastore/preferences/backup/StringSetPreferenceValue;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/backup/StringSetPreferenceValue$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/batch/BatchReadScope {
+	public final fun get (Lio/github/arthurkun/generic/datastore/preferences/Preference;)Ljava/lang/Object;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/batch/BatchUpdateScope {
+	public final fun delete (Lio/github/arthurkun/generic/datastore/preferences/Preference;)V
+	public final fun get (Lio/github/arthurkun/generic/datastore/preferences/Preference;)Ljava/lang/Object;
+	public final fun resetToDefault (Lio/github/arthurkun/generic/datastore/preferences/Preference;)V
+	public final fun set (Lio/github/arthurkun/generic/datastore/preferences/Preference;Ljava/lang/Object;)V
+	public final fun update (Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/batch/BatchWriteScope {
+	public final fun delete (Lio/github/arthurkun/generic/datastore/preferences/Preference;)V
+	public final fun resetToDefault (Lio/github/arthurkun/generic/datastore/preferences/Preference;)V
+	public final fun set (Lio/github/arthurkun/generic/datastore/preferences/Preference;Ljava/lang/Object;)V
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/utils/MappedPreferenceKt {
+	public static final fun map (Lio/github/arthurkun/generic/datastore/preferences/Preference;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static final fun mapIO (Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+}
+
+public final class io/github/arthurkun/generic/datastore/proto/CreateProtoDatastoreKt {
+	public static final fun createProtoDatastore (Landroidx/datastore/core/okio/OkioSerializer;Ljava/lang/Object;Ljava/lang/String;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;)Lio/github/arthurkun/generic/datastore/proto/GenericProtoDatastore;
+	public static final fun createProtoDatastore (Landroidx/datastore/core/okio/OkioSerializer;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;)Lio/github/arthurkun/generic/datastore/proto/GenericProtoDatastore;
+	public static synthetic fun createProtoDatastore$default (Landroidx/datastore/core/okio/OkioSerializer;Ljava/lang/Object;Ljava/lang/String;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/GenericProtoDatastore;
+	public static synthetic fun createProtoDatastore$default (Landroidx/datastore/core/okio/OkioSerializer;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/GenericProtoDatastore;
+	public static final fun createProtoDatastoreWithKotlinxIoPath (Landroidx/datastore/core/okio/OkioSerializer;Ljava/lang/Object;Ljava/lang/String;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;)Lio/github/arthurkun/generic/datastore/proto/GenericProtoDatastore;
+	public static synthetic fun createProtoDatastoreWithKotlinxIoPath$default (Landroidx/datastore/core/okio/OkioSerializer;Ljava/lang/Object;Ljava/lang/String;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/GenericProtoDatastore;
+	public static final fun createProtoDatastoreWithOkioPath (Landroidx/datastore/core/okio/OkioSerializer;Ljava/lang/Object;Ljava/lang/String;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;)Lio/github/arthurkun/generic/datastore/proto/GenericProtoDatastore;
+	public static synthetic fun createProtoDatastoreWithOkioPath$default (Landroidx/datastore/core/okio/OkioSerializer;Ljava/lang/Object;Ljava/lang/String;Landroidx/datastore/core/handlers/ReplaceFileCorruptionHandler;Ljava/util/List;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/GenericProtoDatastore;
+}
+
+public final class io/github/arthurkun/generic/datastore/proto/GenericProtoDatastore : io/github/arthurkun/generic/datastore/proto/ProtoDatastore {
+	public fun <init> (Landroidx/datastore/core/DataStore;Ljava/lang/Object;Ljava/lang/String;Lkotlinx/serialization/json/Json;)V
+	public synthetic fun <init> (Landroidx/datastore/core/DataStore;Ljava/lang/Object;Ljava/lang/String;Lkotlinx/serialization/json/Json;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun data ()Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun enumField (Ljava/lang/Enum;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun enumSetField (Ljava/util/Set;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun field (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun kserializedField (Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun kserializedListField (Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun kserializedSetField (Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun nullableEnumField ([Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun nullableKserializedField (Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun nullableKserializedListField (Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun nullableSerializedField (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun nullableSerializedListField (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun serializedField (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun serializedListField (Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun serializedSetField (Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+}
+
+public abstract interface class io/github/arthurkun/generic/datastore/proto/ProtoDatastore {
+	public abstract fun data ()Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun enumField (Ljava/lang/Enum;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun enumSetField (Ljava/util/Set;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun enumSetField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/Set;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun field (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun kserializedField (Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun kserializedField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun kserializedListField (Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun kserializedListField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun kserializedSetField (Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun kserializedSetField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun nullableEnumField ([Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun nullableKserializedField (Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun nullableKserializedField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun nullableKserializedListField (Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun nullableKserializedListField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun nullableSerializedField (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun nullableSerializedListField (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun serializedField (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun serializedListField (Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun serializedListField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public abstract fun serializedSetField (Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun serializedSetField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+}
+
+public final class io/github/arthurkun/generic/datastore/proto/ProtoDatastore$DefaultImpls {
+	public static synthetic fun enumSetField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/Set;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun kserializedField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun kserializedListField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun kserializedSetField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun nullableKserializedField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun nullableKserializedListField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun serializedListField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static synthetic fun serializedSetField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+}
+
+public abstract interface class io/github/arthurkun/generic/datastore/proto/ProtoPreference : io/github/arthurkun/generic/datastore/core/DelegatedPreference {
+}
+
+public final class io/github/arthurkun/generic/datastore/proto/ProtoPreference$DefaultImpls {
+	public static fun getValue (Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;)Ljava/lang/Object;
+	public static fun setValue (Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;Ljava/lang/Object;)V
+}
+
