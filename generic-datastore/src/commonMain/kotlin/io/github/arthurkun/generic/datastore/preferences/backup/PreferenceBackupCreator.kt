@@ -7,11 +7,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 
 /**
- * A utility class responsible for exporting [Preferences] from [DataStore] into a backup format.
+ * Internal exporter that snapshots a Preferences DataStore into [PreferencesBackup] data.
  *
- * This class provides functionality to filter preferences based on their metadata (e.g., private
- * or app state) and can output the backup either as a structured [PreferencesBackup] object
- * or as a serialized JSON string.
+ * Private keys and app-state keys can be filtered out before serialization.
  *
  * @property datastore The [DataStore] instance to read preferences from.
  */

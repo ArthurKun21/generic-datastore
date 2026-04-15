@@ -3,12 +3,12 @@
 package io.github.arthurkun.generic.datastore
 
 import io.github.arthurkun.generic.datastore.preferences.Preference
-import io.github.arthurkun.generic.datastore.preferences.utils.map as coreMap
-import io.github.arthurkun.generic.datastore.preferences.utils.mapIO as coreMapIO
+import io.github.arthurkun.generic.datastore.preferences.map as coreMap
+import io.github.arthurkun.generic.datastore.preferences.mapIO as coreMapIO
 
 /**
  * Extension for backwards compatibility.
- * @see io.github.arthurkun.generic.datastore.preferences.utils.mapIO
+ * @see io.github.arthurkun.generic.datastore.preferences.mapIO
  */
 @Deprecated(
     message = "Moved to core package",
@@ -25,7 +25,7 @@ public fun <T, R> Preference<T>.mapIO(
 
 /**
  * Extension for backwards compatibility.
- * @see io.github.arthurkun.generic.datastore.preferences.utils.map
+ * @see io.github.arthurkun.generic.datastore.preferences.map
  */
 @Deprecated(
     message = "Moved to core package",

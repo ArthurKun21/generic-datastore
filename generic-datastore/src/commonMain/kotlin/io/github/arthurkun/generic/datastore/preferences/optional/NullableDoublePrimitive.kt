@@ -5,10 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.doublePreferencesKey
 
 /**
- * A [NullableGenericPreferenceItem] for storing nullable [Double] values.
- *
- * @param datastore The [DataStore] instance used for storing and retrieving preferences.
- * @param key The unique String key used to identify this preference within the DataStore.
+ * [NullableGenericPreferenceItem] for a nullable [Double] stored with `doublePreferencesKey`.
  */
 internal class NullableDoublePrimitive(
     datastore: DataStore<Preferences>,

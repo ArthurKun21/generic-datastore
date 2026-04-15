@@ -14,12 +14,10 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
 /**
- * Internal utility class responsible for restoring [Preferences] from a [PreferencesBackup]
- * or its JSON string representation.
+ * Internal importer that restores [PreferencesBackup] snapshots into a Preferences DataStore.
  *
- * This class handles the mapping between backup data models and actual Jetpack DataStore
- * preference keys, supporting standard types such as Int, Long, Float, Double, String,
- * Boolean, and String Sets.
+ * It decodes the library's typed backup model and writes supported primitive and string-set values
+ * back to their matching preference keys.
  *
  * @property datastore The [DataStore] instance where the restored data will be written.
  */

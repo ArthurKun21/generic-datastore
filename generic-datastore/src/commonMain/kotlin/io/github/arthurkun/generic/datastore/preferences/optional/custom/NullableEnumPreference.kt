@@ -7,17 +7,12 @@ import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 
 /**
- * Creates a nullable [DelegatedPreference] for storing enum values.
+ * Internal nullable enum preference factory used by the public `nullableEnum` extension.
  *
- * The enum is serialized using its [name][Enum.name] and deserialized via
- * [enumValueOf]. If the stored string does not match any enum constant,
- * `null` is returned.
- *
- * @param T The enum type.
- * @param key The unique string key for the preference.
- * @return A [DelegatedPreference] instance backed by [PreferencesDatastore.nullableSerialized].
+ * Enum values are stored by [Enum.name]. Missing keys and unknown stored names return `null`.
  */
-public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnum(
+@PublishedApi
+internal inline fun <reified T : Enum<T>> PreferencesDatastore.internalNullableEnum(
     key: String,
 ): Preference<T?> = nullableSerialized(
     key = key,

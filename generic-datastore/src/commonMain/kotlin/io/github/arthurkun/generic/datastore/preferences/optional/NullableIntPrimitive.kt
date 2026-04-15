@@ -5,10 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 
 /**
- * A [NullableGenericPreferenceItem] for storing nullable [Int] values.
- *
- * @param datastore The [DataStore] instance used for storing and retrieving preferences.
- * @param key The unique String key used to identify this preference within the DataStore.
+ * [NullableGenericPreferenceItem] for a nullable [Int] stored with `intPreferencesKey`.
  */
 internal class NullableIntPrimitive(
     datastore: DataStore<Preferences>,

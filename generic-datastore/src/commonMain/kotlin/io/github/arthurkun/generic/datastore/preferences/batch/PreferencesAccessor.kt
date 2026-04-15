@@ -4,13 +4,10 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 
 /**
- * Internal interface that extracts read/write/remove operations from a [Preferences] snapshot
- * or [MutablePreferences] transaction, enabling batch operations across multiple preferences
- * in a single DataStore transaction.
+ * Internal contract that exposes snapshot and transaction access for a preference.
  *
- * All sealed base preference classes implement this interface so that batch scopes
- * ([BatchReadScope], [BatchWriteScope], [BatchUpdateScope]) can read and write
- * values without each preference performing its own independent DataStore transaction.
+ * Batch scopes use this interface to read and write values without each preference performing its
+ * own independent datastore operation.
  *
  * @param T The type of the preference value.
  */

@@ -8,12 +8,19 @@ import io.github.arthurkun.generic.datastore.preferences.Preference
 /**
  * Scope for batch-writing multiple preferences in a single DataStore `edit` transaction.
  *
- * All [set], [delete], and [resetToDefault] calls within this scope write into the
- * same [MutablePreferences] instance, collapsing N writes into one atomic transaction.
+ * All [set], [delete], and [resetToDefault] calls within this scope write into the same
+ * [MutablePreferences] instance, collapsing many logical writes into one atomic transaction.
  *
  * Use [set] or the indexing operator (`this[pref] = value`) to write preference values.
+ * Obtain this scope from `PreferencesDatastore.batchWrite`.
  *
- * Obtain this scope from [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchWrite].
+ * Example:
+ * ```kotlin
+ * datastore.batchWrite {
+ *     this[username] = "rafael"
+ *     resetToDefault(hasSeenOnboarding)
+ * }
+ * ```
  */
 public class BatchWriteScope internal constructor(
     private val mutablePreferences: MutablePreferences,

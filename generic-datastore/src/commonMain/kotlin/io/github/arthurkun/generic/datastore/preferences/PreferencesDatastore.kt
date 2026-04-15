@@ -10,12 +10,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.serializer
 
 /**
- * Defines the contract for a preference data store.
+ * Factory and utility contract for Preferences-backed [Preference] instances.
  *
- * This interface provides methods to create and access various types of preferences.
+ * Implementations expose primitive preferences, nullable variants, serializer-backed
+ * preferences, batch operations, and backup import/export helpers over a single
+ * `DataStore<Preferences>`.
+ *
+ * The `nullable*` APIs model absence explicitly: when a key is not stored they return `null`,
+ * and writing `null` removes the key.
  */
 public interface PreferencesDatastore {
     /**
@@ -181,13 +185,16 @@ public interface PreferencesDatastore {
 
     /**
      * Creates a preference for a custom object using Kotlin Serialization.
-     * The object is serialized to JSON for storage.
+     * The object is encoded as a JSON string and stored under a string preference key.
      *
      * @param T The type of the custom object. Must be serializable using kotlinx.serialization.
      * @param key The preference key.
-     * @param defaultValue The default value for the custom object.
+     * @param defaultValue The value returned when the key is missing or the stored payload cannot
+     * be decoded.
      * @param serializer The [KSerializer] for the type [T].
-     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+     * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
+     * its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
+     * unless it was constructed with a custom default.
      * @return A [DelegatedPreference] instance for the custom object preference.
      */
     public fun <T> kserialized(
@@ -199,13 +206,17 @@ public interface PreferencesDatastore {
 
     /**
      * Creates a preference for a [Set] of custom objects using Kotlin Serialization.
-     * Each element is serialized to JSON for storage using [stringSetPreferencesKey].
+     * Each element is encoded independently as JSON and stored in a string-set preference entry.
+     *
+     * Elements that fail to decode are skipped when the stored set is read back.
      *
      * @param T The type of each element in the set. Must be serializable using kotlinx.serialization.
      * @param key The preference key.
      * @param defaultValue The default value for the set (defaults to an empty set).
      * @param serializer The [KSerializer] for the type [T].
-     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+     * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
+     * its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
+     * unless it was constructed with a custom default.
      * @return A [DelegatedPreference] instance for the Set preference.
      */
     public fun <T> kserializedSet(
@@ -217,8 +228,11 @@ public interface PreferencesDatastore {
 
     /**
      * Creates a preference for a [List] of custom objects that can be serialized to and
-     * deserialized from Strings. The list is stored as a JSON array string using
-     * [stringPreferencesKey].
+     * deserialized from strings.
+     *
+     * The list is stored as a JSON array string inside a single string preference entry.
+     * If the outer JSON array cannot be parsed the [defaultValue] is returned. Individual list
+     * elements that fail to deserialize are skipped.
      *
      * @param T The type of each element in the list.
      * @param key The preference key.
@@ -236,13 +250,15 @@ public interface PreferencesDatastore {
 
     /**
      * Creates a preference for a [List] of custom objects using Kotlin Serialization.
-     * The list is serialized to a JSON array string for storage using [stringPreferencesKey].
+     * The entire list is encoded as a JSON array string inside a single string preference entry.
      *
      * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
      * @param key The preference key.
      * @param defaultValue The default value for the list (defaults to an empty list).
      * @param serializer The [KSerializer] for the type [T].
-     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+     * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
+     * its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
+     * unless it was constructed with a custom default.
      * @return A [DelegatedPreference] instance for the List preference.
      */
     public fun <T> kserializedList(
@@ -273,15 +289,17 @@ public interface PreferencesDatastore {
 
     /**
      * Creates a nullable preference for a custom object using Kotlin Serialization.
-     * The object is serialized to JSON for storage.
+     * The object is encoded as JSON inside a string preference entry.
      *
      * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
-     * If deserialization fails, `null` is returned.
+     * If deserialization fails, `null` is returned instead of throwing.
      *
      * @param T The non-null type of the custom object. Must be serializable using kotlinx.serialization.
      * @param key The preference key.
      * @param serializer The [KSerializer] for the type [T].
-     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+     * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
+     * its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
+     * unless it was constructed with a custom default.
      * @return A [DelegatedPreference] instance for the nullable custom object preference.
      */
     public fun <T : Any> nullableKserialized(
@@ -311,15 +329,17 @@ public interface PreferencesDatastore {
 
     /**
      * Creates a nullable preference for a [List] of custom objects using Kotlin Serialization.
-     * The list is serialized to a JSON array string for storage.
+     * The list is encoded as a JSON array string inside a string preference entry.
      *
      * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
-     * If deserialization fails, `null` is returned.
+     * If deserialization fails, `null` is returned instead of throwing.
      *
      * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
      * @param key The preference key.
      * @param serializer The [KSerializer] for the type [T].
-     * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+     * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
+     * its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
+     * unless it was constructed with a custom default.
      * @return A [DelegatedPreference] instance for the nullable List preference.
      */
     public fun <T> nullableKserializedList(
@@ -329,11 +349,11 @@ public interface PreferencesDatastore {
     ): Preference<List<T>?>
 
     /**
-     * Returns a [Flow] that emits a [BatchReadScope] on every DataStore change,
-     * allowing multiple preferences to be read from the same snapshot.
+     * Returns a [Flow] that re-runs [block] against a shared [BatchReadScope] snapshot on every
+     * datastore change.
      *
-     * The scope re-emits whenever any preference in the datastore changes.
-     * Use `distinctUntilChanged()` on derived values to filter irrelevant updates.
+     * All reads inside [block] observe the same snapshot, which avoids mixing values from
+     * different emissions.
      *
      * @param R The return type of the block.
      * @param block A lambda with [BatchReadScope] receiver that reads one or more preferences.
@@ -352,21 +372,21 @@ public interface PreferencesDatastore {
     public suspend fun <R> batchGet(block: BatchReadScope.() -> R): R
 
     /**
-     * Batch write: executes [block] inside a single DataStore `edit` transaction.
+     * Executes [block] inside a single DataStore `edit` transaction.
      *
      * All [BatchWriteScope.set], [BatchWriteScope.delete], and [BatchWriteScope.resetToDefault]
-     * calls in [block] share the same [MutablePreferences][androidx.datastore.preferences.core.MutablePreferences].
+     * calls share the same mutable transaction state.
      *
      * @param block A lambda with [BatchWriteScope] receiver that writes one or more preferences.
      */
     public suspend fun batchWrite(block: BatchWriteScope.() -> Unit)
 
     /**
-     * Atomic batch update: reads the current snapshot and writes new values in a single
-     * DataStore `edit` transaction.
+     * Atomically reads and writes multiple preferences in a single DataStore `edit`
+     * transaction.
      *
-     * [block] can call [BatchUpdateScope.value] to read and [BatchUpdateScope.set] to write,
-     * guaranteeing consistency.
+     * Reads through [BatchUpdateScope.get] observe earlier writes made through
+     * [BatchUpdateScope.set] in the same block.
      *
      * @param block A lambda with [BatchUpdateScope] receiver that reads and writes preferences.
      */
@@ -423,7 +443,7 @@ public interface PreferencesDatastore {
     )
 
     /**
-     * Reads current DataStore preferences and returns a [PreferencesBackup] snapshot.
+     * Reads current datastore contents and returns a [PreferencesBackup] snapshot.
      *
      * Only keys currently set in DataStore are included. Keys marked private
      * (prefixed `__PRIVATE_`) are excluded unless [exportPrivate] is true.
@@ -494,137 +514,4 @@ public interface PreferencesDatastore {
         importAppState: Boolean = false,
         json: Json? = null,
     )
-}
-
-/**
- * Creates a preference for a custom object using Kotlin Serialization,
- * inferring the [KSerializer] from the reified type parameter.
- *
- * The type [T] must be annotated with [kotlinx.serialization.Serializable].
- *
- * @param T The type of the custom object.
- * @param key The preference key.
- * @param defaultValue The default value for the custom object.
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
- * @return A [DelegatedPreference] instance for the custom object preference.
- */
-public inline fun <reified T> PreferencesDatastore.kserialized(
-    key: String,
-    defaultValue: T,
-    json: Json? = null,
-): Preference<T> = kserialized(
-    key = key,
-    defaultValue = defaultValue,
-    serializer = serializer<T>(),
-    json = json,
-)
-
-/**
- * Creates a preference for a [Set] of custom objects using Kotlin Serialization,
- * inferring the [KSerializer] from the reified type parameter.
- *
- * The type [T] must be annotated with [kotlinx.serialization.Serializable].
- *
- * @param T The type of each element in the set.
- * @param key The preference key.
- * @param defaultValue The default value for the set (defaults to an empty set).
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
- * @return A [DelegatedPreference] instance for the Set preference.
- */
-public inline fun <reified T> PreferencesDatastore.kserializedSet(
-    key: String,
-    defaultValue: Set<T> = emptySet(),
-    json: Json? = null,
-): Preference<Set<T>> = kserializedSet(
-    key = key,
-    defaultValue = defaultValue,
-    serializer = serializer<T>(),
-    json = json,
-)
-
-/**
- * Creates a preference for a [List] of custom objects using Kotlin Serialization,
- * inferring the [KSerializer] from the reified type parameter.
- *
- * The type [T] must be annotated with [kotlinx.serialization.Serializable].
- *
- * @param T The type of each element in the list.
- * @param key The preference key.
- * @param defaultValue The default value for the list (defaults to an empty list).
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
- * @return A [DelegatedPreference] instance for the List preference.
- */
-public inline fun <reified T> PreferencesDatastore.kserializedList(
-    key: String,
-    defaultValue: List<T> = emptyList(),
-    json: Json? = null,
-): Preference<List<T>> = kserializedList(
-    key = key,
-    defaultValue = defaultValue,
-    serializer = serializer<T>(),
-    json = json,
-)
-
-/**
- * Creates a nullable preference for a custom object using Kotlin Serialization,
- * inferring the [KSerializer] from the reified type parameter.
- *
- * The type [T] must be annotated with [kotlinx.serialization.Serializable].
- *
- * @param T The non-null type of the custom object.
- * @param key The preference key.
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
- * @return A [DelegatedPreference] instance for the nullable custom object preference.
- */
-public inline fun <reified T : Any> PreferencesDatastore.nullableKserialized(
-    key: String,
-    json: Json? = null,
-): Preference<T?> = nullableKserialized(
-    key = key,
-    serializer = serializer<T>(),
-    json = json,
-)
-
-/**
- * Creates a nullable preference for a [List] of custom objects using Kotlin Serialization,
- * inferring the [KSerializer] from the reified type parameter.
- *
- * The type [T] must be annotated with [kotlinx.serialization.Serializable].
- *
- * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
- * @param key The preference key.
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
- * @return A [DelegatedPreference] instance for the nullable List preference.
- */
-public inline fun <reified T> PreferencesDatastore.nullableKserializedList(
-    key: String,
-    json: Json? = null,
-): Preference<List<T>?> = nullableKserializedList(
-    key = key,
-    serializer = serializer<T>(),
-    json = json,
-)
-
-/**
- * Toggles an item in a [Set] preference.
- *
- * If the set contains the item, it is removed; otherwise, it is added.
- * Works with [stringSet], [serializedSet], and [enumSet][io.github.arthurkun.generic.datastore.preferences.core.customSet.enumSet] preferences.
- *
- * @param T The type of each element in the set.
- * @param item The item to toggle.
- */
-public suspend inline fun <T> Preference<Set<T>>.toggle(item: T) {
-    update { current ->
-        if (item in current) current - item else current + item
-    }
-}
-
-/**
- * Toggles a [Boolean] preference.
- *
- * Flips the current value: `true` becomes `false`, and `false` becomes `true`.
- */
-public suspend inline fun Preference<Boolean>.toggle() {
-    update { !it }
 }

@@ -5,10 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.longPreferencesKey
 
 /**
- * A [NullableGenericPreferenceItem] for storing nullable [Long] values.
- *
- * @param datastore The [DataStore] instance used for storing and retrieving preferences.
- * @param key The unique String key used to identify this preference within the DataStore.
+ * [NullableGenericPreferenceItem] for a nullable [Long] stored with `longPreferencesKey`.
  */
 internal class NullableLongPrimitive(
     datastore: DataStore<Preferences>,

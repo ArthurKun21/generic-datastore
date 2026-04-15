@@ -8,12 +8,18 @@ import io.github.arthurkun.generic.datastore.preferences.Preference
 /**
  * Scope for atomically reading and writing multiple preferences in a single DataStore transaction.
  *
- * Reads and writes operate on the same [MutablePreferences] transaction state, so reads
- * reflect writes that happened earlier in the same block.
+ * Reads and writes operate on the same [MutablePreferences] transaction state, so reads reflect
+ * writes that happened earlier in the same block.
  *
  * Use [get]/[set] or indexing operators (`this[pref]`, `this[pref] = value`) to access preferences.
+ * Obtain this scope from `PreferencesDatastore.batchUpdate`.
  *
- * Obtain this scope from [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchUpdate].
+ * Example:
+ * ```kotlin
+ * datastore.batchUpdate {
+ *     this[counter] = this[counter] + 1
+ * }
+ * ```
  */
 public class BatchUpdateScope internal constructor(
     private val mutablePreferences: MutablePreferences,

@@ -17,24 +17,24 @@ import kotlin.jvm.JvmName
 import kotlinx.io.files.Path as KotlinxIoPath
 
 /**
- * Creates a [GenericPreferencesDatastore] using a path producer that returns a [String].
+ * Creates a [GenericPreferencesDatastore] from a path producer that returns a [String].
  *
- * This follows the same pattern as [PreferenceDataStoreFactory.createWithPath] from AndroidX,
- * converting the produced path string to an [okio.Path].
+ * Use this overload when your calling code naturally works with string paths. The produced path is
+ * converted to [okio.Path] before delegating to [PreferenceDataStoreFactory.createWithPath].
+ *
+ * Example:
+ * ```kotlin
+ * val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+ * val datastore = createPreferencesDatastore(scope = scope) {
+ *     "C:/app/settings.preferences_pb"
+ * }
+ * ```
  *
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
- * @param scope The [CoroutineScope] to use for DataStore operations. Defaults to an unmanaged
- *   `CoroutineScope(Dispatchers.IO + SupervisorJob())`, which is suitable for application-level
- *   singletons. To control the DataStore lifecycle (e.g., in a scoped component or for testing),
- *   pass a custom scope and cancel it when no longer needed:
- *   ```
- *   val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
- *   val datastore = createPreferencesDatastore(scope = scope) { "/path/to/file" }
- *   // When done:
- *   scope.cancel()
- *   ```
- * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based preferences.
+ * @param scope The [CoroutineScope] to use for DataStore operations. The default creates an
+ * unmanaged application-style scope; pass your own scope when you need explicit lifecycle control.
+ * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
  * @param producePath A lambda that returns the full file path as a [String].
  * @return A new [GenericPreferencesDatastore] instance.
  */
@@ -58,21 +58,16 @@ public fun createPreferencesDatastore(
 }
 
 /**
- * Creates a [GenericPreferencesDatastore] using an [okio.Path] producer.
+ * Creates a [GenericPreferencesDatastore] from an [okio.Path] producer.
+ *
+ * Use this overload when your application already uses Okio paths and you want to avoid string
+ * conversion at the call site.
  *
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
- * @param scope The [CoroutineScope] to use for DataStore operations. Defaults to an unmanaged
- *   `CoroutineScope(Dispatchers.IO + SupervisorJob())`, which is suitable for application-level
- *   singletons. To control the DataStore lifecycle (e.g., in a scoped component or for testing),
- *   pass a custom scope and cancel it when no longer needed:
- *   ```
- *   val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
- *   val datastore = createPreferencesDatastore(scope = scope) { "/path/to/file" }
- *   // When done:
- *   scope.cancel()
- *   ```
- * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based preferences.
+ * @param scope The [CoroutineScope] to use for DataStore operations. The default creates an
+ * unmanaged application-style scope; pass your own scope when you need explicit lifecycle control.
+ * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
  * @param produceOkioPath A lambda that returns the file path as an [okio.Path].
  * @return A new [GenericPreferencesDatastore] instance.
  */
@@ -97,22 +92,17 @@ public fun createPreferencesDatastore(
 }
 
 /**
- * Creates a [GenericPreferencesDatastore] using a [kotlinx.io.files.Path] producer.
+ * Creates a [GenericPreferencesDatastore] from a [KotlinxIoPath] producer.
+ *
+ * This overload is useful in code that already uses `kotlinx-io` paths. The produced path is
+ * converted to [okio.Path] before the datastore is created.
  *
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
- * @param scope The [CoroutineScope] to use for DataStore operations. Defaults to an unmanaged
- *   `CoroutineScope(Dispatchers.IO + SupervisorJob())`, which is suitable for application-level
- *   singletons. To control the DataStore lifecycle (e.g., in a scoped component or for testing),
- *   pass a custom scope and cancel it when no longer needed:
- *   ```
- *   val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
- *   val datastore = createPreferencesDatastore(scope = scope) { "/path/to/file" }
- *   // When done:
- *   scope.cancel()
- *   ```
- * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based preferences.
- * @param produceKotlinxIoPath A lambda that returns the file path as a [kotlinx.io.files.Path].
+ * @param scope The [CoroutineScope] to use for DataStore operations. The default creates an
+ * unmanaged application-style scope; pass your own scope when you need explicit lifecycle control.
+ * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
+ * @param produceKotlinxIoPath A lambda that returns the file path as a [KotlinxIoPath].
  * @return A new [GenericPreferencesDatastore] instance.
  */
 @JvmName("createPreferencesDatastoreWithKotlinxIoPath")
@@ -136,24 +126,17 @@ public fun createPreferencesDatastore(
 }
 
 /**
- * Creates a [GenericPreferencesDatastore] using a directory path and file name.
+ * Creates a [GenericPreferencesDatastore] from a directory path plus a [fileName].
  *
- * The [fileName] will be appended to the path produced by [producePath].
+ * Use this overload when the directory location is dynamic but the datastore file name is stable.
+ * The [fileName] is appended to the directory returned by [producePath].
  *
- * @param fileName The name of the DataStore file (e.g., "settings.preferences_pb").
+ * @param fileName The name of the DataStore file, such as `settings.preferences_pb`.
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
- * @param scope The [CoroutineScope] to use for DataStore operations. Defaults to an unmanaged
- *   `CoroutineScope(Dispatchers.IO + SupervisorJob())`, which is suitable for application-level
- *   singletons. To control the DataStore lifecycle (e.g., in a scoped component or for testing),
- *   pass a custom scope and cancel it when no longer needed:
- *   ```
- *   val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
- *   val datastore = createPreferencesDatastore(scope = scope) { "/path/to/file" }
- *   // When done:
- *   scope.cancel()
- *   ```
- * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based preferences.
+ * @param scope The [CoroutineScope] to use for DataStore operations. The default creates an
+ * unmanaged application-style scope; pass your own scope when you need explicit lifecycle control.
+ * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
  * @param producePath A lambda that returns the directory path as a [String].
  * @return A new [GenericPreferencesDatastore] instance.
  */

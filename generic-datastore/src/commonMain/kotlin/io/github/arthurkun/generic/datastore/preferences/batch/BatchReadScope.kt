@@ -8,13 +8,18 @@ import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 /**
  * Scope for batch-reading multiple preferences from a single [DataStorePreferences] snapshot.
  *
- * Instead of each preference independently accessing the DataStore, all reads within this
- * scope share the same snapshot, eliminating redundant transactions.
+ * Instead of each preference independently accessing the datastore, all reads within this scope
+ * share the same snapshot.
  *
  * Use [get] or the indexing operator (`this[pref]`) to read preference values.
+ * Obtain this scope from `PreferencesDatastore.batchGet` or `PreferencesDatastore.batchReadFlow`.
  *
- * Obtain this scope from [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchGet]
- * or [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchReadFlow].
+ * Example:
+ * ```kotlin
+ * val pair = datastore.batchGet {
+ *     this[firstName] to this[lastName]
+ * }
+ * ```
  */
 public class BatchReadScope internal constructor(
     private val snapshot: DataStorePreferences,

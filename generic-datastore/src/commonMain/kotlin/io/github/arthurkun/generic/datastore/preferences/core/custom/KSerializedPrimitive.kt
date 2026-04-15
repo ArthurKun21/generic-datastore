@@ -9,22 +9,8 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
 /**
- * A [CustomGenericPreferenceItem] for storing custom objects using
- * [kotlinx.serialization][KSerializer].
- *
- * Values are serialized to a JSON string via the provided [json] instance and
- * [serializer], then stored as a string preference. If deserialization fails
- * (e.g., due to corrupted data), the [defaultValue] is returned.
- *
- * @param T The type of the custom object. Must be serializable via kotlinx.serialization.
- * @param datastore The [DataStore] instance used for storing preferences.
- * @param key The unique string key used to identify this preference within the DataStore.
- * @param defaultValue The default value returned when the preference is not set or
- *   deserialization fails.
- * @param serializer The [KSerializer] for the type [T].
- * @param json The [Json] instance to use for serialization and deserialization.
- * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations.
- *   Defaults to [Dispatchers.IO].
+ * [CustomGenericPreferenceItem] that stores a single custom value as JSON using
+ * kotlinx.serialization.
  */
 internal class KSerializedPrimitive<T>(
     datastore: DataStore<Preferences>,
