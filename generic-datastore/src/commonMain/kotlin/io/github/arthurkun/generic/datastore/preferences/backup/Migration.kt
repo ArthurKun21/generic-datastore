@@ -16,10 +16,10 @@ import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
 
 /**
- * Converts any value to a [JsonElement].
+ * Converts arbitrary Kotlin values into a [JsonElement].
  *
- * Supports `null` (to [JsonNull]), [JsonElement], [Number], [Boolean], [String],
- * [Collection], and [Map] types. Other types are converted via [toString].
+ * Supports `null` (as [JsonNull]), [JsonElement], [Number], [Boolean], [String], [Collection],
+ * and [Map]. Other values are converted with [toString].
  *
  * @return The corresponding [JsonElement] representation.
  */
@@ -55,11 +55,10 @@ private fun parseJsonValue(element: JsonElement): Any {
 }
 
 /**
- * Parses this JSON string into a [Map] of [String] keys to [Any] values.
+ * Parses this JSON object string into a [Map] of [String] keys to Kotlin values.
  *
- * Null JSON values are excluded from the resulting map. Primitive values are converted
- * to their Kotlin equivalents ([String], [Boolean], [Long], [Double]), arrays become
- * [List], and objects become nested [Map].
+ * Null JSON values are excluded from the resulting map. Primitive values are converted to their
+ * Kotlin equivalents, arrays become [List], and objects become nested [Map] values.
  *
  * @return A map representation of the JSON string.
  * @throws IllegalArgumentException if the string is not valid JSON.

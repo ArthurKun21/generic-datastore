@@ -23,21 +23,17 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * Base sealed class for nullable [BasePreference] implementations that store values as strings
- * via [stringPreferencesKey].
+ * Base implementation for nullable preferences stored as a single string entry.
  *
- * Subclasses provide [serializer] and [deserializer] functions to convert between [T]
- * and its [String] representation. When a key is not set in DataStore, `null` is returned.
- * Setting a `null` value removes the key from DataStore. If deserialization fails
- * (e.g., due to corrupted data), `null` is returned.
+ * Missing keys and decode failures both read back as `null`. Writing `null` removes the key from
+ * DataStore.
  *
- * @param T The non-null type of the preference value.
+ * @param T The non-null exposed value type.
  * @param datastore The [DataStore] instance used for storing preferences.
  * @param key The unique string key used to identify this preference within the DataStore.
- * @param serializer A function to convert a value of type [T] to its [String] representation.
- * @param deserializer A function to convert a [String] representation back to a value of type [T].
+ * @param serializer Converts [T] to its stored [String] representation.
+ * @param deserializer Converts a stored [String] back to [T].
  * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations.
- *   Defaults to [Dispatchers.IO].
  */
 internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
     private val datastore: DataStore<Preferences>,

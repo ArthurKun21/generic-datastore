@@ -55,14 +55,16 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
 /**
- * A DataStore implementation that provides methods for creating and managing various types of preferences.
+ * Default [PreferencesDatastore] implementation backed by `DataStore<Preferences>`.
  *
- * This class wraps a [DataStore<Preferences>] instance and offers convenient functions
- * to define preferences for common data types like String, Long, Int, Float, Boolean,
- * and Set<String>, as well as custom serialized objects.
+ * It creates typed [Preference] wrappers over primitive keys, nullable keys, serializer-backed
+ * string entries, string-set collections, batch transactions, and backup import/export helpers.
+ *
+ * The [defaultJson] supplied here becomes the fallback JSON configuration for all `kserialized*`
+ * APIs when callers do not pass a [Json] instance explicitly.
  *
  * @property datastore The underlying [DataStore<Preferences>] instance.
- * @property defaultJson The default [Json] instance to use for Kotlin Serialization-based preferences.
+ * @property defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
  */
 public class GenericPreferencesDatastore(
     internal val datastore: DataStore<Preferences>,

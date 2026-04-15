@@ -6,16 +6,9 @@ import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 
 /**
- * Defines a preference for storing a [Set] of enum values using a string set preference key.
+ * Internal enum-set preference factory used by the public `enumSet` extension.
  *
- * Each enum value is serialized to its name for storage and deserialized back on retrieval.
- * If deserialization of an individual element fails due to an unknown enum value, that element
- * is skipped.
- *
- * @param T The enum type.
- * @param key The key for the preference.
- * @param defaultValue The default set of enum values to use if the key is not found
- * (defaults to an empty set).
+ * Enum values are stored by [Enum.name]. Unknown stored names are skipped.
  */
 @PublishedApi
 internal inline fun <reified T : Enum<T>> PreferencesDatastore.internalEnumSet(

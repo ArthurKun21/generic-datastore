@@ -8,24 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
 /**
- * A [CustomSetGenericPreferenceItem] for storing a [Set] of custom objects using per-element serialization.
- *  Each element is serialized to a String via [serializer] and stored using
- *  [stringSetPreferencesKey]. On retrieval, each String element is deserialized back
- *  via [deserializer].
- *
- * If deserialization fails (e.g., due to corrupted data), the [defaultValue] is returned.
- *
- * @param T The type of the custom object.
- * @param datastore The [DataStore] instance used for storing preferences.
- * @param key The unique string key used to identify this preference within the DataStore.
- * @param defaultValue The default value returned when the preference is not set or
- *   deserialization fails.
- * @param serializer A function to serialize the object of type [T] to its [String]
- *   representation for storage.
- * @param deserializer A function to deserialize the [String] representation back to an
- *   object of type [T].
- * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations.
- *   Defaults to [Dispatchers.IO].
+ * [CustomSetGenericPreferenceItem] for a string-set-backed custom [Set] using caller-supplied
+ * element serializers.
  */
 internal class SerializedSetPrimitive<T>(
     datastore: DataStore<Preferences>,

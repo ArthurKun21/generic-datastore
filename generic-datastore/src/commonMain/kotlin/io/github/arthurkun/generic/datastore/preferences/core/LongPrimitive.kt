@@ -5,10 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.longPreferencesKey
 
 /**
- * A [GenericPreferenceItem] for storing [Long] values.
- * @param datastore The [DataStore<Preferences>] instance used for storing and retrieving preferences.
- * @param key The unique String key used to identify this preference within the DataStore.
- * @param defaultValue The default value to use if the preference is not set or on retrieval error.
+ * [GenericPreferenceItem] for a [Long] preference stored with `longPreferencesKey`.
  */
 internal class LongPrimitive(
     datastore: DataStore<Preferences>,

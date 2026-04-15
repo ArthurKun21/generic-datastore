@@ -16,22 +16,17 @@ import kotlin.reflect.KProperty
 import androidx.datastore.preferences.core.Preferences as DataStorePreferences
 
 /**
- * Maps a [io.github.arthurkun.generic.datastore.core.DelegatedPreference] of type [T] to a [io.github.arthurkun.generic.datastore.core.DelegatedPreference] of type [R], inferring the default value by converting
- * the default value of the original preference.
+ * Maps a [Preference] of type [T] to a [Preference] of type [R], deriving the mapped default by
+ * converting the source preference's default value.
  *
- * This is a convenience function for cases where the conversion of the default value is guaranteed
- * to be safe.
+ * Use this only when [convert] is guaranteed to succeed for the source default value. If that is
+ * not guaranteed, prefer [map] and supply an explicit mapped default.
  *
- * **Warning:** This function will throw an exception during initialization if the `convert`
- * function fails on the original preference's default value. For a safer version where you can
- * provide an explicit default value of type [R], see [map].
- *
- * @param T The original type of the preference value in storage.
- * @param R The target type for the preference value in the application.
- * @param convert A lambda function `(T) -> R` for converting the stored value from type [T] to [R].
- * @param reverse A lambda function `(R) -> T` for converting an application value from type [R]
- *   back to type [T] for storage.
- * @return A new [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instance of type [R].
+ * @param T The stored value type.
+ * @param R The mapped value type.
+ * @param convert Converts the stored value to the exposed mapped value.
+ * @param reverse Converts the mapped value back to the stored representation.
+ * @return A new [Preference] of type [R].
  * @throws Exception if `convert(this.defaultValue)` fails.
  */
 internal fun <T, R> Preference<T>.mapIO(
@@ -46,26 +41,18 @@ internal fun <T, R> Preference<T>.mapIO(
     )
 
 /**
- * Maps a [io.github.arthurkun.generic.datastore.core.DelegatedPreference] of type [T] to a [io.github.arthurkun.generic.datastore.core.DelegatedPreference] of type [R] using provided converter functions.
+ * Maps a [Preference] of type [T] to a [Preference] of type [R] using explicit conversion
+ * functions and a mapped default value.
  *
- * This function allows transforming a stored preference value to a different type for
- * application use, while the underlying storage remains in its original type [T].
- * It incorporates error handling for the conversion processes:
- * - When converting from [T] to [R] (e.g., on reads): if [convert] fails, [defaultValue] (of type [R]) is used.
- * - When converting from [R] to [T] (e.g., on writes): if [reverse] fails, the `defaultValue`
- *   of the original [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instance (of type [T]) is used.
+ * Read-side conversion failures return [defaultValue]. Write-side conversion failures fall back
+ * to the original preference's default value.
  *
- * @param T The original type of the preference value in storage.
- * @param R The target type for the preference value in the application.
- * @param defaultValue The default value of type [R] for the mapped preference. This is also
- *   used as a fallback if the [convert] (T -> R) operation fails.
- * @param convert A lambda function `(T) -> R` for converting the stored value from type [T] to [R].
- *   If this function throws an exception, [defaultValue] (type [R]) is returned.
- * @param reverse A lambda function `(R) -> T` for converting an application value from type [R]
- *   back to type [T] for storage. If this function throws an exception, the `defaultValue`
- *   of the original `Prefs<T>` instance is stored.
- * @return A new [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instance of type [R] that applies the specified conversions
- *   and error handling logic.
+ * @param T The stored value type.
+ * @param R The mapped value type.
+ * @param defaultValue The default value for the mapped preference and the read-side fallback.
+ * @param convert Converts the stored value to the exposed mapped value.
+ * @param reverse Converts the mapped value back to the stored representation.
+ * @return A new [Preference] of type [R] with fallback behavior around both conversions.
  */
 internal fun <T, R> Preference<T>.map(
     defaultValue: R,
@@ -80,14 +67,17 @@ internal fun <T, R> Preference<T>.map(
     )
 
 /**
- * Internal implementation of a mapped [io.github.arthurkun.generic.datastore.core.DelegatedPreference].
+ * Internal [Preference] implementation used by [map] and [mapIO].
  *
- * @param T The original type of the preference.
- * @param R The target type after conversion.
- * @property prefs The original [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instance.
- * @property defaultValue The default value for the mapped preference of type [R].
- * @property convert A function to convert from type [T] to type [R].
- * @property reverse A function to convert from type [R] back to type [T] for storage.
+ * The wrapper delegates persistence to [prefs] and applies conversion functions on top. It also
+ * implements [PreferencesAccessor] so mapped preferences continue to work with batch APIs.
+ *
+ * @param T The stored value type.
+ * @param R The mapped value type.
+ * @property prefs The original preference instance.
+ * @property defaultValue The default value exposed by the mapped preference.
+ * @property convert Converts stored values to mapped values.
+ * @property reverse Converts mapped values back to stored values.
  */
 internal class MappedPrefs<T, R>(
     private val prefs: DelegatedPreference<T>,

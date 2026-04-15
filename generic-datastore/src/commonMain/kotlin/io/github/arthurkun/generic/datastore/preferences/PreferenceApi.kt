@@ -15,15 +15,24 @@ import io.github.arthurkun.generic.datastore.preferences.utils.map as internalMa
 import io.github.arthurkun.generic.datastore.preferences.utils.mapIO as internalMapIO
 
 /**
- * Creates a preference for a custom object using Kotlin Serialization,
- * inferring the [KSerializer] from the reified type parameter.
+ * Creates a Kotlin-serialization-backed preference, inferring the [KSerializer] from [T].
  *
- * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ * The value is stored as JSON in a string preference entry. Passing `null` for [json] delegates
+ * to the datastore implementation's configured default. [GenericPreferencesDatastore] falls back
+ * to [PreferenceDefaults.defaultJson] unless it was created with a custom default.
+ *
+ * Example:
+ * ```kotlin
+ * @Serializable
+ * data class User(val id: Int, val name: String)
+ *
+ * val user = datastore.kserialized("user", User(0, "Guest"))
+ * ```
  *
  * @param T The type of the custom object.
  * @param key The preference key.
- * @param defaultValue The default value for the custom object.
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+ * @param defaultValue The value returned when the key is missing or the stored payload cannot be decoded.
+ * @param json The [Json] configuration to use, or `null` to use the datastore default.
  * @return A [DelegatedPreference] instance for the custom object preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserialized(
@@ -38,15 +47,15 @@ public inline fun <reified T> PreferencesDatastore.kserialized(
 )
 
 /**
- * Creates a preference for a [Set] of custom objects using Kotlin Serialization,
- * inferring the [KSerializer] from the reified type parameter.
+ * Creates a Kotlin-serialization-backed [Set] preference, inferring the [KSerializer] from [T].
  *
- * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ * Each element is encoded separately into the underlying string-set entry. Elements that fail to
+ * decode are skipped when the set is read.
  *
  * @param T The type of each element in the set.
  * @param key The preference key.
  * @param defaultValue The default value for the set (defaults to an empty set).
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+ * @param json The [Json] configuration to use, or `null` to use the datastore default.
  * @return A [DelegatedPreference] instance for the Set preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserializedSet(
@@ -61,15 +70,14 @@ public inline fun <reified T> PreferencesDatastore.kserializedSet(
 )
 
 /**
- * Creates a preference for a [List] of custom objects using Kotlin Serialization,
- * inferring the [KSerializer] from the reified type parameter.
+ * Creates a Kotlin-serialization-backed [List] preference, inferring the [KSerializer] from [T].
  *
- * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ * The list is stored as a single JSON array string.
  *
  * @param T The type of each element in the list.
  * @param key The preference key.
  * @param defaultValue The default value for the list (defaults to an empty list).
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+ * @param json The [Json] configuration to use, or `null` to use the datastore default.
  * @return A [DelegatedPreference] instance for the List preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserializedList(
@@ -84,14 +92,21 @@ public inline fun <reified T> PreferencesDatastore.kserializedList(
 )
 
 /**
- * Creates a nullable preference for a custom object using Kotlin Serialization,
- * inferring the [KSerializer] from the reified type parameter.
+ * Creates a nullable Kotlin-serialization-backed preference, inferring the [KSerializer] from [T].
  *
- * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ * Missing keys and failed deserialization both surface as `null`. Writing `null` removes the key.
+ *
+ * Example:
+ * ```kotlin
+ * @Serializable
+ * data class User(val id: Int, val name: String)
+ *
+ * val optionalUser = datastore.nullableKserialized<User>("user")
+ * ```
  *
  * @param T The non-null type of the custom object.
  * @param key The preference key.
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+ * @param json The [Json] configuration to use, or `null` to use the datastore default.
  * @return A [DelegatedPreference] instance for the nullable custom object preference.
  */
 public inline fun <reified T : Any> PreferencesDatastore.nullableKserialized(
@@ -104,14 +119,14 @@ public inline fun <reified T : Any> PreferencesDatastore.nullableKserialized(
 )
 
 /**
- * Creates a nullable preference for a [List] of custom objects using Kotlin Serialization,
- * inferring the [KSerializer] from the reified type parameter.
+ * Creates a nullable Kotlin-serialization-backed [List] preference, inferring the
+ * [KSerializer] from [T].
  *
- * The type [T] must be annotated with [kotlinx.serialization.Serializable].
+ * Missing keys and failed deserialization both surface as `null`. Writing `null` removes the key.
  *
  * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
  * @param key The preference key.
- * @param json The [Json] instance to use for serialization/deserialization. Defaults to [PreferenceDefaults.defaultJson] from the library if not provided.
+ * @param json The [Json] configuration to use, or `null` to use the datastore default.
  * @return A [DelegatedPreference] instance for the nullable List preference.
  */
 public inline fun <reified T> PreferencesDatastore.nullableKserializedList(
@@ -124,10 +139,11 @@ public inline fun <reified T> PreferencesDatastore.nullableKserializedList(
 )
 
 /**
- * Maps a [Preference] to a different value type by converting the stored value's default.
+ * Maps a [Preference] to a different value type by deriving the mapped default from the source
+ * preference's default value.
  *
- * This variant evaluates [convert] against the original preference's default value during
- * initialization and uses that result as the mapped preference default.
+ * This is convenient when [convert] is guaranteed to succeed for the original default value.
+ * If that assumption is not safe, prefer [map] and supply an explicit mapped default instead.
  */
 public fun <T, R> Preference<T>.mapIO(
     convert: (T) -> R,
@@ -136,6 +152,19 @@ public fun <T, R> Preference<T>.mapIO(
 
 /**
  * Maps a [Preference] to a different value type using an explicit mapped default value.
+ *
+ * Reads use [defaultValue] when [convert] throws. Writes fall back to the source preference's
+ * default when [reverse] throws.
+ *
+ * Example:
+ * ```kotlin
+ * val temperatureC = datastore.int("temperature_f")
+ *     .map(
+ *         defaultValue = 0.0,
+ *         convert = { fahrenheit -> (fahrenheit - 32) * 5.0 / 9.0 },
+ *         reverse = { celsius -> ((celsius * 9.0 / 5.0) + 32).toInt() },
+ *     )
+ * ```
  */
 public fun <T, R> Preference<T>.map(
     defaultValue: R,
@@ -144,7 +173,10 @@ public fun <T, R> Preference<T>.map(
 ): Preference<R> = internalMap(defaultValue, convert, reverse)
 
 /**
- * Creates a preference for storing a [Set] of enum values using a string set preference key.
+ * Creates a preference for storing a [Set] of enum values.
+ *
+ * Each enum constant is stored by [Enum.name]. Stored entries that no longer match any enum
+ * constant are skipped when the set is read.
  */
 public inline fun <reified T : Enum<T>> PreferencesDatastore.enumSet(
     key: String,
@@ -155,27 +187,36 @@ public inline fun <reified T : Enum<T>> PreferencesDatastore.enumSet(
 )
 
 /**
- * Creates a nullable preference for storing enum values.
+ * Creates a nullable preference for storing enum values by [Enum.name].
+ *
+ * Missing keys and unknown stored enum names both produce `null`.
  */
 public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnum(
     key: String,
 ): Preference<T?> = internalNullableEnum(key)
 
 /**
- * Converts this value to a [JsonElement].
+ * Converts this value into a [JsonElement] using the same loose conversion rules as the backup
+ * import/export helpers.
  */
 public fun Any?.toJsonElement(): JsonElement = internalToJsonElement()
 
 /**
- * Parses this JSON string into a [Map] of [String] keys to [Any] values.
+ * Parses this JSON object string into a [Map] of [String] keys to Kotlin values.
  */
 public fun String.toJsonMap(): Map<String, Any> = internalToJsonMap()
 
 /**
  * Toggles an item in a [Set] preference.
  *
- * If the set contains the item, it is removed; otherwise, it is added.
- * Works with [stringSet], [serializedSet], and [enumSet] preferences.
+ * If the set contains [item], it is removed; otherwise, it is added.
+ * This is useful with [PreferencesDatastore.stringSet], [PreferencesDatastore.serializedSet],
+ * and [enumSet].
+ *
+ * Example:
+ * ```kotlin
+ * favoriteTags.toggle("kotlin")
+ * ```
  *
  * @param T The type of each element in the set.
  * @param item The item to toggle.
@@ -189,24 +230,21 @@ public suspend inline fun <T> Preference<Set<T>>.toggle(item: T) {
 /**
  * Toggles a [Boolean] preference.
  *
- * Flips the current value: `true` becomes `false`, and `false` becomes `true`.
+ * `true` becomes `false` and `false` becomes `true`.
  */
 public suspend inline fun Preference<Boolean>.toggle() {
     update { !it }
 }
 
 /**
- * Creates a [Prefs] for storing enum values.
+ * Creates a preference for storing enum values by [Enum.name].
  *
- * The enum is serialized using its [name][Enum.name] and deserialized via
- * [enumValueOf]. If the stored string does not match any enum constant,
- * the [defaultValue] is returned.
+ * If the stored string does not match any enum constant, [defaultValue] is returned.
  *
  * @param T The enum type.
  * @param key The unique string key for the preference.
- * @param defaultValue The default enum value to use if the key is not found or
- *   deserialization fails.
- * @return A [Prefs] instance backed by [PreferencesDatastore.serialized].
+ * @param defaultValue The enum value to use when the key is missing or cannot be decoded.
+ * @return A [Preference] instance backed by [PreferencesDatastore.serialized].
  */
 public inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
     key: String,

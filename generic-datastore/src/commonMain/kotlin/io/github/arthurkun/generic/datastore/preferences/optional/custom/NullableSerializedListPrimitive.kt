@@ -13,23 +13,8 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * A [NullableCustomGenericPreferenceItem] for storing a nullable [List] of custom objects
- * using per-element serialization functions.
- *
- * Each element is serialized to a string via [elementSerializer] and wrapped in a
- * [JsonArray] for storage. On retrieval, each element in the JSON array is deserialized
- * via [elementDeserializer]. Individual elements that fail deserialization are skipped
- * rather than causing the entire list to fall back to `null`.
- *
- * @param T The type of each element in the list.
- * @param datastore The [DataStore] instance used for storing preferences.
- * @param key The unique string key used to identify this preference within the DataStore.
- * @param elementSerializer A function to serialize an element of type [T] to its
- *   [String] representation.
- * @param elementDeserializer A function to deserialize a [String] back to an element
- *   of type [T].
- * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations.
- *   Defaults to [Dispatchers.IO].
+ * [NullableCustomGenericPreferenceItem] that stores a nullable [List] inside one JSON array
+ * string using caller-supplied element serializers.
  */
 internal class NullableSerializedListPrimitive<T>(
     datastore: DataStore<Preferences>,

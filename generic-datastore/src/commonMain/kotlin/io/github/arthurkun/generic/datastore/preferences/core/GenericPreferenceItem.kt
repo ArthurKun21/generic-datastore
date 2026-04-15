@@ -21,20 +21,18 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 /**
- * Represents a generic preference that can be stored in and retrieved from a DataStore.
+ * Base implementation for non-null Preferences DataStore entries.
  *
- * This sealed class provides a type-safe way to handle different preference types (String, Int, Long, etc.)
- * while abstracting the underlying DataStore operations. It defines common operations for a preference,
- * such as reading, writing, deleting, and observing its value as a Kotlin Flow or StateFlow.
+ * Subclasses bind a concrete [Preferences.Key] and inherit the common read, write, delete,
+ * blocking, flow, and batch-access behavior used by primitive preferences.
  *
- * Each specific preference type (e.g., [StringPrimitive], [IntPrimitive]) is implemented as a nested class
- * inheriting from [GenericPreferenceItem].
+ * Missing keys read back as [defaultValue].
  *
- * @param T The data type of the preference value (e.g., String, Int, Boolean).
- * @property datastore The [DataStore<Preferences>] instance used for storing and retrieving preferences.
- * @property key The unique String key used to identify this preference within the DataStore.
- * @property defaultValue The default value to be returned if the preference is not set or an error occurs.
- * @property preferences The [Preferences.Key] specific to the type `T`, used to access the preference in DataStore.
+ * @param T The stored value type.
+ * @property datastore The [DataStore<Preferences>] instance used for storage.
+ * @property key The unique preference key name.
+ * @property defaultValue The value returned when the key is not present.
+ * @property preferences The typed [Preferences.Key] used to access this value in DataStore.
  */
 internal sealed class GenericPreferenceItem<T>(
     internal val datastore: DataStore<Preferences>,

@@ -4,7 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * A single preference entry in a backup, consisting of a key and its typed value.
+ * One entry inside a [PreferencesBackup].
+ *
+ * The [key] stores the raw DataStore preference name and [value] keeps the typed payload needed
+ * to restore it later.
  */
 @Serializable
 public data class BackupPreference(
@@ -15,7 +18,8 @@ public data class BackupPreference(
 )
 
 /**
- * Sealed interface representing a typed preference value supported by DataStore Preferences.
+ * Typed backup representation for the preference value types supported by this library's backup
+ * format.
  */
 @Serializable
 public sealed interface PreferenceValue {
@@ -23,8 +27,9 @@ public sealed interface PreferenceValue {
 
     public companion object {
         /**
-         * Converts an [Any] value to the corresponding [PreferenceValue] subtype,
-         * or returns `null` if the value type is not supported.
+         * Converts a runtime value to the matching [PreferenceValue] subtype.
+         *
+         * Returns `null` when the value type is not part of the supported Preferences backup set.
          */
         public fun fromAny(value: Any?): PreferenceValue? {
             return when (value) {
@@ -140,7 +145,7 @@ public data class StringSetPreferenceValue(
 }
 
 /**
- * Top-level backup container holding a list of [BackupPreference] entries.
+ * Serializable snapshot used by `PreferencesDatastore.exportAsData` and restore APIs.
  */
 @Serializable
 public data class PreferencesBackup(

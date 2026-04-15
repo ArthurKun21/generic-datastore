@@ -7,13 +7,13 @@ import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccess
 import kotlin.reflect.KProperty
 
 /**
- * Internal implementation of the [Preference] interface.
+ * Internal adapter that exposes a [BasePreference] as a public [Preference].
  *
- * This class delegates the [BasePreference] functionalities to the provided [pref]
- * instance and implements the property delegation methods.
+ * The wrapper preserves property delegation and batch access support while hiding the concrete
+ * primitive or serializer-backed implementation classes from the public API.
  *
- * @param T The type of the preference value.
- * @property pref The underlying [BasePreference] instance.
+ * @param T The exposed value type.
+ * @property pref The underlying [BasePreference] implementation.
  */
 internal class PreferenceImpl<T>(
     private val pref: BasePreference<T>,

@@ -6,17 +6,9 @@ import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 
 /**
- * Creates a [Prefs] for storing enum values.
+ * Internal enum preference factory used by the public `enum` extension.
  *
- * The enum is serialized using its [name][Enum.name] and deserialized via
- * [enumValueOf]. If the stored string does not match any enum constant,
- * the [defaultValue] is returned.
- *
- * @param T The enum type.
- * @param key The unique string key for the preference.
- * @param defaultValue The default enum value to use if the key is not found or
- *   deserialization fails.
- * @return A [Prefs] instance backed by [PreferencesDatastore.serialized].
+ * Enum values are stored by [Enum.name]. Unknown stored names fall back to [defaultValue].
  */
 @PublishedApi
 internal inline fun <reified T : Enum<T>> PreferencesDatastore.internalEnum(

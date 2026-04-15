@@ -3,11 +3,12 @@ package io.github.arthurkun.generic.datastore.preferences
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 
 /**
- * A marker interface for [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instances backed by a Preferences DataStore.
+ * A [DelegatedPreference] backed by a Preferences DataStore entry.
  *
- * This interface restricts certain extension functions (such as [io.github.arthurkun.generic.datastore.preferences.map] and [io.github.arthurkun.generic.datastore.preferences.mapIO])
- * to preferences-backed implementations only, preventing their use with Proto DataStore.
+ * This marker type keeps Preferences-specific helpers scoped to the Preferences API surface.
+ * Extensions such as [map], [mapIO], [toggle], and the batch helpers only apply to this subtype,
+ * which prevents accidentally using them with Proto-backed preferences.
  *
- * @param T The type of the preference value.
+ * @param T The exposed value type of the preference.
  */
 public interface Preference<T> : DelegatedPreference<T>

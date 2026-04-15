@@ -7,8 +7,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 
 /**
- * Wraps the current value into a [Flow] that emits the value or throws an exception if the
- * underlying data source encounters an error.
+ * Returns the datastore data stream, substituting [emptyPreferences] for I/O failures.
+ *
+ * This keeps preference flows resilient to transient read errors while still rethrowing all
+ * non-I/O exceptions.
  */
 internal val DataStore<Preferences>.dataOrEmpty: Flow<Preferences>
     get() = data
