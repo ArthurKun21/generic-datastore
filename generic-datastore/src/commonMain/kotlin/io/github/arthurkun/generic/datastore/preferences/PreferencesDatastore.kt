@@ -11,7 +11,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
-
 /**
  * Factory and utility contract for Preferences-backed [Preference] instances.
  *
