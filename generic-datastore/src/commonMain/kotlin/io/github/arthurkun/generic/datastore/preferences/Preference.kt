@@ -1,6 +1,7 @@
 package io.github.arthurkun.generic.datastore.preferences
 
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
+import io.github.arthurkun.generic.datastore.preferences.core.custom.internalEnum
 
 /**
  * A marker interface for [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instances backed by a Preferences DataStore.
@@ -11,5 +12,3 @@ import io.github.arthurkun.generic.datastore.core.DelegatedPreference
  * @param T The type of the preference value.
  */
 public interface Preference<T> : DelegatedPreference<T>
-
-

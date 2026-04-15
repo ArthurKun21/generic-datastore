@@ -4,17 +4,17 @@ package io.github.arthurkun.generic.datastore
 
 import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.core.custom.enum as preferencesEnum
+import io.github.arthurkun.generic.datastore.preferences.enum as preferencesEnum
 
 /**
  * Extension for backwards compatibility.
- * @see io.github.arthurkun.generic.datastore.preferences.core.custom.enum
+ * @see io.github.arthurkun.generic.datastore.preferences.enum
  */
 @Deprecated(
     message = "Moved to preferences package",
     replaceWith = ReplaceWith(
         "enum(key, defaultValue)",
-        "io.github.arthurkun.generic.datastore.preferences.default.custom.enum",
+        "io.github.arthurkun.generic.datastore.preferences.enum",
     ),
     level = DeprecationLevel.WARNING,
 )

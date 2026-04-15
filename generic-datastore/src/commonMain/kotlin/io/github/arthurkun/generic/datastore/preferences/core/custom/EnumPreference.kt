@@ -18,7 +18,8 @@ import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
  *   deserialization fails.
  * @return A [Prefs] instance backed by [PreferencesDatastore.serialized].
  */
-public inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
+@PublishedApi
+internal inline fun <reified T : Enum<T>> PreferencesDatastore.internalEnum(
     key: String,
     defaultValue: T,
 ): Preference<T> = serialized(

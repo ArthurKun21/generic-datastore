@@ -6,6 +6,7 @@ import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBacku
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
+import io.github.arthurkun.generic.datastore.preferences.core.custom.internalEnum
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
@@ -628,3 +629,24 @@ public suspend inline fun <T> Preference<Set<T>>.toggle(item: T) {
 public suspend inline fun Preference<Boolean>.toggle() {
     update { !it }
 }
+
+/**
+ * Creates a [Prefs] for storing enum values.
+ *
+ * The enum is serialized using its [name][Enum.name] and deserialized via
+ * [enumValueOf]. If the stored string does not match any enum constant,
+ * the [defaultValue] is returned.
+ *
+ * @param T The enum type.
+ * @param key The unique string key for the preference.
+ * @param defaultValue The default enum value to use if the key is not found or
+ *   deserialization fails.
+ * @return A [Prefs] instance backed by [PreferencesDatastore.serialized].
+ */
+public inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
+    key: String,
+    defaultValue: T,
+): Preference<T> = internalEnum(
+    key = key,
+    defaultValue = defaultValue,
+)
