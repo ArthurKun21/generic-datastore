@@ -3,15 +3,21 @@ package io.github.arthurkun.generic.datastore.preferences
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
+import io.github.arthurkun.generic.datastore.preferences.backup.internalToJsonElement
+import io.github.arthurkun.generic.datastore.preferences.backup.internalToJsonMap
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
 import io.github.arthurkun.generic.datastore.preferences.core.custom.internalEnum
+import io.github.arthurkun.generic.datastore.preferences.core.customSet.internalEnumSet
+import io.github.arthurkun.generic.datastore.preferences.optional.custom.internalNullableEnum
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.serializer
+import io.github.arthurkun.generic.datastore.preferences.utils.map as internalMap
+import io.github.arthurkun.generic.datastore.preferences.utils.mapIO as internalMapIO
 
 /**
  * Defines the contract for a preference data store.
@@ -330,14 +336,14 @@ public interface PreferencesDatastore {
     ): Preference<List<T>?>
 
     /**
-     * Returns a [Flow] that emits a [BatchReadScope] on every DataStore change,
+     * Returns a [Flow] that emits a [io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope] on every DataStore change,
      * allowing multiple preferences to be read from the same snapshot.
      *
      * The scope re-emits whenever any preference in the datastore changes.
      * Use `distinctUntilChanged()` on derived values to filter irrelevant updates.
      *
      * @param R The return type of the block.
-     * @param block A lambda with [BatchReadScope] receiver that reads one or more preferences.
+     * @param block A lambda with [io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope] receiver that reads one or more preferences.
      * @return A [Flow] emitting the value returned by [block] on every update.
      */
     public fun <R> batchReadFlow(block: BatchReadScope.() -> R): Flow<R>
@@ -355,10 +361,10 @@ public interface PreferencesDatastore {
     /**
      * Batch write: executes [block] inside a single DataStore `edit` transaction.
      *
-     * All [BatchWriteScope.set], [BatchWriteScope.delete], and [BatchWriteScope.resetToDefault]
+     * All [io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope.set], [io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope.delete], and [io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope.resetToDefault]
      * calls in [block] share the same [MutablePreferences][androidx.datastore.preferences.core.MutablePreferences].
      *
-     * @param block A lambda with [BatchWriteScope] receiver that writes one or more preferences.
+     * @param block A lambda with [io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope] receiver that writes one or more preferences.
      */
     public suspend fun batchWrite(block: BatchWriteScope.() -> Unit)
 
@@ -366,10 +372,10 @@ public interface PreferencesDatastore {
      * Atomic batch update: reads the current snapshot and writes new values in a single
      * DataStore `edit` transaction.
      *
-     * [block] can call [BatchUpdateScope.value] to read and [BatchUpdateScope.set] to write,
+     * [block] can call [io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope.value] to read and [io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope.set] to write,
      * guaranteeing consistency.
      *
-     * @param block A lambda with [BatchUpdateScope] receiver that reads and writes preferences.
+     * @param block A lambda with [io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope] receiver that reads and writes preferences.
      */
     public suspend fun batchUpdate(block: BatchUpdateScope.() -> Unit)
 
@@ -424,7 +430,7 @@ public interface PreferencesDatastore {
     )
 
     /**
-     * Reads current DataStore preferences and returns a [PreferencesBackup] snapshot.
+     * Reads current DataStore preferences and returns a [io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup] snapshot.
      *
      * Only keys currently set in DataStore are included. Keys marked private
      * (prefixed `__PRIVATE_`) are excluded unless [exportPrivate] is true.
@@ -433,7 +439,7 @@ public interface PreferencesDatastore {
      *
      * @param exportPrivate Whether to include private keys in the backup.
      * @param exportAppState Whether to include app-state keys in the backup.
-     * @return A [PreferencesBackup] containing the exported preferences.
+     * @return A [io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup] containing the exported preferences.
      */
     public suspend fun exportAsData(
         exportPrivate: Boolean = false,
@@ -607,10 +613,58 @@ public inline fun <reified T> PreferencesDatastore.nullableKserializedList(
 )
 
 /**
+ * Maps a [Preference] to a different value type by converting the stored value's default.
+ *
+ * This variant evaluates [convert] against the original preference's default value during
+ * initialization and uses that result as the mapped preference default.
+ */
+public fun <T, R> Preference<T>.mapIO(
+    convert: (T) -> R,
+    reverse: (R) -> T,
+): Preference<R> = internalMapIO(convert, reverse)
+
+/**
+ * Maps a [Preference] to a different value type using an explicit mapped default value.
+ */
+public fun <T, R> Preference<T>.map(
+    defaultValue: R,
+    convert: (T) -> R,
+    reverse: (R) -> T,
+): Preference<R> = internalMap(defaultValue, convert, reverse)
+
+/**
+ * Creates a preference for storing a [Set] of enum values using a string set preference key.
+ */
+public inline fun <reified T : Enum<T>> PreferencesDatastore.enumSet(
+    key: String,
+    defaultValue: Set<T> = emptySet(),
+): Preference<Set<T>> = internalEnumSet(
+    key = key,
+    defaultValue = defaultValue,
+)
+
+/**
+ * Creates a nullable preference for storing enum values.
+ */
+public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnum(
+    key: String,
+): Preference<T?> = internalNullableEnum(key)
+
+/**
+ * Converts this value to a [JsonElement].
+ */
+public fun Any?.toJsonElement(): JsonElement = internalToJsonElement()
+
+/**
+ * Parses this JSON string into a [Map] of [String] keys to [Any] values.
+ */
+public fun String.toJsonMap(): Map<String, Any> = internalToJsonMap()
+
+/**
  * Toggles an item in a [Set] preference.
  *
  * If the set contains the item, it is removed; otherwise, it is added.
- * Works with [stringSet], [serializedSet], and [enumSet][io.github.arthurkun.generic.datastore.preferences.core.customSet.enumSet] preferences.
+ * Works with [stringSet], [serializedSet], and [enumSet] preferences.
  *
  * @param T The type of each element in the set.
  * @param item The item to toggle.

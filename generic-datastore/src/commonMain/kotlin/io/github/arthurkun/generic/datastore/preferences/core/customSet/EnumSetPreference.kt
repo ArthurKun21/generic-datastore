@@ -17,7 +17,8 @@ import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
  * @param defaultValue The default set of enum values to use if the key is not found
  * (defaults to an empty set).
  */
-public inline fun <reified T : Enum<T>> PreferencesDatastore.enumSet(
+@PublishedApi
+internal inline fun <reified T : Enum<T>> PreferencesDatastore.internalEnumSet(
     key: String,
     defaultValue: Set<T> = emptySet(),
 ): Preference<Set<T>> = serializedSet(

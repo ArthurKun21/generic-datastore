@@ -18,7 +18,6 @@ import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupCreator
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupRestorer
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
-import io.github.arthurkun.generic.datastore.preferences.backup.toJsonElement
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope

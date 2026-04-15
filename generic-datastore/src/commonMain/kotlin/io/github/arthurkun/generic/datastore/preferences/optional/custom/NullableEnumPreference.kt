@@ -17,7 +17,8 @@ import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
  * @param key The unique string key for the preference.
  * @return A [DelegatedPreference] instance backed by [PreferencesDatastore.nullableSerialized].
  */
-public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnum(
+@PublishedApi
+internal inline fun <reified T : Enum<T>> PreferencesDatastore.internalNullableEnum(
     key: String,
 ): Preference<T?> = nullableSerialized(
     key = key,

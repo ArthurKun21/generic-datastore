@@ -3,7 +3,7 @@ package io.github.arthurkun.generic.datastore.preferences.batch
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.utils.mapIO
+import io.github.arthurkun.generic.datastore.preferences.mapIO
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest

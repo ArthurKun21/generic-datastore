@@ -1,10 +1,10 @@
 package io.github.arthurkun.generic.datastore.preferences.core
 
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.core.customSet.enumSet
 import io.github.arthurkun.generic.datastore.preferences.enum
-import io.github.arthurkun.generic.datastore.preferences.utils.map
-import io.github.arthurkun.generic.datastore.preferences.utils.mapIO
+import io.github.arthurkun.generic.datastore.preferences.enumSet
+import io.github.arthurkun.generic.datastore.preferences.map
+import io.github.arthurkun.generic.datastore.preferences.mapIO
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

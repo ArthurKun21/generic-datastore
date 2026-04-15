@@ -2,11 +2,11 @@ package io.github.arthurkun.generic.datastore.compose.app.domain
 
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
-import io.github.arthurkun.generic.datastore.preferences.core.customSet.enumSet
 import io.github.arthurkun.generic.datastore.preferences.enum
+import io.github.arthurkun.generic.datastore.preferences.enumSet
 import io.github.arthurkun.generic.datastore.preferences.kserialized
 import io.github.arthurkun.generic.datastore.preferences.kserializedSet
-import io.github.arthurkun.generic.datastore.preferences.utils.mapIO
+import io.github.arthurkun.generic.datastore.preferences.mapIO
 import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 

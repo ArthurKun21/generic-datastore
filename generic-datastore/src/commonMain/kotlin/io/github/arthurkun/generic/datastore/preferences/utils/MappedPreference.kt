@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package io.github.arthurkun.generic.datastore.preferences.utils
 
 import androidx.datastore.preferences.core.MutablePreferences
@@ -36,7 +34,7 @@ import androidx.datastore.preferences.core.Preferences as DataStorePreferences
  * @return A new [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instance of type [R].
  * @throws Exception if `convert(this.defaultValue)` fails.
  */
-public fun <T, R> Preference<T>.mapIO(
+internal fun <T, R> Preference<T>.mapIO(
     convert: (T) -> R,
     reverse: (R) -> T,
 ): Preference<R> =
@@ -69,7 +67,7 @@ public fun <T, R> Preference<T>.mapIO(
  * @return A new [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instance of type [R] that applies the specified conversions
  *   and error handling logic.
  */
-public fun <T, R> Preference<T>.map(
+internal fun <T, R> Preference<T>.map(
     defaultValue: R,
     convert: (T) -> R,
     reverse: (R) -> T,

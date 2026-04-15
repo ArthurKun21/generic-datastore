@@ -1,12 +1,11 @@
 package io.github.arthurkun.generic.datastore.preferences
 
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
-import io.github.arthurkun.generic.datastore.preferences.core.custom.internalEnum
 
 /**
  * A marker interface for [io.github.arthurkun.generic.datastore.core.DelegatedPreference] instances backed by a Preferences DataStore.
  *
- * This interface restricts certain extension functions (such as [io.github.arthurkun.generic.datastore.preferences.utils.map] and [io.github.arthurkun.generic.datastore.preferences.utils.mapIO])
+ * This interface restricts certain extension functions (such as [io.github.arthurkun.generic.datastore.preferences.map] and [io.github.arthurkun.generic.datastore.preferences.mapIO])
  * to preferences-backed implementations only, preventing their use with Proto DataStore.
  *
  * @param T The type of the preference value.

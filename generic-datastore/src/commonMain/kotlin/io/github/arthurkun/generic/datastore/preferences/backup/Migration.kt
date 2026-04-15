@@ -23,14 +23,14 @@ import kotlinx.serialization.json.longOrNull
  *
  * @return The corresponding [JsonElement] representation.
  */
-public fun Any?.toJsonElement(): JsonElement = when (this) {
+internal fun Any?.internalToJsonElement(): JsonElement = when (this) {
     null -> JsonNull
     is JsonElement -> this
     is Number -> JsonPrimitive(this)
     is Boolean -> JsonPrimitive(this)
     is String -> JsonPrimitive(this)
-    is Collection<*> -> JsonArray(map { it.toJsonElement() })
-    is Map<*, *> -> JsonObject(map { it.key.toString() to it.value.toJsonElement() }.toMap())
+    is Collection<*> -> JsonArray(map { it.internalToJsonElement() })
+    is Map<*, *> -> JsonObject(map { it.key.toString() to it.value.internalToJsonElement() }.toMap())
     else -> JsonPrimitive(this.toString())
 }
 
@@ -64,7 +64,7 @@ private fun parseJsonValue(element: JsonElement): Any {
  * @return A map representation of the JSON string.
  * @throws IllegalArgumentException if the string is not valid JSON.
  */
-public fun String.toJsonMap(): Map<String, Any> = try {
+internal fun String.internalToJsonMap(): Map<String, Any> = try {
     Json.parseToJsonElement(this)
         .jsonObject
         .mapNotNull { (k, v) ->
