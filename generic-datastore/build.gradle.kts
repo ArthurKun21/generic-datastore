@@ -40,12 +40,3 @@ mavenPublishing {
         description.set("A generic datastore library for Kotlin Multiplatform.")
     }
 }
-
-val baselineProfileProducer = rootProject.findProject(":benchmark-generic-datastore")
-if (baselineProfileProducer != null) {
-    pluginManager.apply("androidx.baselineprofile")
-
-    dependencies {
-        add("baselineProfile", baselineProfileProducer)
-    }
-}

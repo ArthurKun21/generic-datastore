@@ -39,12 +39,3 @@ mavenPublishing {
         description.set("Jetpack Compose extensions for Generic Datastore Library.")
     }
 }
-
-val baselineProfileProducer = rootProject.findProject(":benchmark-generic-datastore")
-if (baselineProfileProducer != null) {
-    pluginManager.apply("androidx.baselineprofile")
-
-    dependencies {
-        add("baselineProfile", baselineProfileProducer)
-    }
-}
