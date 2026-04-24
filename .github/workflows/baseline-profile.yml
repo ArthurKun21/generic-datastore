@@ -81,6 +81,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: baseline-profile-${{ github.run_number }}
+          if-no-files-found: error
           path: |
             generic-datastore/src/androidMain/generated/baselineProfiles/**
             generic-datastore-compose/src/androidMain/generated/baselineProfiles/**
