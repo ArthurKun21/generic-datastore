@@ -88,6 +88,28 @@ dependencies {
 }
 ```
 
+## Baseline Profiles
+
+Android baseline profiles for both published libraries are generated from the shared producer module
+`:benchmark-generic-datastore`, which drives the dedicated app module
+`:benchmark-generic-datastore-app` through a small deterministic user journey.
+
+To regenerate them locally, run:
+
+```bash
+./gradlew :benchmark-generic-datastore:generateBaselineProfile
+```
+
+Generated profiles are written into:
+
+```text
+generic-datastore/src/androidMain/generated/baselineProfiles/
+generic-datastore-compose/src/androidMain/generated/baselineProfiles/
+```
+
+The benchmark modules are tooling-only. They are excluded from JitPack builds through
+`settings.gradle.kts` and are intended only for local and CI baseline profile refresh workflows.
+
 ## Preferences DataStore
 
 ### Setup Preference DataStore

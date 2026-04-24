@@ -37,6 +37,8 @@ rootProject.name = "GenericDataStore"
 include(":generic-datastore")
 include(":generic-datastore-compose")
 if (!isJitPack) {
+    include(":benchmark-generic-datastore")
+    include(":benchmark-generic-datastore-app")
     include(":samples:preferenceAndroidApp")
     include(":samples:preferenceComposeApp")
     include(":samples:protoComposeApp")
