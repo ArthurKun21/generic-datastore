@@ -94,11 +94,32 @@ Android baseline profiles for both published libraries are generated from the sh
 `:benchmark-generic-datastore`, which drives the dedicated app module
 `:benchmark-generic-datastore-app` through a small deterministic user journey.
 
+The producer declares a Gradle Managed Device named `pixel6api31`:
+
+```kotlin
+testOptions.managedDevices.localDevices {
+    create("pixel6api31") {
+        device = "Pixel 6"
+        apiLevel = 31
+        systemImageSource = "aosp"
+    }
+}
+```
+
+This lets Gradle target a consistent local emulator definition for baseline profile generation
+instead of depending on whichever physical device or emulator happens to already be connected.
+
 To regenerate them locally, run:
 
 ```bash
 ./gradlew :benchmark-generic-datastore:generateBaselineProfile
 ```
+
+Gradle will use the managed `pixel6api31` device declared by the producer module. You do not need
+to boot a matching emulator manually first.
+
+On the first run, make sure the Android SDK is installed with accepted licenses and that the API 31
+AOSP system image required by that managed device is available.
 
 Generated profiles are written into:
 
