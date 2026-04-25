@@ -22,19 +22,11 @@ concurrency:
 
 jobs:
   generate:
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
-    env:
-      api-level: 35
+    timeout-minutes: 45
+    runs-on: macos-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
@@ -45,37 +37,8 @@ jobs:
       - name: Set up gradle
         uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e
 
-      - name: AVD cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-baseline-profile-${{ env.api-level }}
-
-      - name: Create AVD snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a
-        with:
-          api-level: ${{ env.api-level }}
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-
       - name: Generate baseline profiles
-        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a
-        with:
-          api-level: ${{ env.api-level }}
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew :benchmark-generic-datastore:generateBaselineProfile
+        run: ./gradlew :benchmark-generic-datastore:generateBaselineProfile -Dorg.gradle.workers.max=1 -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect
 
       - name: Upload generated baseline profiles
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
