@@ -12,7 +12,7 @@ android {
     targetProjectPath = ":benchmark-generic-datastore-app"
 
     defaultConfig {
-        minSdk = 28
+        minSdk = AndroidConfig.MIN_SDK
         targetSdk = AndroidConfig.TARGET_SDK
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR"
