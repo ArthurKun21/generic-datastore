@@ -23,11 +23,24 @@ android {
         targetCompatibility = AndroidConfig.JavaVersion
     }
 
+    testOptions {
+        managedDevices {
+            localDevices {
+                create("pixel6api31") {
+                    device = "Pixel 6"
+                    apiLevel = 31
+                    systemImageSource = "aosp"
+                }
+            }
+        }
+    }
+
     experimentalProperties["android.experimental.self-instrumenting"] = true
 }
 
 baselineProfile {
-    useConnectedDevices = true
+    managedDevices += "pixel6api31"
+    useConnectedDevices = false
 }
 
 dependencies {
