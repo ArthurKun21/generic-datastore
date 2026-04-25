@@ -39,3 +39,9 @@ mavenPublishing {
         description.set("Jetpack Compose extensions for Generic Datastore Library.")
     }
 }
+
+baselineProfile {
+    filter {
+        include("io.github.arthurkun.generic.datastore.compose.**")
+    }
+}

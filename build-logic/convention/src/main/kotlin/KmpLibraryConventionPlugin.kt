@@ -21,6 +21,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
                 apply(libs.pluginId("kotlin-multiplatform"))
                 apply(libs.pluginId("android-library"))
                 apply("gd.spotless")
+                apply(libs.pluginId("androidx-baselineprofile"))
             }
 
             extensions.configure<KotlinMultiplatformExtension> {
@@ -49,8 +50,6 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
 
             val baselineProfileProducer = rootProject.findProject(":benchmark-generic-datastore")
             if (baselineProfileProducer != null) {
-                pluginManager.apply(libs.pluginId("androidx-baselineprofile"))
-
                 dependencies {
                     add("baselineProfile", baselineProfileProducer)
                 }

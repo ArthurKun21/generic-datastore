@@ -1,5 +1,6 @@
 plugins {
     id("gd.android.sample")
+    alias(libs.plugins.androidx.baselineprofile)
 }
 
 android {
@@ -24,6 +25,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.activity.compose)
     implementation(libs.bundles.compose)
+    implementation(libs.androidx.profileinstaller)
 
     debugImplementation(libs.compose.ui.tooling)
 }
