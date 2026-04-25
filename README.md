@@ -112,7 +112,8 @@ instead of depending on whichever physical device or emulator happens to already
 To regenerate them locally, run:
 
 ```bash
-./gradlew :benchmark-generic-datastore:generateBaselineProfile
+./gradlew :generic-datastore:generateReleaseBaselineProfile \
+  :generic-datastore-compose:generateReleaseBaselineProfile
 ```
 
 Gradle will use the managed `pixel6api31` device declared by the producer module. You do not need
