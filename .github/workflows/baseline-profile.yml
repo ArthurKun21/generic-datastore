@@ -1,0 +1,50 @@
+name: baseline-profile
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/baseline-profile.yml'
+      - 'benchmark-generic-datastore/**'
+      - 'benchmark-generic-datastore-app/**'
+      - 'generic-datastore/**'
+      - 'generic-datastore-compose/**'
+      - 'gradle/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+
+env:
+  JAVA_VERSION: 17
+  JAVA_DISTRO: 'temurin'
+
+concurrency:
+  group: ${{ github.ref }}-baseline-profile
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  generate:
+    timeout-minutes: 45
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
+
+      - name: Set up gradle
+        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e
+
+      - name: Generate baseline profiles
+        run: ./gradlew :generic-datastore:generateBaselineProfile :generic-datastore-compose:generateBaselineProfile -Dorg.gradle.workers.max=1 -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect --no-daemon
+
+      - name: Upload generated baseline profiles
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: baseline-profile-${{ github.run_number }}
+          if-no-files-found: error
+          path: |
+            generic-datastore/src/androidMain/generated/baselineProfiles/**
+            generic-datastore-compose/src/androidMain/generated/baselineProfiles/**

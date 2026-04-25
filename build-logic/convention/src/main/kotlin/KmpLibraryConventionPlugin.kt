@@ -7,6 +7,7 @@ import gd.buildlogic.pluginId
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
@@ -20,6 +21,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
                 apply(libs.pluginId("kotlin-multiplatform"))
                 apply(libs.pluginId("android-library"))
                 apply("gd.spotless")
+                apply(libs.pluginId("androidx-baselineprofile"))
             }
 
             extensions.configure<KotlinMultiplatformExtension> {
@@ -43,6 +45,13 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
                         "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
                         "-Xexpect-actual-classes",
                     )
+                }
+            }
+
+            val baselineProfileProducer = rootProject.findProject(":benchmark-generic-datastore")
+            if (baselineProfileProducer != null) {
+                dependencies {
+                    add("baselineProfile", baselineProfileProducer)
                 }
             }
         }

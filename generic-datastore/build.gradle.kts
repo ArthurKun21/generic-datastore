@@ -40,3 +40,10 @@ mavenPublishing {
         description.set("A generic datastore library for Kotlin Multiplatform.")
     }
 }
+
+baselineProfile {
+    filter {
+        include("io.github.arthurkun.generic.datastore.**")
+        exclude("io.github.arthurkun.generic.datastore.compose.**")
+    }
+}
