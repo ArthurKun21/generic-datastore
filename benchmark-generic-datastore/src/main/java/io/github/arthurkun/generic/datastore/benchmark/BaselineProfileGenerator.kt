@@ -9,8 +9,8 @@ import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
 
-private const val PackageName = "io.github.arthurkun.generic.datastore.benchmark.app"
-private const val DefaultTimeoutMs = 5_000L
+private const val PACKAGE_NAME = "io.github.arthurkun.generic.datastore.benchmark.app"
+private const val DEFAULT_TIMEOUT_MS = 5_000L
 
 @RequiresApi(Build.VERSION_CODES.P)
 class BaselineProfileGenerator {
@@ -20,7 +20,7 @@ class BaselineProfileGenerator {
 
     @Test
     fun startupAndCriticalJourney() = baselineProfileRule.collect(
-        packageName = PackageName,
+        packageName = PACKAGE_NAME,
         stableIterations = 2,
         maxIterations = 8,
     ) {
@@ -42,12 +42,12 @@ class BaselineProfileGenerator {
     }
 }
 
-private fun UiDevice.waitForTag(tag: String, timeoutMs: Long = DefaultTimeoutMs): Boolean {
-    return wait(Until.hasObject(By.res(PackageName, tag)), timeoutMs)
+private fun UiDevice.waitForTag(tag: String, timeoutMs: Long = DEFAULT_TIMEOUT_MS): Boolean {
+    return wait(Until.hasObject(By.res(PACKAGE_NAME, tag)), timeoutMs)
 }
 
-private fun UiDevice.clickTag(tag: String, timeoutMs: Long = DefaultTimeoutMs) {
+private fun UiDevice.clickTag(tag: String, timeoutMs: Long = DEFAULT_TIMEOUT_MS) {
     check(waitForTag(tag, timeoutMs)) { "Could not find UI element with tag: $tag" }
-    checkNotNull(findObject(By.res(PackageName, tag))) { "Could not click UI element with tag: $tag" }
+    checkNotNull(findObject(By.res(PACKAGE_NAME, tag))) { "Could not click UI element with tag: $tag" }
         .click()
 }
