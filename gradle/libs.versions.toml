@@ -27,7 +27,7 @@ kotlinx_serialization = "1.11.0"
 coroutines = "1.10.2"
 kotlinx-io = "0.9.0"
 
-wire = "6.2.0"
+wire = "6.3.0"
 
 spotless = "8.4.0"
 ktlint-core = "1.8.0"
