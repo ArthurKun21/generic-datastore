@@ -29,7 +29,7 @@ kotlinx-io = "0.9.0"
 
 wire = "6.3.0"
 
-spotless = "8.4.0"
+spotless = "8.5.1"
 ktlint-core = "1.8.0"
 
 [libraries]
