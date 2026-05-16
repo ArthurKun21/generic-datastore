@@ -7,24 +7,13 @@ import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
+import io.github.arthurkun.generic.datastore.core.createDatastoreScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
 import kotlin.jvm.JvmName
 import kotlinx.io.files.Path as KotlinxIoPath
 
-private fun preferencesDatastoreScope(parentScope: CoroutineScope?): CoroutineScope {
-    if (parentScope == null) {
-        return CoroutineScope(Dispatchers.IO + SupervisorJob())
-    }
-
-    val parentJob = parentScope.coroutineContext[Job]
-    return CoroutineScope(parentScope.coroutineContext + SupervisorJob(parentJob))
-}
 
 /**
  * Creates a [GenericPreferencesDatastore] from a path producer that returns a [String].
@@ -56,7 +45,7 @@ public fun createPreferencesDatastore(
     defaultJson: Json = PreferenceDefaults.defaultJson,
     producePath: () -> String,
 ): GenericPreferencesDatastore {
-    val datastoreScope = preferencesDatastoreScope(scope)
+    val datastoreScope = createDatastoreScope(scope)
     val datastore = PreferenceDataStoreFactory.createWithPath(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
@@ -93,7 +82,7 @@ public fun createPreferencesDatastore(
     defaultJson: Json = PreferenceDefaults.defaultJson,
     produceOkioPath: () -> okio.Path,
 ): GenericPreferencesDatastore {
-    val datastoreScope = preferencesDatastoreScope(scope)
+    val datastoreScope = createDatastoreScope(scope)
     val datastore = PreferenceDataStoreFactory.createWithPath(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
@@ -130,7 +119,7 @@ public fun createPreferencesDatastore(
     defaultJson: Json = PreferenceDefaults.defaultJson,
     produceKotlinxIoPath: () -> KotlinxIoPath,
 ): GenericPreferencesDatastore {
-    val datastoreScope = preferencesDatastoreScope(scope)
+    val datastoreScope = createDatastoreScope(scope)
     val datastore = PreferenceDataStoreFactory.createWithPath(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
@@ -168,7 +157,7 @@ public fun createPreferencesDatastore(
     defaultJson: Json = PreferenceDefaults.defaultJson,
     producePath: () -> String,
 ): GenericPreferencesDatastore {
-    val datastoreScope = preferencesDatastoreScope(scope)
+    val datastoreScope = createDatastoreScope(scope)
     val datastore = PreferenceDataStoreFactory.createWithPath(
         corruptionHandler = corruptionHandler,
         migrations = migrations,

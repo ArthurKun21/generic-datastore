@@ -8,25 +8,13 @@ import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.core.okio.OkioSerializer
 import androidx.datastore.core.okio.OkioStorage
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
+import io.github.arthurkun.generic.datastore.core.createDatastoreScope
 import io.github.arthurkun.generic.datastore.core.systemFileSystem
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
 import kotlin.jvm.JvmName
 import kotlinx.io.files.Path as KotlinxIoPath
-
-private fun protoDatastoreScope(parentScope: CoroutineScope?): CoroutineScope {
-    if (parentScope == null) {
-        return CoroutineScope(Dispatchers.IO + SupervisorJob())
-    }
-
-    val parentJob = parentScope.coroutineContext[Job]
-    return CoroutineScope(parentScope.coroutineContext + SupervisorJob(parentJob))
-}
 
 /**
  * Creates a [GenericProtoDatastore] using an [OkioSerializer] and a path producer
@@ -64,7 +52,7 @@ public fun <T> createProtoDatastore(
     defaultJson: Json = PreferenceDefaults.defaultJson,
     producePath: () -> String,
 ): GenericProtoDatastore<T> {
-    val datastoreScope = protoDatastoreScope(scope)
+    val datastoreScope = createDatastoreScope(scope)
     val datastore = DataStoreFactory.create(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
@@ -117,7 +105,7 @@ public fun <T> createProtoDatastore(
     defaultJson: Json = PreferenceDefaults.defaultJson,
     produceOkioPath: () -> okio.Path,
 ): GenericProtoDatastore<T> {
-    val datastoreScope = protoDatastoreScope(scope)
+    val datastoreScope = createDatastoreScope(scope)
     val datastore = DataStoreFactory.create(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
@@ -171,7 +159,7 @@ public fun <T> createProtoDatastore(
     defaultJson: Json = PreferenceDefaults.defaultJson,
     produceKotlinxIoPath: () -> KotlinxIoPath,
 ): GenericProtoDatastore<T> {
-    val datastoreScope = protoDatastoreScope(scope)
+    val datastoreScope = createDatastoreScope(scope)
     val datastore = DataStoreFactory.create(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
@@ -228,7 +216,7 @@ public fun <T> createProtoDatastore(
     defaultJson: Json = PreferenceDefaults.defaultJson,
     producePath: () -> String,
 ): GenericProtoDatastore<T> {
-    val datastoreScope = protoDatastoreScope(scope)
+    val datastoreScope = createDatastoreScope(scope)
     val datastore = DataStoreFactory.create(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
