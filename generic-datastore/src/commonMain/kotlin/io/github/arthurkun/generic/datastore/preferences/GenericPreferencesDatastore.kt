@@ -46,6 +46,8 @@ import io.github.arthurkun.generic.datastore.preferences.optional.custom.Nullabl
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableObjectPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -65,14 +67,20 @@ import kotlinx.serialization.json.JsonElement
  *
  * @property datastore The underlying [DataStore<Preferences>] instance.
  * @property defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
+ * @property ownedScope The scope owned by this wrapper when it creates the underlying [DataStore].
  */
 public class GenericPreferencesDatastore(
     internal val datastore: DataStore<Preferences>,
     private val defaultJson: Json = PreferenceDefaults.defaultJson,
+    private val ownedScope: CoroutineScope? = null,
 ) : PreferencesDatastore {
 
     private val backupCreator = PreferenceBackupCreator(datastore)
     private val backupRestorer = PreferenceBackupRestorer(datastore)
+
+    override fun close() {
+        ownedScope?.cancel()
+    }
 
     /**
      * Creates a String preference.

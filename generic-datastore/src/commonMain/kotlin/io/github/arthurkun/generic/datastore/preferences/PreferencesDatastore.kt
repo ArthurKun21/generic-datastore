@@ -23,6 +23,16 @@ import kotlinx.serialization.json.JsonElement
  */
 public interface PreferencesDatastore {
     /**
+     * Closes resources owned by this preferences datastore wrapper.
+     *
+     * Datastores created with `createPreferencesDatastore` own the DataStore scope and cancel it
+     * here. Wrappers around an externally-created `DataStore<Preferences>` may not own any
+     * resources, in which case this is a no-op.
+     */
+    public fun close() {
+    }
+
+    /**
      * Creates a String preference.
      *
      * @param key The preference key.

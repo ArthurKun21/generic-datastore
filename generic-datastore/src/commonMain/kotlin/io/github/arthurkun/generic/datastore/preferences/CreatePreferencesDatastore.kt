@@ -10,11 +10,21 @@ import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
 import kotlin.jvm.JvmName
 import kotlinx.io.files.Path as KotlinxIoPath
+
+private fun preferencesDatastoreScope(parentScope: CoroutineScope?): CoroutineScope {
+    if (parentScope == null) {
+        return CoroutineScope(Dispatchers.IO + SupervisorJob())
+    }
+
+    val parentJob = parentScope.coroutineContext[Job]
+    return CoroutineScope(parentScope.coroutineContext + SupervisorJob(parentJob))
+}
 
 /**
  * Creates a [GenericPreferencesDatastore] from a path producer that returns a [String].
@@ -32,8 +42,9 @@ import kotlinx.io.files.Path as KotlinxIoPath
  *
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
- * @param scope The [CoroutineScope] to use for DataStore operations. The default creates an
- * unmanaged application-style scope; pass your own scope when you need explicit lifecycle control.
+ * @param scope Optional parent [CoroutineScope] for DataStore operations. The returned
+ * [GenericPreferencesDatastore] owns a child scope and cancels it from [GenericPreferencesDatastore.close].
+ * Pass a custom scope to tie the datastore to a parent lifecycle.
  * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
  * @param producePath A lambda that returns the full file path as a [String].
  * @return A new [GenericPreferencesDatastore] instance.
@@ -41,19 +52,21 @@ import kotlinx.io.files.Path as KotlinxIoPath
 public fun createPreferencesDatastore(
     corruptionHandler: ReplaceFileCorruptionHandler<Preferences>? = null,
     migrations: List<DataMigration<Preferences>> = emptyList(),
-    scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
     producePath: () -> String,
 ): GenericPreferencesDatastore {
+    val datastoreScope = preferencesDatastoreScope(scope)
     val datastore = PreferenceDataStoreFactory.createWithPath(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        scope = scope,
+        scope = datastoreScope,
         produceFile = { producePath().toPath() },
     )
     return GenericPreferencesDatastore(
         datastore = datastore,
         defaultJson = defaultJson,
+        ownedScope = datastoreScope,
     )
 }
 
@@ -65,8 +78,9 @@ public fun createPreferencesDatastore(
  *
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
- * @param scope The [CoroutineScope] to use for DataStore operations. The default creates an
- * unmanaged application-style scope; pass your own scope when you need explicit lifecycle control.
+ * @param scope Optional parent [CoroutineScope] for DataStore operations. The returned
+ * [GenericPreferencesDatastore] owns a child scope and cancels it from [GenericPreferencesDatastore.close].
+ * Pass a custom scope to tie the datastore to a parent lifecycle.
  * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
  * @param produceOkioPath A lambda that returns the file path as an [okio.Path].
  * @return A new [GenericPreferencesDatastore] instance.
@@ -75,19 +89,21 @@ public fun createPreferencesDatastore(
 public fun createPreferencesDatastore(
     corruptionHandler: ReplaceFileCorruptionHandler<Preferences>? = null,
     migrations: List<DataMigration<Preferences>> = emptyList(),
-    scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
     produceOkioPath: () -> okio.Path,
 ): GenericPreferencesDatastore {
+    val datastoreScope = preferencesDatastoreScope(scope)
     val datastore = PreferenceDataStoreFactory.createWithPath(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        scope = scope,
+        scope = datastoreScope,
         produceFile = produceOkioPath,
     )
     return GenericPreferencesDatastore(
         datastore = datastore,
         defaultJson = defaultJson,
+        ownedScope = datastoreScope,
     )
 }
 
@@ -99,8 +115,9 @@ public fun createPreferencesDatastore(
  *
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
- * @param scope The [CoroutineScope] to use for DataStore operations. The default creates an
- * unmanaged application-style scope; pass your own scope when you need explicit lifecycle control.
+ * @param scope Optional parent [CoroutineScope] for DataStore operations. The returned
+ * [GenericPreferencesDatastore] owns a child scope and cancels it from [GenericPreferencesDatastore.close].
+ * Pass a custom scope to tie the datastore to a parent lifecycle.
  * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
  * @param produceKotlinxIoPath A lambda that returns the file path as a [KotlinxIoPath].
  * @return A new [GenericPreferencesDatastore] instance.
@@ -109,19 +126,21 @@ public fun createPreferencesDatastore(
 public fun createPreferencesDatastore(
     corruptionHandler: ReplaceFileCorruptionHandler<Preferences>? = null,
     migrations: List<DataMigration<Preferences>> = emptyList(),
-    scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
     produceKotlinxIoPath: () -> KotlinxIoPath,
 ): GenericPreferencesDatastore {
+    val datastoreScope = preferencesDatastoreScope(scope)
     val datastore = PreferenceDataStoreFactory.createWithPath(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        scope = scope,
+        scope = datastoreScope,
         produceFile = { produceKotlinxIoPath().toString().toPath() },
     )
     return GenericPreferencesDatastore(
         datastore = datastore,
         defaultJson = defaultJson,
+        ownedScope = datastoreScope,
     )
 }
 
@@ -134,8 +153,9 @@ public fun createPreferencesDatastore(
  * @param fileName The name of the DataStore file, such as `settings.preferences_pb`.
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
- * @param scope The [CoroutineScope] to use for DataStore operations. The default creates an
- * unmanaged application-style scope; pass your own scope when you need explicit lifecycle control.
+ * @param scope Optional parent [CoroutineScope] for DataStore operations. The returned
+ * [GenericPreferencesDatastore] owns a child scope and cancels it from [GenericPreferencesDatastore.close].
+ * Pass a custom scope to tie the datastore to a parent lifecycle.
  * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
  * @param producePath A lambda that returns the directory path as a [String].
  * @return A new [GenericPreferencesDatastore] instance.
@@ -144,18 +164,20 @@ public fun createPreferencesDatastore(
     fileName: String,
     corruptionHandler: ReplaceFileCorruptionHandler<Preferences>? = null,
     migrations: List<DataMigration<Preferences>> = emptyList(),
-    scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
     producePath: () -> String,
 ): GenericPreferencesDatastore {
+    val datastoreScope = preferencesDatastoreScope(scope)
     val datastore = PreferenceDataStoreFactory.createWithPath(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        scope = scope,
+        scope = datastoreScope,
         produceFile = { producePath().toPath() / fileName },
     )
     return GenericPreferencesDatastore(
         datastore = datastore,
         defaultJson = defaultJson,
+        ownedScope = datastoreScope,
     )
 }
