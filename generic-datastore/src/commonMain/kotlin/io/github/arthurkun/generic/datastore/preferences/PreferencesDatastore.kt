@@ -21,7 +21,9 @@ import kotlinx.serialization.json.JsonElement
  * The `nullable*` APIs model absence explicitly: when a key is not stored they return `null`,
  * and writing `null` removes the key.
  */
-public interface PreferencesDatastore {
+public interface PreferencesDatastore : AutoCloseable {
+    override fun close() {}
+
     /**
      * Creates a String preference.
      *
