@@ -741,6 +741,10 @@ val protoDatastore = createProtoDatastore(
 )
 ```
 
+`createProtoDatastore` creates a DataStore scope owned by the returned `GenericProtoDatastore`.
+Call `protoDatastore.close()` when the datastore is no longer needed; if you pass `scope`, it is
+used as a parent lifecycle and is not cancelled by `close()`.
+
 Overloads accepting `okio.Path` and `kotlinx.io.files.Path` are also available:
 
 ```kotlin

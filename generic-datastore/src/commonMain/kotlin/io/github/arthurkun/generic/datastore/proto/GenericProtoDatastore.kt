@@ -19,6 +19,8 @@ import io.github.arthurkun.generic.datastore.proto.custom.optional.nullableSeria
 import io.github.arthurkun.generic.datastore.proto.custom.set.enumSetFieldInternal
 import io.github.arthurkun.generic.datastore.proto.custom.set.kserializedSetFieldInternal
 import io.github.arthurkun.generic.datastore.proto.custom.set.serializedSetFieldInternal
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
@@ -30,12 +32,14 @@ import kotlinx.serialization.json.Json
  * @param T The proto message type.
  * @param datastore The underlying [DataStore<T>] instance.
  * @param defaultValue The default value for the proto message.
+ * @param ownedScope The scope owned by this wrapper when it creates the underlying [DataStore].
  */
 public class GenericProtoDatastore<T>(
     internal val datastore: DataStore<T>,
     private val defaultValue: T,
     private val key: String = "proto_datastore",
     private val defaultJson: Json = PreferenceDefaults.defaultJson,
+    private val ownedScope: CoroutineScope? = null,
 ) : ProtoDatastore<T> {
 
     private val cachedData: ProtoPreference<T> by lazy {
@@ -47,6 +51,10 @@ public class GenericProtoDatastore<T>(
     }
 
     override fun data(): ProtoPreference<T> = cachedData
+
+    override fun close() {
+        ownedScope?.cancel()
+    }
 
     override fun <F> field(
         defaultValue: F,

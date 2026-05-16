@@ -14,6 +14,16 @@ import kotlinx.serialization.serializer
  */
 public interface ProtoDatastore<T> {
     /**
+     * Closes resources owned by this proto datastore wrapper.
+     *
+     * Datastores created with `createProtoDatastore` own the DataStore scope and cancel it here.
+     * Wrappers around an externally-created `DataStore<T>` may not own any resources, in which case
+     * this is a no-op.
+     */
+    public fun close() {
+    }
+
+    /**
      * Returns the proto message wrapped as a [DelegatedPreference] instance.
      *
      * @return A [DelegatedPreference] instance for the proto message.
