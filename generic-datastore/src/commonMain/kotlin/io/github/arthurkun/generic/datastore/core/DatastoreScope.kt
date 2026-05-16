@@ -6,7 +6,6 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 
-
 /**
  * Creates a [CoroutineScope] specifically for DataStore operations.
  *

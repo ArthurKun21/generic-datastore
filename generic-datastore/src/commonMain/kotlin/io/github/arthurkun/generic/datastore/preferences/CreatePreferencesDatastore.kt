@@ -14,7 +14,6 @@ import okio.Path.Companion.toPath
 import kotlin.jvm.JvmName
 import kotlinx.io.files.Path as KotlinxIoPath
 
-
 /**
  * Creates a [GenericPreferencesDatastore] from a path producer that returns a [String].
  *
