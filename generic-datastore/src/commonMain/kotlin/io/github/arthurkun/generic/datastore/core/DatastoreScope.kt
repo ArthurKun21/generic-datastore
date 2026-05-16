@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Creates a [CoroutineScope] specifically for DataStore operations.
@@ -13,21 +14,19 @@ import kotlinx.coroutines.SupervisorJob
  * new [SupervisorJob] to the parent's [Job] to maintain structured concurrency.
  * If no parent is provided, a standalone scope is created.
  *
- * In both cases, the scope uses [Dispatchers.IO] to ensure disk I/O operations
- * are performed on the appropriate thread pool and a [SupervisorJob] to prevent
- * failures in individual tasks from canceling the entire scope.
+ * If the parent does not provide a dispatcher, the scope uses [Dispatchers.IO]
+ * to ensure disk I/O operations are performed on the appropriate thread pool.
+ * It also uses a [SupervisorJob] to prevent failures in individual tasks from
+ * canceling the entire scope.
  *
  * @param parentScope An optional [CoroutineScope] to link the new scope to.
- * @return A [CoroutineScope] configured with [Dispatchers.IO] and a [SupervisorJob].
+ * @return A [CoroutineScope] configured with fallback [Dispatchers.IO] and a [SupervisorJob].
  */
 internal fun createDatastoreScope(parentScope: CoroutineScope?): CoroutineScope {
-    if (parentScope == null) {
-        return CoroutineScope(Dispatchers.IO + SupervisorJob())
-    }
-
-    val parentJob = parentScope.coroutineContext[Job]
+    val parentContext = parentScope?.coroutineContext ?: EmptyCoroutineContext
+    val parentJob = parentContext[Job]
     return CoroutineScope(
-        parentScope.coroutineContext + Dispatchers.IO +
+        Dispatchers.IO + parentContext +
             SupervisorJob(parentJob),
     )
 }
