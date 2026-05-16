@@ -13,6 +13,8 @@ import kotlinx.serialization.serializer
  * @param T The proto message type.
  */
 public interface ProtoDatastore<T> : AutoCloseable {
+    override fun close() {}
+
     /**
      * Returns the proto message wrapped as a [DelegatedPreference] instance.
      *

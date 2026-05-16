@@ -22,6 +22,8 @@ import kotlinx.serialization.json.JsonElement
  * and writing `null` removes the key.
  */
 public interface PreferencesDatastore : AutoCloseable {
+    override fun close() {}
+
     /**
      * Creates a String preference.
      *
