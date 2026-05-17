@@ -34,6 +34,9 @@ plugins {
 val isJitPack = System.getenv("JITPACK") == "true"
 
 rootProject.name = "GenericDataStore"
+include(":generic-datastore-core")
+include(":generic-datastore-preferences")
+include(":generic-datastore-proto")
 include(":generic-datastore")
 include(":generic-datastore-compose")
 if (!isJitPack) {

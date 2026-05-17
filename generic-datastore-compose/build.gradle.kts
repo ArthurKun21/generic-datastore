@@ -17,7 +17,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(project(":generic-datastore"))
+            api(project(":generic-datastore-core"))
+            api(project(":generic-datastore-preferences"))
             implementation(libs.compose.runtime)
         }
 

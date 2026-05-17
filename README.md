@@ -13,14 +13,17 @@ SharedPreferences.
 
 ## Modules
 
-| Module                      | Description                                                          |
-|-----------------------------|----------------------------------------------------------------------|
-| `generic-datastore`         | Core library with Preferences DataStore and Proto DataStore wrappers |
-| `generic-datastore-compose` | Jetpack Compose extensions (`remember()`, `rememberPreferences()`, `rememberBatchRead()`, `LocalPreferencesDatastore`) |
+| Module                         | Description                                                                 |
+|--------------------------------|-----------------------------------------------------------------------------|
+| `generic-datastore`            | Published umbrella artifact that depends on `generic-datastore-preferences` and `generic-datastore-proto` |
+| `generic-datastore-preferences`| Published Preferences DataStore wrapper module                               |
+| `generic-datastore-proto`      | Published Proto DataStore wrapper module                                     |
+| `generic-datastore-core`       | Shared internal core module used by the feature modules; not published       |
+| `generic-datastore-compose`    | Repository-only Compose helpers built on top of core and preferences; not published |
 
 ### KMP Targets
 
-Both modules target **Android**, **Desktop (JVM)**, and **iOS** (`iosArm64`,
+The library modules target **Android**, **Desktop (JVM)**, and **iOS** (`iosArm64`,
 `iosSimulatorArm64`).
 
 ## Installation
@@ -43,8 +46,9 @@ Add the dependencies:
 dependencies {
     implementation("com.github.arthurkun:generic-datastore:<version>")
 
-    // Optional: Compose extensions
-    implementation("com.github.arthurkun:generic-datastore-compose:<version>")
+    // Or choose a feature module directly
+    implementation("com.github.arthurkun:generic-datastore-preferences:<version>")
+    implementation("com.github.arthurkun:generic-datastore-proto:<version>")
 }
 ```
 
@@ -83,10 +87,14 @@ Add the dependencies:
 dependencies {
     implementation("com.github.ArthurKun21:generic-datastore:<version>")
 
-    // Optional: Compose extensions
-    implementation("com.github.ArthurKun21:generic-datastore-compose:<version>")
+    // Or choose a feature module directly
+    implementation("com.github.ArthurKun21:generic-datastore-preferences:<version>")
+    implementation("com.github.ArthurKun21:generic-datastore-proto:<version>")
 }
 ```
+
+`generic-datastore-compose` remains available as a repository module for local builds and samples,
+but it is not published as an external artifact.
 
 ## Preferences DataStore
 

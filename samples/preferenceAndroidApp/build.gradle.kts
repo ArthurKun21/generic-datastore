@@ -25,7 +25,7 @@ android {
 
 dependencies {
     implementation(project(":samples:preferenceComposeApp"))
-    implementation(project(":generic-datastore"))
+    implementation(project(":generic-datastore-preferences"))
     implementation(libs.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)
