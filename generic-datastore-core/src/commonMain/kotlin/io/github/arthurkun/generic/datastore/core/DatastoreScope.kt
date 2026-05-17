@@ -22,6 +22,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @param parentScope An optional [CoroutineScope] to link the new scope to.
  * @return A [CoroutineScope] configured with fallback [Dispatchers.IO] and a [SupervisorJob].
  */
+@InternalGenericDatastoreApi
 public fun createDatastoreScope(parentScope: CoroutineScope?): CoroutineScope {
     val parentContext = parentScope?.coroutineContext ?: EmptyCoroutineContext
     val parentJob = parentContext[Job]

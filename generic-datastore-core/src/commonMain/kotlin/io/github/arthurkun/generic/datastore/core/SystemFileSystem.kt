@@ -9,4 +9,5 @@ import okio.FileSystem
  * `commonMain` when compiling for iOS targets. Each platform source set provides its own
  * `actual` that returns `FileSystem.SYSTEM`.
  */
+@InternalGenericDatastoreApi
 public expect val systemFileSystem: FileSystem
