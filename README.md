@@ -44,11 +44,11 @@ Add the dependencies:
 
 ```kotlin
 dependencies {
-    implementation("com.github.arthurkun:generic-datastore:<version>")
+    implementation("com.github.ArthurKun21:generic-datastore:<version>")
 
     // Or choose a feature module directly
-    implementation("com.github.arthurkun:generic-datastore-preferences:<version>")
-    implementation("com.github.arthurkun:generic-datastore-proto:<version>")
+    implementation("com.github.ArthurKun21:generic-datastore-preferences:<version>")
+    implementation("com.github.ArthurKun21:generic-datastore-proto:<version>")
 }
 ```
 
