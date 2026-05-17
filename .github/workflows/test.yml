@@ -48,9 +48,18 @@ jobs:
       - name: Set up gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Run Generic Datastore tests
+      - name: Run Generic Datastore Core tests
         run: |
-          ./gradlew :generic-datastore:jvmTest --parallel
+          ./gradlew :generic-datastore-core:jvmTest --parallel
+
+      - name: Run Generic Datastore Preferences tests
+        run: |
+          ./gradlew :generic-datastore-preferences:jvmTest --parallel
+
+      - name: Run Generic Datastore Proto tests
+        if: ${{ !cancelled() }}
+        run: |
+          ./gradlew :generic-datastore-proto:jvmTest --parallel
       
       - name: Run Generic Datastore Compose tests
         if: ${{ !cancelled() }}
@@ -85,9 +94,18 @@ jobs:
             konan-test-ios
 
 
-      - name: Run Generic Datastore tests
+      - name: Run Generic Datastore Core tests
         run: |
-          ./gradlew :generic-datastore:iosSimulatorArm64Test --parallel
+          ./gradlew :generic-datastore-core:iosSimulatorArm64Test --parallel
+
+      - name: Run Generic Datastore Preferences tests
+        run: |
+          ./gradlew :generic-datastore-preferences:iosSimulatorArm64Test --parallel
+
+      - name: Run Generic Datastore Proto tests
+        if: ${{ !cancelled() }}
+        run: |
+          ./gradlew :generic-datastore-proto:iosSimulatorArm64Test --parallel
       
       - name: Run Generic Datastore Compose tests
         if: ${{ !cancelled() }}
@@ -133,7 +151,7 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Run Generic Datastore tests
+      - name: Run Generic Datastore Preferences tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ env.api-level }}
@@ -142,7 +160,19 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew :generic-datastore:connectedAndroidDeviceTest
+          script: ./gradlew :generic-datastore-preferences:connectedAndroidDeviceTest
+
+      - name: Run Generic Datastore Proto tests
+        if: ${{ !cancelled() }}
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.api-level }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew :generic-datastore-proto:connectedAndroidDeviceTest
       
       - name: Run Generic Datastore Compose tests
         if: ${{ !cancelled() }}
