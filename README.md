@@ -18,8 +18,8 @@ SharedPreferences.
 | `generic-datastore`            | Published umbrella artifact that depends on `generic-datastore-preferences` and `generic-datastore-proto` |
 | `generic-datastore-preferences`| Published Preferences DataStore wrapper module                               |
 | `generic-datastore-proto`      | Published Proto DataStore wrapper module                                     |
-| `generic-datastore-core`       | Shared internal core module used by the feature modules; not published       |
-| `generic-datastore-compose`    | Repository-only Compose helpers built on top of core and preferences; not published |
+| `generic-datastore-core`       | Shared internal core module used by the feature modules       |
+| `generic-datastore-compose`    | Repository-only Compose helpers built on top of core and preferences |
 
 ### KMP Targets
 
