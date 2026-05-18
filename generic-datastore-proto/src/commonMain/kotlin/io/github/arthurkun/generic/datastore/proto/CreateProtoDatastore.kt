@@ -4,7 +4,8 @@
 package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.DataMigration
-import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.Storage
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.core.okio.OkioSerializer
 import androidx.datastore.core.okio.OkioStorage
@@ -14,6 +15,7 @@ import io.github.arthurkun.generic.datastore.core.systemFileSystem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
+import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmName
 import kotlinx.io.files.Path as KotlinxIoPath
 
@@ -54,7 +56,7 @@ public fun <T> createProtoDatastore(
     producePath: () -> String,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
-    val datastore = DataStoreFactory.create(
+    val datastore = createDataStore(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
             serializer = serializer,
@@ -62,7 +64,7 @@ public fun <T> createProtoDatastore(
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        scope = datastoreScope,
+        context = datastoreScope.coroutineContext,
     )
     return GenericProtoDatastore(
         datastore = datastore,
@@ -107,7 +109,7 @@ public fun <T> createProtoDatastore(
     produceOkioPath: () -> okio.Path,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
-    val datastore = DataStoreFactory.create(
+    val datastore = createDataStore(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
             serializer = serializer,
@@ -115,7 +117,7 @@ public fun <T> createProtoDatastore(
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        scope = datastoreScope,
+        context = datastoreScope.coroutineContext,
     )
     return GenericProtoDatastore(
         datastore = datastore,
@@ -161,7 +163,7 @@ public fun <T> createProtoDatastore(
     produceKotlinxIoPath: () -> KotlinxIoPath,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
-    val datastore = DataStoreFactory.create(
+    val datastore = createDataStore(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
             serializer = serializer,
@@ -169,7 +171,7 @@ public fun <T> createProtoDatastore(
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        scope = datastoreScope,
+        context = datastoreScope.coroutineContext,
     )
     return GenericProtoDatastore(
         datastore = datastore,
@@ -218,7 +220,7 @@ public fun <T> createProtoDatastore(
     producePath: () -> String,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
-    val datastore = DataStoreFactory.create(
+    val datastore = createDataStore(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
             serializer = serializer,
@@ -226,7 +228,7 @@ public fun <T> createProtoDatastore(
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        scope = datastoreScope,
+        context = datastoreScope.coroutineContext,
     )
     return GenericProtoDatastore(
         datastore = datastore,
@@ -235,4 +237,25 @@ public fun <T> createProtoDatastore(
         defaultJson = defaultJson,
         ownedScope = datastoreScope,
     )
+}
+
+private fun <T> createDataStore(
+    storage: Storage<T>,
+    corruptionHandler: ReplaceFileCorruptionHandler<T>?,
+    migrations: List<DataMigration<T>>,
+    context: CoroutineContext,
+): DataStore<T> {
+    val builder = DataStore.Builder(
+        storage = storage,
+        context = context,
+    )
+
+    builder.apply {
+        addMigrations(migrations)
+        if (corruptionHandler != null) {
+            setCorruptionHandler(corruptionHandler)
+        }
+    }
+
+    return builder.build()
 }
