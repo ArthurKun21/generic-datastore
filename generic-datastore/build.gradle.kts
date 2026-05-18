@@ -2,7 +2,6 @@ plugins {
     id("gd.kmp.library")
     id("gd.kmp.library.test")
     id("gd.maven.publish")
-    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -19,11 +18,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.coroutines.core)
-            api(libs.datastore.preferences.core)
-            api(libs.datastore.core)
-            implementation(libs.kotlinx.io.core)
-            implementation(libs.kotlinx.serialization.json)
+            api(project(":generic-datastore-preferences"))
+            api(project(":generic-datastore-proto"))
+            api(libs.kotlinx.serialization.json)
         }
     }
 }

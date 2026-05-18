@@ -11,7 +11,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":generic-datastore"))
+                implementation(project(":generic-datastore-proto"))
                 implementation(project(":generic-datastore-compose"))
                 implementation(libs.bundles.compose)
                 implementation(libs.androidx.lifecycle.viewmodel.compose)

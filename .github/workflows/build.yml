@@ -16,11 +16,15 @@ on:
       - 'samples/**'
       - 'build.gradle.kts'
       - 'settings.gradle.kts'
+      - 'generic-datastore-core/build.gradle.kts'
+      - 'generic-datastore-core/src/**'
+      - 'generic-datastore-preferences/build.gradle.kts'
+      - 'generic-datastore-preferences/src/**'
+      - 'generic-datastore-proto/build.gradle.kts'
+      - 'generic-datastore-proto/src/**'
       - 'generic-datastore/build.gradle.kts'
-      - 'generic-datastore/src/androidMain/**'
-      - 'generic-datastore/src/commonMain/**'
-      - 'generic-datastore/src/desktopMain/**'
-      - 'generic-datastore/src/iosMain/**'
+      - 'generic-datastore/src/**'
+      - 'generic-datastore-compose/build.gradle.kts'
       - 'generic-datastore-compose/src/**'
   workflow_dispatch:
 
@@ -111,6 +115,14 @@ jobs:
         run: |
           ./gradlew :generic-datastore:publishIosArm64PublicationToMavenLocal
 
-      - name: Create Release for Generic Datastore Compose
+      - name: Create Release for Generic Datastore Preferences
         run: |
-          ./gradlew :generic-datastore-compose:publishIosArm64PublicationToMavenLocal
+          ./gradlew :generic-datastore-preferences:publishIosArm64PublicationToMavenLocal
+
+      - name: Create Release for Generic Datastore Proto
+        run: |
+          ./gradlew :generic-datastore-proto:publishIosArm64PublicationToMavenLocal
+
+      - name: Compile Generic Datastore Compose for iOS
+        run: |
+          ./gradlew :generic-datastore-compose:compileKotlinIosArm64

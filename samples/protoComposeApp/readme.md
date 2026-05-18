@@ -2,7 +2,7 @@
 
 A sample desktop (JVM) app demonstrating **Proto DataStore** integration using
 [Square Wire](https://github.com/square/wire) for protocol buffer code generation and
-`GenericProtoDatastore` from the `:generic-datastore` module.
+`GenericProtoDatastore` from the `:generic-datastore-proto` module.
 
 ## Running
 

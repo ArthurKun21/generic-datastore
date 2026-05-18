@@ -25,7 +25,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":generic-datastore"))
+                implementation(project(":generic-datastore-preferences"))
                 implementation(project(":generic-datastore-compose"))
                 implementation(libs.bundles.compose)
                 implementation(libs.kotlinx.serialization.json)
