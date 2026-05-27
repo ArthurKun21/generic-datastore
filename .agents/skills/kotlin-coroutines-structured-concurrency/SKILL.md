@@ -2,8 +2,7 @@
 description: Use when writing or reviewing Kotlin code that stores CoroutineScope, launches from init/non-suspending APIs, calls runBlocking, or catches broad exceptions around suspend calls.
 metadata:
     github-path: skills/kotlin-coroutines-structured-concurrency
-    github-pinned: bc69bba2c7fbe96ee78a554498a579b12b67c9b4
-    github-ref: bc69bba2c7fbe96ee78a554498a579b12b67c9b4
+    github-ref: refs/tags/2026.05.21
     github-repo: https://github.com/chrisbanes/skills
     github-tree-sha: 3045cddcb91e9c0bc2fe71676a7966444d558b55
 name: kotlin-coroutines-structured-concurrency
