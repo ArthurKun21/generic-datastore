@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 
 /**
  * Represents a single preference item.
@@ -72,11 +73,31 @@ public interface BasePreference<T> {
     /**
      * Converts the preference [Flow] into a [StateFlow].
      *
+     * The returned [StateFlow] starts with [defaultValue]. It updates to the persisted value after
+     * the upstream flow emits. Use [stateInCurrent] when the initial [StateFlow.value] must reflect
+     * the current persisted value.
+     *
      * @param scope The [CoroutineScope] to use for the [StateFlow].
      * @param started The [SharingStarted] strategy for the [StateFlow]. Defaults to [SharingStarted.Eagerly].
      * @return A [StateFlow] of the preference value.
      */
     public fun stateIn(scope: CoroutineScope, started: SharingStarted = SharingStarted.Eagerly): StateFlow<T>
+
+    /**
+     * Converts the preference [Flow] into a [StateFlow] whose initial value is read from the
+     * datastore before the [StateFlow] is created.
+     *
+     * This is useful when consumers synchronously read [StateFlow.value] immediately after
+     * creation and cannot tolerate the default-value placeholder used by [stateIn].
+     *
+     * @param scope The [CoroutineScope] to use for the [StateFlow].
+     * @param started The [SharingStarted] strategy for the [StateFlow]. Defaults to [SharingStarted.Eagerly].
+     * @return A [StateFlow] initialized with the current preference value.
+     */
+    public suspend fun stateInCurrent(
+        scope: CoroutineScope,
+        started: SharingStarted = SharingStarted.Eagerly,
+    ): StateFlow<T> = asFlow().stateIn(scope, started, get())
 
     /**
      * Gets the current value of the preference.

@@ -19,7 +19,7 @@ SharedPreferences.
 | `generic-datastore-preferences`| Published Preferences DataStore wrapper module                               |
 | `generic-datastore-proto`      | Published Proto DataStore wrapper module                                     |
 | `generic-datastore-core`       | Shared internal core module used by the feature modules       |
-| `generic-datastore-compose`    | Repository-only Compose helpers built on top of core and preferences |
+| `generic-datastore-compose`    | Published Compose helpers built on top of core and preferences |
 
 ### KMP Targets
 
@@ -49,6 +49,7 @@ dependencies {
     // Or choose a feature module directly
     implementation("com.github.ArthurKun21:generic-datastore-preferences:<version>")
     implementation("com.github.ArthurKun21:generic-datastore-proto:<version>")
+    implementation("com.github.ArthurKun21:generic-datastore-compose:<version>")
 }
 ```
 
@@ -90,11 +91,9 @@ dependencies {
     // Or choose a feature module directly
     implementation("com.github.ArthurKun21:generic-datastore-preferences:<version>")
     implementation("com.github.ArthurKun21:generic-datastore-proto:<version>")
+    implementation("com.github.ArthurKun21:generic-datastore-compose:<version>")
 }
 ```
-
-`generic-datastore-compose` remains available as a repository module for local builds and samples,
-but it is not published as an external artifact.
 
 ## Preferences DataStore
 
@@ -124,7 +123,7 @@ default `Json` instance used for serialization-based preferences:
 val datastore = createPreferencesDatastore(
     corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
     migrations = listOf(myMigration),
-    scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    scope = CoroutineScope(SupervisorJob() + IO),
     defaultJson = Json { prettyPrint = true },
     producePath = { context.filesDir.resolve("settings.preferences_pb").absolutePath },
 )
@@ -409,6 +408,17 @@ val profileListPref: Preference<List<UserProfile>?> =
 All nullable variants return `null` when the key is not set. Setting `null` removes the key. If
 deserialization fails, `null` is returned.
 
+### Decode Failure Policy
+
+Serializer-backed preferences are intentionally lenient. A non-null serialized preference returns
+its `defaultValue` when the stored payload cannot be decoded. Nullable serialized preferences
+return `null`. Set and list variants skip individual elements that fail to decode when the outer
+collection can still be parsed.
+
+This keeps reads resilient after app downgrades, partial migrations, or user-edited backup data. If
+decode failures must be surfaced, validate the serialized payload in your serializer or migration
+code before exposing it as a preference value.
+
 ### Reading & Writing Values
 
 Each `Preference<T>` provides multiple access patterns:
@@ -416,7 +426,7 @@ Each `Preference<T>` provides multiple access patterns:
 #### Suspend Functions
 
 ```kotlin
-CoroutineScope(Dispatchers.IO).launch {
+CoroutineScope(SupervisorJob() + IO).launch {
     val name = userName.get()
     userName.set("John Doe")
     userName.delete()
@@ -429,6 +439,9 @@ CoroutineScope(Dispatchers.IO).launch {
 userName.asFlow().collect { value -> /* react to changes */ }
 
 val nameState: StateFlow<String> = userName.stateIn(viewModelScope)
+
+// Suspends once to initialize StateFlow.value with the persisted value.
+val currentNameState: StateFlow<String> = userName.stateInCurrent(viewModelScope)
 ```
 
 #### Blocking Access
@@ -514,7 +527,7 @@ class SettingsViewModel(
     fun loadSettings() {
         viewModelScope.launch {
             val (name, isDark, vol) = datastore.batchGet {
-                Triple(get[userName], get[darkMode], get[volume])
+                Triple(get(userName), get(darkMode), get(volume))
             }
         }
     }
@@ -611,7 +624,7 @@ thread:
 
 ```kotlin
 val (name, isDark) = datastore.batchGetBlocking {
-    get[userName] to get[darkMode]
+    get(userName) to get(darkMode)
 }
 
 datastore.batchWriteBlocking {
@@ -747,7 +760,7 @@ val protoDatastore = createProtoDatastore(
     key = "my_proto",
     corruptionHandler = ReplaceFileCorruptionHandler { MyProtoMessage.getDefaultInstance() },
     migrations = listOf(myMigration),
-    scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    scope = CoroutineScope(SupervisorJob() + IO),
     defaultJson = Json { prettyPrint = true },
     producePath = { context.filesDir.resolve("my_proto.pb").absolutePath },
 )
