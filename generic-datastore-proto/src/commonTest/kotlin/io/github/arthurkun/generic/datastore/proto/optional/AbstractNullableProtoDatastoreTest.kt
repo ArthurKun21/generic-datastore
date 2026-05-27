@@ -1,3 +1,5 @@
+@file:OptIn(io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi::class)
+
 package io.github.arthurkun.generic.datastore.proto.optional
 
 import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore

@@ -14,6 +14,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
+import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupCreator
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupRestorer
@@ -65,11 +66,14 @@ import kotlinx.serialization.json.JsonElement
  * The [defaultJson] supplied here becomes the fallback JSON configuration for all `kserialized*`
  * APIs when callers do not pass a [Json] instance explicitly.
  *
+ * Direct construction is a low-level wiring API. Prefer [createPreferencesDatastore] unless you
+ * already own the underlying [DataStore<Preferences>].
+ *
  * @property datastore The underlying [DataStore<Preferences>] instance.
  * @property defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
  * @property ownedScope The scope owned by this wrapper when it creates the underlying [DataStore].
  */
-public class GenericPreferencesDatastore(
+public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructor(
     internal val datastore: DataStore<Preferences>,
     private val defaultJson: Json = PreferenceDefaults.defaultJson,
     private val ownedScope: CoroutineScope? = null,

@@ -145,9 +145,11 @@ val datastore = createPreferencesDatastore(
 )
 ```
 
-Alternatively, wrap an existing `DataStore<Preferences>` directly:
+Alternatively, wrap an existing `DataStore<Preferences>` directly. This bypasses the factory
+lifecycle wiring and requires opting in to `InternalGenericDatastoreApi`:
 
 ```kotlin
+@OptIn(InternalGenericDatastoreApi::class)
 val datastore = GenericPreferencesDatastore(myExistingDataStore)
 ```
 
@@ -786,9 +788,11 @@ val protoDatastore = createProtoDatastore(
 )
 ```
 
-Alternatively, wrap an existing `DataStore<T>` directly:
+Alternatively, wrap an existing `DataStore<T>` directly. This bypasses the factory lifecycle
+wiring and requires opting in to `InternalGenericDatastoreApi`:
 
 ```kotlin
+@OptIn(InternalGenericDatastoreApi::class)
 val protoDatastore = GenericProtoDatastore(
     datastore = myExistingProtoDataStore,
     defaultValue = MyProtoMessage.getDefaultInstance(),

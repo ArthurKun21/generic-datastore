@@ -3,6 +3,7 @@
 package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.DataStore
+import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.proto.core.GenericProtoPreferenceItem
 import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
@@ -29,12 +30,15 @@ import kotlinx.serialization.json.Json
  *
  * This class wraps a [DataStore<T>] instance for typed proto messages.
  *
+ * Direct construction is a low-level wiring API. Prefer [createProtoDatastore] unless you already
+ * own the underlying [DataStore<T>].
+ *
  * @param T The proto message type.
  * @param datastore The underlying [DataStore<T>] instance.
  * @param defaultValue The default value for the proto message.
  * @param ownedScope The scope owned by this wrapper when it creates the underlying [DataStore].
  */
-public class GenericProtoDatastore<T>(
+public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
     internal val datastore: DataStore<T>,
     private val defaultValue: T,
     private val key: String = "proto_datastore",
