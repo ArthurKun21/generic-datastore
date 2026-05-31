@@ -143,7 +143,7 @@ abstract class AbstractNullableProtoDatastoreTest {
     @Test
     fun data_keyReturnsConfiguredKey() = runTest(testDispatcher) {
         val pref = protoDatastore.data()
-        assertEquals("proto_datastore", pref.key())
+        assertEquals("test_nullable_proto.pb", pref.key())
     }
 
     @Test
@@ -256,7 +256,7 @@ abstract class AbstractNullableProtoDatastoreTest {
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
         )
-        assertEquals("proto_datastore", namePref.key())
+        assertEquals("test_nullable_proto.pb", namePref.key())
     }
 
     @Test
@@ -266,7 +266,7 @@ abstract class AbstractNullableProtoDatastoreTest {
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
         )
-        assertEquals("proto_datastore", namePref.key())
+        assertEquals("test_nullable_proto.pb", namePref.key())
     }
 
     // ── field() – top-level nullable fields ─────────────────────────────

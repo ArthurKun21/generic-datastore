@@ -76,13 +76,13 @@ abstract class AbstractProtoDatastoreTest {
     @Test
     fun data_keyReturnsConfiguredKey() = runTest(testDispatcher) {
         val pref = protoDatastore.data()
-        assertEquals("proto_datastore", pref.key())
+        assertEquals("test_proto.pb", pref.key())
     }
 
     @Test
     fun data_defaultKey() = runTest(testDispatcher) {
         val pref = protoDatastore.data()
-        assertEquals("proto_datastore", pref.key())
+        assertEquals("test_proto.pb", pref.key())
     }
 
     @Test
