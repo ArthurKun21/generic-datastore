@@ -12,7 +12,7 @@ You can initialize preferences in the datastore like this:
 
 ```kotlin
 class PreferenceStore(
-    private val datastore: GenericPreferencesDatastore,
+    private val datastore: PreferencesDatastore,
 ) {
 
     val theme = datastore.enum(
@@ -54,8 +54,9 @@ class PreferenceStore(
         },
     )
 
-    suspend fun exportPreferences() = datastore.export()
+    suspend fun exportPreferences() = datastore.exportAsString()
 
-    suspend fun importPreferences(data: Map<String, Any>) = datastore.import(data)
+    suspend fun importPreferences(backupString: String) =
+        datastore.importDataAsString(backupString)
 }
 ```

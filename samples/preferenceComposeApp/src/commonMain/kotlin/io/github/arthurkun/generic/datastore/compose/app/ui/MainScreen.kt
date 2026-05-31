@@ -37,6 +37,7 @@ import io.github.arthurkun.generic.datastore.compose.app.domain.Animal
 import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
 import io.github.arthurkun.generic.datastore.compose.app.domain.UserProfile
 import io.github.arthurkun.generic.datastore.remember
+import io.github.arthurkun.generic.datastore.utils.collectAsStatePlatform
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -54,6 +55,7 @@ fun MainScreen(
     var userProfileSet by viewModel.userProfileSet.remember()
     var animalSet by viewModel.animalSet.remember()
     var themeSet by viewModel.themeSet.remember()
+    val apiCoverageStatus by viewModel.apiCoverageStatus.collectAsStatePlatform()
 
     val (batchText, batchNum, batchBool) = rememberPreferences(
         viewModel.text,
@@ -214,6 +216,17 @@ fun MainScreen(
                 ExportImportButtons(
                     onExport = { viewModel.exportPreferences() },
                     onImport = { jsonString -> viewModel.importPreferences(jsonString) },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                ApiCoverageSection(
+                    status = apiCoverageStatus,
+                    onRun = viewModel::runApiCoverageShowcase,
                 )
             }
         }
@@ -655,6 +668,26 @@ private fun BatchRememberSection(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text("Randomize All")
+        }
+    }
+}
+
+@Composable
+private fun ApiCoverageSection(
+    status: String,
+    onRun: () -> Unit,
+) {
+    Column {
+        Text(
+            "API Coverage",
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        Text(status)
+        Button(
+            onClick = onRun,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Run Preferences API Showcase")
         }
     }
 }

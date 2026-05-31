@@ -10,6 +10,13 @@ message UserSettings {
   optional bool dark_mode = 3;
   optional Theme theme = 4;
   optional Address address = 5;
+  optional string theme_raw = 6;
+  repeated string theme_set_raw = 7;
+  optional string json_raw = 8;
+  optional string nullable_json_raw = 9;
+  optional string json_list_raw = 10;
+  optional string nullable_json_list_raw = 11;
+  repeated string json_set_raw = 12;
 
   enum Theme {
     SYSTEM = 0;

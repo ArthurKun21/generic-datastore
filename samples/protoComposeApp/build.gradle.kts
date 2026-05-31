@@ -15,6 +15,7 @@ kotlin {
                 implementation(project(":generic-datastore-compose"))
                 implementation(libs.bundles.compose)
                 implementation(libs.androidx.lifecycle.viewmodel.compose)
+                implementation(libs.kotlinx.serialization.json)
                 implementation(libs.wire.runtime)
             }
         }
