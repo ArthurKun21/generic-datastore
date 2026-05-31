@@ -99,10 +99,10 @@ dependencies {
 
 ### Setup Preference DataStore
 
-Use the `createPreferencesDatastore` factory function to create a `GenericPreferencesDatastore`:
+Use the `createPreferencesDatastore` factory function to create a `PreferencesDatastore`:
 
 ```kotlin
-val datastore = createPreferencesDatastore(
+val datastore: PreferencesDatastore = createPreferencesDatastore(
     producePath = { context.filesDir.resolve("settings.preferences_pb").absolutePath },
 )
 ```
@@ -129,9 +129,9 @@ val datastore = createPreferencesDatastore(
 )
 ```
 
-`createPreferencesDatastore` creates a DataStore scope owned by the returned
-`GenericPreferencesDatastore`. Call `datastore.close()` when the datastore is no longer needed; if
-you pass `scope`, it is used as a parent lifecycle and is not cancelled by `close()`.
+`createPreferencesDatastore` creates a DataStore scope owned by the returned datastore wrapper. Call
+`datastore.close()` when the datastore is no longer needed; if you pass `scope`, it is used as a
+parent lifecycle and is not cancelled by `close()`.
 
 Overloads accepting `okio.Path` and `kotlinx.io.files.Path` are also available:
 
@@ -153,9 +153,13 @@ lifecycle wiring and requires opting in to `InternalGenericDatastoreApi`:
 val datastore = GenericPreferencesDatastore(myExistingDataStore)
 ```
 
+`GenericPreferenceDatastore` is a deprecated compatibility typealias for
+`GenericPreferencesDatastore`. Prefer `PreferencesDatastore` for public API boundaries and
+`GenericPreferencesDatastore` only when directly wiring an existing `DataStore<Preferences>`.
+
 ### Defining Preferences
 
-The `GenericPreferencesDatastore` provides factory methods for all supported types:
+The `PreferencesDatastore` provides factory methods for all supported types:
 
 ```kotlin
 val userName: Preference<String> = datastore.string("user_name", "Guest")
@@ -166,6 +170,22 @@ val precision: Preference<Double> = datastore.double("precision", 0.0)
 val darkMode: Preference<Boolean> = datastore.bool("dark_mode", false)
 val tags: Preference<Set<String>> = datastore.stringSet("tags")
 ```
+
+Current Preferences API surface:
+
+| Category | APIs |
+|----------|------|
+| Lifecycle | `close()` |
+| Primitives | `string`, `long`, `int`, `float`, `double`, `bool`, `stringSet` |
+| Nullable primitives | `nullableString`, `nullableStringSet`, `nullableInt`, `nullableLong`, `nullableFloat`, `nullableDouble`, `nullableBool` |
+| Custom values | `serialized`, `serializedSet`, `serializedList`, `nullableSerialized`, `nullableSerializedList` |
+| Kotlin Serialization | `kserialized`, `kserializedSet`, `kserializedList`, `nullableKserialized`, `nullableKserializedList` |
+| Enum helpers | `enum`, `enumSet`, `nullableEnum` |
+| Reads and writes | `get`, `set`, `update`, `delete`, `resetToDefault`, `asFlow`, `stateIn`, `stateInCurrent`, blocking variants, property delegation |
+| Batch operations | `batchReadFlow`, `batchGet`, `batchWrite`, `batchUpdate`, `batchGetBlocking`, `batchWriteBlocking`, `batchUpdateBlocking` |
+| Backup and restore | `exportAsData`, `exportAsString`, `importData`, `importDataAsString`, `clearAll` |
+| Utilities | `map`, `mapIO`, `toggle`, `toJsonElement`, `toJsonMap`, `BasePreference.privateKey`, `BasePreference.appStateKey` |
+| Deprecated compatibility | `GenericPreferenceDatastore`, `export`, `import` |
 
 ### Enum Preferences
 
@@ -519,7 +539,7 @@ Read multiple preferences from a single snapshot:
 
 ```kotlin
 class SettingsViewModel(
-    private val datastore: GenericPreferencesDatastore,
+    private val datastore: PreferencesDatastore,
 ) : ViewModel() {
 
     private val userName = datastore.string("user_name", "Guest")
@@ -543,14 +563,14 @@ preference in the datastore changes:
 
 ```kotlin
 class SettingsViewModel(
-    private val datastore: GenericPreferencesDatastore,
+    private val datastore: PreferencesDatastore,
 ) : ViewModel() {
 
     private val userName = datastore.string("user_name", "Guest")
     private val darkMode = datastore.bool("dark_mode", false)
 
     val settingsFlow: Flow<Pair<String, Boolean>> = datastore
-        .batchReadFlow{
+        .batchReadFlow {
             get(userName) to get(darkMode)
         }
         .distinctUntilChanged()
@@ -563,7 +583,7 @@ Write multiple preferences in a single atomic transaction:
 
 ```kotlin
 class SettingsViewModel(
-    private val datastore: GenericPreferencesDatastore,
+    private val datastore: PreferencesDatastore,
 ) : ViewModel() {
 
     private val userName = datastore.string("user_name", "Guest")
@@ -589,7 +609,7 @@ consistency when new values depend on current ones:
 
 ```kotlin
 class GameViewModel(
-    private val datastore: GenericPreferencesDatastore,
+    private val datastore: PreferencesDatastore,
 ) : ViewModel() {
 
     private val userScore = datastore.int("user_score", 0)
@@ -662,8 +682,8 @@ the default value fails.
 
 ### Backup & Restore
 
-`GenericPreferencesDatastore` supports exporting and importing all preferences using type-safe
-backup models:
+`PreferencesDatastore` supports exporting and importing all preferences using type-safe backup
+models:
 
 #### Export as structured data
 
@@ -717,6 +737,9 @@ Import merges into existing preferences. Call `datastore.clearAll()` before impo
 semantics. A `BackupParsingException` is thrown if the JSON string is invalid or exceeds the 10 MB
 size limit.
 
+The older `export()` and `import()` APIs remain available for source compatibility, but are
+deprecated. Prefer `exportAsData` / `exportAsString` and `importData` / `importDataAsString`.
+
 ### Private & App-State Key Prefixes
 
 Use `BasePreference.privateKey(key)` or `BasePreference.appStateKey(key)` to prefix keys so they can
@@ -731,10 +754,10 @@ val onboarded = datastore.bool(BasePreference.appStateKey("onboarding_done"), fa
 
 ### Setup Proto DataStore
 
-Use the `createProtoDatastore` factory function to create a `GenericProtoDatastore`:
+Use the `createProtoDatastore` factory function to create a `ProtoDatastore`:
 
 ```kotlin
-val protoDatastore = createProtoDatastore(
+val protoDatastore: ProtoDatastore<MyProtoMessage> = createProtoDatastore(
     serializer = MyProtoSerializer,
     defaultValue = MyProtoMessage.getDefaultInstance(),
     producePath = { context.filesDir.resolve("my_proto.pb").absolutePath },
@@ -768,9 +791,9 @@ val protoDatastore = createProtoDatastore(
 )
 ```
 
-`createProtoDatastore` creates a DataStore scope owned by the returned `GenericProtoDatastore`.
-Call `protoDatastore.close()` when the datastore is no longer needed; if you pass `scope`, it is
-used as a parent lifecycle and is not cancelled by `close()`.
+`createProtoDatastore` creates a DataStore scope owned by the returned datastore wrapper. Call
+`protoDatastore.close()` when the datastore is no longer needed; if you pass `scope`, it is used as
+a parent lifecycle and is not cancelled by `close()`.
 
 Overloads accepting `okio.Path` and `kotlinx.io.files.Path` are also available:
 
@@ -800,6 +823,18 @@ val protoDatastore = GenericProtoDatastore(
 ```
 
 ### Usage
+
+Current Proto API surface:
+
+| Category | APIs |
+|----------|------|
+| Lifecycle | `close()` |
+| Whole message | `data()` |
+| Raw fields | `field()` |
+| Enum fields | `enumField`, `nullableEnumField`, `enumSetField` |
+| Caller-serialized fields | `serializedField`, `nullableSerializedField`, `serializedListField`, `nullableSerializedListField`, `serializedSetField` |
+| Kotlin Serialization fields | `kserializedField`, `nullableKserializedField`, `kserializedListField`, `nullableKserializedListField`, `kserializedSetField` |
+| Preference operations | `get`, `set`, `update`, `delete`, `resetToDefault`, `asFlow`, `stateIn`, `stateInCurrent`, blocking variants, property delegation |
 
 #### Whole-Object Access
 
@@ -1082,7 +1117,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
 @Composable
-fun SettingsScreen(datastore: GenericPreferencesDatastore) {
+fun SettingsScreen(datastore: PreferencesDatastore) {
     var userName by datastore.string("user_name", "Guest").remember()
 
     Column {
@@ -1108,7 +1143,7 @@ DataStore snapshot:
 
 ```kotlin
 @Composable
-fun SettingsScreen(datastore: GenericPreferencesDatastore) {
+fun SettingsScreen(datastore: PreferencesDatastore) {
     val userName = datastore.string("user_name", "Guest")
     val darkMode = datastore.bool("dark_mode", false)
 
@@ -1132,7 +1167,7 @@ observation, and writes are launched asynchronously with an optimistic local ove
 
 ```kotlin
 @Composable
-fun SettingsScreen(datastore: GenericPreferencesDatastore) {
+fun SettingsScreen(datastore: PreferencesDatastore) {
     val userName = datastore.string("user_name", "Guest")
     val darkMode = datastore.bool("dark_mode", false)
     val volume = datastore.float("volume", 1.0f)
@@ -1169,7 +1204,7 @@ call the standalone `rememberPreferences` overloads without an explicit datastor
 
 ```kotlin
 @Composable
-fun App(datastore: GenericPreferencesDatastore) {
+fun App(datastore: PreferencesDatastore) {
     ProvidePreferencesDatastore(datastore) {
         SettingsScreen()
     }
