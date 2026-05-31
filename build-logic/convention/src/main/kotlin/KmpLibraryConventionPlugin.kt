@@ -42,6 +42,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
                     freeCompilerArgs.addAll(
                         "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
                         "-Xexpect-actual-classes",
+                        "-opt-in=io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi",
                     )
                 }
             }
