@@ -2,9 +2,9 @@ package io.github.arthurkun.generic.datastore.proto.custom.set
 
 import androidx.datastore.core.DataStore
 import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
-import io.github.arthurkun.generic.datastore.proto.custom.core.safeDeserialize
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import kotlin.coroutines.cancellation.CancellationException
 
 internal fun <T, F> kserializedSetFieldInternal(
     datastore: DataStore<T>,
@@ -20,9 +20,17 @@ internal fun <T, F> kserializedSetFieldInternal(
     key = key,
     defaultValue = defaultValue,
     getter = { proto ->
-        getter(proto).mapNotNull { raw ->
-            safeDeserialize<F?>(raw, null) { json.decodeFromString(serializer, it) }
-        }.toSet()
+        val elements = mutableSetOf<F>()
+        getter(proto).forEach { raw ->
+            try {
+                elements.add(json.decodeFromString(serializer, raw))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                // Skip only elements that failed to deserialize.
+            }
+        }
+        elements
     },
     updater = { proto, value ->
         updater(proto, value.map { json.encodeToString(serializer, it) }.toSet())

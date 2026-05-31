@@ -45,6 +45,20 @@ abstract class AbstractNullableSerializedListTest {
     }
 
     @Test
+    fun nullableSerializedList_preservesNullElements() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableSerializedList<String?>(
+            key = "nullableSerListNullElements",
+            serializer = { it ?: "NULL" },
+            deserializer = { if (it == "NULL") null else it },
+        )
+        val items = listOf("hello", null, "world")
+
+        pref.set(items)
+
+        assertEquals(items, pref.get())
+    }
+
+    @Test
     fun nullableSerializedList_setNullClearsValue() = runTest(testDispatcher) {
         val pref = preferenceDatastore.nullableSerializedList<String>(
             key = "nullableSerListSetNull",

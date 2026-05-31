@@ -47,6 +47,16 @@ abstract class AbstractKSerializedSetTest {
     }
 
     @Test
+    fun kserializedSetPreference_preservesNullElements() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.kserializedSet<String?>("testKSerSetNullElements")
+        val values = setOf("A", null, "B")
+
+        pref.set(values)
+
+        assertEquals(values, pref.get())
+    }
+
+    @Test
     fun kserializedSetPreference_observeDefaultValue() = runTest(testDispatcher) {
         val default = setOf(KSerUser(name = "FlowDefault", age = 1))
         val pref = preferenceDatastore.kserializedSet("testKSerSetFlowDefault", default)

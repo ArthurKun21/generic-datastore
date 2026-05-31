@@ -44,6 +44,21 @@ abstract class AbstractProtoNullableSerializedListFieldTest {
     }
 
     @Test
+    fun nullableSerializedListField_preservesNullElements() = runTest(testDispatcher) {
+        val listPref = protoDatastore.nullableSerializedListField<String?>(
+            elementSerializer = { it ?: "NULL" },
+            elementDeserializer = { if (it == "NULL") null else it },
+            getter = { it.nullableJsonListRaw },
+            updater = { proto, raw -> proto.copy(nullableJsonListRaw = raw) },
+        )
+        val items = listOf("A", null, "B")
+
+        listPref.set(items)
+
+        assertEquals(items, listPref.get())
+    }
+
+    @Test
     fun nullableSerializedListField_skipsInvalidElements() = runTest(testDispatcher) {
         val listPref = protoDatastore.nullableSerializedListField(
             elementSerializer = elemSerializer,

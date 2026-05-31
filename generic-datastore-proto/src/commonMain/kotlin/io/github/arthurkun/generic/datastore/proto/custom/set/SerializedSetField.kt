@@ -2,7 +2,7 @@ package io.github.arthurkun.generic.datastore.proto.custom.set
 
 import androidx.datastore.core.DataStore
 import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
-import io.github.arthurkun.generic.datastore.proto.custom.core.safeDeserialize
+import kotlin.coroutines.cancellation.CancellationException
 
 internal fun <T, F> serializedSetFieldInternal(
     datastore: DataStore<T>,
@@ -18,9 +18,17 @@ internal fun <T, F> serializedSetFieldInternal(
     key = key,
     defaultValue = defaultValue,
     getter = { proto ->
-        getter(proto).mapNotNull { raw ->
-            safeDeserialize<F?>(raw, null) { deserializer(it) }
-        }.toSet()
+        val elements = mutableSetOf<F>()
+        getter(proto).forEach { raw ->
+            try {
+                elements.add(deserializer(raw))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                // Skip only elements that failed to deserialize.
+            }
+        }
+        elements
     },
     updater = { proto, value ->
         updater(proto, value.map { serializer(it) }.toSet())

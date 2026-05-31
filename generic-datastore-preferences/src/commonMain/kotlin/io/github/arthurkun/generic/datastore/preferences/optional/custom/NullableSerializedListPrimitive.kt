@@ -27,15 +27,17 @@ internal class NullableSerializedListPrimitive<T>(
     key = key,
     serializer = { list -> JsonArray(list.map { JsonPrimitive(elementSerializer(it)) }).toString() },
     deserializer = { str ->
-        Json.parseToJsonElement(str).jsonArray.mapNotNull { element ->
+        val elements = mutableListOf<T>()
+        Json.parseToJsonElement(str).jsonArray.forEach { element ->
             try {
-                elementDeserializer(element.jsonPrimitive.content)
+                elements.add(elementDeserializer(element.jsonPrimitive.content))
             } catch (e: CancellationException) {
                 throw e
             } catch (_: Exception) {
-                null
+                // Skip only elements that failed to deserialize.
             }
         }
+        elements
     },
     ioDispatcher = ioDispatcher,
 )

@@ -27,15 +27,17 @@ internal fun <T, F> serializedListFieldInternal(
             } else {
                 safeDeserialize(raw, defaultValue) { rawStr ->
                     val jsonArray = json.decodeFromString<List<String>>(rawStr)
-                    jsonArray.mapNotNull { element ->
+                    val elements = mutableListOf<F>()
+                    jsonArray.forEach { element ->
                         try {
-                            elementDeserializer(element)
+                            elements.add(elementDeserializer(element))
                         } catch (e: CancellationException) {
                             throw e
                         } catch (_: Exception) {
-                            null
+                            // Skip only elements that failed to deserialize.
                         }
                     }
+                    elements
                 }
             }
         },
