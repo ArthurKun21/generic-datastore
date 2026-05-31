@@ -15,7 +15,6 @@ import io.github.arthurkun.generic.datastore.core.systemFileSystem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
-import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmName
 import kotlinx.io.files.Path as KotlinxIoPath
 
@@ -53,7 +52,7 @@ public fun createPreferencesDatastore(
     val datastore = createPreferencesDataStore(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        context = datastoreScope.coroutineContext,
+        scope = datastoreScope,
         producePath = { producePath().toPath() },
     )
     return GenericPreferencesDatastore(
@@ -90,7 +89,7 @@ public fun createPreferencesDatastore(
     val datastore = createPreferencesDataStore(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        context = datastoreScope.coroutineContext,
+        scope = datastoreScope,
         producePath = produceOkioPath,
     )
     return GenericPreferencesDatastore(
@@ -127,7 +126,7 @@ public fun createPreferencesDatastore(
     val datastore = createPreferencesDataStore(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        context = datastoreScope.coroutineContext,
+        scope = datastoreScope,
         producePath = { produceKotlinxIoPath().toString().toPath() },
     )
     return GenericPreferencesDatastore(
@@ -165,7 +164,7 @@ public fun createPreferencesDatastore(
     val datastore = createPreferencesDataStore(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        context = datastoreScope.coroutineContext,
+        scope = datastoreScope,
         producePath = { producePath().toPath() / fileName },
     )
     return GenericPreferencesDatastore(
@@ -178,7 +177,7 @@ public fun createPreferencesDatastore(
 private fun createPreferencesDataStore(
     corruptionHandler: ReplaceFileCorruptionHandler<Preferences>?,
     migrations: List<DataMigration<Preferences>>,
-    context: CoroutineContext,
+    scope: CoroutineScope,
     producePath: () -> okio.Path,
 ): DataStore<Preferences> {
     val builder = DataStore.Builder(
@@ -187,7 +186,7 @@ private fun createPreferencesDataStore(
             serializer = PreferencesSerializer,
             producePath = producePath,
         ),
-        context = context,
+        context = scope.coroutineContext,
     )
     builder.apply {
         addMigrations(migrations)

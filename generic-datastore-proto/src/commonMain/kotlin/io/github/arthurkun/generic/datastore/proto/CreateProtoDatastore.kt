@@ -15,7 +15,6 @@ import io.github.arthurkun.generic.datastore.core.systemFileSystem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
-import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmName
 import kotlinx.io.files.Path as KotlinxIoPath
 
@@ -64,7 +63,7 @@ public fun <T> createProtoDatastore(
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        context = datastoreScope.coroutineContext,
+        scope = datastoreScope,
     )
     return GenericProtoDatastore(
         datastore = datastore,
@@ -117,7 +116,7 @@ public fun <T> createProtoDatastore(
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        context = datastoreScope.coroutineContext,
+        scope = datastoreScope,
     )
     return GenericProtoDatastore(
         datastore = datastore,
@@ -171,7 +170,7 @@ public fun <T> createProtoDatastore(
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        context = datastoreScope.coroutineContext,
+        scope = datastoreScope,
     )
     return GenericProtoDatastore(
         datastore = datastore,
@@ -228,7 +227,7 @@ public fun <T> createProtoDatastore(
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
-        context = datastoreScope.coroutineContext,
+        scope = datastoreScope,
     )
     return GenericProtoDatastore(
         datastore = datastore,
@@ -243,11 +242,11 @@ private fun <T> createDataStore(
     storage: Storage<T>,
     corruptionHandler: ReplaceFileCorruptionHandler<T>?,
     migrations: List<DataMigration<T>>,
-    context: CoroutineContext,
+    scope: CoroutineScope,
 ): DataStore<T> {
     val builder = DataStore.Builder(
         storage = storage,
-        context = context,
+        context = scope.coroutineContext,
     )
 
     builder.apply {
