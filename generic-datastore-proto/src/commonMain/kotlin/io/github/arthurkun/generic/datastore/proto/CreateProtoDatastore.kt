@@ -25,7 +25,7 @@ import kotlinx.io.files.Path as KotlinxIoPath
  * @param T The proto message or typed data type.
  * @param serializer The [OkioSerializer] for the type [T].
  * @param defaultValue The default value for the proto message.
- * @param key The key identifier for this proto datastore.
+ * @param key The key identifier for this proto datastore. If null, the file name from the produced path will be used as the key.
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
  * @param scope Optional parent [CoroutineScope] for DataStore operations. The returned
@@ -44,7 +44,7 @@ import kotlinx.io.files.Path as KotlinxIoPath
 public fun <T> createProtoDatastore(
     serializer: OkioSerializer<T>,
     defaultValue: T,
-    key: String = "proto_datastore",
+    key: String? = null,
     corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
     migrations: List<DataMigration<T>> = emptyList(),
     scope: CoroutineScope? = null,
@@ -52,20 +52,22 @@ public fun <T> createProtoDatastore(
     producePath: () -> String,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
+    val path = producePath().toPath()
     val datastore = createDataStore(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
             serializer = serializer,
-            producePath = { producePath().toPath() },
+            producePath = { path },
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
         scope = datastoreScope,
     )
+    val nameKey = key ?: path.name
     return GenericProtoDatastore(
         datastore = datastore,
         defaultValue = defaultValue,
-        key = key,
+        key = nameKey,
         defaultJson = defaultJson,
         ownedScope = datastoreScope,
     )
@@ -77,7 +79,7 @@ public fun <T> createProtoDatastore(
  * @param T The proto message or typed data type.
  * @param serializer The [OkioSerializer] for the type [T].
  * @param defaultValue The default value for the proto message.
- * @param key The key identifier for this proto datastore.
+ * @param key The key identifier for this proto datastore. If null, the file name from the produced path will be used as the key.
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
  * @param scope Optional parent [CoroutineScope] for DataStore operations. The returned
@@ -97,7 +99,7 @@ public fun <T> createProtoDatastore(
 public fun <T> createProtoDatastore(
     serializer: OkioSerializer<T>,
     defaultValue: T,
-    key: String = "proto_datastore",
+    key: String? = null,
     corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
     migrations: List<DataMigration<T>> = emptyList(),
     scope: CoroutineScope? = null,
@@ -115,10 +117,11 @@ public fun <T> createProtoDatastore(
         migrations = migrations,
         scope = datastoreScope,
     )
+    val nameKey = key ?: produceOkioPath().name
     return GenericProtoDatastore(
         datastore = datastore,
         defaultValue = defaultValue,
-        key = key,
+        key = nameKey,
         defaultJson = defaultJson,
         ownedScope = datastoreScope,
     )
@@ -131,7 +134,7 @@ public fun <T> createProtoDatastore(
  * @param T The proto message or typed data type.
  * @param serializer The [OkioSerializer] for the type [T].
  * @param defaultValue The default value for the proto message.
- * @param key The key identifier for this proto datastore.
+ * @param key The key identifier for this proto datastore. If null, the file name from the produced path will be used as the key.
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
  * @param scope Optional parent [CoroutineScope] for DataStore operations. The returned
@@ -151,7 +154,7 @@ public fun <T> createProtoDatastore(
 public fun <T> createProtoDatastore(
     serializer: OkioSerializer<T>,
     defaultValue: T,
-    key: String = "proto_datastore",
+    key: String? = null,
     corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
     migrations: List<DataMigration<T>> = emptyList(),
     scope: CoroutineScope? = null,
@@ -159,20 +162,22 @@ public fun <T> createProtoDatastore(
     produceKotlinxIoPath: () -> KotlinxIoPath,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
+    val path = produceKotlinxIoPath().toString().toPath()
     val datastore = createDataStore(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
             serializer = serializer,
-            producePath = { produceKotlinxIoPath().toString().toPath() },
+            producePath = { path },
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
         scope = datastoreScope,
     )
+    val nameKey = key ?: path.name
     return GenericProtoDatastore(
         datastore = datastore,
         defaultValue = defaultValue,
-        key = key,
+        key = nameKey,
         defaultJson = defaultJson,
         ownedScope = datastoreScope,
     )
@@ -188,7 +193,7 @@ public fun <T> createProtoDatastore(
  * @param serializer The [OkioSerializer] for the type [T].
  * @param defaultValue The default value for the proto message.
  * @param fileName The name of the DataStore file.
- * @param key The key identifier for this proto datastore.
+ * @param key The key identifier for this proto datastore. If null, the [fileName] will be used as the key.
  * @param corruptionHandler An optional [ReplaceFileCorruptionHandler] to handle data corruption.
  * @param migrations A list of [DataMigration] to apply when the DataStore is created.
  * @param scope Optional parent [CoroutineScope] for DataStore operations. The returned
@@ -208,7 +213,7 @@ public fun <T> createProtoDatastore(
     serializer: OkioSerializer<T>,
     defaultValue: T,
     fileName: String,
-    key: String = "proto_datastore",
+    key: String = fileName,
     corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
     migrations: List<DataMigration<T>> = emptyList(),
     scope: CoroutineScope? = null,
