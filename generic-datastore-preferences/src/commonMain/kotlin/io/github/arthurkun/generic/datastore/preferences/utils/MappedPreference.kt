@@ -123,6 +123,7 @@ internal class MappedPrefs<T, R>(
     }
 
     private fun sourceAccessor(): PreferencesAccessor<T> {
+        @Suppress("UNCHECKED_CAST")
         return prefs as? PreferencesAccessor<T>
             ?: error("Batch operations only support preferences created by this library")
     }
