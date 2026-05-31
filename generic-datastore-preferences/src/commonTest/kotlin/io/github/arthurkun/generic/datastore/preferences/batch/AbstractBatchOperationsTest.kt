@@ -3,13 +3,22 @@ package io.github.arthurkun.generic.datastore.preferences.batch
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.mapIO
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlin.reflect.KProperty
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.fail
 
 abstract class AbstractBatchOperationsTest {
 
@@ -376,6 +385,39 @@ abstract class AbstractBatchOperationsTest {
         }
 
         assertEquals(99, intPref.get())
+    }
+
+    @Test
+    fun batchGet_mappedCustomPreferenceThrowsIllegalStateException() = runTest(testDispatcher) {
+        val customPref = object : Preference<Int> {
+            override fun key(): String = "custom"
+            override suspend fun get(): Int = defaultValue
+            override suspend fun set(value: Int) = Unit
+            override suspend fun update(transform: (Int) -> Int) = Unit
+            override suspend fun delete() = Unit
+            override suspend fun resetToDefault() = Unit
+            override val defaultValue: Int = 0
+            override fun asFlow(): Flow<Int> = flowOf(defaultValue)
+            override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<Int> =
+                MutableStateFlow(defaultValue)
+            override fun getBlocking(): Int = defaultValue
+            override fun setBlocking(value: Int) = Unit
+            override fun resetToDefaultBlocking() = Unit
+            override fun getValue(thisRef: Any?, property: KProperty<*>): Int = defaultValue
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) = Unit
+        }
+        val mappedPref = customPref.mapIO(
+            convert = { value -> value.toString() },
+            reverse = { value -> value.toInt() },
+        )
+
+        try {
+            preferenceDatastore.batchGet {
+                get(mappedPref)
+            }
+            fail("Expected mapped custom preference to fail batch access")
+        } catch (_: IllegalStateException) {
+        }
     }
 
     // -- stringSet in batch --

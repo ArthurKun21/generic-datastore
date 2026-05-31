@@ -66,7 +66,7 @@ internal class PreferenceBackupRestorer(private val datastore: DataStore<Prefere
                     }
                 }
 
-            mutablePreferences
+            mutablePreferences.toPreferences()
         }
     }
 

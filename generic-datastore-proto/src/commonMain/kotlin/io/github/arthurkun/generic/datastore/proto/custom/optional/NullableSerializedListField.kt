@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
 import io.github.arthurkun.generic.datastore.proto.custom.core.safeDeserialize
 import kotlinx.serialization.json.Json
+import kotlin.coroutines.cancellation.CancellationException
 
 internal fun <T, F> nullableSerializedListFieldInternal(
     datastore: DataStore<T>,
@@ -24,7 +25,15 @@ internal fun <T, F> nullableSerializedListFieldInternal(
             raw?.let {
                 safeDeserialize<List<F>?>(it, null) { rawStr ->
                     val jsonArray = json.decodeFromString<List<String>>(rawStr)
-                    jsonArray.map { elem -> elementDeserializer(elem) }
+                    jsonArray.mapNotNull { element ->
+                        try {
+                            elementDeserializer(element)
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (_: Exception) {
+                            null
+                        }
+                    }
                 }
             }
         },

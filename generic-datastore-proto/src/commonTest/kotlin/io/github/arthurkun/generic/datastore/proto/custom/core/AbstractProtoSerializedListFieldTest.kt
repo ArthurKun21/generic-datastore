@@ -41,6 +41,22 @@ abstract class AbstractProtoSerializedListFieldTest {
     }
 
     @Test
+    fun serializedListField_skipsInvalidElements() = runTest(testDispatcher) {
+        val listPref = protoDatastore.serializedListField(
+            elementSerializer = elemSerializer,
+            elementDeserializer = elemDeserializer,
+            getter = { it.jsonListRaw },
+            updater = { proto, raw -> proto.copy(jsonListRaw = raw) },
+        )
+        val validItem = TestItem("A", 1)
+        val rawList = Json.encodeToString(listOf(elemSerializer(validItem), "not-json"))
+
+        protoDatastore.data().set(TestCustomFieldProtoData(jsonListRaw = rawList))
+
+        assertEquals(listOf(validItem), listPref.get())
+    }
+
+    @Test
     fun serializedListField_asFlowEmitsUpdates() = runTest(testDispatcher) {
         val listPref = protoDatastore.serializedListField(
             elementSerializer = elemSerializer,
