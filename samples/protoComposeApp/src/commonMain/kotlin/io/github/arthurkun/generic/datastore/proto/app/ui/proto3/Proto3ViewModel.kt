@@ -2,7 +2,7 @@ package io.github.arthurkun.generic.datastore.proto.app.ui.proto3
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
+import io.github.arthurkun.generic.datastore.proto.ProtoDatastore
 import io.github.arthurkun.generic.datastore.proto.ProtoPreference
 import io.github.arthurkun.generic.datastore.proto.app.wire.AppConfig
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
  * and all [ProtoDatastore] operations.
  */
 class Proto3ViewModel(
-    private val datastore: GenericProtoDatastore<AppConfig>,
+    private val datastore: ProtoDatastore<AppConfig>,
 ) : ViewModel() {
 
     /** Whole-object preference */

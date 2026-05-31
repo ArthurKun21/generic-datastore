@@ -1,23 +1,14 @@
 package io.github.arthurkun.generic.datastore.proto.app.domain
 
+import android.content.Context
 import io.github.arthurkun.generic.datastore.proto.ProtoDatastore
 import io.github.arthurkun.generic.datastore.proto.app.wire.AppConfig
 import io.github.arthurkun.generic.datastore.proto.app.wire.UserSettings
 import io.github.arthurkun.generic.datastore.proto.createProtoDatastore
-import java.io.File
 
-/**
- * Desktop (JVM) implementation of [AppContainer].
- *
- * Stores proto files under `~/.generic-datastore-proto-sample/`.
- */
-actual class AppContainer {
-
-    private val appDir: String by lazy {
-        val dir = File(System.getProperty("user.home"), ".generic-datastore-proto-sample")
-        dir.mkdirs()
-        dir.absolutePath
-    }
+actual class AppContainer(
+    private val context: Context,
+) {
 
     actual val userSettingsDatastore: ProtoDatastore<UserSettings> = createProtoDatastore(
         serializer = WireOkioSerializer(
@@ -27,7 +18,7 @@ actual class AppContainer {
         defaultValue = UserSettings(),
         key = "user_settings",
         producePath = {
-            File(appDir, "user_settings.pb").absolutePath
+            context.filesDir.resolve("user_settings.pb").absolutePath
         },
     )
 
@@ -39,7 +30,7 @@ actual class AppContainer {
         defaultValue = AppConfig(),
         key = "app_config",
         producePath = {
-            File(appDir, "app_config.pb").absolutePath
+            context.filesDir.resolve("app_config.pb").absolutePath
         },
     )
 }

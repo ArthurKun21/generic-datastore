@@ -2,7 +2,7 @@ package io.github.arthurkun.generic.datastore.proto.app.ui.proto2
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
+import io.github.arthurkun.generic.datastore.proto.ProtoDatastore
 import io.github.arthurkun.generic.datastore.proto.ProtoPreference
 import io.github.arthurkun.generic.datastore.proto.app.wire.UserSettings
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
  * - Property delegation via `by`
  */
 class Proto2ViewModel(
-    private val datastore: GenericProtoDatastore<UserSettings>,
+    private val datastore: ProtoDatastore<UserSettings>,
 ) : ViewModel() {
 
     /** Whole-object preference via `data()` */

@@ -1,6 +1,6 @@
 package io.github.arthurkun.generic.datastore.compose.app.domain
 
-import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
 import io.github.arthurkun.generic.datastore.preferences.enum
 import io.github.arthurkun.generic.datastore.preferences.enumSet
@@ -11,7 +11,7 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
 class PreferenceStore(
-    val datastore: GenericPreferencesDatastore,
+    val datastore: PreferencesDatastore,
 ) {
 
     val theme = datastore.enum(
