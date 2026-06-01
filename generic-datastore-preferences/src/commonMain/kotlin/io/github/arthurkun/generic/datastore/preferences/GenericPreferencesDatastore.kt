@@ -48,7 +48,8 @@ import io.github.arthurkun.generic.datastore.preferences.optional.custom.Nullabl
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -84,7 +85,9 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
     private val backupRestorer = PreferenceBackupRestorer(datastore)
 
     override fun close() {
-        ownedScope?.cancel()
+        runBlocking {
+            ownedScope?.coroutineContext?.get(Job)?.cancelAndJoin()
+        }
     }
 
     /**

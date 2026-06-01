@@ -18,7 +18,7 @@ class DesktopPreferencesDatastoreLifecycleTest {
     lateinit var tempFolder: File
 
     @Test
-    fun closeAllowsDatastorePathToBeReopened() = runTest {
+    fun closeAllowsDatastorePathToBeReopenedAndClosedAgain() = runTest {
         val path = "${tempFolder.absolutePath}/lifecycle.preferences_pb"
         val firstDatastore = createPreferencesDatastore(
             producePath = { path },
@@ -33,6 +33,8 @@ class DesktopPreferencesDatastoreLifecycleTest {
 
         try {
             assertEquals("first", secondDatastore.string("name").get())
+            secondDatastore.string("name").set("second")
+            assertEquals("second", secondDatastore.string("name").get())
         } finally {
             secondDatastore.close()
         }

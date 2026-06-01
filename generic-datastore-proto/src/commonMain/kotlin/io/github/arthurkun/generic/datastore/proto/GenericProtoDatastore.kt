@@ -21,7 +21,9 @@ import io.github.arthurkun.generic.datastore.proto.custom.set.enumSetFieldIntern
 import io.github.arthurkun.generic.datastore.proto.custom.set.kserializedSetFieldInternal
 import io.github.arthurkun.generic.datastore.proto.custom.set.serializedSetFieldInternal
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
@@ -57,7 +59,9 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
     override fun data(): ProtoPreference<T> = cachedData
 
     override fun close() {
-        ownedScope?.cancel()
+        runBlocking {
+            ownedScope?.coroutineContext?.get(Job)?.cancelAndJoin()
+        }
     }
 
     override fun <F> field(
