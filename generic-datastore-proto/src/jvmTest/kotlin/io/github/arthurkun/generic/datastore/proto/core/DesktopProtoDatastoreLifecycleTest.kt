@@ -18,7 +18,7 @@ class DesktopProtoDatastoreLifecycleTest {
     lateinit var tempFolder: File
 
     @Test
-    fun closeAllowsDatastorePathToBeReopened() = runTest {
+    fun closeAllowsDatastorePathToBeReopenedAndClosedAgain() = runTest {
         val path = "${tempFolder.absolutePath}/lifecycle.pb"
         val firstDatastore = createProtoDatastore(
             serializer = TestProtoDataSerializer,
@@ -37,6 +37,8 @@ class DesktopProtoDatastoreLifecycleTest {
 
         try {
             assertEquals("first", secondDatastore.data().get().name)
+            secondDatastore.data().set(TestProtoData(id = 2, name = "second"))
+            assertEquals("second", secondDatastore.data().get().name)
         } finally {
             secondDatastore.close()
         }

@@ -1,14 +1,14 @@
-@file:Suppress("unused")
-@file:OptIn(io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi::class)
-
 package io.github.arthurkun.generic.datastore.preferences
 
 import androidx.datastore.core.DataMigration
+import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.core.okio.OkioStorage
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.PreferencesSerializer
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.core.createDatastoreScope
+import io.github.arthurkun.generic.datastore.core.systemFileSystem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
@@ -19,7 +19,7 @@ import kotlinx.io.files.Path as KotlinxIoPath
  * Creates a [GenericPreferencesDatastore] from a path producer that returns a [String].
  *
  * Use this overload when your calling code naturally works with string paths. The produced path is
- * converted to [okio.Path] before delegating to [PreferenceDataStoreFactory.createWithPath].
+ * converted to [okio.Path] before creating the underlying DataStore.
  *
  * Example:
  * ```kotlin
@@ -46,11 +46,11 @@ public fun createPreferencesDatastore(
     producePath: () -> String,
 ): GenericPreferencesDatastore {
     val datastoreScope = createDatastoreScope(scope)
-    val datastore = PreferenceDataStoreFactory.createWithPath(
+    val datastore = createPreferencesDataStore(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
         scope = datastoreScope,
-        produceFile = { producePath().toPath() },
+        producePath = { producePath().toPath() },
     )
     return GenericPreferencesDatastore(
         datastore = datastore,
@@ -83,11 +83,11 @@ public fun createPreferencesDatastore(
     produceOkioPath: () -> okio.Path,
 ): GenericPreferencesDatastore {
     val datastoreScope = createDatastoreScope(scope)
-    val datastore = PreferenceDataStoreFactory.createWithPath(
+    val datastore = createPreferencesDataStore(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
         scope = datastoreScope,
-        produceFile = produceOkioPath,
+        producePath = produceOkioPath,
     )
     return GenericPreferencesDatastore(
         datastore = datastore,
@@ -120,11 +120,11 @@ public fun createPreferencesDatastore(
     produceKotlinxIoPath: () -> KotlinxIoPath,
 ): GenericPreferencesDatastore {
     val datastoreScope = createDatastoreScope(scope)
-    val datastore = PreferenceDataStoreFactory.createWithPath(
+    val datastore = createPreferencesDataStore(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
         scope = datastoreScope,
-        produceFile = { produceKotlinxIoPath().toString().toPath() },
+        producePath = { produceKotlinxIoPath().toString().toPath() },
     )
     return GenericPreferencesDatastore(
         datastore = datastore,
@@ -158,15 +158,39 @@ public fun createPreferencesDatastore(
     producePath: () -> String,
 ): GenericPreferencesDatastore {
     val datastoreScope = createDatastoreScope(scope)
-    val datastore = PreferenceDataStoreFactory.createWithPath(
+    val datastore = createPreferencesDataStore(
         corruptionHandler = corruptionHandler,
         migrations = migrations,
         scope = datastoreScope,
-        produceFile = { producePath().toPath() / fileName },
+        producePath = { producePath().toPath() / fileName },
     )
     return GenericPreferencesDatastore(
         datastore = datastore,
         defaultJson = defaultJson,
         ownedScope = datastoreScope,
     )
+}
+
+private fun createPreferencesDataStore(
+    corruptionHandler: ReplaceFileCorruptionHandler<Preferences>?,
+    migrations: List<DataMigration<Preferences>>,
+    scope: CoroutineScope,
+    producePath: () -> okio.Path,
+): DataStore<Preferences> {
+    val builder = DataStore.Builder(
+        storage = OkioStorage(
+            fileSystem = systemFileSystem,
+            serializer = PreferencesSerializer,
+            producePath = producePath,
+        ),
+        context = scope.coroutineContext,
+    )
+    builder.apply {
+        addMigrations(migrations)
+        if (corruptionHandler != null) {
+            setCorruptionHandler(corruptionHandler)
+        }
+    }
+
+    return builder.build()
 }

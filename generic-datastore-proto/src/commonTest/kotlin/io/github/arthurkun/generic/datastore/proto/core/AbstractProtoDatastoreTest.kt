@@ -1,3 +1,5 @@
+@file:OptIn(io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi::class)
+
 package io.github.arthurkun.generic.datastore.proto.core
 
 import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
@@ -74,13 +76,13 @@ abstract class AbstractProtoDatastoreTest {
     @Test
     fun data_keyReturnsConfiguredKey() = runTest(testDispatcher) {
         val pref = protoDatastore.data()
-        assertEquals("proto_datastore", pref.key())
+        assertEquals("test_proto.pb", pref.key())
     }
 
     @Test
     fun data_defaultKey() = runTest(testDispatcher) {
         val pref = protoDatastore.data()
-        assertEquals("proto_datastore", pref.key())
+        assertEquals("test_proto.pb", pref.key())
     }
 
     @Test

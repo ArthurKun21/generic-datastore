@@ -355,23 +355,31 @@ public interface PreferencesDatastore : AutoCloseable {
      * datastore change.
      *
      * All reads inside [block] observe the same snapshot, which avoids mixing values from
-     * different emissions.
+     * different emissions. Set [distinctUntilChanged] to `true` when the derived value should only
+     * emit after it changes according to `equals`.
      *
      * @param R The return type of the block.
+     * @param distinctUntilChanged Whether to suppress consecutive equal values returned by [block].
      * @param block A lambda with [BatchReadScope] receiver that reads one or more preferences.
      * @return A [Flow] emitting the value returned by [block] on every update.
      */
-    public fun <R> batchReadFlow(block: BatchReadScope.() -> R): Flow<R>
+    public fun <R> batchReadFlow(
+        distinctUntilChanged: Boolean = false,
+        block: BatchReadScope.() -> R,
+    ): Flow<R>
 
     /**
      * One-shot batch read: collects the latest DataStore snapshot and executes [block]
      * within a [BatchReadScope].
      *
+     * Use this for reading multiple preferences from one consistent snapshot. For reusable
+     * projections, define an extension function on [BatchReadScope] and call it inside [block].
+     *
      * @param R The return type of the block.
      * @param block A lambda with [BatchReadScope] receiver that reads one or more preferences.
      * @return The value returned by [block].
      */
-    public suspend fun <R> batchGet(block: BatchReadScope.() -> R): R
+    public suspend fun <R> batchRead(block: BatchReadScope.() -> R): R
 
     /**
      * Executes [block] inside a single DataStore `edit` transaction.
@@ -395,13 +403,13 @@ public interface PreferencesDatastore : AutoCloseable {
     public suspend fun batchUpdate(block: BatchUpdateScope.() -> Unit)
 
     /**
-     * Blocking variant of [batchGet].
+     * Blocking variant of [batchRead].
      *
      * @param R The return type of the block.
      * @param block A lambda with [BatchReadScope] receiver.
      * @return The value returned by [block].
      */
-    public fun <R> batchGetBlocking(block: BatchReadScope.() -> R): R
+    public fun <R> batchReadBlocking(block: BatchReadScope.() -> R): R
 
     /**
      * Blocking variant of [batchWrite].

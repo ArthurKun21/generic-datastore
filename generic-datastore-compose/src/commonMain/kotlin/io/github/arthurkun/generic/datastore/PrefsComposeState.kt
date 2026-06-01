@@ -11,6 +11,7 @@ import androidx.compose.runtime.structuralEqualityPolicy
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 private object Unset
 
@@ -64,7 +65,20 @@ internal class PrefsComposeState<T>(
             if (!policy.equivalent(oldValue, value)) {
                 localOverride = value
                 scope.launch {
-                    prefs.set(value)
+                    try {
+                        prefs.set(value)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (_: Exception) {
+                        val currentOverride = localOverride
+                        if (currentOverride !== Unset) {
+                            @Suppress("UNCHECKED_CAST")
+                            val override = currentOverride as T
+                            if (policy.equivalent(override, value)) {
+                                localOverride = Unset
+                            }
+                        }
+                    }
                 }
             }
         }

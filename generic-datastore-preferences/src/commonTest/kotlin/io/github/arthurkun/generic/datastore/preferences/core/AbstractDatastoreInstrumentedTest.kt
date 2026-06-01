@@ -506,6 +506,21 @@ abstract class AbstractDatastoreInstrumentedTest {
     }
 
     @Test
+    fun serializedSetPreference_preservesNullElements() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.serializedSet<String?>(
+            key = "testSerializedSetNullElements",
+            defaultValue = emptySet(),
+            serializer = { it ?: "NULL" },
+            deserializer = { if (it == "NULL") null else it },
+        )
+        val newSet = setOf("A", null, "B")
+
+        pref.set(newSet)
+
+        assertEquals(newSet, pref.get())
+    }
+
+    @Test
     fun serializedSetPreference_observeSetValue() = runTest(testDispatcher) {
         val pref = preferenceDatastore.serializedSet(
             key = "testSerializedSetFlow",

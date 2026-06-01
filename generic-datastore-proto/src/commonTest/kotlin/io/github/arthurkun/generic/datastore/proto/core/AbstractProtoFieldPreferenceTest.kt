@@ -137,7 +137,7 @@ abstract class AbstractProtoFieldPreferenceTest {
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
         )
-        assertEquals("proto_datastore", namePref.key())
+        assertEquals("test_proto_field.pb", namePref.key())
     }
 
     @Test
@@ -147,7 +147,7 @@ abstract class AbstractProtoFieldPreferenceTest {
             getter = { it.name },
             updater = { proto, value -> proto.copy(name = value) },
         )
-        assertEquals("proto_datastore", namePref.key())
+        assertEquals("test_proto_field.pb", namePref.key())
     }
 
     // ---- Nested field tests (level 2 — profile.*) ----

@@ -10,11 +10,11 @@ abstract class AbstractBatchOperationsBlockingTest {
     abstract val preferenceDatastore: GenericPreferencesDatastore
 
     @Test
-    fun batchGetBlocking_readMultiplePreferences() {
+    fun batchReadBlocking_readMultiplePreferences() {
         val stringPref = preferenceDatastore.string("batch_b_str", "hello")
         val intPref = preferenceDatastore.int("batch_b_int", 42)
 
-        val result = preferenceDatastore.batchGetBlocking {
+        val result = preferenceDatastore.batchReadBlocking {
             Pair(get(stringPref), get(intPref))
         }
 
@@ -23,10 +23,10 @@ abstract class AbstractBatchOperationsBlockingTest {
     }
 
     @Test
-    fun batchGetBlocking_readNullablePreferences() {
+    fun batchReadBlocking_readNullablePreferences() {
         val nullablePref = preferenceDatastore.nullableString("batch_b_nullable")
 
-        val result = preferenceDatastore.batchGetBlocking {
+        val result = preferenceDatastore.batchReadBlocking {
             get(nullablePref)
         }
 

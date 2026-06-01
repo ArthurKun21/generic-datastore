@@ -120,7 +120,7 @@ internal sealed class GenericPreferenceItem<T>(
     /**
      * Converts the preference [Flow] into a [StateFlow] within the given [scope].
      * The [StateFlow] is typically started when there are subscribers and shares the most recent value.
-     * It will be initialized with the current preference value (or [defaultValue] if not set or on error).
+     * It is initialized with [defaultValue] and updates after the upstream flow emits.
      * @param scope The [CoroutineScope] in which to launch the [StateFlow].
      * @param started The [SharingStarted] strategy that controls when the upstream flow is active.
      * @return A [StateFlow] representing the preference's value.

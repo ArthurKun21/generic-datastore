@@ -35,6 +35,7 @@ fun Proto2Screen(
     viewModel: Proto2ViewModel,
 ) {
     val state by viewModel.uiState.collectAsStatePlatform()
+    val apiCoverageStatus by viewModel.apiCoverageStatus.collectAsStatePlatform()
 
     LazyColumn(
         modifier = Modifier
@@ -111,6 +112,15 @@ fun Proto2Screen(
             WholeObjectSection(
                 onResetAll = viewModel::resetAll,
                 onDeleteAll = viewModel::deleteAll,
+            )
+        }
+
+        item { HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) }
+
+        item {
+            ApiCoverageSection(
+                status = apiCoverageStatus,
+                onRun = viewModel::runApiCoverageShowcase,
             )
         }
     }
@@ -281,6 +291,23 @@ private fun WholeObjectSection(
             ) {
                 Text("Delete All")
             }
+        }
+    }
+}
+
+@Composable
+private fun ApiCoverageSection(
+    status: String,
+    onRun: () -> Unit,
+) {
+    Column {
+        Text("API Coverage", style = MaterialTheme.typography.titleSmall)
+        Text(status)
+        Button(
+            onClick = onRun,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Run Proto API Showcase")
         }
     }
 }

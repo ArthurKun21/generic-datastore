@@ -122,6 +122,12 @@ internal class MappedPrefs<T, R>(
         }
     }
 
+    private fun sourceAccessor(): PreferencesAccessor<T> {
+        @Suppress("UNCHECKED_CAST")
+        return prefs as? PreferencesAccessor<T>
+            ?: error("Batch operations only support preferences created by this library")
+    }
+
     override suspend fun get(): R = asFlow().first()
 
     override suspend fun set(value: R) = prefs.set(reverseFallback(value))
@@ -157,17 +163,17 @@ internal class MappedPrefs<T, R>(
 
     @Suppress("UNCHECKED_CAST")
     override fun readFrom(preferences: DataStorePreferences): R {
-        val raw = (prefs as PreferencesAccessor<T>).readFrom(preferences)
+        val raw = sourceAccessor().readFrom(preferences)
         return convertFallback(raw)
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun writeInto(mutablePreferences: MutablePreferences, value: R) {
-        (prefs as PreferencesAccessor<T>).writeInto(mutablePreferences, reverseFallback(value))
+        sourceAccessor().writeInto(mutablePreferences, reverseFallback(value))
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun removeFrom(mutablePreferences: MutablePreferences) {
-        (prefs as PreferencesAccessor<T>).removeFrom(mutablePreferences)
+        sourceAccessor().removeFrom(mutablePreferences)
     }
 }

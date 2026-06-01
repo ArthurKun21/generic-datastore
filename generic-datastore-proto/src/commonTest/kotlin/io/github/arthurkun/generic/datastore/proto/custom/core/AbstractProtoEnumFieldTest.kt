@@ -89,7 +89,7 @@ abstract class AbstractProtoEnumFieldTest {
             getter = { it.enumRaw },
             updater = { proto, raw -> proto.copy(enumRaw = raw) },
         )
-        assertEquals("proto_datastore", colorPref.key())
+        assertEquals("test_proto_enum_field.pb", colorPref.key())
     }
 
     @Test
@@ -99,7 +99,7 @@ abstract class AbstractProtoEnumFieldTest {
             getter = { it.enumRaw },
             updater = { proto, raw -> proto.copy(enumRaw = raw) },
         )
-        assertEquals("proto_datastore", colorPref.key())
+        assertEquals("test_proto_enum_field.pb", colorPref.key())
     }
 
     @Test

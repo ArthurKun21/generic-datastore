@@ -1,6 +1,6 @@
 package io.github.arthurkun.generic.datastore.proto.app.domain
 
-import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
+import io.github.arthurkun.generic.datastore.proto.ProtoDatastore
 import io.github.arthurkun.generic.datastore.proto.app.wire.AppConfig
 import io.github.arthurkun.generic.datastore.proto.app.wire.UserSettings
 
@@ -15,10 +15,10 @@ expect class AppContainer {
     /**
      * Proto2 [UserSettings] DataStore.
      */
-    val userSettingsDatastore: GenericProtoDatastore<UserSettings>
+    val userSettingsDatastore: ProtoDatastore<UserSettings>
 
     /**
      * Proto3 [AppConfig] DataStore.
      */
-    val appConfigDatastore: GenericProtoDatastore<AppConfig>
+    val appConfigDatastore: ProtoDatastore<AppConfig>
 }

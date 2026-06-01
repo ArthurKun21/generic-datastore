@@ -38,6 +38,20 @@ abstract class AbstractProtoKserializedSetFieldTest {
     }
 
     @Test
+    fun kserializedSetField_preservesNullElements() = runTest(testDispatcher) {
+        val setPref = protoDatastore.kserializedSetField(
+            defaultValue = emptySet<String?>(),
+            getter = { it.jsonSetRaw },
+            updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },
+        )
+        val items = setOf("A", null, "B")
+
+        setPref.set(items)
+
+        assertEquals(items, setPref.get())
+    }
+
+    @Test
     fun kserializedSetField_asFlowEmitsUpdates() = runTest(testDispatcher) {
         val setPref = protoDatastore.kserializedSetField(
             defaultValue = emptySet<TestItem>(),

@@ -43,6 +43,21 @@ abstract class AbstractProtoSerializedSetFieldTest {
     }
 
     @Test
+    fun serializedSetField_preservesNullElements() = runTest(testDispatcher) {
+        val setPref = protoDatastore.serializedSetField<String?>(
+            serializer = { it ?: "NULL" },
+            deserializer = { if (it == "NULL") null else it },
+            getter = { it.jsonSetRaw },
+            updater = { proto, raw -> proto.copy(jsonSetRaw = raw) },
+        )
+        val items = setOf("A", null, "B")
+
+        setPref.set(items)
+
+        assertEquals(items, setPref.get())
+    }
+
+    @Test
     fun serializedSetField_asFlowEmitsUpdates() = runTest(testDispatcher) {
         val setPref = protoDatastore.serializedSetField(
             serializer = elemSerializer,

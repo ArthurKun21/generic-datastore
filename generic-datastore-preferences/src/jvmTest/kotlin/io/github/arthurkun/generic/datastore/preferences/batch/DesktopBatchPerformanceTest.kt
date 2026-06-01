@@ -9,9 +9,11 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 
 private const val TEST_DATASTORE_NAME = "test_batch_performance"
 
+@Ignore("Benchmark-style timing comparison; run manually when measuring batch performance.")
 class DesktopBatchPerformanceTest : AbstractBatchPerformanceTest() {
 
     @TempDir

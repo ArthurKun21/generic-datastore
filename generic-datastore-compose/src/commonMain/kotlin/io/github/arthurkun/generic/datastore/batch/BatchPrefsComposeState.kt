@@ -14,6 +14,7 @@ import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 private object Unset
 
@@ -73,8 +74,13 @@ internal class BatchPrefsComposeState<T>(
                 scope.launch {
                     try {
                         datastore.batchWrite { this[preference] = value }
+                    } catch (e: CancellationException) {
+                        throw e
                     } catch (_: Exception) {
-                        localOverride = Unset
+                        val currentOverride = localOverride
+                        if (currentOverride !== Unset && policy.equivalent(currentOverride, value)) {
+                            localOverride = Unset
+                        }
                     }
                 }
             }

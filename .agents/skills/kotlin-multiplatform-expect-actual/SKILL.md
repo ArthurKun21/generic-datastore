@@ -2,8 +2,7 @@
 description: Use when designing Kotlin Multiplatform expect/actual or interface boundaries for platform services, native SDKs, source sets, Compose Multiplatform UI, permissions, files, settings, sensors, or platform interop.
 metadata:
     github-path: skills/kotlin-multiplatform-expect-actual
-    github-pinned: bc69bba2c7fbe96ee78a554498a579b12b67c9b4
-    github-ref: bc69bba2c7fbe96ee78a554498a579b12b67c9b4
+    github-ref: refs/tags/2026.05.21
     github-repo: https://github.com/chrisbanes/skills
     github-tree-sha: 0e44c36cc581f779ca7b7ff5dfb4f694872ec4fc
 name: kotlin-multiplatform-expect-actual

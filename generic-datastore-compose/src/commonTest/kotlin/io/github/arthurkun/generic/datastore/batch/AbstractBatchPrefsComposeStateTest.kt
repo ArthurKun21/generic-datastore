@@ -9,6 +9,7 @@ import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -143,7 +144,29 @@ abstract class AbstractBatchPrefsComposeStateTest {
         assertEquals("fallback", preference.get())
     }
 
-    private suspend fun currentSnapshot(): BatchReadScope = preferenceDatastore.batchGet { this }
+    @Test
+    fun set_olderFailedBatchWriteDoesNotClearNewerOptimisticOverride() = runTest(testDispatcher) {
+        val failingDatastore = FailsFirstBatchWritePreferencesDatastore(preferenceDatastore)
+        val preference = failingDatastore.string("compose_batch_state_write_race", "fallback")
+        val batchState = mutableStateOf<BatchReadScope?>(null)
+        val state = BatchPrefsComposeState(
+            preference = preference,
+            batchState = batchState,
+            datastore = failingDatastore,
+            scope = this,
+        )
+
+        state.value = "first"
+        state.value = "second"
+
+        runCurrent()
+        batchState.value = currentSnapshot()
+
+        assertEquals("second", state.value)
+        assertEquals("second", preference.get())
+    }
+
+    private suspend fun currentSnapshot(): BatchReadScope = preferenceDatastore.batchRead { this }
 }
 
 private class CountingPreferencesDatastore(
@@ -163,5 +186,20 @@ private class FailingBatchWritePreferencesDatastore(
 ) : PreferencesDatastore by delegate {
     override suspend fun batchWrite(block: BatchWriteScope.() -> Unit) {
         throw IllegalStateException("forced batch write failure")
+    }
+}
+
+private class FailsFirstBatchWritePreferencesDatastore(
+    private val delegate: PreferencesDatastore,
+) : PreferencesDatastore by delegate {
+    private var writes = 0
+
+    override suspend fun batchWrite(block: BatchWriteScope.() -> Unit) {
+        writes += 1
+        if (writes == 1) {
+            yield()
+            throw IllegalStateException("forced first batch write failure")
+        }
+        delegate.batchWrite(block)
     }
 }

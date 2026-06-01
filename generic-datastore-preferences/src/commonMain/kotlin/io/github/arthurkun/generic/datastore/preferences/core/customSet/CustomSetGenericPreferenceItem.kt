@@ -104,15 +104,17 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
     override fun setBlocking(value: Set<T>) = runBlocking { set(value) }
 
     private fun safeDeserializeSet(values: Set<String>): Set<T> {
-        return values.mapNotNull { value ->
+        val elements = mutableSetOf<T>()
+        values.forEach { value ->
             try {
-                deserializer(value)
+                elements.add(deserializer(value))
             } catch (e: CancellationException) {
                 throw e
             } catch (_: Exception) {
-                null
+                // Skip only elements that failed to deserialize.
             }
-        }.toSet()
+        }
+        return elements
     }
 
     override fun readFrom(preferences: Preferences): Set<T> =

@@ -2,8 +2,7 @@
 description: Use when writing or reviewing Kotlin Flow state and event APIs with StateFlow, MutableStateFlow.update, SharedFlow, Channel, stateIn, SharingStarted, .value, receiveAsFlow, one-shot events, or sentinel initial values.
 metadata:
     github-path: skills/kotlin-flow-state-event-modeling
-    github-pinned: bc69bba2c7fbe96ee78a554498a579b12b67c9b4
-    github-ref: bc69bba2c7fbe96ee78a554498a579b12b67c9b4
+    github-ref: refs/tags/2026.05.21
     github-repo: https://github.com/chrisbanes/skills
     github-tree-sha: f849f7dc820c3be59f5bead0ad1ee241b27d1f28
 name: kotlin-flow-state-event-modeling

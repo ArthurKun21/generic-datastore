@@ -7,6 +7,9 @@ import io.github.arthurkun.generic.datastore.compose.app.domain.PreferenceStore
 import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
 import io.github.arthurkun.generic.datastore.compose.app.domain.UserProfile
 import io.github.arthurkun.generic.datastore.preferences.toggle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -26,6 +29,8 @@ class MainViewModel(
     val themeSet = preferenceStore.themeSet
 
     private val jsonConfig = Json { prettyPrint = true }
+    private val _apiCoverageStatus = MutableStateFlow("Not run")
+    val apiCoverageStatus: StateFlow<String> = _apiCoverageStatus.asStateFlow()
 
     fun resetText() {
         viewModelScope.launch { preferenceStore.text.resetToDefault() }
@@ -97,5 +102,10 @@ class MainViewModel(
             set(num, (0..100).random())
             set(bool, listOf(true, false).random())
         }
+    }
+
+    fun runApiCoverageShowcase() = viewModelScope.launch {
+        _apiCoverageStatus.value = "Running"
+        _apiCoverageStatus.value = preferenceStore.runApiCoverageShowcase(json = jsonConfig)
     }
 }

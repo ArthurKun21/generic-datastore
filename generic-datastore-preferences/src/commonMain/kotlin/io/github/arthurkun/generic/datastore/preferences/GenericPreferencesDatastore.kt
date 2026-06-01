@@ -14,6 +14,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
+import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupCreator
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupRestorer
@@ -47,8 +48,10 @@ import io.github.arthurkun.generic.datastore.preferences.optional.custom.Nullabl
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
@@ -65,11 +68,14 @@ import kotlinx.serialization.json.JsonElement
  * The [defaultJson] supplied here becomes the fallback JSON configuration for all `kserialized*`
  * APIs when callers do not pass a [Json] instance explicitly.
  *
+ * Direct construction is a low-level wiring API. Prefer [createPreferencesDatastore] unless you
+ * already own the underlying [DataStore<Preferences>].
+ *
  * @property datastore The underlying [DataStore<Preferences>] instance.
  * @property defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
  * @property ownedScope The scope owned by this wrapper when it creates the underlying [DataStore].
  */
-public class GenericPreferencesDatastore(
+public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructor(
     internal val datastore: DataStore<Preferences>,
     private val defaultJson: Json = PreferenceDefaults.defaultJson,
     private val ownedScope: CoroutineScope? = null,
@@ -79,7 +85,9 @@ public class GenericPreferencesDatastore(
     private val backupRestorer = PreferenceBackupRestorer(datastore)
 
     override fun close() {
-        ownedScope?.cancel()
+        runBlocking {
+            ownedScope?.coroutineContext?.get(Job)?.cancelAndJoin()
+        }
     }
 
     /**
@@ -529,13 +537,18 @@ public class GenericPreferencesDatastore(
         ),
     )
 
-    override fun <R> batchReadFlow(block: BatchReadScope.() -> R): Flow<R> =
-        datastore.dataOrEmpty.map { mutablePrefs ->
+    override fun <R> batchReadFlow(
+        distinctUntilChanged: Boolean,
+        block: BatchReadScope.() -> R,
+    ): Flow<R> {
+        val flow = datastore.dataOrEmpty.map { mutablePrefs ->
             BatchReadScope(mutablePrefs).block()
         }
+        return if (distinctUntilChanged) flow.distinctUntilChanged() else flow
+    }
 
-    override suspend fun <R> batchGet(block: BatchReadScope.() -> R): R =
-        batchReadFlow(block).first()
+    override suspend fun <R> batchRead(block: BatchReadScope.() -> R): R =
+        batchReadFlow(block = block).first()
 
     override suspend fun batchWrite(block: BatchWriteScope.() -> Unit) {
         datastore.edit { mutablePrefs ->
@@ -549,8 +562,8 @@ public class GenericPreferencesDatastore(
         }
     }
 
-    override fun <R> batchGetBlocking(block: BatchReadScope.() -> R): R =
-        runBlocking { batchGet(block) }
+    override fun <R> batchReadBlocking(block: BatchReadScope.() -> R): R =
+        runBlocking { batchRead(block) }
 
     override fun batchWriteBlocking(block: BatchWriteScope.() -> Unit): Unit =
         runBlocking { batchWrite(block) }

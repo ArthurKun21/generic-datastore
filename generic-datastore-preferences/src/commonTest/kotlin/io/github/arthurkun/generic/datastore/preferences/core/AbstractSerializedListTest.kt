@@ -55,6 +55,20 @@ abstract class AbstractSerializedListTest {
     }
 
     @Test
+    fun serializedListPreference_preservesNullElements() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.serializedList<String?>(
+            key = "testSerListNullElements",
+            serializer = { it ?: "NULL" },
+            deserializer = { if (it == "NULL") null else it },
+        )
+        val items = listOf("hello", null, "world")
+
+        pref.set(items)
+
+        assertEquals(items, pref.get())
+    }
+
+    @Test
     fun serializedListPreference_preservesOrder() = runTest(testDispatcher) {
         val pref = preferenceDatastore.serializedList<String>(
             key = "testSerListOrder",
