@@ -7,7 +7,8 @@ import io.github.arthurkun.generic.datastore.proto.createProtoDatastore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -49,7 +50,9 @@ class AndroidNullableProtoTestHelper private constructor(
     fun tearDown() {
         try {
             if (::testScope.isInitialized) {
-                testScope.cancel()
+                runBlocking {
+                    testScope.coroutineContext[Job]?.cancelAndJoin()
+                }
             }
         } finally {
             try {
