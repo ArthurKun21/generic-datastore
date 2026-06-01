@@ -167,7 +167,7 @@ abstract class AbstractBatchPerformanceTest {
         }
 
         val batchTime = measureTime {
-            preferenceDatastore.batchGet {
+            preferenceDatastore.batchRead {
                 prefs.map { get(it) }
             }
         }
@@ -191,7 +191,7 @@ abstract class AbstractBatchPerformanceTest {
         }
 
         val batchTime = measureTime {
-            preferenceDatastore.batchGet {
+            preferenceDatastore.batchRead {
                 prefs.map { get(it) }
             }
         }
@@ -215,7 +215,7 @@ abstract class AbstractBatchPerformanceTest {
         }
 
         val batchTime = measureTime {
-            preferenceDatastore.batchGet {
+            preferenceDatastore.batchRead {
                 prefs.map { get(it) }
             }
         }
@@ -239,7 +239,7 @@ abstract class AbstractBatchPerformanceTest {
         }
 
         val batchTime = measureTime {
-            preferenceDatastore.batchGet {
+            preferenceDatastore.batchRead {
                 prefs.map { get(it) }
             }
         }
@@ -404,7 +404,7 @@ abstract class AbstractBatchPerformanceTest {
         }
 
         val batchTime = measureTime {
-            preferenceDatastore.batchGet {
+            preferenceDatastore.batchRead {
                 get(str)
                 get(int)
                 get(bool)

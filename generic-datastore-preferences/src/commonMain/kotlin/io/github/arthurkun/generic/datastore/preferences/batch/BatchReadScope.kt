@@ -12,15 +12,26 @@ import androidx.datastore.preferences.core.Preferences as DataStorePreferences
  * share the same snapshot.
  *
  * Use [get] or the indexing operator (`this[pref]`) to read preference values.
- * Obtain this scope from `PreferencesDatastore.batchGet` or `PreferencesDatastore.batchReadFlow`.
+ * Obtain this scope from `PreferencesDatastore.batchRead` or `PreferencesDatastore.batchReadFlow`.
  *
  * Example:
  * ```kotlin
- * val pair = datastore.batchGet {
+ * val pair = datastore.batchRead {
  *     this[firstName] to this[lastName]
  * }
  * ```
+ *
+ * For reusable projections, prefer extension functions on this scope:
+ * ```kotlin
+ * fun BatchReadScope.userSettings() = UserSettings(
+ *     username = this[usernamePref],
+ *     darkMode = this[darkModePref],
+ * )
+ *
+ * val settings = datastore.batchRead { userSettings() }
+ * ```
  */
+@PreferencesBatchDsl
 public class BatchReadScope internal constructor(
     private val snapshot: DataStorePreferences,
 ) {

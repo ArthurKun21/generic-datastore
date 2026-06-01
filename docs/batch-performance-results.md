@@ -45,7 +45,7 @@ At 50 preferences, batch is **~54x faster** because it performs 1 file write ins
 
 ### Read operations benefit from shared snapshots
 
-Each normal `get()` call independently reads from the DataStore flow. `batchGet` takes a
+Each normal `get()` call independently reads from the DataStore flow. `batchRead` takes a
 **single snapshot** and reads all values from it in-memory.
 
 | Preferences | Normal per-op | Batch per-op | Speedup |
@@ -77,7 +77,7 @@ in a single batch is **~20x faster** than writing them individually.
 | Scenario                              | Recommendation               |
 |---------------------------------------|------------------------------|
 | Reading/writing 1–2 preferences       | Normal operations are fine   |
-| Reading/writing 3+ preferences        | Use `batchGet`/`batchWrite`  |
+| Reading/writing 3+ preferences        | Use `batchRead`/`batchWrite`  |
 | Read-modify-write on multiple values  | Use `batchUpdate`            |
 | Resetting or deleting multiple prefs  | Use `batchWrite`             |
 | UI settings screens saving all fields | Use `batchWrite`             |

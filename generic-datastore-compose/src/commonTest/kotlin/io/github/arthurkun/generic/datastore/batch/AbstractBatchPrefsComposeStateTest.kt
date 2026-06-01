@@ -143,7 +143,7 @@ abstract class AbstractBatchPrefsComposeStateTest {
         assertEquals("fallback", preference.get())
     }
 
-    private suspend fun currentSnapshot(): BatchReadScope = preferenceDatastore.batchGet { this }
+    private suspend fun currentSnapshot(): BatchReadScope = preferenceDatastore.batchRead { this }
 }
 
 private class CountingPreferencesDatastore(

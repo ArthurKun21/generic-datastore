@@ -21,6 +21,7 @@ import io.github.arthurkun.generic.datastore.preferences.Preference
  * }
  * ```
  */
+@PreferencesBatchDsl
 public class BatchUpdateScope internal constructor(
     private val mutablePreferences: MutablePreferences,
 ) {

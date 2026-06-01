@@ -182,7 +182,7 @@ Current Preferences API surface:
 | Kotlin Serialization | `kserialized`, `kserializedSet`, `kserializedList`, `nullableKserialized`, `nullableKserializedList` |
 | Enum helpers | `enum`, `enumSet`, `nullableEnum` |
 | Reads and writes | `get`, `set`, `update`, `delete`, `resetToDefault`, `asFlow`, `stateIn`, `stateInCurrent`, blocking variants, property delegation |
-| Batch operations | `batchReadFlow`, `batchGet`, `batchWrite`, `batchUpdate`, `batchGetBlocking`, `batchWriteBlocking`, `batchUpdateBlocking` |
+| Batch operations | `batchReadFlow`, `batchRead`, `batchWrite`, `batchUpdate`, `batchReadBlocking`, `batchWriteBlocking`, `batchUpdateBlocking` |
 | Backup and restore | `exportAsData`, `exportAsString`, `importData`, `importDataAsString`, `clearAll` |
 | Utilities | `map`, `mapIO`, `toggle`, `toJsonElement`, `toJsonMap`, `BasePreference.privateKey`, `BasePreference.appStateKey` |
 | Deprecated compatibility | `GenericPreferenceDatastore`, `export`, `import` |
@@ -530,8 +530,9 @@ val key: String = userName.key()
 
 ### Batch Operations
 
-Batch operations let you read or write multiple preferences in a single DataStore transaction,
-avoiding redundant I/O and ensuring atomicity.
+Batch operations let you read multiple preferences from one DataStore snapshot or write multiple
+preferences in one DataStore transaction, avoiding redundant I/O and keeping related values
+consistent.
 
 #### Batch Read
 
@@ -548,7 +549,7 @@ class SettingsViewModel(
 
     fun loadSettings() {
         viewModelScope.launch {
-            val (name, isDark, vol) = datastore.batchGet {
+            val (name, isDark, vol) = datastore.batchRead {
                 Triple(get(userName), get(darkMode), get(volume))
             }
         }
@@ -556,10 +557,41 @@ class SettingsViewModel(
 }
 ```
 
+You can use either `get(pref)` or the index operator `this[pref]`. For reusable read models,
+define an extension on `BatchReadScope` and call it from `batchRead` or `batchReadFlow`:
+
+```kotlin
+data class SettingsSnapshot(
+    val userName: String,
+    val darkMode: Boolean,
+    val volume: Float,
+)
+
+class SettingsRepository(
+    private val datastore: PreferencesDatastore,
+) {
+    private val userName = datastore.string("user_name", "Guest")
+    private val darkMode = datastore.bool("dark_mode", false)
+    private val volume = datastore.float("volume", 1.0f)
+
+    private fun BatchReadScope.settingsSnapshot() = SettingsSnapshot(
+        userName = this[userName],
+        darkMode = this[darkMode],
+        volume = this[volume],
+    )
+
+    suspend fun loadSettings() = datastore.batchRead { settingsSnapshot() }
+}
+```
+
+The batch scopes are marked with a Kotlin DSL marker, so if you nest batch operations inside other
+DSLs, qualify the receiver explicitly when needed.
+
 #### Batch Read Flow
 
 Observe multiple preferences reactively from the same snapshot. The flow re-emits whenever any
-preference in the datastore changes:
+preference in the datastore changes. Pass `distinctUntilChanged = true` when the derived value
+should only emit after it changes according to `equals`:
 
 ```kotlin
 class SettingsViewModel(
@@ -570,10 +602,9 @@ class SettingsViewModel(
     private val darkMode = datastore.bool("dark_mode", false)
 
     val settingsFlow: Flow<Pair<String, Boolean>> = datastore
-        .batchReadFlow {
+        .batchReadFlow(distinctUntilChanged = true) {
             get(userName) to get(darkMode)
         }
-        .distinctUntilChanged()
 }
 ```
 
@@ -645,7 +676,7 @@ Blocking variants are available for non-coroutine contexts. Avoid calling these 
 thread:
 
 ```kotlin
-val (name, isDark) = datastore.batchGetBlocking {
+val (name, isDark) = datastore.batchReadBlocking {
     get(userName) to get(darkMode)
 }
 

@@ -4,6 +4,15 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 
 /**
+ * Marks the receiver scope used by preference batch operations.
+ *
+ * This prevents accidental calls to a batch read/write/update receiver from nested Kotlin DSLs
+ * without explicitly qualifying the receiver (for example, `this@batchRead[pref]`).
+ */
+@DslMarker
+public annotation class PreferencesBatchDsl
+
+/**
  * Internal contract that exposes snapshot and transaction access for a preference.
  *
  * Batch scopes use this interface to read and write values without each preference performing its

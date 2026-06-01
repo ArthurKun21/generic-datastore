@@ -50,6 +50,7 @@ import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
@@ -533,13 +534,18 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         ),
     )
 
-    override fun <R> batchReadFlow(block: BatchReadScope.() -> R): Flow<R> =
-        datastore.dataOrEmpty.map { mutablePrefs ->
+    override fun <R> batchReadFlow(
+        distinctUntilChanged: Boolean,
+        block: BatchReadScope.() -> R,
+    ): Flow<R> {
+        val flow = datastore.dataOrEmpty.map { mutablePrefs ->
             BatchReadScope(mutablePrefs).block()
         }
+        return if (distinctUntilChanged) flow.distinctUntilChanged() else flow
+    }
 
-    override suspend fun <R> batchGet(block: BatchReadScope.() -> R): R =
-        batchReadFlow(block).first()
+    override suspend fun <R> batchRead(block: BatchReadScope.() -> R): R =
+        batchReadFlow(block = block).first()
 
     override suspend fun batchWrite(block: BatchWriteScope.() -> Unit) {
         datastore.edit { mutablePrefs ->
@@ -553,8 +559,8 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         }
     }
 
-    override fun <R> batchGetBlocking(block: BatchReadScope.() -> R): R =
-        runBlocking { batchGet(block) }
+    override fun <R> batchReadBlocking(block: BatchReadScope.() -> R): R =
+        runBlocking { batchRead(block) }
 
     override fun batchWriteBlocking(block: BatchWriteScope.() -> Unit): Unit =
         runBlocking { batchWrite(block) }

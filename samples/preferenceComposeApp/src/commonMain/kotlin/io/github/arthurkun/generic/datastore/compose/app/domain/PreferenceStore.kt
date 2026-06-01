@@ -163,7 +163,7 @@ class PreferenceStore(
                 Triple(get(text), get(num), get(bool))
             }
             val batchFlowValue = batchFlow.getFirstForShowcase()
-            val batchGetValue = datastore.batchGet {
+            val batchReadValue = datastore.batchRead {
                 Triple(get(text), get(num), get(bool))
             }
             datastore.batchUpdate {
@@ -171,13 +171,13 @@ class PreferenceStore(
                 update(num) { it + 1 }
                 resetToDefault(bool)
             }
-            val blockingValue = datastore.batchGetBlocking {
+            val blockingValue = datastore.batchReadBlocking {
                 Triple(get(text), get(num), get(bool))
             }
             datastore.batchWriteBlocking {
-                set(text, batchGetValue.first)
-                set(num, batchGetValue.second)
-                set(bool, batchGetValue.third)
+                set(text, batchReadValue.first)
+                set(num, batchReadValue.second)
+                set(bool, batchReadValue.third)
             }
             datastore.batchUpdateBlocking {
                 delete(nullableStringPref)

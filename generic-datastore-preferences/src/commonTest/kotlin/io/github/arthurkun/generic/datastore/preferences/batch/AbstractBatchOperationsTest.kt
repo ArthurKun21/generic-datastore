@@ -12,7 +12,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.reflect.KProperty
 import kotlin.test.Test
@@ -26,15 +30,15 @@ abstract class AbstractBatchOperationsTest {
     abstract val dataStore: DataStore<Preferences>
     abstract val testDispatcher: TestDispatcher
 
-    // -- batchGet tests --
+    // -- batchRead tests --
 
     @Test
-    fun batchGet_readMultiplePrimitivePreferences() = runTest(testDispatcher) {
+    fun batchRead_readMultiplePrimitivePreferences() = runTest(testDispatcher) {
         val stringPref = preferenceDatastore.string("batch_string", "hello")
         val intPref = preferenceDatastore.int("batch_int", 42)
         val boolPref = preferenceDatastore.bool("batch_bool", true)
 
-        val result = preferenceDatastore.batchGet {
+        val result = preferenceDatastore.batchRead {
             Triple(get(stringPref), get(intPref), get(boolPref))
         }
 
@@ -44,7 +48,7 @@ abstract class AbstractBatchOperationsTest {
     }
 
     @Test
-    fun batchGet_readMixedTypes() = runTest(testDispatcher) {
+    fun batchRead_readMixedTypes() = runTest(testDispatcher) {
         val stringPref = preferenceDatastore.string("batch_mixed_str", "default")
         val longPref = preferenceDatastore.long("batch_mixed_long", 100L)
         val floatPref = preferenceDatastore.float("batch_mixed_float", 1.5f)
@@ -53,7 +57,7 @@ abstract class AbstractBatchOperationsTest {
         stringPref.set("updated")
         longPref.set(200L)
 
-        val result = preferenceDatastore.batchGet {
+        val result = preferenceDatastore.batchRead {
             listOf(
                 get(stringPref),
                 get(longPref).toString(),
@@ -69,11 +73,11 @@ abstract class AbstractBatchOperationsTest {
     }
 
     @Test
-    fun batchGet_readNullablePreferences() = runTest(testDispatcher) {
+    fun batchRead_readNullablePreferences() = runTest(testDispatcher) {
         val nullableString = preferenceDatastore.nullableString("batch_nullable_str")
         val nullableInt = preferenceDatastore.nullableInt("batch_nullable_int")
 
-        val result = preferenceDatastore.batchGet {
+        val result = preferenceDatastore.batchRead {
             Pair(get(nullableString), get(nullableInt))
         }
 
@@ -82,14 +86,14 @@ abstract class AbstractBatchOperationsTest {
     }
 
     @Test
-    fun batchGet_readNullablePreferencesWithValues() = runTest(testDispatcher) {
+    fun batchRead_readNullablePreferencesWithValues() = runTest(testDispatcher) {
         val nullableString = preferenceDatastore.nullableString("batch_nullable_val_str")
         val nullableInt = preferenceDatastore.nullableInt("batch_nullable_val_int")
 
         nullableString.set("present")
         nullableInt.set(99)
 
-        val result = preferenceDatastore.batchGet {
+        val result = preferenceDatastore.batchRead {
             Pair(get(nullableString), get(nullableInt))
         }
 
@@ -98,7 +102,7 @@ abstract class AbstractBatchOperationsTest {
     }
 
     @Test
-    fun batchGet_readCustomSerializedPreference() = runTest(testDispatcher) {
+    fun batchRead_readCustomSerializedPreference() = runTest(testDispatcher) {
         val customPref = preferenceDatastore.serialized(
             key = "batch_custom",
             defaultValue = "default_custom",
@@ -108,7 +112,7 @@ abstract class AbstractBatchOperationsTest {
 
         customPref.set("hello")
 
-        val result = preferenceDatastore.batchGet {
+        val result = preferenceDatastore.batchRead {
             get(customPref)
         }
 
@@ -116,7 +120,7 @@ abstract class AbstractBatchOperationsTest {
     }
 
     @Test
-    fun batchGet_readSerializedSetPreference() = runTest(testDispatcher) {
+    fun batchRead_readSerializedSetPreference() = runTest(testDispatcher) {
         val setPref = preferenceDatastore.serializedSet(
             key = "batch_set",
             defaultValue = emptySet(),
@@ -126,7 +130,7 @@ abstract class AbstractBatchOperationsTest {
 
         setPref.set(setOf(1, 2, 3))
 
-        val result = preferenceDatastore.batchGet {
+        val result = preferenceDatastore.batchRead {
             get(setPref)
         }
 
@@ -134,10 +138,10 @@ abstract class AbstractBatchOperationsTest {
     }
 
     @Test
-    fun batchGet_indexOperatorSyntax() = runTest(testDispatcher) {
+    fun batchRead_indexOperatorSyntax() = runTest(testDispatcher) {
         val pref = preferenceDatastore.string("batch_idx_get", "indexed")
 
-        val result = preferenceDatastore.batchGet {
+        val result = preferenceDatastore.batchRead {
             this[pref]
         }
 
@@ -165,6 +169,28 @@ abstract class AbstractBatchOperationsTest {
             }
             .first()
         assertEquals("after", updated)
+    }
+
+    @Test
+    fun batchReadFlow_distinctUntilChangedSuppressesEqualDerivedValues() = runTest(testDispatcher) {
+        val intPref = preferenceDatastore.int("batch_flow_distinct", 0)
+        val emissions = mutableListOf<String>()
+
+        val collection = backgroundScope.launch(testDispatcher) {
+            preferenceDatastore
+                .batchReadFlow(distinctUntilChanged = true) {
+                    if (this[intPref] % 2 == 0) "even" else "odd"
+                }
+                .take(2)
+                .toList(emissions)
+        }
+
+        runCurrent()
+        intPref.set(2)
+        intPref.set(3)
+        collection.join()
+
+        assertEquals(listOf("even", "odd"), emissions)
     }
 
     // -- batchWrite tests --
@@ -356,7 +382,7 @@ abstract class AbstractBatchOperationsTest {
     // -- mapped preferences in batch --
 
     @Test
-    fun batchGet_mappedPreferenceWorks() = runTest(testDispatcher) {
+    fun batchRead_mappedPreferenceWorks() = runTest(testDispatcher) {
         val intPref = preferenceDatastore.int("batch_mapped", 10)
         val mappedPref = intPref.mapIO(
             convert = { v: Int -> v.toString() },
@@ -365,7 +391,7 @@ abstract class AbstractBatchOperationsTest {
 
         intPref.set(42)
 
-        val result = preferenceDatastore.batchGet {
+        val result = preferenceDatastore.batchRead {
             get(mappedPref)
         }
 
@@ -388,7 +414,7 @@ abstract class AbstractBatchOperationsTest {
     }
 
     @Test
-    fun batchGet_mappedCustomPreferenceThrowsIllegalStateException() = runTest(testDispatcher) {
+    fun batchRead_mappedCustomPreferenceThrowsIllegalStateException() = runTest(testDispatcher) {
         val customPref = object : Preference<Int> {
             override fun key(): String = "custom"
             override suspend fun get(): Int = defaultValue
@@ -412,7 +438,7 @@ abstract class AbstractBatchOperationsTest {
         )
 
         try {
-            preferenceDatastore.batchGet {
+            preferenceDatastore.batchRead {
                 get(mappedPref)
             }
             fail("Expected mapped custom preference to fail batch access")
