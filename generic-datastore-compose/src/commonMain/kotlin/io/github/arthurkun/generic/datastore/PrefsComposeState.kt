@@ -70,7 +70,14 @@ internal class PrefsComposeState<T>(
                     } catch (e: CancellationException) {
                         throw e
                     } catch (_: Exception) {
-                        localOverride = Unset
+                        val currentOverride = localOverride
+                        if (currentOverride !== Unset) {
+                            @Suppress("UNCHECKED_CAST")
+                            val override = currentOverride as T
+                            if (policy.equivalent(override, value)) {
+                                localOverride = Unset
+                            }
+                        }
                     }
                 }
             }

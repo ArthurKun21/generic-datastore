@@ -77,7 +77,10 @@ internal class BatchPrefsComposeState<T>(
                     } catch (e: CancellationException) {
                         throw e
                     } catch (_: Exception) {
-                        localOverride = Unset
+                        val currentOverride = localOverride
+                        if (currentOverride !== Unset && policy.equivalent(currentOverride, value)) {
+                            localOverride = Unset
+                        }
                     }
                 }
             }
