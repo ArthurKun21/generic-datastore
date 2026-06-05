@@ -19,11 +19,22 @@ kotlin {
         commonMain.dependencies {
             api(project(":generic-datastore-core"))
             implementation(libs.coroutines.core)
-            api(libs.datastore.preferences.core)
-            api(libs.datastore.core)
+            compileOnly(libs.datastore.preferences.core)
             api(libs.okio)
             implementation(libs.kotlinx.io.core)
             implementation(libs.kotlinx.serialization.json)
+        }
+
+        androidMain.dependencies {
+            api(libs.datastore.preferences)
+        }
+
+        jvmMain.dependencies {
+            api(libs.datastore.preferences.core)
+        }
+
+        iosMain.dependencies {
+            api(libs.datastore.preferences.core)
         }
     }
 }
