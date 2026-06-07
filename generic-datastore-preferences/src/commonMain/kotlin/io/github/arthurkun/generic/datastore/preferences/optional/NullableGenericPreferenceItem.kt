@@ -54,7 +54,7 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
         }
     }
 
-    override suspend fun set(value: T?): Unit {
+    override suspend fun set(value: T?) {
         withContext(ioDispatcher) {
             if (value == null) {
                 datastore.edit { ds ->
@@ -68,7 +68,7 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
         }
     }
 
-    override suspend fun update(transform: (T?) -> T?): Unit {
+    override suspend fun update(transform: (T?) -> T?) {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 val current = ds[preferences]
@@ -82,7 +82,7 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
         }
     }
 
-    override suspend fun delete(): Unit {
+    override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 ds.remove(preferences)
@@ -107,7 +107,7 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
         get()
     }
 
-    override fun setBlocking(value: T?): Unit {
+    override fun setBlocking(value: T?) {
         runBlocking {
             set(value)
         }
@@ -116,7 +116,7 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
     override fun readFrom(preferences: Preferences): T? =
         preferences[this.preferences]
 
-    override fun writeInto(mutablePreferences: MutablePreferences, value: T?): Unit {
+    override fun writeInto(mutablePreferences: MutablePreferences, value: T?) {
         if (value == null) {
             mutablePreferences.remove(this.preferences)
         } else {
@@ -124,7 +124,7 @@ internal sealed class NullableGenericPreferenceItem<T : Any>(
         }
     }
 
-    override fun removeFrom(mutablePreferences: MutablePreferences): Unit {
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
         mutablePreferences.remove(this.preferences)
     }
 }

@@ -40,13 +40,13 @@ internal open class ProtoSerialFieldPreference<P, T>(
         asFlow().first()
     }
 
-    override suspend fun set(value: T): Unit {
+    override suspend fun set(value: T) {
         withContext(ioDispatcher) {
             datastore.updateData { current -> updater(current, value) }
         }
     }
 
-    override suspend fun update(transform: (T) -> T): Unit {
+    override suspend fun update(transform: (T) -> T) {
         withContext(ioDispatcher) {
             datastore.updateData { current ->
                 val currentField = getter(current)

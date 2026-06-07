@@ -69,7 +69,7 @@ internal sealed class GenericPreferenceItem<T>(
      * This is a suspending function.
      * @param value The new value to store for this preference.
      */
-    override suspend fun set(value: T): Unit {
+    override suspend fun set(value: T) {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 ds[preferences] = value
@@ -81,7 +81,7 @@ internal sealed class GenericPreferenceItem<T>(
      * Atomically reads the current value and applies [transform] to compute a new value,
      * then writes it back in a single [datastore.edit] transaction.
      */
-    override suspend fun update(transform: (T) -> T): Unit {
+    override suspend fun update(transform: (T) -> T) {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 val current = ds[preferences] ?: defaultValue
@@ -94,7 +94,7 @@ internal sealed class GenericPreferenceItem<T>(
      * Removes the preference from the DataStore.
      * This is a suspending function.
      */
-    override suspend fun delete(): Unit {
+    override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 ds.remove(preferences)
@@ -144,7 +144,7 @@ internal sealed class GenericPreferenceItem<T>(
      * Use with caution due to potential blocking.
      * @param value The new value to store for this preference.
      */
-    override fun setBlocking(value: T): Unit {
+    override fun setBlocking(value: T) {
         runBlocking {
             set(value)
         }
@@ -153,11 +153,11 @@ internal sealed class GenericPreferenceItem<T>(
     override fun readFrom(preferences: Preferences): T =
         preferences[this.preferences] ?: defaultValue
 
-    override fun writeInto(mutablePreferences: MutablePreferences, value: T): Unit {
+    override fun writeInto(mutablePreferences: MutablePreferences, value: T) {
         mutablePreferences[this.preferences] = value
     }
 
-    override fun removeFrom(mutablePreferences: MutablePreferences): Unit {
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
         mutablePreferences.remove(this.preferences)
     }
 }

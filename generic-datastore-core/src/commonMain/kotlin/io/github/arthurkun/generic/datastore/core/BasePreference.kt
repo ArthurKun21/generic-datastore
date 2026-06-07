@@ -44,7 +44,7 @@ public interface BasePreference<T> {
      *
      * @param transform A function that receives the current value and returns the new value.
      */
-    public suspend fun update(transform: (T) -> T) : Unit
+    public suspend fun update(transform: (T) -> T): Unit
 
     /**
      * Deletes the preference from the underlying storage.

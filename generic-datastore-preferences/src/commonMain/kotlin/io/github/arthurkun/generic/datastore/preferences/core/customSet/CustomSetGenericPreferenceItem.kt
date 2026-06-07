@@ -61,7 +61,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun set(value: Set<T>): Unit {
+    override suspend fun set(value: Set<T>) {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
                 prefs[stringSetPrefKey] = value.map { serializer(it) }.toSet()
@@ -69,7 +69,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun update(transform: (Set<T>) -> Set<T>): Unit {
+    override suspend fun update(transform: (Set<T>) -> Set<T>) {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
                 val current = prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
@@ -79,7 +79,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun delete(): Unit {
+    override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
                 prefs.remove(stringSetPrefKey)
@@ -120,11 +120,11 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
     override fun readFrom(preferences: Preferences): Set<T> =
         preferences[stringSetPrefKey]?.let { safeDeserializeSet(it) } ?: defaultValue
 
-    override fun writeInto(mutablePreferences: MutablePreferences, value: Set<T>): Unit {
+    override fun writeInto(mutablePreferences: MutablePreferences, value: Set<T>) {
         mutablePreferences[stringSetPrefKey] = value.map { serializer(it) }.toSet()
     }
 
-    override fun removeFrom(mutablePreferences: MutablePreferences): Unit {
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
         mutablePreferences.remove(stringSetPrefKey)
     }
 }

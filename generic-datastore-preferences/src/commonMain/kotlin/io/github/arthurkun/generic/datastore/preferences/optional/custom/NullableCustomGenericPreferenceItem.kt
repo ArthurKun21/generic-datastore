@@ -61,7 +61,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    override suspend fun set(value: T?): Unit {
+    override suspend fun set(value: T?) {
         withContext(ioDispatcher) {
             if (value == null) {
                 datastore.edit { ds ->
@@ -75,7 +75,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    override suspend fun update(transform: (T?) -> T?): Unit {
+    override suspend fun update(transform: (T?) -> T?) {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 val current = ds[stringPrefKey]?.let { safeDeserialize(it) }
@@ -89,7 +89,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    override suspend fun delete(): Unit {
+    override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 ds.remove(stringPrefKey)
@@ -112,7 +112,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         get()
     }
 
-    override fun setBlocking(value: T?): Unit {
+    override fun setBlocking(value: T?) {
         runBlocking {
             set(value)
         }
@@ -131,7 +131,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
     override fun readFrom(preferences: Preferences): T? =
         preferences[stringPrefKey]?.let { safeDeserialize(it) }
 
-    override fun writeInto(mutablePreferences: MutablePreferences, value: T?): Unit {
+    override fun writeInto(mutablePreferences: MutablePreferences, value: T?) {
         if (value == null) {
             mutablePreferences.remove(stringPrefKey)
         } else {
@@ -139,7 +139,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    override fun removeFrom(mutablePreferences: MutablePreferences): Unit {
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
         mutablePreferences.remove(stringPrefKey)
     }
 }
