@@ -1,0 +1,13 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <GenericDataStore:generic-datastore>
+final fun (kotlin/Any?).io.github.arthurkun.generic.datastore/toJsonElement(): kotlinx.serialization.json/JsonElement // io.github.arthurkun.generic.datastore/toJsonElement|toJsonElement@kotlin.Any?(){}[0]
+final fun (kotlin/String).io.github.arthurkun.generic.datastore/toJsonMap(): kotlin.collections/Map<kotlin/String, kotlin/Any> // io.github.arthurkun.generic.datastore/toJsonMap|toJsonMap@kotlin.String(){}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (io.github.arthurkun.generic.datastore.preferences/Preference<#A>).io.github.arthurkun.generic.datastore/map(#B, kotlin/Function1<#A, #B>, kotlin/Function1<#B, #A>): io.github.arthurkun.generic.datastore.preferences/Preference<#B> // io.github.arthurkun.generic.datastore/map|map@io.github.arthurkun.generic.datastore.preferences.Preference<0:0>(0:1;kotlin.Function1<0:0,0:1>;kotlin.Function1<0:1,0:0>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (io.github.arthurkun.generic.datastore.preferences/Preference<#A>).io.github.arthurkun.generic.datastore/mapIO(kotlin/Function1<#A, #B>, kotlin/Function1<#B, #A>): io.github.arthurkun.generic.datastore.preferences/Preference<#B> // io.github.arthurkun.generic.datastore/mapIO|mapIO@io.github.arthurkun.generic.datastore.preferences.Preference<0:0>(kotlin.Function1<0:0,0:1>;kotlin.Function1<0:1,0:0>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final inline fun <#A: reified kotlin/Enum<#A>> (io.github.arthurkun.generic.datastore.preferences/PreferencesDatastore).io.github.arthurkun.generic.datastore/enum(kotlin/String, #A): io.github.arthurkun.generic.datastore.preferences/Preference<#A> // io.github.arthurkun.generic.datastore/enum|enum@io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore(kotlin.String;0:0){0§<kotlin.Enum<0:0>>}[0]

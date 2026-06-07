@@ -35,12 +35,12 @@ internal interface PreferencesAccessor<T> {
      * @param mutablePreferences The mutable preferences to write into.
      * @param value The value to write.
      */
-    fun writeInto(mutablePreferences: MutablePreferences, value: T)
+    fun writeInto(mutablePreferences: MutablePreferences, value: T): Unit
 
     /**
      * Removes this preference's key from [MutablePreferences].
      *
      * @param mutablePreferences The mutable preferences to remove from.
      */
-    fun removeFrom(mutablePreferences: MutablePreferences)
+    fun removeFrom(mutablePreferences: MutablePreferences): Unit
 }

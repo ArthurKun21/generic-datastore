@@ -102,7 +102,7 @@ internal sealed class GenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun resetToDefault() = set(defaultValue)
+    override suspend fun resetToDefault(): Unit = set(defaultValue)
 
     /**
      * Returns a [Flow] that emits the preference's current value and subsequent updates from DataStore.

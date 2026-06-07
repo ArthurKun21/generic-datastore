@@ -26,6 +26,15 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
                 configureKmpLibrary()
                 explicitApi()
 
+                @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
+                abiValidation {
+                    filters {
+                        exclude {
+                            annotatedWith.add("io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi")
+                        }
+                    }
+                }
+
                 applyDefaultHierarchyTemplate()
 
                 targets.withType<KotlinMultiplatformAndroidLibraryTarget>().configureEach {

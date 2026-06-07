@@ -30,9 +30,9 @@ internal class GenericProtoPreferenceItem<T>(
         defaultProtoValue = defaultValue,
     ) {
 
-    override fun resetToDefaultBlocking() = setBlocking(defaultValue)
+    override fun resetToDefaultBlocking(): Unit = setBlocking(defaultValue)
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = getBlocking()
 
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = setBlocking(value)
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T): Unit = setBlocking(value)
 }

@@ -87,7 +87,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun resetToDefault() = set(defaultValue)
+    override suspend fun resetToDefault(): Unit = set(defaultValue)
 
     override fun asFlow(): Flow<Set<T>> {
         return datastore.dataOrEmpty.map { prefs ->
@@ -101,7 +101,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
 
     override fun getBlocking(): Set<T> = runBlocking { get() }
 
-    override fun setBlocking(value: Set<T>) = runBlocking { set(value) }
+    override fun setBlocking(value: Set<T>): Unit = runBlocking { set(value) }
 
     private fun safeDeserializeSet(values: Set<String>): Set<T> {
         val elements = mutableSetOf<T>()

@@ -88,7 +88,7 @@ internal sealed class CustomGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun resetToDefault() = set(defaultValue)
+    override suspend fun resetToDefault(): Unit = set(defaultValue)
 
     override fun asFlow(): Flow<T> {
         return datastore.dataOrEmpty.map { prefs ->

@@ -1,0 +1,48 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <GenericDataStore:generic-datastore-core>
+open annotation class io.github.arthurkun.generic.datastore.core/InternalGenericDatastoreApi : kotlin/Annotation { // io.github.arthurkun.generic.datastore.core/InternalGenericDatastoreApi|null[0]
+    constructor <init>() // io.github.arthurkun.generic.datastore.core/InternalGenericDatastoreApi.<init>|<init>(){}[0]
+}
+
+abstract interface <#A: kotlin/Any?> io.github.arthurkun.generic.datastore.core/BasePreference { // io.github.arthurkun.generic.datastore.core/BasePreference|null[0]
+    abstract val defaultValue // io.github.arthurkun.generic.datastore.core/BasePreference.defaultValue|{}defaultValue[0]
+        abstract fun <get-defaultValue>(): #A // io.github.arthurkun.generic.datastore.core/BasePreference.defaultValue.<get-defaultValue>|<get-defaultValue>(){}[0]
+
+    abstract fun asFlow(): kotlinx.coroutines.flow/Flow<#A> // io.github.arthurkun.generic.datastore.core/BasePreference.asFlow|asFlow(){}[0]
+    abstract fun getBlocking(): #A // io.github.arthurkun.generic.datastore.core/BasePreference.getBlocking|getBlocking(){}[0]
+    abstract fun key(): kotlin/String // io.github.arthurkun.generic.datastore.core/BasePreference.key|key(){}[0]
+    abstract fun setBlocking(#A) // io.github.arthurkun.generic.datastore.core/BasePreference.setBlocking|setBlocking(1:0){}[0]
+    abstract fun stateIn(kotlinx.coroutines/CoroutineScope, kotlinx.coroutines.flow/SharingStarted = ...): kotlinx.coroutines.flow/StateFlow<#A> // io.github.arthurkun.generic.datastore.core/BasePreference.stateIn|stateIn(kotlinx.coroutines.CoroutineScope;kotlinx.coroutines.flow.SharingStarted){}[0]
+    abstract suspend fun delete() // io.github.arthurkun.generic.datastore.core/BasePreference.delete|delete(){}[0]
+    abstract suspend fun get(): #A // io.github.arthurkun.generic.datastore.core/BasePreference.get|get(){}[0]
+    abstract suspend fun resetToDefault() // io.github.arthurkun.generic.datastore.core/BasePreference.resetToDefault|resetToDefault(){}[0]
+    abstract suspend fun set(#A) // io.github.arthurkun.generic.datastore.core/BasePreference.set|set(1:0){}[0]
+    abstract suspend fun update(kotlin/Function1<#A, #A>) // io.github.arthurkun.generic.datastore.core/BasePreference.update|update(kotlin.Function1<1:0,1:0>){}[0]
+    open fun getValue(): #A // io.github.arthurkun.generic.datastore.core/BasePreference.getValue|getValue(){}[0]
+    open fun setValue(#A) // io.github.arthurkun.generic.datastore.core/BasePreference.setValue|setValue(1:0){}[0]
+    open suspend fun stateInCurrent(kotlinx.coroutines/CoroutineScope, kotlinx.coroutines.flow/SharingStarted = ...): kotlinx.coroutines.flow/StateFlow<#A> // io.github.arthurkun.generic.datastore.core/BasePreference.stateInCurrent|stateInCurrent(kotlinx.coroutines.CoroutineScope;kotlinx.coroutines.flow.SharingStarted){}[0]
+
+    final object Companion { // io.github.arthurkun.generic.datastore.core/BasePreference.Companion|null[0]
+        final fun appStateKey(kotlin/String): kotlin/String // io.github.arthurkun.generic.datastore.core/BasePreference.Companion.appStateKey|appStateKey(kotlin.String){}[0]
+        final fun isAppState(kotlin/String): kotlin/Boolean // io.github.arthurkun.generic.datastore.core/BasePreference.Companion.isAppState|isAppState(kotlin.String){}[0]
+        final fun isPrivate(kotlin/String): kotlin/Boolean // io.github.arthurkun.generic.datastore.core/BasePreference.Companion.isPrivate|isPrivate(kotlin.String){}[0]
+        final fun privateKey(kotlin/String): kotlin/String // io.github.arthurkun.generic.datastore.core/BasePreference.Companion.privateKey|privateKey(kotlin.String){}[0]
+    }
+}
+
+abstract interface <#A: kotlin/Any?> io.github.arthurkun.generic.datastore.core/DelegatedPreference : io.github.arthurkun.generic.datastore.core/BasePreference<#A>, kotlin.properties/ReadWriteProperty<kotlin/Any?, #A> { // io.github.arthurkun.generic.datastore.core/DelegatedPreference|null[0]
+    abstract fun resetToDefaultBlocking() // io.github.arthurkun.generic.datastore.core/DelegatedPreference.resetToDefaultBlocking|resetToDefaultBlocking(){}[0]
+}
+
+final object io.github.arthurkun.generic.datastore.core/PreferenceDefaults { // io.github.arthurkun.generic.datastore.core/PreferenceDefaults|null[0]
+    final val defaultJson // io.github.arthurkun.generic.datastore.core/PreferenceDefaults.defaultJson|{}defaultJson[0]
+        final fun <get-defaultJson>(): kotlinx.serialization.json/Json // io.github.arthurkun.generic.datastore.core/PreferenceDefaults.defaultJson.<get-defaultJson>|<get-defaultJson>(){}[0]
+}
+
+final fun <#A: kotlin/Any?> (io.github.arthurkun.generic.datastore.core/DelegatedPreference<#A>).io.github.arthurkun.generic.datastore.core/distinctFlow(): kotlinx.coroutines.flow/Flow<#A> // io.github.arthurkun.generic.datastore.core/distinctFlow|distinctFlow@io.github.arthurkun.generic.datastore.core.DelegatedPreference<0:0>(){0§<kotlin.Any?>}[0]

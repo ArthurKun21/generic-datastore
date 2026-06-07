@@ -1,0 +1,65 @@
+name: ABI Validation
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '.idea/**'
+      - 'jitpack.yml'
+      - '**/.gitignore'
+      - '**/*.md'
+      - '.github/**.md'
+  pull_request:
+    paths:
+      - 'gradle/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'generic-datastore-core/build.gradle.kts'
+      - 'generic-datastore-core/src/**'
+      - 'generic-datastore-preferences/build.gradle.kts'
+      - 'generic-datastore-preferences/src/**'
+      - 'generic-datastore-proto/build.gradle.kts'
+      - 'generic-datastore-proto/src/**'
+      - 'generic-datastore/build.gradle.kts'
+      - 'generic-datastore/src/**'
+      - 'generic-datastore-compose/build.gradle.kts'
+      - 'generic-datastore-compose/src/**'
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: 21
+  JAVA_DISTRO: 'temurin'
+
+concurrency:
+  group: ${{ github.ref }}-abi
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  abi:
+    name: Check ABI compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
+
+      - name: Set up gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Check ABI compatibility
+        run: >-
+          ./gradlew
+          :generic-datastore:checkKotlinAbi
+          :generic-datastore-core:checkKotlinAbi
+          :generic-datastore-preferences:checkKotlinAbi
+          :generic-datastore-proto:checkKotlinAbi
+          :generic-datastore-compose:checkKotlinAbi

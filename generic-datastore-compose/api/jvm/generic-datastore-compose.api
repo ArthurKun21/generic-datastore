@@ -1,0 +1,94 @@
+public final class io/github/arthurkun/generic/datastore/RememberKt {
+	public static final fun remember (Lio/github/arthurkun/generic/datastore/core/DelegatedPreference;Lkotlin/coroutines/CoroutineContext;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Landroidx/compose/runtime/MutableState;
+}
+
+public final class io/github/arthurkun/generic/datastore/batch/LocalPreferencesDatastoreKt {
+	public static final fun ProvidePreferencesDatastore (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)V
+	public static final fun getLocalPreferencesDatastore ()Landroidx/compose/runtime/ProvidableCompositionLocal;
+}
+
+public final class io/github/arthurkun/generic/datastore/batch/PreferencesState2 {
+	public static final field $stable I
+	public final fun component1 ()Landroidx/compose/runtime/MutableState;
+	public final fun component2 ()Landroidx/compose/runtime/MutableState;
+	public final fun getFirst ()Ljava/lang/Object;
+	public final fun getSecond ()Ljava/lang/Object;
+	public final fun getValue (Ljava/lang/Object;Lkotlin/reflect/KProperty;)Lio/github/arthurkun/generic/datastore/batch/PreferencesState2;
+	public final fun setFirst (Ljava/lang/Object;)V
+	public final fun setSecond (Ljava/lang/Object;)V
+}
+
+public final class io/github/arthurkun/generic/datastore/batch/PreferencesState3 {
+	public static final field $stable I
+	public final fun component1 ()Landroidx/compose/runtime/MutableState;
+	public final fun component2 ()Landroidx/compose/runtime/MutableState;
+	public final fun component3 ()Landroidx/compose/runtime/MutableState;
+	public final fun getFirst ()Ljava/lang/Object;
+	public final fun getSecond ()Ljava/lang/Object;
+	public final fun getThird ()Ljava/lang/Object;
+	public final fun getValue (Ljava/lang/Object;Lkotlin/reflect/KProperty;)Lio/github/arthurkun/generic/datastore/batch/PreferencesState3;
+	public final fun setFirst (Ljava/lang/Object;)V
+	public final fun setSecond (Ljava/lang/Object;)V
+	public final fun setThird (Ljava/lang/Object;)V
+}
+
+public final class io/github/arthurkun/generic/datastore/batch/PreferencesState4 {
+	public static final field $stable I
+	public final fun component1 ()Landroidx/compose/runtime/MutableState;
+	public final fun component2 ()Landroidx/compose/runtime/MutableState;
+	public final fun component3 ()Landroidx/compose/runtime/MutableState;
+	public final fun component4 ()Landroidx/compose/runtime/MutableState;
+	public final fun getFirst ()Ljava/lang/Object;
+	public final fun getFourth ()Ljava/lang/Object;
+	public final fun getSecond ()Ljava/lang/Object;
+	public final fun getThird ()Ljava/lang/Object;
+	public final fun getValue (Ljava/lang/Object;Lkotlin/reflect/KProperty;)Lio/github/arthurkun/generic/datastore/batch/PreferencesState4;
+	public final fun setFirst (Ljava/lang/Object;)V
+	public final fun setFourth (Ljava/lang/Object;)V
+	public final fun setSecond (Ljava/lang/Object;)V
+	public final fun setThird (Ljava/lang/Object;)V
+}
+
+public final class io/github/arthurkun/generic/datastore/batch/PreferencesState5 {
+	public static final field $stable I
+	public final fun component1 ()Landroidx/compose/runtime/MutableState;
+	public final fun component2 ()Landroidx/compose/runtime/MutableState;
+	public final fun component3 ()Landroidx/compose/runtime/MutableState;
+	public final fun component4 ()Landroidx/compose/runtime/MutableState;
+	public final fun component5 ()Landroidx/compose/runtime/MutableState;
+	public final fun getFifth ()Ljava/lang/Object;
+	public final fun getFirst ()Ljava/lang/Object;
+	public final fun getFourth ()Ljava/lang/Object;
+	public final fun getSecond ()Ljava/lang/Object;
+	public final fun getThird ()Ljava/lang/Object;
+	public final fun getValue (Ljava/lang/Object;Lkotlin/reflect/KProperty;)Lio/github/arthurkun/generic/datastore/batch/PreferencesState5;
+	public final fun setFifth (Ljava/lang/Object;)V
+	public final fun setFirst (Ljava/lang/Object;)V
+	public final fun setFourth (Ljava/lang/Object;)V
+	public final fun setSecond (Ljava/lang/Object;)V
+	public final fun setThird (Ljava/lang/Object;)V
+}
+
+public final class io/github/arthurkun/generic/datastore/batch/RememberBatchRead_jvmKt {
+	public static final fun rememberBatchRead (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)Landroidx/compose/runtime/State;
+}
+
+public final class io/github/arthurkun/generic/datastore/batch/RememberPreferencesKt {
+	public static final fun rememberPreferences (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/coroutines/CoroutineContext;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Lio/github/arthurkun/generic/datastore/batch/PreferencesState5;
+	public static final fun rememberPreferences (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/coroutines/CoroutineContext;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Lio/github/arthurkun/generic/datastore/batch/PreferencesState4;
+	public static final fun rememberPreferences (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/coroutines/CoroutineContext;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Lio/github/arthurkun/generic/datastore/batch/PreferencesState3;
+	public static final fun rememberPreferences (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/coroutines/CoroutineContext;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Lio/github/arthurkun/generic/datastore/batch/PreferencesState2;
+}
+
+public final class io/github/arthurkun/generic/datastore/batch/RememberPreferencesLocalKt {
+	public static final fun rememberPreferences (Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/coroutines/CoroutineContext;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Lio/github/arthurkun/generic/datastore/batch/PreferencesState5;
+	public static final fun rememberPreferences (Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/coroutines/CoroutineContext;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Lio/github/arthurkun/generic/datastore/batch/PreferencesState4;
+	public static final fun rememberPreferences (Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/coroutines/CoroutineContext;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Lio/github/arthurkun/generic/datastore/batch/PreferencesState3;
+	public static final fun rememberPreferences (Lio/github/arthurkun/generic/datastore/preferences/Preference;Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/coroutines/CoroutineContext;Landroidx/compose/runtime/SnapshotMutationPolicy;Landroidx/compose/runtime/Composer;II)Lio/github/arthurkun/generic/datastore/batch/PreferencesState2;
+}
+
+public final class io/github/arthurkun/generic/datastore/utils/State_jvmKt {
+	public static final fun collectAsStatePlatform (Lkotlinx/coroutines/flow/Flow;Ljava/lang/Object;Lkotlin/coroutines/CoroutineContext;Landroidx/compose/runtime/Composer;II)Landroidx/compose/runtime/State;
+	public static final fun collectAsStatePlatform (Lkotlinx/coroutines/flow/StateFlow;Landroidx/compose/runtime/Composer;I)Landroidx/compose/runtime/State;
+}
+

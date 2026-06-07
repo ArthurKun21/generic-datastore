@@ -55,9 +55,9 @@ internal open class ProtoSerialFieldPreference<P, T>(
         }
     }
 
-    override suspend fun delete() = resetToDefault()
+    override suspend fun delete(): Unit = resetToDefault()
 
-    override suspend fun resetToDefault() = set(defaultValue)
+    override suspend fun resetToDefault(): Unit = set(defaultValue)
 
     override fun asFlow(): Flow<T> = datastore.data
         .catch { e ->
@@ -71,5 +71,5 @@ internal open class ProtoSerialFieldPreference<P, T>(
 
     override fun getBlocking(): T = runBlocking { get() }
 
-    override fun setBlocking(value: T) = runBlocking { set(value) }
+    override fun setBlocking(value: T): Unit = runBlocking { set(value) }
 }

@@ -97,7 +97,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    override suspend fun resetToDefault() = delete()
+    override suspend fun resetToDefault(): Unit = delete()
 
     override fun asFlow(): Flow<T?> {
         return datastore.dataOrEmpty.map { prefs ->
