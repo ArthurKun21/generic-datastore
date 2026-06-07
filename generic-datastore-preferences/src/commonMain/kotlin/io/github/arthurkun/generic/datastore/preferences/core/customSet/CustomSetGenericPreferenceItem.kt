@@ -61,7 +61,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun set(value: Set<T>) {
+    override suspend fun set(value: Set<T>): Unit {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
                 prefs[stringSetPrefKey] = value.map { serializer(it) }.toSet()
@@ -69,7 +69,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun update(transform: (Set<T>) -> Set<T>) {
+    override suspend fun update(transform: (Set<T>) -> Set<T>): Unit {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
                 val current = prefs[stringSetPrefKey]?.let { safeDeserializeSet(it) }
@@ -79,7 +79,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun delete() {
+    override suspend fun delete(): Unit {
         withContext(ioDispatcher) {
             datastore.edit { prefs ->
                 prefs.remove(stringSetPrefKey)
@@ -87,7 +87,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun resetToDefault() = set(defaultValue)
+    override suspend fun resetToDefault(): Unit = set(defaultValue)
 
     override fun asFlow(): Flow<Set<T>> {
         return datastore.dataOrEmpty.map { prefs ->
@@ -101,7 +101,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
 
     override fun getBlocking(): Set<T> = runBlocking { get() }
 
-    override fun setBlocking(value: Set<T>) = runBlocking { set(value) }
+    override fun setBlocking(value: Set<T>): Unit = runBlocking { set(value) }
 
     private fun safeDeserializeSet(values: Set<String>): Set<T> {
         val elements = mutableSetOf<T>()
@@ -120,11 +120,11 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
     override fun readFrom(preferences: Preferences): Set<T> =
         preferences[stringSetPrefKey]?.let { safeDeserializeSet(it) } ?: defaultValue
 
-    override fun writeInto(mutablePreferences: MutablePreferences, value: Set<T>) {
+    override fun writeInto(mutablePreferences: MutablePreferences, value: Set<T>): Unit {
         mutablePreferences[stringSetPrefKey] = value.map { serializer(it) }.toSet()
     }
 
-    override fun removeFrom(mutablePreferences: MutablePreferences) {
+    override fun removeFrom(mutablePreferences: MutablePreferences): Unit {
         mutablePreferences.remove(stringSetPrefKey)
     }
 }

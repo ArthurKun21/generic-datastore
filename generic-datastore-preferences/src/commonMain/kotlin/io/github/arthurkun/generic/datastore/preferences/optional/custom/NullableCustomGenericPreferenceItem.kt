@@ -61,7 +61,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    override suspend fun set(value: T?) {
+    override suspend fun set(value: T?): Unit {
         withContext(ioDispatcher) {
             if (value == null) {
                 datastore.edit { ds ->
@@ -75,7 +75,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    override suspend fun update(transform: (T?) -> T?) {
+    override suspend fun update(transform: (T?) -> T?): Unit {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 val current = ds[stringPrefKey]?.let { safeDeserialize(it) }
@@ -89,7 +89,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    override suspend fun delete() {
+    override suspend fun delete(): Unit {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 ds.remove(stringPrefKey)
@@ -97,7 +97,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    override suspend fun resetToDefault() = delete()
+    override suspend fun resetToDefault(): Unit = delete()
 
     override fun asFlow(): Flow<T?> {
         return datastore.dataOrEmpty.map { prefs ->
@@ -112,7 +112,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         get()
     }
 
-    override fun setBlocking(value: T?) {
+    override fun setBlocking(value: T?): Unit {
         runBlocking {
             set(value)
         }
@@ -131,7 +131,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
     override fun readFrom(preferences: Preferences): T? =
         preferences[stringPrefKey]?.let { safeDeserialize(it) }
 
-    override fun writeInto(mutablePreferences: MutablePreferences, value: T?) {
+    override fun writeInto(mutablePreferences: MutablePreferences, value: T?): Unit {
         if (value == null) {
             mutablePreferences.remove(stringPrefKey)
         } else {
@@ -139,7 +139,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    override fun removeFrom(mutablePreferences: MutablePreferences) {
+    override fun removeFrom(mutablePreferences: MutablePreferences): Unit {
         mutablePreferences.remove(stringPrefKey)
     }
 }

@@ -61,7 +61,7 @@ internal sealed class CustomGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun set(value: T) {
+    override suspend fun set(value: T): Unit {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 ds[stringPrefKey] = serializer(value)
@@ -69,7 +69,7 @@ internal sealed class CustomGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun update(transform: (T) -> T) {
+    override suspend fun update(transform: (T) -> T): Unit {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 val current = ds[stringPrefKey]?.let {
@@ -80,7 +80,7 @@ internal sealed class CustomGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun delete() {
+    override suspend fun delete(): Unit {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
                 ds.remove(stringPrefKey)
@@ -88,7 +88,7 @@ internal sealed class CustomGenericPreferenceItem<T>(
         }
     }
 
-    override suspend fun resetToDefault() = set(defaultValue)
+    override suspend fun resetToDefault(): Unit = set(defaultValue)
 
     override fun asFlow(): Flow<T> {
         return datastore.dataOrEmpty.map { prefs ->
@@ -104,7 +104,7 @@ internal sealed class CustomGenericPreferenceItem<T>(
         get()
     }
 
-    override fun setBlocking(value: T) {
+    override fun setBlocking(value: T): Unit {
         runBlocking {
             set(value)
         }
@@ -123,11 +123,11 @@ internal sealed class CustomGenericPreferenceItem<T>(
     override fun readFrom(preferences: Preferences): T =
         preferences[stringPrefKey]?.let { safeDeserialize(it) } ?: defaultValue
 
-    override fun writeInto(mutablePreferences: MutablePreferences, value: T) {
+    override fun writeInto(mutablePreferences: MutablePreferences, value: T): Unit {
         mutablePreferences[stringPrefKey] = serializer(value)
     }
 
-    override fun removeFrom(mutablePreferences: MutablePreferences) {
+    override fun removeFrom(mutablePreferences: MutablePreferences): Unit {
         mutablePreferences.remove(stringPrefKey)
     }
 }

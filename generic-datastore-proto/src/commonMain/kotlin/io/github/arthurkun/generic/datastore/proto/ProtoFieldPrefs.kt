@@ -18,7 +18,7 @@ internal class ProtoFieldPrefs<P, T>(
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = pref.getBlocking()
 
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = pref.setBlocking(value)
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T): Unit = pref.setBlocking(value)
 
-    override fun resetToDefaultBlocking() = pref.setBlocking(pref.defaultValue)
+    override fun resetToDefaultBlocking(): Unit = pref.setBlocking(pref.defaultValue)
 }

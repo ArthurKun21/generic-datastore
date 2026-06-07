@@ -36,7 +36,7 @@ public interface BasePreference<T> {
      *
      * @param value The new value for the preference.
      */
-    public suspend fun set(value: T)
+    public suspend fun set(value: T): Unit
 
     /**
      * Atomically reads the current value and applies [transform] to compute a new value,
@@ -44,19 +44,19 @@ public interface BasePreference<T> {
      *
      * @param transform A function that receives the current value and returns the new value.
      */
-    public suspend fun update(transform: (T) -> T)
+    public suspend fun update(transform: (T) -> T) : Unit
 
     /**
      * Deletes the preference from the underlying storage.
      */
-    public suspend fun delete()
+    public suspend fun delete(): Unit
 
     /**
      * Resets the preference value to its [defaultValue].
      *
      * This is a suspending function equivalent of [DelegatedPreference.resetToDefaultBlocking].
      */
-    public suspend fun resetToDefault()
+    public suspend fun resetToDefault(): Unit
 
     /**
      * Returns the default value of the preference.
@@ -123,7 +123,7 @@ public interface BasePreference<T> {
      *
      * @param value The new value for the preference.
      */
-    public fun setBlocking(value: T)
+    public fun setBlocking(value: T): Unit
 
     @Deprecated(
         message = "Use setBlocking(value) instead",

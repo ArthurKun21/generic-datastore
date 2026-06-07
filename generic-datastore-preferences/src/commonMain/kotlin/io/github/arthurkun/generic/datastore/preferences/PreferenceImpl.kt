@@ -23,19 +23,19 @@ internal class PreferenceImpl<T>(
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = pref.getBlocking()
 
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = pref.setBlocking(value)
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T): Unit = pref.setBlocking(value)
 
-    override fun resetToDefaultBlocking() = pref.setBlocking(pref.defaultValue)
+    override fun resetToDefaultBlocking(): Unit = pref.setBlocking(pref.defaultValue)
 
     @Suppress("UNCHECKED_CAST")
     override fun readFrom(preferences: Preferences): T =
         (pref as PreferencesAccessor<T>).readFrom(preferences)
 
     @Suppress("UNCHECKED_CAST")
-    override fun writeInto(mutablePreferences: MutablePreferences, value: T) =
+    override fun writeInto(mutablePreferences: MutablePreferences, value: T): Unit =
         (pref as PreferencesAccessor<T>).writeInto(mutablePreferences, value)
 
     @Suppress("UNCHECKED_CAST")
-    override fun removeFrom(mutablePreferences: MutablePreferences) =
+    override fun removeFrom(mutablePreferences: MutablePreferences): Unit =
         (pref as PreferencesAccessor<T>).removeFrom(mutablePreferences)
 }

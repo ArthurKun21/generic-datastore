@@ -31,7 +31,7 @@ internal class PreferenceBackupRestorer(private val datastore: DataStore<Prefere
         backup: PreferencesBackup,
         importPrivate: Boolean,
         importAppState: Boolean,
-    ) {
+    ): Unit {
         datastore.updateData { currentPreferences ->
             val mutablePreferences = currentPreferences.toMutablePreferences()
 
@@ -75,7 +75,7 @@ internal class PreferenceBackupRestorer(private val datastore: DataStore<Prefere
         importPrivate: Boolean,
         importAppState: Boolean,
         json: Json,
-    ) {
+    ): Unit {
         if (backupString.length > MAX_BACKUP_STRING_LENGTH) {
             throw BackupParsingException(
                 "Backup string exceeds maximum allowed size of $MAX_BACKUP_STRING_LENGTH characters",
