@@ -86,7 +86,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
       
       - name: Cache Kotlin/Native
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.konan
           key: konan-test-ios-${{ hashFiles('gradle/libs.versions.toml') }}
@@ -131,7 +131,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: AVD cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         id: avd-cache
         with:
           path: |
