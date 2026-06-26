@@ -26,6 +26,7 @@ import io.github.arthurkun.generic.datastore.proto.custom.set.serializedSetField
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
@@ -75,6 +76,7 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
     override suspend fun exportAsByteArray(): ByteArray {
         val resolvedPath = path
             ?: throw UnsupportedOperationException("Byte-array backup requires a resolved datastore path.")
+        datastore.data.first()
         return ProtoBackupCreator(resolvedPath).exportAsByteArray()
     }
 

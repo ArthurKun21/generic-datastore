@@ -2,6 +2,7 @@
 
 package io.github.arthurkun.generic.datastore.proto.backup
 
+import androidx.datastore.core.DataMigration
 import io.github.arthurkun.generic.datastore.proto.GenericProtoDatastore
 import io.github.arthurkun.generic.datastore.proto.ProtoDatastore
 import io.github.arthurkun.generic.datastore.proto.core.TestAddress
@@ -19,9 +20,51 @@ abstract class AbstractProtoBackupTest {
     abstract val protoDatastore: GenericProtoDatastore<TestProtoData>
     abstract val testDispatcher: TestDispatcher
 
+    abstract fun createProtoDatastore(
+        datastoreName: String,
+        migrations: List<DataMigration<TestProtoData>> = emptyList(),
+    ): GenericProtoDatastore<TestProtoData>
+
+    open fun deleteProtoDatastore(datastoreName: String) = Unit
+
     @Test
     fun exportAsByteArray_fileDoesNotExist_returnsEmptyBytes() = runTest(testDispatcher) {
         assertTrue(protoDatastore.exportAsByteArray().isEmpty())
+    }
+
+    @Test
+    fun exportAsByteArray_firstOperation_runsMigrationsBeforeReadingBytes() = runTest(testDispatcher) {
+        val datastoreName = "test_proto_backup_migration"
+        val migrated = TestProtoData(id = 10, name = "Migrated")
+        var cleanUpCalled = false
+        val migration = object : DataMigration<TestProtoData> {
+            override suspend fun shouldMigrate(currentData: TestProtoData): Boolean = true
+
+            override suspend fun migrate(currentData: TestProtoData): TestProtoData = migrated
+
+            override suspend fun cleanUp() {
+                cleanUpCalled = true
+            }
+        }
+        val datastore = createProtoDatastore(
+            datastoreName = datastoreName,
+            migrations = listOf(migration),
+        )
+
+        try {
+            val backup = datastore.exportAsByteArray()
+
+            assertTrue(backup.isNotEmpty())
+            assertTrue(cleanUpCalled)
+
+            datastore.data().set(TestProtoData(id = 11, name = "Changed"))
+            datastore.importFromByteArray(backup)
+
+            assertEquals(migrated, datastore.data().get())
+        } finally {
+            datastore.close()
+            deleteProtoDatastore(datastoreName)
+        }
     }
 
     @Test
