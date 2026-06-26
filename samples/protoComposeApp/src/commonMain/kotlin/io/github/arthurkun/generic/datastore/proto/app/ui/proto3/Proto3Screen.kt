@@ -11,6 +11,8 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
@@ -26,12 +28,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import io.github.arthurkun.generic.datastore.utils.collectAsStatePlatform
+import io.github.vinceglb.filekit.dialogs.FileKitDialogSettings
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.dialogs.compose.rememberFileSaverLauncher
 
 @Composable
 fun Proto3Screen(
     viewModel: Proto3ViewModel,
 ) {
     val state by viewModel.uiState.collectAsStatePlatform()
+    val backupStatus by viewModel.backupStatus.collectAsStatePlatform()
+    val backupSaver = rememberFileSaverLauncher(
+        dialogSettings = FileKitDialogSettings.createDefault(),
+    ) { destination ->
+        if (destination == null) {
+            viewModel.cancelBackupAction("Export")
+        } else {
+            viewModel.exportBackupTo(destination)
+        }
+    }
+    val backupPicker = rememberFilePickerLauncher(
+        type = FileKitType.File("pb"),
+    ) { source ->
+        if (source == null) {
+            viewModel.cancelBackupAction("Restore")
+        } else {
+            viewModel.restoreBackupFrom(source)
+        }
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -156,6 +181,53 @@ fun Proto3Screen(
                 onResetNetwork = viewModel::resetNetwork,
             )
         }
+
+        item { HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) }
+
+        item {
+            BackupSection(
+                status = backupStatus,
+                onExport = {
+                    backupSaver.launch(
+                        suggestedName = "app_config_backup",
+                        defaultExtension = "pb",
+                        allowedExtensions = setOf("pb"),
+                    )
+                },
+                onRestore = backupPicker::launch,
+            )
+        }
+    }
+}
+
+@Composable
+private fun BackupSection(
+    status: String,
+    onExport: () -> Unit,
+    onRestore: () -> Unit,
+) {
+    Column {
+        Text("Backup and Restore", style = MaterialTheme.typography.titleSmall)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Button(
+                onClick = onExport,
+                modifier = Modifier.weight(1f),
+            ) {
+                Icon(Icons.Filled.FileDownload, contentDescription = null)
+                Text("Export", modifier = Modifier.padding(start = 4.dp))
+            }
+            Button(
+                onClick = onRestore,
+                modifier = Modifier.weight(1f),
+            ) {
+                Icon(Icons.Filled.FileUpload, contentDescription = null)
+                Text("Restore", modifier = Modifier.padding(start = 4.dp))
+            }
+        }
+        Text(status, style = MaterialTheme.typography.bodySmall)
     }
 }
 

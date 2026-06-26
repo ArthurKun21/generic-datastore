@@ -4,3 +4,8 @@
 -dontwarn android.os.Parcelable$Creator
 -dontwarn android.os.Parcel
 
+-keep class com.sun.jna.** { *; }
+-keep class * implements com.sun.jna.** { *; }
+-keep class org.freedesktop.dbus.** { *; }
+-keep class io.github.vinceglb.filekit.dialogs.platform.xdg.** { *; }
+-keepattributes Signature,InnerClasses,RuntimeVisibleAnnotations

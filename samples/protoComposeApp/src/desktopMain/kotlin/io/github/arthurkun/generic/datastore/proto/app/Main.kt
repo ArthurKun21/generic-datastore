@@ -7,8 +7,10 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import io.github.arthurkun.generic.datastore.proto.app.domain.AppContainer
 import io.github.arthurkun.generic.datastore.proto.app.theme.ProtoAppTheme
+import io.github.vinceglb.filekit.FileKit
 
 fun main() {
+    FileKit.init(appId = "generic-datastore-proto-sample")
     val appContainer = AppContainer()
 
     application {

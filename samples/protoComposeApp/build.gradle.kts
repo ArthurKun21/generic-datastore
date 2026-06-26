@@ -17,6 +17,7 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodel.compose)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.wire.runtime)
+                implementation(libs.filekit.dialogs.compose)
             }
         }
     }
@@ -37,6 +38,10 @@ compose.desktop {
 
         nativeDistributions {
             packageName = "generic-datastore-proto-sample"
+
+            linux {
+                modules("jdk.security.auth")
+            }
         }
     }
 }
