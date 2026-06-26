@@ -23,6 +23,8 @@ abstract interface <#A: kotlin/Any?> io.github.arthurkun.generic.datastore.proto
     abstract fun <#A1: kotlin/Enum<#A1>> nullableEnumField(kotlin/Array<#A1>, kotlin/Function1<#A, kotlin/String?>, kotlin/Function2<#A, kotlin/String?, #A>): io.github.arthurkun.generic.datastore.proto/ProtoPreference<#A1?> // io.github.arthurkun.generic.datastore.proto/ProtoDatastore.nullableEnumField|nullableEnumField(kotlin.Array<0:0>;kotlin.Function1<1:0,kotlin.String?>;kotlin.Function2<1:0,kotlin.String?,1:0>){0§<kotlin.Enum<0:0>>}[0]
     abstract fun data(): io.github.arthurkun.generic.datastore.proto/ProtoPreference<#A> // io.github.arthurkun.generic.datastore.proto/ProtoDatastore.data|data(){}[0]
     open fun close() // io.github.arthurkun.generic.datastore.proto/ProtoDatastore.close|close(){}[0]
+    open suspend fun exportAsByteArray(): kotlin/ByteArray // io.github.arthurkun.generic.datastore.proto/ProtoDatastore.exportAsByteArray|exportAsByteArray(){}[0]
+    open suspend fun importFromByteArray(kotlin/ByteArray) // io.github.arthurkun.generic.datastore.proto/ProtoDatastore.importFromByteArray|importFromByteArray(kotlin.ByteArray){}[0]
 }
 
 abstract interface <#A: kotlin/Any?> io.github.arthurkun.generic.datastore.proto/ProtoPreference : io.github.arthurkun.generic.datastore.core/DelegatedPreference<#A> // io.github.arthurkun.generic.datastore.proto/ProtoPreference|null[0]
@@ -44,6 +46,8 @@ final class <#A: kotlin/Any?> io.github.arthurkun.generic.datastore.proto/Generi
     final fun <#A1: kotlin/Enum<#A1>> nullableEnumField(kotlin/Array<#A1>, kotlin/Function1<#A, kotlin/String?>, kotlin/Function2<#A, kotlin/String?, #A>): io.github.arthurkun.generic.datastore.proto/ProtoPreference<#A1?> // io.github.arthurkun.generic.datastore.proto/GenericProtoDatastore.nullableEnumField|nullableEnumField(kotlin.Array<0:0>;kotlin.Function1<1:0,kotlin.String?>;kotlin.Function2<1:0,kotlin.String?,1:0>){0§<kotlin.Enum<0:0>>}[0]
     final fun close() // io.github.arthurkun.generic.datastore.proto/GenericProtoDatastore.close|close(){}[0]
     final fun data(): io.github.arthurkun.generic.datastore.proto/ProtoPreference<#A> // io.github.arthurkun.generic.datastore.proto/GenericProtoDatastore.data|data(){}[0]
+    final suspend fun exportAsByteArray(): kotlin/ByteArray // io.github.arthurkun.generic.datastore.proto/GenericProtoDatastore.exportAsByteArray|exportAsByteArray(){}[0]
+    final suspend fun importFromByteArray(kotlin/ByteArray) // io.github.arthurkun.generic.datastore.proto/GenericProtoDatastore.importFromByteArray|importFromByteArray(kotlin.ByteArray){}[0]
 }
 
 final fun <#A: kotlin/Any?> io.github.arthurkun.generic.datastore.proto/createProtoDatastore(androidx.datastore.core.okio/OkioSerializer<#A>, #A, kotlin/String, kotlin/String = ..., androidx.datastore.core.handlers/ReplaceFileCorruptionHandler<#A>? = ..., kotlin.collections/List<androidx.datastore.core/DataMigration<#A>> = ..., kotlinx.coroutines/CoroutineScope? = ..., kotlinx.serialization.json/Json = ..., kotlin/Function0<kotlin/String>): io.github.arthurkun.generic.datastore.proto/GenericProtoDatastore<#A> // io.github.arthurkun.generic.datastore.proto/createProtoDatastore|createProtoDatastore(androidx.datastore.core.okio.OkioSerializer<0:0>;0:0;kotlin.String;kotlin.String;androidx.datastore.core.handlers.ReplaceFileCorruptionHandler<0:0>?;kotlin.collections.List<androidx.datastore.core.DataMigration<0:0>>;kotlinx.coroutines.CoroutineScope?;kotlinx.serialization.json.Json;kotlin.Function0<kotlin.String>){0§<kotlin.Any?>}[0]
