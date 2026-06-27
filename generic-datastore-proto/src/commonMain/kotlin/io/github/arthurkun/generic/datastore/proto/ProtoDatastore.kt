@@ -15,6 +15,30 @@ public interface ProtoDatastore<T> : AutoCloseable {
     override fun close() {}
 
     /**
+     * Exports the raw proto datastore file contents as bytes.
+     *
+     * Factory-created datastores support this API. Implementations that do not own a resolvable
+     * datastore file may throw [UnsupportedOperationException].
+     *
+     * @return The current datastore file bytes, or an empty [ByteArray] when the file does not exist.
+     */
+    public suspend fun exportAsByteArray(): ByteArray {
+        throw UnsupportedOperationException("Byte-array backup is not supported by this ProtoDatastore.")
+    }
+
+    /**
+     * Imports raw proto bytes and replaces the whole proto message.
+     *
+     * Factory-created datastores support this API by decoding [data] with their [androidx.datastore.core.okio.OkioSerializer].
+     * Implementations that cannot decode raw proto bytes may throw [UnsupportedOperationException].
+     *
+     * @param data The serialized proto bytes to import.
+     */
+    public suspend fun importFromByteArray(data: ByteArray) {
+        throw UnsupportedOperationException("Byte-array restore is not supported by this ProtoDatastore.")
+    }
+
+    /**
      * Returns the proto message wrapped as a [DelegatedPreference] instance.
      *
      * @return A [DelegatedPreference] instance for the proto message.

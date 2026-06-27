@@ -3,8 +3,11 @@
 package io.github.arthurkun.generic.datastore.proto
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.okio.OkioSerializer
 import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
+import io.github.arthurkun.generic.datastore.proto.backup.ProtoBackupCreator
+import io.github.arthurkun.generic.datastore.proto.backup.ProtoBackupRestorer
 import io.github.arthurkun.generic.datastore.proto.core.GenericProtoPreferenceItem
 import io.github.arthurkun.generic.datastore.proto.custom.ProtoSerialFieldPreference
 import io.github.arthurkun.generic.datastore.proto.custom.core.enumFieldInternal
@@ -23,9 +26,11 @@ import io.github.arthurkun.generic.datastore.proto.custom.set.serializedSetField
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import okio.Path
 
 /**
  * A DataStore implementation for Proto DataStore.
@@ -39,6 +44,8 @@ import kotlinx.serialization.json.Json
  * @param datastore The underlying [DataStore<T>] instance.
  * @param defaultValue The default value for the proto message.
  * @param ownedScope The scope owned by this wrapper when it creates the underlying [DataStore].
+ * @param serializer The serializer used by byte-array restore for factory-created datastores.
+ * @param path The resolved datastore file path used by byte-array backup for factory-created datastores.
  */
 public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
     internal val datastore: DataStore<T>,
@@ -46,6 +53,8 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
     private val key: String = "proto_datastore",
     private val defaultJson: Json = PreferenceDefaults.defaultJson,
     private val ownedScope: CoroutineScope? = null,
+    private val serializer: OkioSerializer<T>? = null,
+    private val path: Path? = null,
 ) : ProtoDatastore<T> {
 
     private val cachedData: ProtoPreference<T> by lazy {
@@ -62,6 +71,22 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
         runBlocking {
             ownedScope?.coroutineContext?.get(Job)?.cancelAndJoin()
         }
+    }
+
+    override suspend fun exportAsByteArray(): ByteArray {
+        val resolvedPath = path
+            ?: throw UnsupportedOperationException("Byte-array backup requires a resolved datastore path.")
+        datastore.data.first()
+        return ProtoBackupCreator(resolvedPath).exportAsByteArray()
+    }
+
+    override suspend fun importFromByteArray(data: ByteArray) {
+        val resolvedSerializer = serializer
+            ?: throw UnsupportedOperationException("Byte-array restore requires an OkioSerializer.")
+        ProtoBackupRestorer(
+            datastore = datastore,
+            serializer = resolvedSerializer,
+        ).importFromByteArray(data)
     }
 
     override fun <F> field(

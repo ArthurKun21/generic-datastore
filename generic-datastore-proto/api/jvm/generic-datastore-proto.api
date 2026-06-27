@@ -14,7 +14,9 @@ public final class io/github/arthurkun/generic/datastore/proto/GenericProtoDatas
 	public fun data ()Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
 	public fun enumField (Ljava/lang/Enum;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
 	public fun enumSetField (Ljava/util/Set;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun exportAsByteArray (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun field (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun importFromByteArray ([BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun kserializedField (Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
 	public fun kserializedListField (Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
 	public fun kserializedSetField (Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
@@ -34,7 +36,9 @@ public abstract interface class io/github/arthurkun/generic/datastore/proto/Prot
 	public abstract fun enumField (Ljava/lang/Enum;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
 	public abstract fun enumSetField (Ljava/util/Set;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
 	public static synthetic fun enumSetField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/Set;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun exportAsByteArray (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun field (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public fun importFromByteArray ([BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun kserializedField (Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
 	public static synthetic fun kserializedField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
 	public abstract fun kserializedListField (Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
@@ -58,6 +62,8 @@ public abstract interface class io/github/arthurkun/generic/datastore/proto/Prot
 public final class io/github/arthurkun/generic/datastore/proto/ProtoDatastore$DefaultImpls {
 	public static fun close (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;)V
 	public static synthetic fun enumSetField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/Set;[Ljava/lang/Enum;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
+	public static fun exportAsByteArray (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun importFromByteArray (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;[BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun kserializedField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
 	public static synthetic fun kserializedListField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;
 	public static synthetic fun kserializedSetField$default (Lio/github/arthurkun/generic/datastore/proto/ProtoDatastore;Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/proto/ProtoPreference;

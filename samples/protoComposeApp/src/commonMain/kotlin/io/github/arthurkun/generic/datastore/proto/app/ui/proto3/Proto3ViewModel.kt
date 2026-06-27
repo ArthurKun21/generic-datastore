@@ -5,11 +5,17 @@ import androidx.lifecycle.viewModelScope
 import io.github.arthurkun.generic.datastore.proto.ProtoDatastore
 import io.github.arthurkun.generic.datastore.proto.ProtoPreference
 import io.github.arthurkun.generic.datastore.proto.app.wire.AppConfig
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.readBytes
+import io.github.vinceglb.filekit.write
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * ViewModel for the Proto3 (AppConfig) screen.
@@ -20,6 +26,9 @@ import kotlinx.coroutines.launch
 class Proto3ViewModel(
     private val datastore: ProtoDatastore<AppConfig>,
 ) : ViewModel() {
+
+    private val _backupStatus = MutableStateFlow("Ready")
+    val backupStatus: StateFlow<String> = _backupStatus.asStateFlow()
 
     /** Whole-object preference */
     val wholeData: ProtoPreference<AppConfig> = datastore.data()
@@ -237,6 +246,40 @@ class Proto3ViewModel(
 
     fun resetAppNameBlocking() {
         appNamePref.resetToDefaultBlocking()
+    }
+
+    fun exportBackupTo(destination: PlatformFile) {
+        viewModelScope.launch {
+            _backupStatus.value = "Exporting"
+            try {
+                val bytes = datastore.exportAsByteArray()
+                destination.write(bytes)
+                _backupStatus.value = "Exported ${bytes.size} bytes"
+            } catch (failure: CancellationException) {
+                throw failure
+            } catch (failure: Exception) {
+                _backupStatus.value = "Export failed: ${failure.message ?: "Unknown error"}"
+            }
+        }
+    }
+
+    fun restoreBackupFrom(source: PlatformFile) {
+        viewModelScope.launch {
+            _backupStatus.value = "Restoring"
+            try {
+                val bytes = source.readBytes()
+                datastore.importFromByteArray(bytes)
+                _backupStatus.value = "Restored ${bytes.size} bytes"
+            } catch (failure: CancellationException) {
+                throw failure
+            } catch (failure: Exception) {
+                _backupStatus.value = "Restore failed: ${failure.message ?: "Unknown error"}"
+            }
+        }
+    }
+
+    fun cancelBackupAction(action: String) {
+        _backupStatus.value = "$action cancelled"
     }
 }
 

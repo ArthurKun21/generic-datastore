@@ -860,6 +860,7 @@ Current Proto API surface:
 | Category | APIs |
 |----------|------|
 | Lifecycle | `close()` |
+| Byte backup | `exportAsByteArray`, `importFromByteArray` |
 | Whole message | `data()` |
 | Raw fields | `field()` |
 | Enum fields | `enumField`, `nullableEnumField`, `enumSetField` |
@@ -874,6 +875,22 @@ val dataPref: ProtoPreference<MyProtoMessage> = protoDatastore.data()
 
 // Then use get(), set(), asFlow(), etc. just like Preferences DataStore
 ```
+
+#### Byte Backup and Restore
+
+Factory-created proto datastores can export and import the raw datastore file bytes:
+
+```kotlin
+val backupBytes: ByteArray = protoDatastore.exportAsByteArray()
+
+protoDatastore.importFromByteArray(backupBytes)
+```
+
+`exportAsByteArray()` returns an empty `ByteArray` if the backing file has not been created yet.
+`importFromByteArray()` decodes the bytes with the datastore's `OkioSerializer` and replaces the
+whole proto message. Low-level `GenericProtoDatastore` wrappers only support these APIs when they
+are constructed with the serializer and resolved path; otherwise they throw
+`UnsupportedOperationException`.
 
 #### Per-Field Access
 

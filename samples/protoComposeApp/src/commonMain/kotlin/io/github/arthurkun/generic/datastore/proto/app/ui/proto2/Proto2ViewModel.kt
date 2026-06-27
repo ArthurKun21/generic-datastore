@@ -13,6 +13,9 @@ import io.github.arthurkun.generic.datastore.proto.kserializedListField
 import io.github.arthurkun.generic.datastore.proto.kserializedSetField
 import io.github.arthurkun.generic.datastore.proto.nullableKserializedField
 import io.github.arthurkun.generic.datastore.proto.nullableKserializedListField
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.readBytes
+import io.github.vinceglb.filekit.write
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -43,6 +46,8 @@ class Proto2ViewModel(
     private val jsonConfig = Json { ignoreUnknownKeys = true }
     private val _apiCoverageStatus = MutableStateFlow("Not run")
     val apiCoverageStatus: StateFlow<String> = _apiCoverageStatus.asStateFlow()
+    private val _backupStatus = MutableStateFlow("Ready")
+    val backupStatus: StateFlow<String> = _backupStatus.asStateFlow()
 
     /** Whole-object preference via `data()` */
     val wholeData: ProtoPreference<UserSettings> = datastore.data()
@@ -226,6 +231,40 @@ class Proto2ViewModel(
     /** Demonstrates `resetToDefaultBlocking()` */
     fun resetUsernameBlocking() {
         usernamePref.resetToDefaultBlocking()
+    }
+
+    fun exportBackupTo(destination: PlatformFile) {
+        viewModelScope.launch {
+            _backupStatus.value = "Exporting"
+            try {
+                val bytes = datastore.exportAsByteArray()
+                destination.write(bytes)
+                _backupStatus.value = "Exported ${bytes.size} bytes"
+            } catch (failure: CancellationException) {
+                throw failure
+            } catch (failure: Exception) {
+                _backupStatus.value = "Export failed: ${failure.message ?: "Unknown error"}"
+            }
+        }
+    }
+
+    fun restoreBackupFrom(source: PlatformFile) {
+        viewModelScope.launch {
+            _backupStatus.value = "Restoring"
+            try {
+                val bytes = source.readBytes()
+                datastore.importFromByteArray(bytes)
+                _backupStatus.value = "Restored ${bytes.size} bytes"
+            } catch (failure: CancellationException) {
+                throw failure
+            } catch (failure: Exception) {
+                _backupStatus.value = "Restore failed: ${failure.message ?: "Unknown error"}"
+            }
+        }
+    }
+
+    fun cancelBackupAction(action: String) {
+        _backupStatus.value = "$action cancelled"
     }
 
     fun runApiCoverageShowcase() {

@@ -70,6 +70,8 @@ public fun <T> createProtoDatastore(
         key = nameKey,
         defaultJson = defaultJson,
         ownedScope = datastoreScope,
+        serializer = serializer,
+        path = path,
     )
 }
 
@@ -107,23 +109,26 @@ public fun <T> createProtoDatastore(
     produceOkioPath: () -> okio.Path,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
+    val path = produceOkioPath()
     val datastore = createDataStore(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
             serializer = serializer,
-            producePath = produceOkioPath,
+            producePath = { path },
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
         scope = datastoreScope,
     )
-    val nameKey = key ?: produceOkioPath().name
+    val nameKey = key ?: path.name
     return GenericProtoDatastore(
         datastore = datastore,
         defaultValue = defaultValue,
         key = nameKey,
         defaultJson = defaultJson,
         ownedScope = datastoreScope,
+        serializer = serializer,
+        path = path,
     )
 }
 
@@ -180,6 +185,8 @@ public fun <T> createProtoDatastore(
         key = nameKey,
         defaultJson = defaultJson,
         ownedScope = datastoreScope,
+        serializer = serializer,
+        path = path,
     )
 }
 
@@ -221,11 +228,12 @@ public fun <T> createProtoDatastore(
     producePath: () -> String,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
+    val path = producePath().toPath() / fileName
     val datastore = createDataStore(
         storage = OkioStorage(
             fileSystem = systemFileSystem,
             serializer = serializer,
-            producePath = { producePath().toPath() / fileName },
+            producePath = { path },
         ),
         corruptionHandler = corruptionHandler,
         migrations = migrations,
@@ -237,6 +245,8 @@ public fun <T> createProtoDatastore(
         key = key,
         defaultJson = defaultJson,
         ownedScope = datastoreScope,
+        serializer = serializer,
+        path = path,
     )
 }
 
