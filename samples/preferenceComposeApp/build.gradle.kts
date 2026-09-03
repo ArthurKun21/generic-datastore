@@ -45,7 +45,7 @@ kotlin {
         }
 
         androidMain.dependsOn(jvmCommon)
-        named("desktopMain") {
+        named("jvmMain") {
             dependsOn(jvmCommon)
         }
     }

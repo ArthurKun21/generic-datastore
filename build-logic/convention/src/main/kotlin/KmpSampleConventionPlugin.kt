@@ -42,13 +42,13 @@ class KmpSampleConventionPlugin : Plugin<Project> {
                     minSdk = AndroidConfig.MIN_SDK
                 }
 
-                jvm("desktop")
+                jvm()
 
                 compilerOptions {
                     freeCompilerArgs.add("-Xexpect-actual-classes")
                 }
 
-                sourceSets.named("desktopMain") {
+                sourceSets.named("jvmMain") {
                     dependencies {
                         implementation(libs.library("coroutines-swing"))
                         @Suppress("DEPRECATION")
