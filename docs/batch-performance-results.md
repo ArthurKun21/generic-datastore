@@ -87,13 +87,13 @@ in a single batch is **~20x faster** than writing them individually.
 Run the performance test suite on Desktop/JVM:
 
 ```bash
-./gradlew :generic-datastore:desktopTest \
+./gradlew :generic-datastore-preferences:jvmTest \
   --tests "io.github.arthurkun.generic.datastore.preferences.batch.DesktopBatchPerformanceTest"
 ```
 
 Test output is captured in the JUnit XML report:
 
 ```
-generic-datastore/build/test-results/desktopTest/
+generic-datastore-preferences/build/test-results/jvmTest/
   TEST-io.github.arthurkun.generic.datastore.preferences.batch.DesktopBatchPerformanceTest.xml
 ```
