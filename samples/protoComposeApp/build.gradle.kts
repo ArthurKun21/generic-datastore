@@ -9,7 +9,7 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(project(":generic-datastore-proto"))
                 implementation(project(":generic-datastore-compose"))
