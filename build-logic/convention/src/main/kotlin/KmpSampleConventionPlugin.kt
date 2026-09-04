@@ -2,7 +2,6 @@ import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import gd.buildlogic.AndroidConfig
 import gd.buildlogic.configureCommonKotlinCompileOptions
 import gd.buildlogic.configureKmpLibrary
-import gd.buildlogic.library
 import gd.buildlogic.libs
 import gd.buildlogic.pluginId
 import org.gradle.api.Plugin
@@ -13,7 +12,6 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.compose.ComposeExtension
-import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -46,14 +44,6 @@ class KmpSampleConventionPlugin : Plugin<Project> {
 
                 compilerOptions {
                     freeCompilerArgs.add("-Xexpect-actual-classes")
-                }
-
-                sourceSets.named("jvmMain") {
-                    dependencies {
-                        implementation(libs.library("coroutines-swing"))
-                        @Suppress("DEPRECATION")
-                        implementation(ComposePlugin.DesktopDependencies.currentOs)
-                    }
                 }
             }
 

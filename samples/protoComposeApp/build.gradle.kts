@@ -20,6 +20,10 @@ kotlin {
                 implementation(libs.filekit.dialogs.compose)
             }
         }
+        jvmMain.dependencies {
+            implementation(libs.coroutines.swing)
+            implementation(compose.desktop.currentOs)
+        }
     }
 }
 

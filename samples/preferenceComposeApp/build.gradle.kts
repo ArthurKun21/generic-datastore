@@ -39,6 +39,10 @@ kotlin {
                 implementation(libs.activity.compose)
             }
         }
+        jvmMain.dependencies {
+            implementation(libs.coroutines.swing)
+            implementation(compose.desktop.currentOs)
+        }
     }
 }
 
