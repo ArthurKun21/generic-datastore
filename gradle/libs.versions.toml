@@ -26,7 +26,7 @@ kotlinx_serialization = "1.11.0"
 
 coroutines = "1.11.0"
 kotlinx-io = "0.9.1"
-okio = "3.18.1"
+okio = "3.18.2"
 
 wire = "6.4.7"
 filekit = "0.15.0"
