@@ -31,7 +31,7 @@ okio = "3.18.2"
 wire = "6.4.7"
 filekit = "0.15.0"
 
-spotless = "8.10.1"
+spotless = "8.10.2"
 ktlint-core = "1.8.0"
 
 [libraries]
