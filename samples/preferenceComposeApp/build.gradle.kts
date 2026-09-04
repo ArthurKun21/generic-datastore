@@ -50,6 +50,15 @@ compose.desktop {
     application {
         mainClass = "io.github.arthurkun.generic.datastore.compose.app.MainKt"
 
+        buildTypes {
+            release {
+                proguard {
+                    isEnabled = true
+                    configurationFiles.from("proguard-rules.pro")
+                }
+            }
+        }
+
         nativeDistributions {
             packageName = "generic-datastore-sample"
         }
