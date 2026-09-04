@@ -53,7 +53,7 @@ compose.desktop {
         buildTypes {
             release {
                 proguard {
-                    isEnabled = true
+                    isEnabled = false
                     configurationFiles.from("proguard-rules.pro")
                 }
             }
