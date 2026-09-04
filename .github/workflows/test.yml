@@ -39,7 +39,7 @@ jobs:
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v6
 
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v6
         with:
           java-version: ${{ env.JAVA_VERSION }}
@@ -60,7 +60,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           ./gradlew :generic-datastore-proto:jvmTest --parallel
-      
+
       - name: Run Generic Datastore Compose tests
         if: ${{ !cancelled() }}
         run: |
@@ -76,7 +76,7 @@ jobs:
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v6
 
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v6
         with:
           java-version: ${{ env.JAVA_VERSION }}
@@ -84,7 +84,7 @@ jobs:
 
       - name: Set up gradle
         uses: gradle/actions/setup-gradle@v6
-      
+
       - name: Cache Kotlin/Native
         uses: actions/cache@v6
         with:
@@ -106,7 +106,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           ./gradlew :generic-datastore-proto:iosSimulatorArm64Test --parallel
-      
+
       - name: Run Generic Datastore Compose tests
         if: ${{ !cancelled() }}
         run: |
@@ -173,7 +173,7 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: ./gradlew :generic-datastore-proto:connectedAndroidDeviceTest
-      
+
       - name: Run Generic Datastore Compose tests
         if: ${{ !cancelled() }}
         uses: reactivecircus/android-emulator-runner@v2

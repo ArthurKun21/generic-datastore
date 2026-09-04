@@ -9,7 +9,7 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(project(":generic-datastore-proto"))
                 implementation(project(":generic-datastore-compose"))
@@ -19,6 +19,10 @@ kotlin {
                 implementation(libs.wire.runtime)
                 implementation(libs.filekit.dialogs.compose)
             }
+        }
+        jvmMain.dependencies {
+            implementation(libs.coroutines.swing)
+            implementation(compose.desktop.currentOs)
         }
     }
 }

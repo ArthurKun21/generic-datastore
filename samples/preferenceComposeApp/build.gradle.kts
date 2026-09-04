@@ -23,7 +23,7 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(project(":generic-datastore-preferences"))
                 implementation(project(":generic-datastore-compose"))
@@ -33,20 +33,15 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
+        androidMain {
             dependencies {
                 implementation(libs.androidx.core.ktx)
                 implementation(libs.activity.compose)
             }
         }
-
-        val jvmCommon by creating {
-            dependsOn(commonMain)
-        }
-
-        androidMain.dependsOn(jvmCommon)
-        named("desktopMain") {
-            dependsOn(jvmCommon)
+        jvmMain.dependencies {
+            implementation(libs.coroutines.swing)
+            implementation(compose.desktop.currentOs)
         }
     }
 }
