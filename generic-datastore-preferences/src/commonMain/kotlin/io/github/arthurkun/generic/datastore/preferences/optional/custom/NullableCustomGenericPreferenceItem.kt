@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
+import io.github.arthurkun.generic.datastore.preferences.utils.deserializeOrNull
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Base implementation for nullable preferences stored as a single string entry.
@@ -118,15 +118,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    private fun safeDeserialize(value: String): T? {
-        return try {
-            deserializer(value)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {
-            null
-        }
-    }
+    private fun safeDeserialize(value: String): T? = deserializeOrNull(value, deserializer)
 
     override fun readFrom(preferences: Preferences): T? =
         preferences[stringPrefKey]?.let { safeDeserialize(it) }

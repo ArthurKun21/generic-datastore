@@ -3,9 +3,12 @@ package io.github.arthurkun.generic.datastore.batch
 import androidx.compose.runtime.SnapshotMutationPolicy
 import androidx.compose.runtime.mutableStateOf
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchPref
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchValues
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
+import io.github.arthurkun.generic.datastore.preferences.batch.prefBatch
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -18,13 +21,22 @@ abstract class AbstractBatchPrefsComposeStateTest {
     abstract val preferenceDatastore: GenericPreferencesDatastore
     abstract val testDispatcher: TestDispatcher
 
+    private fun <T> handleFor(preference: Preference<T>): BatchPref<T> {
+        var handle: BatchPref<T>? = null
+        prefBatch { handle = add(preference) }
+        return requireNotNull(handle)
+    }
+
+    private suspend fun <T> currentSnapshot(preference: Preference<T>): BatchValues =
+        preferenceDatastore.batchReadValues { add(preference) }
+
     @Test
     fun value_returnsDefaultWhenBatchSnapshotIsUnavailable() = runTest(testDispatcher) {
         val preference = preferenceDatastore.string("compose_batch_state_default", "fallback")
-        val batchState = mutableStateOf<BatchReadScope?>(null)
+        val batchState = mutableStateOf<BatchValues?>(null)
 
         val state = BatchPrefsComposeState(
-            preference = preference,
+            handle = handleFor(preference),
             batchState = batchState,
             datastore = preferenceDatastore,
             scope = this,
@@ -38,9 +50,9 @@ abstract class AbstractBatchPrefsComposeStateTest {
         val preference = preferenceDatastore.string("compose_batch_state_snapshot", "fallback")
         preference.set("stored")
 
-        val batchState = mutableStateOf<BatchReadScope?>(currentSnapshot())
+        val batchState = mutableStateOf<BatchValues?>(currentSnapshot(preference))
         val state = BatchPrefsComposeState(
-            preference = preference,
+            handle = handleFor(preference),
             batchState = batchState,
             datastore = preferenceDatastore,
             scope = this,
@@ -54,9 +66,9 @@ abstract class AbstractBatchPrefsComposeStateTest {
         val preference = preferenceDatastore.string("compose_batch_state_override", "fallback")
         preference.set("upstream")
 
-        val batchState = mutableStateOf<BatchReadScope?>(currentSnapshot())
+        val batchState = mutableStateOf<BatchValues?>(currentSnapshot(preference))
         val state = BatchPrefsComposeState(
-            preference = preference,
+            handle = handleFor(preference),
             batchState = batchState,
             datastore = preferenceDatastore,
             scope = this,
@@ -70,11 +82,11 @@ abstract class AbstractBatchPrefsComposeStateTest {
         runCurrent()
         assertEquals("local", preference.get())
 
-        batchState.value = currentSnapshot()
+        batchState.value = currentSnapshot(preference)
         assertEquals("local", state.value)
 
         preference.set("remote")
-        batchState.value = currentSnapshot()
+        batchState.value = currentSnapshot(preference)
         assertEquals("remote", state.value)
     }
 
@@ -82,9 +94,9 @@ abstract class AbstractBatchPrefsComposeStateTest {
     fun set_doesNotWriteWhenValueIsEquivalent() = runTest(testDispatcher) {
         val countingDatastore = CountingPreferencesDatastore(preferenceDatastore)
         val preference = countingDatastore.string("compose_batch_state_equivalent", "same")
-        val batchState = mutableStateOf<BatchReadScope?>(null)
+        val batchState = mutableStateOf<BatchValues?>(null)
         val state = BatchPrefsComposeState(
-            preference = preference,
+            handle = handleFor(preference),
             batchState = batchState,
             datastore = countingDatastore,
             scope = this,
@@ -100,7 +112,7 @@ abstract class AbstractBatchPrefsComposeStateTest {
     fun set_respectsCustomMutationPolicy() = runTest(testDispatcher) {
         val countingDatastore = CountingPreferencesDatastore(preferenceDatastore)
         val preference = countingDatastore.string("compose_batch_state_custom_policy", "same")
-        val batchState = mutableStateOf<BatchReadScope?>(null)
+        val batchState = mutableStateOf<BatchValues?>(null)
         val ignoreCasePolicy = object : SnapshotMutationPolicy<Any?> {
             override fun equivalent(a: Any?, b: Any?): Boolean {
                 if (a is String && b is String) {
@@ -110,7 +122,7 @@ abstract class AbstractBatchPrefsComposeStateTest {
             }
         }
         val state = BatchPrefsComposeState(
-            preference = preference,
+            handle = handleFor(preference),
             batchState = batchState,
             datastore = countingDatastore,
             scope = this,
@@ -127,9 +139,9 @@ abstract class AbstractBatchPrefsComposeStateTest {
     fun set_clearsOptimisticOverrideWhenBatchWriteFails() = runTest(testDispatcher) {
         val failingDatastore = FailingBatchWritePreferencesDatastore(preferenceDatastore)
         val preference = failingDatastore.string("compose_batch_state_write_failure", "fallback")
-        val batchState = mutableStateOf<BatchReadScope?>(null)
+        val batchState = mutableStateOf<BatchValues?>(null)
         val state = BatchPrefsComposeState(
-            preference = preference,
+            handle = handleFor(preference),
             batchState = batchState,
             datastore = failingDatastore,
             scope = this,
@@ -148,9 +160,9 @@ abstract class AbstractBatchPrefsComposeStateTest {
     fun set_olderFailedBatchWriteDoesNotClearNewerOptimisticOverride() = runTest(testDispatcher) {
         val failingDatastore = FailsFirstBatchWritePreferencesDatastore(preferenceDatastore)
         val preference = failingDatastore.string("compose_batch_state_write_race", "fallback")
-        val batchState = mutableStateOf<BatchReadScope?>(null)
+        val batchState = mutableStateOf<BatchValues?>(null)
         val state = BatchPrefsComposeState(
-            preference = preference,
+            handle = handleFor(preference),
             batchState = batchState,
             datastore = failingDatastore,
             scope = this,
@@ -160,13 +172,11 @@ abstract class AbstractBatchPrefsComposeStateTest {
         state.value = "second"
 
         runCurrent()
-        batchState.value = currentSnapshot()
+        batchState.value = currentSnapshot(preference)
 
         assertEquals("second", state.value)
         assertEquals("second", preference.get())
     }
-
-    private suspend fun currentSnapshot(): BatchReadScope = preferenceDatastore.batchRead { this }
 }
 
 private class CountingPreferencesDatastore(
@@ -175,7 +185,9 @@ private class CountingPreferencesDatastore(
     var batchWriteCalls: Int = 0
         private set
 
-    override suspend fun batchWrite(block: BatchWriteScope.() -> Unit) {
+    override suspend fun batchWrite(
+        block: BatchWriteScope.() -> Unit,
+    ) {
         batchWriteCalls += 1
         delegate.batchWrite(block)
     }
@@ -184,7 +196,9 @@ private class CountingPreferencesDatastore(
 private class FailingBatchWritePreferencesDatastore(
     private val delegate: PreferencesDatastore,
 ) : PreferencesDatastore by delegate {
-    override suspend fun batchWrite(block: BatchWriteScope.() -> Unit) {
+    override suspend fun batchWrite(
+        block: BatchWriteScope.() -> Unit,
+    ) {
         throw IllegalStateException("forced batch write failure")
     }
 }
@@ -194,7 +208,9 @@ private class FailsFirstBatchWritePreferencesDatastore(
 ) : PreferencesDatastore by delegate {
     private var writes = 0
 
-    override suspend fun batchWrite(block: BatchWriteScope.() -> Unit) {
+    override suspend fun batchWrite(
+        block: BatchWriteScope.() -> Unit,
+    ) {
         writes += 1
         if (writes == 1) {
             yield()

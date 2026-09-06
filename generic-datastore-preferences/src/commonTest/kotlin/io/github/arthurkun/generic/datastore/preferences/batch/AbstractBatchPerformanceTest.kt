@@ -16,6 +16,17 @@ abstract class AbstractBatchPerformanceTest {
     abstract val dataStore: DataStore<Preferences>
     abstract val testDispatcher: TestDispatcher
 
+    /**
+     * Bridges a [PreferenceBatch] built by [prefBatch] to an inline `declare` block, so existing
+     * declaration fixtures keep working with the inline batch operations.
+     */
+    protected fun declare(batch: PreferenceBatch): PrefBuilder.() -> Unit = {
+        batch.forEach { pref ->
+            @Suppress("UNCHECKED_CAST")
+            add(pref as BatchPref<Any?>)
+        }
+    }
+
     private data class TimingResult(
         val label: String,
         val duration: Duration,
@@ -39,452 +50,295 @@ abstract class AbstractBatchPerformanceTest {
         println()
     }
 
+    private suspend fun compareWrites(count: Int) {
+        val normalPrefs = (0 until count).map {
+            preferenceDatastore.int("perf_normal_write${count}_$it", 0)
+        }
+        val normalTime = measureTime {
+            normalPrefs.forEachIndexed { i, pref -> pref.set(i * 10) }
+        }
+        normalPrefs.forEachIndexed { i, pref -> assertEquals(i * 10, pref.get()) }
+
+        val handles = mutableListOf<BatchPref<Int>>()
+        val batch = prefBatch {
+            repeat(count) { i -> handles += int("perf_batch_write${count}_$i", 0) }
+        }
+        val batchTime = measureTime {
+            preferenceDatastore.batchWrite {
+                handles.forEachIndexed { i, handle -> set(handle, i * 10) }
+            }
+        }
+        handles.forEachIndexed { i, handle ->
+            assertEquals(i * 10, preferenceDatastore.int(handle.key, 0).get())
+        }
+
+        printComparison(
+            "Write $count preferences",
+            TimingResult("Normal", normalTime, count),
+            TimingResult("Batch", batchTime, count),
+        )
+    }
+
+    private suspend fun compareReads(count: Int) {
+        val normalPrefs = (0 until count).map {
+            preferenceDatastore.int("perf_normal_read${count}_$it", 0)
+        }
+        normalPrefs.forEachIndexed { i, pref -> pref.set(i * 10) }
+        val normalTime = measureTime {
+            normalPrefs.forEach { pref -> pref.get() }
+        }
+
+        val handles = mutableListOf<BatchPref<Int>>()
+        val batch = prefBatch {
+            repeat(count) { i -> handles += int("perf_batch_read${count}_$i", 0) }
+        }
+        handles.forEachIndexed { i, handle ->
+            preferenceDatastore.int(handle.key, 0).set(i * 10)
+        }
+        val batchTime = measureTime {
+            val values = preferenceDatastore.batchReadValues(declare(batch))
+            handles.forEach { handle -> values[handle] }
+        }
+        val batchValues = preferenceDatastore.batchReadValues(declare(batch))
+        handles.forEachIndexed { i, handle -> assertEquals(i * 10, batchValues[handle]) }
+
+        printComparison(
+            "Read $count preferences",
+            TimingResult("Normal", normalTime, count),
+            TimingResult("Batch", batchTime, count),
+        )
+    }
+
+    private suspend fun compareUpdates(count: Int) {
+        val normalPrefs = (0 until count).map {
+            preferenceDatastore.int("perf_normal_update${count}_$it", 0)
+        }
+        normalPrefs.forEach { pref -> pref.set(0) }
+        val normalTime = measureTime {
+            normalPrefs.forEach { pref -> pref.update { value -> value + 1 } }
+        }
+        normalPrefs.forEachIndexed { i, pref -> assertEquals(1, pref.get()) }
+
+        val handles = mutableListOf<BatchPref<Int>>()
+        val batch = prefBatch {
+            repeat(count) { i -> handles += int("perf_batch_update${count}_$i", 0) }
+        }
+        handles.forEach { handle -> preferenceDatastore.int(handle.key, 0).set(0) }
+        val batchTime = measureTime {
+            preferenceDatastore.batchUpdate {
+                handles.forEach { handle -> update(handle) { value -> value + 1 } }
+            }
+        }
+        handles.forEach { handle ->
+            assertEquals(1, preferenceDatastore.int(handle.key, 0).get())
+        }
+
+        printComparison(
+            "Update $count preferences",
+            TimingResult("Normal", normalTime, count),
+            TimingResult("Batch", batchTime, count),
+        )
+    }
+
+    private suspend fun compareDeletes(count: Int) {
+        val normalPrefs = (0 until count).map {
+            preferenceDatastore.int("perf_normal_delete${count}_$it", 0)
+        }
+        normalPrefs.forEachIndexed { i, pref -> pref.set(i) }
+        val normalTime = measureTime {
+            normalPrefs.forEach { pref -> pref.delete() }
+        }
+        normalPrefs.forEachIndexed { i, pref -> assertEquals(0, pref.get()) }
+
+        val handles = mutableListOf<BatchPref<Int>>()
+        val batch = prefBatch {
+            repeat(count) { i -> handles += int("perf_batch_delete${count}_$i", 0) }
+        }
+        handles.forEachIndexed { i, handle -> preferenceDatastore.int(handle.key, 0).set(i) }
+        val batchTime = measureTime {
+            preferenceDatastore.batchDelete(declare(batch))
+        }
+        val values = preferenceDatastore.batchReadValues(declare(batch))
+        handles.forEach { handle -> assertEquals(0, values[handle]) }
+
+        printComparison(
+            "Delete $count preferences",
+            TimingResult("Normal", normalTime, count),
+            TimingResult("Batch", batchTime, count),
+        )
+    }
+
+    private suspend fun compareResetToDefault(count: Int) {
+        val normalPrefs = (0 until count).map {
+            preferenceDatastore.int("perf_normal_reset${count}_$it", 7)
+        }
+        normalPrefs.forEachIndexed { i, pref -> pref.set(i + 100) }
+        val normalTime = measureTime {
+            normalPrefs.forEach { pref -> pref.resetToDefault() }
+        }
+        normalPrefs.forEach { pref -> assertEquals(7, pref.get()) }
+
+        val handles = mutableListOf<BatchPref<Int>>()
+        val batch = prefBatch {
+            repeat(count) { i -> handles += int("perf_batch_reset${count}_$i", 7) }
+        }
+        handles.forEachIndexed { i, handle ->
+            preferenceDatastore.int(handle.key, 7).set(i + 100)
+        }
+        val batchTime = measureTime {
+            preferenceDatastore.batchWrite {
+                handles.forEach { handle -> resetToDefault(handle) }
+            }
+        }
+        handles.forEach { handle ->
+            assertEquals(7, preferenceDatastore.int(handle.key, 7).get())
+        }
+
+        printComparison(
+            "Reset $count preferences to default",
+            TimingResult("Normal", normalTime, count),
+            TimingResult("Batch", batchTime, count),
+        )
+    }
+
     // ---- Write performance ----
 
     @Test
-    fun performanceComparison_write5Preferences() = runTest(testDispatcher) {
-        val count = 5
-
-        val normalPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_normal_write5_$it", 0)
-        }
-        val normalTime = measureTime {
-            normalPrefs.forEachIndexed { i, pref -> pref.set(i * 10) }
-        }
-        normalPrefs.forEachIndexed { i, pref -> assertEquals(i * 10, pref.get()) }
-
-        val batchPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_batch_write5_$it", 0)
-        }
-        val batchTime = measureTime {
-            preferenceDatastore.batchWrite {
-                batchPrefs.forEachIndexed { i, pref -> set(pref, i * 10) }
-            }
-        }
-        batchPrefs.forEachIndexed { i, pref -> assertEquals(i * 10, pref.get()) }
-
-        printComparison(
-            "Write 5 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
+    fun performanceComparison_write5Preferences() = runTest(testDispatcher) { compareWrites(5) }
 
     @Test
-    fun performanceComparison_write10Preferences() = runTest(testDispatcher) {
-        val count = 10
-
-        val normalPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_normal_write10_$it", 0)
-        }
-        val normalTime = measureTime {
-            normalPrefs.forEachIndexed { i, pref -> pref.set(i * 10) }
-        }
-        normalPrefs.forEachIndexed { i, pref -> assertEquals(i * 10, pref.get()) }
-
-        val batchPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_batch_write10_$it", 0)
-        }
-        val batchTime = measureTime {
-            preferenceDatastore.batchWrite {
-                batchPrefs.forEachIndexed { i, pref -> set(pref, i * 10) }
-            }
-        }
-        batchPrefs.forEachIndexed { i, pref -> assertEquals(i * 10, pref.get()) }
-
-        printComparison(
-            "Write 10 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
+    fun performanceComparison_write10Preferences() = runTest(testDispatcher) { compareWrites(10) }
 
     @Test
-    fun performanceComparison_write25Preferences() = runTest(testDispatcher) {
-        val count = 25
-
-        val normalPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_normal_write25_$it", 0)
-        }
-        val normalTime = measureTime {
-            normalPrefs.forEachIndexed { i, pref -> pref.set(i) }
-        }
-
-        val batchPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_batch_write25_$it", 0)
-        }
-        val batchTime = measureTime {
-            preferenceDatastore.batchWrite {
-                batchPrefs.forEachIndexed { i, pref -> set(pref, i) }
-            }
-        }
-
-        printComparison(
-            "Write 25 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
+    fun performanceComparison_write25Preferences() = runTest(testDispatcher) { compareWrites(25) }
 
     @Test
-    fun performanceComparison_write50Preferences() = runTest(testDispatcher) {
-        val count = 50
-
-        val normalPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_normal_write50_$it", 0)
-        }
-        val normalTime = measureTime {
-            normalPrefs.forEachIndexed { i, pref -> pref.set(i) }
-        }
-
-        val batchPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_batch_write50_$it", 0)
-        }
-        val batchTime = measureTime {
-            preferenceDatastore.batchWrite {
-                batchPrefs.forEachIndexed { i, pref -> set(pref, i) }
-            }
-        }
-
-        printComparison(
-            "Write 50 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
+    fun performanceComparison_write50Preferences() = runTest(testDispatcher) { compareWrites(50) }
 
     // ---- Read performance ----
 
     @Test
-    fun performanceComparison_read5Preferences() = runTest(testDispatcher) {
-        val count = 5
-        val prefs = (0 until count).map {
-            preferenceDatastore.int("perf_read5_$it", it * 10)
-        }
-
-        val normalTime = measureTime {
-            prefs.forEach { it.get() }
-        }
-
-        val batchTime = measureTime {
-            preferenceDatastore.batchRead {
-                prefs.map { get(it) }
-            }
-        }
-
-        printComparison(
-            "Read 5 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
+    fun performanceComparison_read5Preferences() = runTest(testDispatcher) { compareReads(5) }
 
     @Test
-    fun performanceComparison_read10Preferences() = runTest(testDispatcher) {
-        val count = 10
-        val prefs = (0 until count).map {
-            preferenceDatastore.int("perf_read10_$it", it * 10)
-        }
-
-        val normalTime = measureTime {
-            prefs.forEach { it.get() }
-        }
-
-        val batchTime = measureTime {
-            preferenceDatastore.batchRead {
-                prefs.map { get(it) }
-            }
-        }
-
-        printComparison(
-            "Read 10 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
+    fun performanceComparison_read10Preferences() = runTest(testDispatcher) { compareReads(10) }
 
     @Test
-    fun performanceComparison_read25Preferences() = runTest(testDispatcher) {
-        val count = 25
-        val prefs = (0 until count).map {
-            preferenceDatastore.int("perf_read25_$it", it)
-        }
-
-        val normalTime = measureTime {
-            prefs.forEach { it.get() }
-        }
-
-        val batchTime = measureTime {
-            preferenceDatastore.batchRead {
-                prefs.map { get(it) }
-            }
-        }
-
-        printComparison(
-            "Read 25 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
+    fun performanceComparison_read25Preferences() = runTest(testDispatcher) { compareReads(25) }
 
     @Test
-    fun performanceComparison_read50Preferences() = runTest(testDispatcher) {
-        val count = 50
-        val prefs = (0 until count).map {
-            preferenceDatastore.int("perf_read50_$it", it)
-        }
+    fun performanceComparison_read50Preferences() = runTest(testDispatcher) { compareReads(50) }
 
-        val normalTime = measureTime {
-            prefs.forEach { it.get() }
-        }
-
-        val batchTime = measureTime {
-            preferenceDatastore.batchRead {
-                prefs.map { get(it) }
-            }
-        }
-
-        printComparison(
-            "Read 50 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
-
-    // ---- Update (read-modify-write) performance ----
+    // ---- Update performance ----
 
     @Test
-    fun performanceComparison_update5Preferences() = runTest(testDispatcher) {
-        val count = 5
-
-        val normalPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_normal_update5_$it", it)
-        }
-        val normalTime = measureTime {
-            normalPrefs.forEach { pref -> pref.update { it + 1 } }
-        }
-
-        val batchPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_batch_update5_$it", it)
-        }
-        val batchTime = measureTime {
-            preferenceDatastore.batchUpdate {
-                batchPrefs.forEach { pref -> update(pref) { it + 1 } }
-            }
-        }
-
-        printComparison(
-            "Update 5 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
+    fun performanceComparison_update5Preferences() = runTest(testDispatcher) { compareUpdates(5) }
 
     @Test
-    fun performanceComparison_update10Preferences() = runTest(testDispatcher) {
-        val count = 10
-
-        val normalPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_normal_update10_$it", it)
-        }
-        val normalTime = measureTime {
-            normalPrefs.forEach { pref -> pref.update { it + 1 } }
-        }
-
-        val batchPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_batch_update10_$it", it)
-        }
-        val batchTime = measureTime {
-            preferenceDatastore.batchUpdate {
-                batchPrefs.forEach { pref -> update(pref) { it + 1 } }
-            }
-        }
-
-        printComparison(
-            "Update 10 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
+    fun performanceComparison_update10Preferences() = runTest(testDispatcher) { compareUpdates(10) }
 
     @Test
-    fun performanceComparison_update25Preferences() = runTest(testDispatcher) {
-        val count = 25
-
-        val normalPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_normal_update25_$it", it)
-        }
-        val normalTime = measureTime {
-            normalPrefs.forEach { pref -> pref.update { it + 1 } }
-        }
-
-        val batchPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_batch_update25_$it", it)
-        }
-        val batchTime = measureTime {
-            preferenceDatastore.batchUpdate {
-                batchPrefs.forEach { pref -> update(pref) { it + 1 } }
-            }
-        }
-
-        printComparison(
-            "Update 25 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
+    fun performanceComparison_update25Preferences() = runTest(testDispatcher) { compareUpdates(25) }
 
     // ---- Mixed-type performance ----
 
     @Test
     fun performanceComparison_writeMixedTypes() = runTest(testDispatcher) {
-        val normalString = preferenceDatastore.string("perf_normal_mix_str", "")
-        val normalInt = preferenceDatastore.int("perf_normal_mix_int", 0)
-        val normalBool = preferenceDatastore.bool("perf_normal_mix_bool", false)
-        val normalLong = preferenceDatastore.long("perf_normal_mix_long", 0L)
-        val normalFloat = preferenceDatastore.float("perf_normal_mix_float", 0f)
-        val normalDouble = preferenceDatastore.double("perf_normal_mix_double", 0.0)
-        val normalStringSet = preferenceDatastore.stringSet("perf_normal_mix_sset", emptySet())
+        val stringPref = preferenceDatastore.string("perf_normal_mixed_string", "")
+        val intPref = preferenceDatastore.int("perf_normal_mixed_int", 0)
+        val boolPref = preferenceDatastore.bool("perf_normal_mixed_bool", false)
+        val longPref = preferenceDatastore.long("perf_normal_mixed_long", 0L)
 
         val normalTime = measureTime {
-            normalString.set("hello")
-            normalInt.set(42)
-            normalBool.set(true)
-            normalLong.set(123456L)
-            normalFloat.set(3.14f)
-            normalDouble.set(2.718)
-            normalStringSet.set(setOf("a", "b", "c"))
+            stringPref.set("mixed")
+            intPref.set(7)
+            boolPref.set(true)
+            longPref.set(70L)
         }
+        assertEquals("mixed", stringPref.get())
+        assertEquals(7, intPref.get())
 
-        val batchString = preferenceDatastore.string("perf_batch_mix_str", "")
-        val batchInt = preferenceDatastore.int("perf_batch_mix_int", 0)
-        val batchBool = preferenceDatastore.bool("perf_batch_mix_bool", false)
-        val batchLong = preferenceDatastore.long("perf_batch_mix_long", 0L)
-        val batchFloat = preferenceDatastore.float("perf_batch_mix_float", 0f)
-        val batchDouble = preferenceDatastore.double("perf_batch_mix_double", 0.0)
-        val batchStringSet = preferenceDatastore.stringSet("perf_batch_mix_sset", emptySet())
-
+        var stringHandle: BatchPref<String>? = null
+        var intHandle: BatchPref<Int>? = null
+        var boolHandle: BatchPref<Boolean>? = null
+        var longHandle: BatchPref<Long>? = null
+        val batch = prefBatch {
+            stringHandle = add(stringPref)
+            intHandle = add(intPref)
+            boolHandle = add(boolPref)
+            longHandle = add(longPref)
+        }
         val batchTime = measureTime {
             preferenceDatastore.batchWrite {
-                set(batchString, "hello")
-                set(batchInt, 42)
-                set(batchBool, true)
-                set(batchLong, 123456L)
-                set(batchFloat, 3.14f)
-                set(batchDouble, 2.718)
-                set(batchStringSet, setOf("a", "b", "c"))
+                set(requireNotNull(stringHandle), "mixed")
+                set(requireNotNull(intHandle), 7)
+                set(requireNotNull(boolHandle), true)
+                set(requireNotNull(longHandle), 70L)
             }
         }
+        assertEquals("mixed", stringPref.get())
+        assertEquals(7, intPref.get())
+        assertEquals(true, boolPref.get())
+        assertEquals(70L, longPref.get())
 
         printComparison(
-            "Write 7 mixed-type preferences",
-            TimingResult("Normal", normalTime, 7),
-            TimingResult("Batch", batchTime, 7),
+            "Write mixed types",
+            TimingResult("Normal", normalTime, 4),
+            TimingResult("Batch", batchTime, 4),
         )
     }
 
     @Test
     fun performanceComparison_readMixedTypes() = runTest(testDispatcher) {
-        val str = preferenceDatastore.string("perf_read_mix_str", "hello")
-        val int = preferenceDatastore.int("perf_read_mix_int", 42)
-        val bool = preferenceDatastore.bool("perf_read_mix_bool", true)
-        val long = preferenceDatastore.long("perf_read_mix_long", 123456L)
-        val float = preferenceDatastore.float("perf_read_mix_float", 3.14f)
-        val double = preferenceDatastore.double("perf_read_mix_double", 2.718)
-        val stringSet = preferenceDatastore.stringSet("perf_read_mix_sset", setOf("a", "b"))
+        val stringPref = preferenceDatastore.string("perf_normal_mixed_read_string", "")
+        val intPref = preferenceDatastore.int("perf_normal_mixed_read_int", 0)
+        val boolPref = preferenceDatastore.bool("perf_normal_mixed_read_bool", false)
+        val longPref = preferenceDatastore.long("perf_normal_mixed_read_long", 0L)
+        stringPref.set("mixed")
+        intPref.set(7)
+        boolPref.set(true)
+        longPref.set(70L)
 
         val normalTime = measureTime {
-            str.get()
-            int.get()
-            bool.get()
-            long.get()
-            float.get()
-            double.get()
-            stringSet.get()
+            stringPref.get()
+            intPref.get()
+            boolPref.get()
+            longPref.get()
         }
 
-        val batchTime = measureTime {
-            preferenceDatastore.batchRead {
-                get(str)
-                get(int)
-                get(bool)
-                get(long)
-                get(float)
-                get(double)
-                get(stringSet)
-            }
+        var stringHandle: BatchPref<String>? = null
+        var intHandle: BatchPref<Int>? = null
+        var boolHandle: BatchPref<Boolean>? = null
+        var longHandle: BatchPref<Long>? = null
+        val batch = prefBatch {
+            stringHandle = add(stringPref)
+            intHandle = add(intPref)
+            boolHandle = add(boolPref)
+            longHandle = add(longPref)
         }
+        val batchTime = measureTime {
+            preferenceDatastore.batchReadValues(declare(batch)).toMap()
+        }
+        val values = preferenceDatastore.batchReadValues(declare(batch))
+        assertEquals("mixed", values[requireNotNull(stringHandle)])
+        assertEquals(7, values[requireNotNull(intHandle)])
+        assertEquals(true, values[requireNotNull(boolHandle)])
+        assertEquals(70L, values[requireNotNull(longHandle)])
 
         printComparison(
-            "Read 7 mixed-type preferences",
-            TimingResult("Normal", normalTime, 7),
-            TimingResult("Batch", batchTime, 7),
+            "Read mixed types",
+            TimingResult("Normal", normalTime, 4),
+            TimingResult("Batch", batchTime, 4),
         )
     }
 
-    // ---- Delete performance ----
+    // ---- Delete / reset performance ----
 
     @Test
-    fun performanceComparison_delete10Preferences() = runTest(testDispatcher) {
-        val count = 10
-
-        val normalPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_normal_del10_$it", it).also { p ->
-                p.set(it * 100)
-            }
-        }
-        val normalTime = measureTime {
-            normalPrefs.forEach { it.delete() }
-        }
-
-        val batchPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_batch_del10_$it", it).also { p ->
-                p.set(it * 100)
-            }
-        }
-        val batchTime = measureTime {
-            preferenceDatastore.batchWrite {
-                batchPrefs.forEach { delete(it) }
-            }
-        }
-
-        printComparison(
-            "Delete 10 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
-    }
-
-    // ---- ResetToDefault performance ----
+    fun performanceComparison_delete10Preferences() = runTest(testDispatcher) { compareDeletes(10) }
 
     @Test
     fun performanceComparison_resetToDefault10Preferences() = runTest(testDispatcher) {
-        val count = 10
-
-        val normalPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_normal_reset10_$it", it).also { p ->
-                p.set(it * 100)
-            }
-        }
-        val normalTime = measureTime {
-            normalPrefs.forEach { it.resetToDefault() }
-        }
-
-        val batchPrefs = (0 until count).map {
-            preferenceDatastore.int("perf_batch_reset10_$it", it).also { p ->
-                p.set(it * 100)
-            }
-        }
-        val batchTime = measureTime {
-            preferenceDatastore.batchWrite {
-                batchPrefs.forEach { resetToDefault(it) }
-            }
-        }
-
-        printComparison(
-            "ResetToDefault 10 preferences",
-            TimingResult("Normal", normalTime, count),
-            TimingResult("Batch", batchTime, count),
-        )
+        compareResetToDefault(10)
     }
 }

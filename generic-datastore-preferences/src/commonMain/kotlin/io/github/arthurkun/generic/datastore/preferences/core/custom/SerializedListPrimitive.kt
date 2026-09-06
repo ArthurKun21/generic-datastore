@@ -2,15 +2,11 @@ package io.github.arthurkun.generic.datastore.preferences.core.custom
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import io.github.arthurkun.generic.datastore.preferences.utils.deserializeList
+import io.github.arthurkun.generic.datastore.preferences.utils.serializeList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonPrimitive
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * [CustomGenericPreferenceItem] that stores a [List] inside one JSON array string.
@@ -29,19 +25,7 @@ internal class SerializedListPrimitive<T>(
     datastore = datastore,
     key = key,
     defaultValue = defaultValue,
-    serializer = { list -> JsonArray(list.map { JsonPrimitive(elementSerializer(it)) }).toString() },
-    deserializer = { str ->
-        val elements = mutableListOf<T>()
-        Json.parseToJsonElement(str).jsonArray.forEach { element ->
-            try {
-                elements.add(elementDeserializer(element.jsonPrimitive.content))
-            } catch (e: CancellationException) {
-                throw e
-            } catch (_: Exception) {
-                // Skip only elements that failed to deserialize.
-            }
-        }
-        elements
-    },
+    serializer = { list -> serializeList(list, elementSerializer) },
+    deserializer = { str -> deserializeList(str, elementDeserializer) },
     ioDispatcher = ioDispatcher,
 )

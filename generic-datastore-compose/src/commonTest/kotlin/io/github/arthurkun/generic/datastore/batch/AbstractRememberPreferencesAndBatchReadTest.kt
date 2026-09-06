@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchPref
+import io.github.arthurkun.generic.datastore.preferences.batch.prefBatch
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
@@ -25,13 +27,25 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
     fun rememberBatchRead_initialNullThenEmitsAndUpdates() = runTest(testDispatcher) {
         val stringPref = preferenceDatastore.string("remember_batch_read_string", "default")
         val intPref = preferenceDatastore.int("remember_batch_read_int", 1)
+        var stringHandle: BatchPref<String>? = null
+        var intHandle: BatchPref<Int>? = null
+        prefBatch {
+            stringHandle = add(stringPref)
+            intHandle = add(intPref)
+        }
         var observedState: State<Pair<String, Int>?>? = null
 
         val harness = ComposeRuntimeTestHarness(testDispatcher)
         harness.setContent {
             PlatformProviders {
-                observedState = preferenceDatastore.rememberBatchRead(context = testDispatcher) {
-                    get(stringPref) to get(intPref)
+                observedState = preferenceDatastore.rememberBatchRead(
+                    context = testDispatcher,
+                    declare = {
+                        add(stringPref)
+                        add(intPref)
+                    },
+                ) {
+                    this[requireNotNull(stringHandle)] to this[requireNotNull(intHandle)]
                 }
             }
         }

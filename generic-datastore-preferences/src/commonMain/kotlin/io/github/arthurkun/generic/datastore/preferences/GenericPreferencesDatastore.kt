@@ -19,9 +19,11 @@ import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupCreator
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupRestorer
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
-import io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchValues
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
+import io.github.arthurkun.generic.datastore.preferences.batch.PrefBuilder
+import io.github.arthurkun.generic.datastore.preferences.batch.buildBatch
 import io.github.arthurkun.generic.datastore.preferences.core.BooleanPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.DoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.FloatPrimitive
@@ -233,6 +235,46 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             NullableStringSetPrimitive(
                 datastore = datastore,
                 key = key,
+            ),
+        )
+
+    /**
+     * Creates a `List<String>` preference stored as a JSON array string.
+     *
+     * @param key The preference key.
+     * @param defaultValue The default List<String> value.
+     * @return A [DelegatedPreference] instance for the List<String> preference.
+     */
+    override fun stringList(
+        key: String,
+        defaultValue: List<String>,
+    ): Preference<List<String>> =
+        PreferenceImpl(
+            SerializedListPrimitive(
+                datastore = datastore,
+                key = key,
+                defaultValue = defaultValue,
+                elementSerializer = { it },
+                elementDeserializer = { it },
+            ),
+        )
+
+    /**
+     * Creates a nullable `List<String>` preference.
+     * Returns `null` when the key is not set in DataStore or the stored payload cannot be decoded.
+     *
+     * @param key The preference key.
+     * @return A [DelegatedPreference] instance for the nullable List<String> preference.
+     */
+    override fun nullableStringList(
+        key: String,
+    ): Preference<List<String>?> =
+        PreferenceImpl(
+            NullableSerializedListPrimitive(
+                datastore = datastore,
+                key = key,
+                elementSerializer = { it },
+                elementDeserializer = { it },
             ),
         )
 
@@ -537,39 +579,81 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         ),
     )
 
-    override fun <R> batchReadFlow(
+    override fun batchReadFlowValues(
         distinctUntilChanged: Boolean,
-        block: BatchReadScope.() -> R,
-    ): Flow<R> {
+        declare: PrefBuilder.() -> Unit,
+    ): Flow<BatchValues> {
+        val batch = buildBatch(declare)
         val flow = datastore.dataOrEmpty.map { mutablePrefs ->
-            BatchReadScope(mutablePrefs).block()
+            BatchValues(mutablePrefs, batch)
         }
         return if (distinctUntilChanged) flow.distinctUntilChanged() else flow
     }
 
-    override suspend fun <R> batchRead(block: BatchReadScope.() -> R): R =
-        batchReadFlow(block = block).first()
+    override fun <R> batchReadFlow(
+        distinctUntilChanged: Boolean,
+        declare: PrefBuilder.() -> Unit,
+        block: BatchValues.() -> R,
+    ): Flow<R> {
+        val flow = batchReadFlowValues(declare = declare).map { values ->
+            values.block()
+        }
+        return if (distinctUntilChanged) flow.distinctUntilChanged() else flow
+    }
 
-    override suspend fun batchWrite(block: BatchWriteScope.() -> Unit) {
+    override suspend fun batchReadValues(
+        declare: PrefBuilder.() -> Unit,
+    ): BatchValues = batchReadFlowValues(declare = declare).first()
+
+    override suspend fun <R> batchRead(
+        declare: PrefBuilder.() -> Unit,
+        block: BatchValues.() -> R,
+    ): R = batchReadFlow(declare = declare, block = block).first()
+
+    override suspend fun batchWrite(
+        block: BatchWriteScope.() -> Unit,
+    ) {
         datastore.edit { mutablePrefs ->
             BatchWriteScope(mutablePrefs).block()
         }
     }
 
-    override suspend fun batchUpdate(block: BatchUpdateScope.() -> Unit) {
+    override suspend fun batchUpdate(
+        block: BatchUpdateScope.() -> Unit,
+    ) {
         datastore.edit { mutablePrefs ->
             BatchUpdateScope(mutablePrefs).block()
         }
     }
 
-    override fun <R> batchReadBlocking(block: BatchReadScope.() -> R): R =
-        runBlocking { batchRead(block) }
+    override suspend fun batchDelete(declare: PrefBuilder.() -> Unit) {
+        val batch = buildBatch(declare)
+        datastore.edit { mutablePrefs ->
+            batch.forEach { pref ->
+                pref.removeFrom(mutablePrefs)
+            }
+        }
+    }
 
-    override fun batchWriteBlocking(block: BatchWriteScope.() -> Unit): Unit =
-        runBlocking { batchWrite(block) }
+    override fun batchReadBlockingValues(
+        declare: PrefBuilder.() -> Unit,
+    ): BatchValues = runBlocking { batchReadValues(declare) }
 
-    override fun batchUpdateBlocking(block: BatchUpdateScope.() -> Unit): Unit =
-        runBlocking { batchUpdate(block) }
+    override fun <R> batchReadBlocking(
+        declare: PrefBuilder.() -> Unit,
+        block: BatchValues.() -> R,
+    ): R = runBlocking { batchRead(declare, block) }
+
+    override fun batchWriteBlocking(
+        block: BatchWriteScope.() -> Unit,
+    ): Unit = runBlocking { batchWrite(block) }
+
+    override fun batchUpdateBlocking(
+        block: BatchUpdateScope.() -> Unit,
+    ): Unit = runBlocking { batchUpdate(block) }
+
+    override fun batchDeleteBlocking(declare: PrefBuilder.() -> Unit): Unit =
+        runBlocking { batchDelete(declare) }
 
     /**
      * Clears all preferences stored in this datastore.

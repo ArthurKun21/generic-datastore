@@ -1,62 +1,66 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package io.github.arthurkun.generic.datastore.preferences.batch
 
 import androidx.datastore.preferences.core.MutablePreferences
-import io.github.arthurkun.generic.datastore.preferences.Preference
 
 /**
- * Scope for batch-writing multiple preferences in a single DataStore `edit` transaction.
+ * Unified scope for batch-writing multiple preferences in a single DataStore `edit` transaction.
+ *
+ * This scope extends [PrefBuilder], so one `datastore.batchWrite { … }` block both **declares**
+ * preferences and **operates** on them — reusing existing preferences or declaring from scratch:
+ *
+ * ```kotlin
+ * val text = datastore.string("text", "Hello World!")
+ *
+ * datastore.batchWrite {
+ *     val textHandle = add(text)          // reuse an existing Preference
+ *     val numHandle = int("num", 0)       // …or declare inline
+ *     set(textHandle, "Hi")
+ *     set(numHandle, 42)
+ *     resetToDefault(textHandle)
+ * }
+ * ```
  *
  * All [set], [delete], and [resetToDefault] calls within this scope write into the same
  * [MutablePreferences] instance, collapsing many logical writes into one atomic transaction.
+ * Batch membership is not enforced: any [BatchPref] handle may be written, so
+ * `batchWrite { set(handle, value) }` works without re-declaring.
  *
- * Use [set] or the indexing operator (`this[pref] = value`) to write preference values.
- * Obtain this scope from `PreferencesDatastore.batchWrite`.
- *
- * Example:
- * ```kotlin
- * datastore.batchWrite {
- *     this[username] = "rafael"
- *     resetToDefault(hasSeenOnboarding)
- * }
- * ```
+ * Obtain this scope from
+ * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchWrite].
  */
 @PreferencesBatchDsl
 public class BatchWriteScope internal constructor(
     private val mutablePreferences: MutablePreferences,
-) {
+) : PrefBuilder() {
     /**
-     * Sets the given preference's value in the shared transaction.
+     * Sets the given preference's value in the shared transaction. Writing `null` to a nullable
+     * preference removes its key.
      *
-     * @param preference The preference to write.
+     * @param T The preference value type.
+     * @param pref The preference to write.
      * @param value The new value to write.
-     * @throws IllegalStateException if [preference] does not implement [PreferencesAccessor].
      */
-    public operator fun <T> set(preference: Preference<T>, value: T) {
-        val accessible = preference as? PreferencesAccessor<T>
-            ?: error("Batch operations only support preferences created by this library")
-        accessible.writeInto(mutablePreferences, value)
+    public operator fun <T> set(pref: BatchPref<T>, value: T) {
+        pref.writeTo(mutablePreferences, value)
     }
 
     /**
      * Removes the given preference's key from the shared transaction.
      *
-     * @param preference The preference to remove.
-     * @throws IllegalStateException if [preference] does not implement [PreferencesAccessor].
+     * @param T The preference value type.
+     * @param pref The preference to remove.
      */
-    public fun <T> delete(preference: Preference<T>) {
-        val accessible = preference as? PreferencesAccessor<T>
-            ?: error("Batch operations only support preferences created by this library")
-        accessible.removeFrom(mutablePreferences)
+    public fun <T> delete(pref: BatchPref<T>) {
+        pref.removeFrom(mutablePreferences)
     }
 
     /**
-     * Resets the given preference to its [Preference.defaultValue] in the shared transaction.
+     * Resets the given preference to its [BatchPref.defaultValue] in the shared transaction.
      *
-     * @param preference The preference to reset.
+     * @param T The preference value type.
+     * @param pref The preference to reset.
      */
-    public fun <T> resetToDefault(preference: Preference<T>) {
-        set(preference, preference.defaultValue)
+    public fun <T> resetToDefault(pref: BatchPref<T>) {
+        set(pref, pref.defaultValue)
     }
 }

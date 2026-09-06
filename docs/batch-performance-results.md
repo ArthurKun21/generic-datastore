@@ -3,28 +3,31 @@
 Performance comparison between individual DataStore operations and batch operations,
 measured on Desktop/JVM (JUnit 5) using `kotlin.time.measureTime`.
 
-> **Environment:** Windows 10, JVM desktop target, `StandardTestDispatcher`, single test run.
-> Timings include DataStore I/O overhead (file reads/writes). Results may vary across runs.
+> **Environment:** macOS (darwin, Apple Silicon), JVM desktop target, `StandardTestDispatcher`,
+> single test run on 2026-09-06, inline `datastore.batchX { … }` API.
+> Timings include DataStore I/O overhead (file reads/writes). Absolute timings are
+> machine-dependent and speedup ratios vary run to run; treat them as orders of magnitude,
+> not exact figures.
 
 ## Summary
 
 | Operation            | Count | Normal (total) | Batch (total) | Speedup |
 |----------------------|------:|---------------:|--------------:|--------:|
-| **Write**            |     5 |      254.46 ms |      83.49 ms |  3.05x  |
-| **Write**            |    10 |      257.88 ms |      21.32 ms | 12.10x  |
-| **Write**            |    25 |      728.96 ms |      23.48 ms | 31.05x  |
-| **Write**            |    50 |     1459.24 ms |      26.81 ms | 54.42x  |
-| **Write (mixed)**    |     7 |      631.82 ms |      32.28 ms | 19.57x  |
-| **Read**             |     5 |        5.64 ms |       0.46 ms | 12.33x  |
-| **Read**             |    10 |       70.84 ms |       4.99 ms | 14.18x  |
-| **Read**             |    25 |       15.68 ms |       0.47 ms | 33.08x  |
-| **Read**             |    50 |      115.35 ms |       1.82 ms | 63.52x  |
-| **Read (mixed)**     |     7 |        7.87 ms |       0.63 ms | 12.49x  |
-| **Update**           |     5 |      209.53 ms |      45.91 ms |  4.56x  |
-| **Update**           |    10 |      219.97 ms |      30.94 ms |  7.11x  |
-| **Update**           |    25 |      815.90 ms |      22.69 ms | 35.95x  |
-| **Delete**           |    10 |      230.95 ms |      17.28 ms | 13.36x  |
-| **ResetToDefault**   |    10 |      196.04 ms |      24.18 ms |  8.11x  |
+| **Write**            |     5 |        2.40 ms |     463.08 µs |  5.17x  |
+| **Write**            |    10 |        5.29 ms |     473.92 µs | 11.15x  |
+| **Write**            |    25 |       13.68 ms |     591.42 µs | 23.12x  |
+| **Write**            |    50 |       65.80 ms |       1.37 ms | 48.16x  |
+| **Write (mixed)**    |     4 |       44.35 ms |     915.75 µs | 48.43x  |
+| **Read**             |     5 |      200.92 µs |      76.63 µs |  2.62x  |
+| **Read**             |    10 |      582.21 µs |     900.17 µs |  0.64x  |
+| **Read**             |    25 |      853.67 µs |     163.46 µs |  5.22x  |
+| **Read**             |    50 |        1.50 ms |     314.08 µs |  4.78x  |
+| **Read (mixed)**     |     4 |      147.38 µs |      74.08 µs |  1.98x  |
+| **Update**           |     5 |        1.78 ms |     354.75 µs |  5.00x  |
+| **Update**           |    10 |        5.48 ms |       1.19 ms |  4.59x  |
+| **Update**           |    25 |       13.52 ms |     486.75 µs | 27.77x  |
+| **Delete**           |    10 |        8.62 ms |     751.04 µs | 11.47x  |
+| **ResetToDefault**   |    10 |        6.84 ms |     755.04 µs |  9.06x  |
 
 ## Key Findings
 
@@ -36,26 +39,29 @@ triggers a separate DataStore `edit` transaction (read file → modify → write
 
 | Preferences | Normal per-op | Batch per-op | Speedup |
 |------------:|--------------:|-------------:|--------:|
-|           5 |      50.89 ms |     16.70 ms |  3.05x  |
-|          10 |      25.79 ms |      2.13 ms | 12.10x  |
-|          25 |      29.16 ms |      0.94 ms | 31.05x  |
-|          50 |      29.18 ms |      0.54 ms | 54.42x  |
+|           5 |     479.56 µs |     92.62 µs |  5.17x  |
+|          10 |     528.83 µs |     47.39 µs | 11.15x  |
+|          25 |     547.06 µs |     23.66 µs | 23.12x  |
+|          50 |       1.32 ms |     27.33 µs | 48.16x  |
 
-At 50 preferences, batch is **~54x faster** because it performs 1 file write instead of 50.
+At 50 preferences, batch is **~48x faster** because it performs 1 file write instead of 50.
 
 ### Read operations benefit from shared snapshots
 
-Each normal `get()` call independently reads from the DataStore flow. `batchRead` takes a
+Each normal `get()` call independently reads from the DataStore flow. `batchReadValues` takes a
 **single snapshot** and reads all values from it in-memory.
 
 | Preferences | Normal per-op | Batch per-op | Speedup |
 |------------:|--------------:|-------------:|--------:|
-|           5 |       1.13 ms |     91.48 μs | 12.33x  |
-|          10 |       7.08 ms |    499.46 μs | 14.18x  |
-|          25 |     627.15 μs |     18.96 μs | 33.08x  |
-|          50 |       2.31 ms |     36.32 μs | 63.52x  |
+|           5 |      40.18 µs |     15.33 µs |  2.62x  |
+|          10 |      58.22 µs |     90.02 µs |  0.64x  |
+|          25 |      34.15 µs |      6.54 µs |  5.22x  |
+|          50 |      30.04 µs |      6.28 µs |  4.78x  |
 
-At 50 preferences, batch reads are **~64x faster**.
+At 50 preferences, batch reads are **~5x faster**. Small reads are noisy: at 10 preferences both
+sides are sub-millisecond and a repeat run measured 0.46x–0.64x, i.e. a wash — the fixed cost of
+building the `BatchValues` map dominates when there is almost no I/O to save. Reads win
+decisively once the snapshot replaces many independent flow collections.
 
 ### Update operations: compounded savings
 
@@ -63,28 +69,34 @@ At 50 preferences, batch reads are **~64x faster**.
 
 | Preferences | Normal per-op | Batch per-op | Speedup |
 |------------:|--------------:|-------------:|--------:|
-|           5 |      41.91 ms |      9.18 ms |  4.56x  |
-|          10 |      22.00 ms |      3.09 ms |  7.11x  |
-|          25 |      32.64 ms |      0.91 ms | 35.95x  |
+|           5 |     355.41 µs |     70.95 µs |  5.00x  |
+|          10 |     548.10 µs |    119.30 µs |  4.59x  |
+|          25 |     540.73 µs |     19.47 µs | 27.77x  |
 
 ### Mixed-type operations
 
-Writing 7 preferences of different types (String, Int, Boolean, Long, Float, Double, Set\<String\>)
-in a single batch is **~20x faster** than writing them individually.
+Writing 4 preferences of different types (String, Int, Boolean, Long) in a single batch is
+**~48x faster** than writing them individually (44.35 ms vs 915.75 µs total). Reading the same
+4 back in one snapshot is **~2x faster** (147.38 µs vs 74.08 µs total).
 
 ## When to use batch operations
 
-| Scenario                              | Recommendation               |
-|---------------------------------------|------------------------------|
-| Reading/writing 1–2 preferences       | Normal operations are fine   |
-| Reading/writing 3+ preferences        | Use `batchRead`/`batchWrite`  |
-| Read-modify-write on multiple values  | Use `batchUpdate`            |
-| Resetting or deleting multiple prefs  | Use `batchWrite`             |
-| UI settings screens saving all fields | Use `batchWrite`             |
+Every batch operation takes an inline `datastore.batchX { … }` declaration (`add(pref)` reuse or
+`string(…)`/`int(…)` from scratch); the measurements above apply equally to the inline API.
+
+| Scenario                              | Recommendation                     |
+|---------------------------------------|------------------------------------|
+| Reading/writing 1–2 preferences       | Normal operations are fine         |
+| Reading/writing 3+ preferences        | Use `batchReadValues`/`batchWrite` |
+| Read-modify-write on multiple values  | Use `batchUpdate`                  |
+| Resetting or deleting multiple prefs  | Use `batchDelete` or `batchWrite`  |
+| UI settings screens saving all fields | Use `batchWrite`                   |
 
 ## How to reproduce
 
-Run the performance test suite on Desktop/JVM:
+`DesktopBatchPerformanceTest` is `@Ignore`d at class level (benchmark timings are noisy and
+machine-dependent), so temporarily remove the `@Ignore` first, then run the performance test
+suite on Desktop/JVM:
 
 ```bash
 ./gradlew :generic-datastore-preferences:jvmTest \
