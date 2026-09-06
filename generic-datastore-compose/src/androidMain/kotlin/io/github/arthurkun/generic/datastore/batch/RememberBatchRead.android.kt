@@ -4,21 +4,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.batch.BatchReadScope
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchValues
+import io.github.arthurkun.generic.datastore.preferences.batch.PreferenceBatch
 import kotlin.coroutines.CoroutineContext
 
 /**
  * Android implementation of [PreferencesDatastore.rememberBatchRead] that uses
  * [collectAsStateWithLifecycle] to automatically pause collection when the lifecycle is stopped.
  *
+ * @param batch The batch declaration to observe.
  * @param context The [CoroutineContext] to use for collecting the flow.
- * @param block A lambda with receiver on [BatchReadScope] to derive the desired state from the batch read snapshot.
- * @return A [State] containing the latest [BatchReadScope], or `null` until the first
+ * @return A [State] containing the latest [BatchValues] snapshot, or `null` until the first
+ *   snapshot is available.
+ */
+@Composable
+public actual fun PreferencesDatastore.rememberBatchRead(
+    batch: PreferenceBatch,
+    context: CoroutineContext,
+): State<BatchValues?> = batchReadFlow(batch)
+    .collectAsStateWithLifecycle(initialValue = null, context = context)
+
+/**
+ * Android implementation of [PreferencesDatastore.rememberBatchRead] that uses
+ * [collectAsStateWithLifecycle] to automatically pause collection when the lifecycle is stopped.
+ *
+ * @param R The type of the derived state value.
+ * @param batch The batch declaration to observe.
+ * @param context The [CoroutineContext] to use for collecting the flow.
+ * @param block A lambda with receiver on [BatchValues] to derive the desired state from the batch
+ *   read snapshot.
+ * @return A [State] containing the latest value returned by [block], or `null` until the first
  *   snapshot is available.
  */
 @Composable
 public actual fun <R> PreferencesDatastore.rememberBatchRead(
+    batch: PreferenceBatch,
     context: CoroutineContext,
-    block: BatchReadScope.() -> R,
-): State<R?> = batchReadFlow(block = block)
+    block: BatchValues.() -> R,
+): State<R?> = batchReadFlow(batch, block = block)
     .collectAsStateWithLifecycle(initialValue = null, context = context)

@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.structuralEqualityPolicy
 import io.github.arthurkun.generic.datastore.preferences.Preference
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchPref
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -35,12 +36,19 @@ public fun <T1, T2> rememberPreferences(
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState2<T1, T2> {
     val datastore = LocalPreferencesDatastore.current
-    val batchState = datastore.rememberBatchRead(context) { this }
+    val batch = rememberBatch(pref1, pref2)
+
+    @Suppress("UNCHECKED_CAST")
+    val handle1 = batch[0] as BatchPref<T1>
+
+    @Suppress("UNCHECKED_CAST")
+    val handle2 = batch[1] as BatchPref<T2>
+    val batchState = datastore.rememberBatchRead(batch, context)
     val scope = rememberCoroutineScope()
     return remember(datastore, pref1, pref2, policy) {
         PreferencesState2(
-            state1 = BatchPrefsComposeState(pref1, batchState, datastore, scope, policy),
-            state2 = BatchPrefsComposeState(pref2, batchState, datastore, scope, policy),
+            state1 = BatchPrefsComposeState(handle1, batchState, datastore, scope, policy),
+            state2 = BatchPrefsComposeState(handle2, batchState, datastore, scope, policy),
         )
     }
 }
@@ -69,13 +77,23 @@ public fun <T1, T2, T3> rememberPreferences(
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState3<T1, T2, T3> {
     val datastore = LocalPreferencesDatastore.current
-    val batchState = datastore.rememberBatchRead(context) { this }
+    val batch = rememberBatch(pref1, pref2, pref3)
+
+    @Suppress("UNCHECKED_CAST")
+    val handle1 = batch[0] as BatchPref<T1>
+
+    @Suppress("UNCHECKED_CAST")
+    val handle2 = batch[1] as BatchPref<T2>
+
+    @Suppress("UNCHECKED_CAST")
+    val handle3 = batch[2] as BatchPref<T3>
+    val batchState = datastore.rememberBatchRead(batch, context)
     val scope = rememberCoroutineScope()
     return remember(datastore, pref1, pref2, pref3, policy) {
         PreferencesState3(
-            state1 = BatchPrefsComposeState(pref1, batchState, datastore, scope, policy),
-            state2 = BatchPrefsComposeState(pref2, batchState, datastore, scope, policy),
-            state3 = BatchPrefsComposeState(pref3, batchState, datastore, scope, policy),
+            state1 = BatchPrefsComposeState(handle1, batchState, datastore, scope, policy),
+            state2 = BatchPrefsComposeState(handle2, batchState, datastore, scope, policy),
+            state3 = BatchPrefsComposeState(handle3, batchState, datastore, scope, policy),
         )
     }
 }
@@ -105,14 +123,27 @@ public fun <T1, T2, T3, T4> rememberPreferences(
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState4<T1, T2, T3, T4> {
     val datastore = LocalPreferencesDatastore.current
-    val batchState = datastore.rememberBatchRead(context) { this }
+    val batch = rememberBatch(pref1, pref2, pref3, pref4)
+
+    @Suppress("UNCHECKED_CAST")
+    val handle1 = batch[0] as BatchPref<T1>
+
+    @Suppress("UNCHECKED_CAST")
+    val handle2 = batch[1] as BatchPref<T2>
+
+    @Suppress("UNCHECKED_CAST")
+    val handle3 = batch[2] as BatchPref<T3>
+
+    @Suppress("UNCHECKED_CAST")
+    val handle4 = batch[3] as BatchPref<T4>
+    val batchState = datastore.rememberBatchRead(batch, context)
     val scope = rememberCoroutineScope()
     return remember(datastore, pref1, pref2, pref3, pref4, policy) {
         PreferencesState4(
-            state1 = BatchPrefsComposeState(pref1, batchState, datastore, scope, policy),
-            state2 = BatchPrefsComposeState(pref2, batchState, datastore, scope, policy),
-            state3 = BatchPrefsComposeState(pref3, batchState, datastore, scope, policy),
-            state4 = BatchPrefsComposeState(pref4, batchState, datastore, scope, policy),
+            state1 = BatchPrefsComposeState(handle1, batchState, datastore, scope, policy),
+            state2 = BatchPrefsComposeState(handle2, batchState, datastore, scope, policy),
+            state3 = BatchPrefsComposeState(handle3, batchState, datastore, scope, policy),
+            state4 = BatchPrefsComposeState(handle4, batchState, datastore, scope, policy),
         )
     }
 }
@@ -143,15 +174,31 @@ public fun <T1, T2, T3, T4, T5> rememberPreferences(
     policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ): PreferencesState5<T1, T2, T3, T4, T5> {
     val datastore = LocalPreferencesDatastore.current
-    val batchState = datastore.rememberBatchRead(context) { this }
+    val batch = rememberBatch(pref1, pref2, pref3, pref4, pref5)
+
+    @Suppress("UNCHECKED_CAST")
+    val handle1 = batch[0] as BatchPref<T1>
+
+    @Suppress("UNCHECKED_CAST")
+    val handle2 = batch[1] as BatchPref<T2>
+
+    @Suppress("UNCHECKED_CAST")
+    val handle3 = batch[2] as BatchPref<T3>
+
+    @Suppress("UNCHECKED_CAST")
+    val handle4 = batch[3] as BatchPref<T4>
+
+    @Suppress("UNCHECKED_CAST")
+    val handle5 = batch[4] as BatchPref<T5>
+    val batchState = datastore.rememberBatchRead(batch, context)
     val scope = rememberCoroutineScope()
     return remember(datastore, pref1, pref2, pref3, pref4, pref5, policy) {
         PreferencesState5(
-            state1 = BatchPrefsComposeState(pref1, batchState, datastore, scope, policy),
-            state2 = BatchPrefsComposeState(pref2, batchState, datastore, scope, policy),
-            state3 = BatchPrefsComposeState(pref3, batchState, datastore, scope, policy),
-            state4 = BatchPrefsComposeState(pref4, batchState, datastore, scope, policy),
-            state5 = BatchPrefsComposeState(pref5, batchState, datastore, scope, policy),
+            state1 = BatchPrefsComposeState(handle1, batchState, datastore, scope, policy),
+            state2 = BatchPrefsComposeState(handle2, batchState, datastore, scope, policy),
+            state3 = BatchPrefsComposeState(handle3, batchState, datastore, scope, policy),
+            state4 = BatchPrefsComposeState(handle4, batchState, datastore, scope, policy),
+            state5 = BatchPrefsComposeState(handle5, batchState, datastore, scope, policy),
         )
     }
 }
