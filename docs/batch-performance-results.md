@@ -74,12 +74,15 @@ in a single batch is **~20x faster** than writing them individually.
 
 ## When to use batch operations
 
+Every batch operation consumes a `prefBatch { ... }` declaration; the measurements below apply
+equally to the declaration-based API.
+
 | Scenario                              | Recommendation               |
 |---------------------------------------|------------------------------|
 | Reading/writing 1–2 preferences       | Normal operations are fine   |
 | Reading/writing 3+ preferences        | Use `batchRead`/`batchWrite`  |
 | Read-modify-write on multiple values  | Use `batchUpdate`            |
-| Resetting or deleting multiple prefs  | Use `batchWrite`             |
+| Resetting or deleting multiple prefs  | Use `batchDelete` or `batchWrite` |
 | UI settings screens saving all fields | Use `batchWrite`             |
 
 ## How to reproduce
