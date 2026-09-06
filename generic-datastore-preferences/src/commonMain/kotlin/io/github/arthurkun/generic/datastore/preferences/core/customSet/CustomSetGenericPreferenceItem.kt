@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
+import io.github.arthurkun.generic.datastore.preferences.utils.deserializeSet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Base implementation for non-null set preferences stored in a string-set entry.
@@ -103,19 +103,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
 
     override fun setBlocking(value: Set<T>): Unit = runBlocking { set(value) }
 
-    private fun safeDeserializeSet(values: Set<String>): Set<T> {
-        val elements = mutableSetOf<T>()
-        values.forEach { value ->
-            try {
-                elements.add(deserializer(value))
-            } catch (e: CancellationException) {
-                throw e
-            } catch (_: Exception) {
-                // Skip only elements that failed to deserialize.
-            }
-        }
-        return elements
-    }
+    private fun safeDeserializeSet(values: Set<String>): Set<T> = deserializeSet(values, deserializer)
 
     override fun readFrom(preferences: Preferences): Set<T> =
         preferences[stringSetPrefKey]?.let { safeDeserializeSet(it) } ?: defaultValue
