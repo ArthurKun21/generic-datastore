@@ -24,12 +24,20 @@ import kotlinx.serialization.serializer
  *
  * ```kotlin
  * class AppSettings {
- *     val batch = prefBatch {
- *         volume = int("volume", 50) // assign the returned handle to a holder property
- *         name = string("name")
+ *     val batch: PreferenceBatch
+ *     val volume: BatchPref<Int>
+ *     val name: BatchPref<String>
+ *
+ *     init {
+ *         var volumeH: BatchPref<Int>? = null
+ *         var nameH: BatchPref<String>? = null
+ *         batch = prefBatch {
+ *             volumeH = int("volume", 50) // capture the returned handle
+ *             nameH = string("name")
+ *         }
+ *         volume = requireNotNull(volumeH)
+ *         name = requireNotNull(nameH)
  *     }
- *     lateinit var volume: BatchPref<Int>
- *     lateinit var name: BatchPref<String>
  * }
  * ```
  *
