@@ -14,6 +14,8 @@ package io.github.arthurkun.generic.datastore.preferences.batch
  * every declared key in one transaction.
  *
  * The class implements [List] in declaration order, so batches can also be iterated directly.
+ * Equality is order-sensitive (declaration order matters); the read result
+ * ([BatchValues] equality) is order-insensitive since it compares the decoded value map.
  */
 public class PreferenceBatch internal constructor(
     private val entries: List<BatchPref<*>>,
