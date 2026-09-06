@@ -74,8 +74,8 @@ in a single batch is **~20x faster** than writing them individually.
 
 ## When to use batch operations
 
-Every batch operation consumes a `prefBatch { ... }` declaration; the measurements below apply
-equally to the declaration-based API.
+Every batch operation takes an inline `datastore.batchX { … }` declaration (`add(pref)` reuse or
+`string(…)`/`int(…)` from scratch); the measurements below apply equally to the inline API.
 
 | Scenario                              | Recommendation               |
 |---------------------------------------|------------------------------|
