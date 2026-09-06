@@ -71,6 +71,7 @@ public final class io/github/arthurkun/generic/datastore/batch/PreferencesState5
 
 public final class io/github/arthurkun/generic/datastore/batch/RememberBatchRead_jvmKt {
 	public static final fun rememberBatchRead (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)Landroidx/compose/runtime/State;
+	public static final fun rememberBatchRead (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)Landroidx/compose/runtime/State;
 }
 
 public final class io/github/arthurkun/generic/datastore/batch/RememberPreferencesKt {

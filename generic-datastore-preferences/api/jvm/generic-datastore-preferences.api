@@ -10,9 +10,14 @@ public final class io/github/arthurkun/generic/datastore/preferences/CreatePrefe
 }
 
 public final class io/github/arthurkun/generic/datastore/preferences/GenericPreferencesDatastore : io/github/arthurkun/generic/datastore/preferences/PreferencesDatastore {
-	public fun batchRead (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun batchReadBlocking (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public fun batchReadFlow (ZLkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public fun batchDelete (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun batchDeleteBlocking (Lkotlin/jvm/functions/Function1;)V
+	public fun batchRead (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun batchReadBlocking (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun batchReadBlockingValues (Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchValues;
+	public fun batchReadFlow (ZLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public fun batchReadFlowValues (ZLkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public fun batchReadValues (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun batchUpdate (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun batchUpdateBlocking (Lkotlin/jvm/functions/Function1;)V
 	public fun batchWrite (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -43,11 +48,13 @@ public final class io/github/arthurkun/generic/datastore/preferences/GenericPref
 	public fun nullableSerialized (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableSerializedList (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableString (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableStringList (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableStringSet (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun serialized (Ljava/lang/String;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun serializedList (Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun serializedSet (Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun string (Ljava/lang/String;Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun stringList (Ljava/lang/String;Ljava/util/List;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun stringSet (Ljava/lang/String;Ljava/util/Set;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 }
 
@@ -70,10 +77,16 @@ public final class io/github/arthurkun/generic/datastore/preferences/PreferenceA
 }
 
 public abstract interface class io/github/arthurkun/generic/datastore/preferences/PreferencesDatastore : java/lang/AutoCloseable {
-	public abstract fun batchRead (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun batchReadBlocking (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun batchReadFlow (ZLkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
-	public static synthetic fun batchReadFlow$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun batchDelete (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun batchDeleteBlocking (Lkotlin/jvm/functions/Function1;)V
+	public abstract fun batchRead (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun batchReadBlocking (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public abstract fun batchReadBlockingValues (Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchValues;
+	public abstract fun batchReadFlow (ZLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun batchReadFlow$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun batchReadFlowValues (ZLkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun batchReadFlowValues$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun batchReadValues (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun batchUpdate (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun batchUpdateBlocking (Lkotlin/jvm/functions/Function1;)V
 	public abstract fun batchWrite (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -119,6 +132,7 @@ public abstract interface class io/github/arthurkun/generic/datastore/preference
 	public abstract fun nullableSerialized (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableSerializedList (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableString (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableStringList (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableStringSet (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun serialized (Ljava/lang/String;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun serializedList (Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
@@ -127,12 +141,15 @@ public abstract interface class io/github/arthurkun/generic/datastore/preference
 	public static synthetic fun serializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun string (Ljava/lang/String;Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun string$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun stringList (Ljava/lang/String;Ljava/util/List;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun stringList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun stringSet (Ljava/lang/String;Ljava/util/Set;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun stringSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/Set;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 }
 
 public final class io/github/arthurkun/generic/datastore/preferences/PreferencesDatastore$DefaultImpls {
-	public static synthetic fun batchReadFlow$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun batchReadFlow$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun batchReadFlowValues$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
 	public static synthetic fun bool$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static fun close (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;)V
 	public static synthetic fun double$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;DILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
@@ -152,6 +169,7 @@ public final class io/github/arthurkun/generic/datastore/preferences/Preferences
 	public static synthetic fun serializedList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun serializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun string$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun stringList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun stringSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/Set;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 }
 
@@ -422,22 +440,146 @@ public final class io/github/arthurkun/generic/datastore/preferences/backup/Stri
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-public final class io/github/arthurkun/generic/datastore/preferences/batch/BatchReadScope {
-	public final fun get (Lio/github/arthurkun/generic/datastore/preferences/Preference;)Ljava/lang/Object;
+public abstract class io/github/arthurkun/generic/datastore/preferences/batch/BatchPref {
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Object;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun equals (Ljava/lang/Object;)Z
+	public final fun getDefaultValue ()Ljava/lang/Object;
+	public final fun getKey ()Ljava/lang/String;
+	public final fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/arthurkun/generic/datastore/preferences/batch/BatchUpdateScope {
-	public final fun delete (Lio/github/arthurkun/generic/datastore/preferences/Preference;)V
-	public final fun get (Lio/github/arthurkun/generic/datastore/preferences/Preference;)Ljava/lang/Object;
-	public final fun resetToDefault (Lio/github/arthurkun/generic/datastore/preferences/Preference;)V
-	public final fun set (Lio/github/arthurkun/generic/datastore/preferences/Preference;Ljava/lang/Object;)V
-	public final fun update (Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/jvm/functions/Function1;)V
+public final class io/github/arthurkun/generic/datastore/preferences/batch/BatchUpdateScope : io/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder {
+	public final fun delete (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)V
+	public final fun get (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)Ljava/lang/Object;
+	public final fun resetToDefault (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)V
+	public final fun set (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;Ljava/lang/Object;)V
+	public final fun update (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;Lkotlin/jvm/functions/Function1;)V
 }
 
-public final class io/github/arthurkun/generic/datastore/preferences/batch/BatchWriteScope {
-	public final fun delete (Lio/github/arthurkun/generic/datastore/preferences/Preference;)V
-	public final fun resetToDefault (Lio/github/arthurkun/generic/datastore/preferences/Preference;)V
-	public final fun set (Lio/github/arthurkun/generic/datastore/preferences/Preference;Ljava/lang/Object;)V
+public final class io/github/arthurkun/generic/datastore/preferences/batch/BatchValues {
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component10 ()Ljava/lang/Object;
+	public final fun component2 ()Ljava/lang/Object;
+	public final fun component3 ()Ljava/lang/Object;
+	public final fun component4 ()Ljava/lang/Object;
+	public final fun component5 ()Ljava/lang/Object;
+	public final fun component6 ()Ljava/lang/Object;
+	public final fun component7 ()Ljava/lang/Object;
+	public final fun component8 ()Ljava/lang/Object;
+	public final fun component9 ()Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun get (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public final fun toList ()Ljava/util/List;
+	public final fun toMap ()Ljava/util/Map;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/batch/BatchWriteScope : io/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder {
+	public final fun delete (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)V
+	public final fun resetToDefault (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)V
+	public final fun set (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;Ljava/lang/Object;)V
+}
+
+public class io/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder {
+	public final fun add (Lio/github/arthurkun/generic/datastore/preferences/Preference;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun add (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun bool (Ljava/lang/String;Z)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun bool$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun build ()Lio/github/arthurkun/generic/datastore/preferences/batch/PreferenceBatch;
+	public final fun double (Ljava/lang/String;D)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun double$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;DILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun float (Ljava/lang/String;F)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun float$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;FILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun int (Ljava/lang/String;I)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun int$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;IILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun kserialized (Ljava/lang/String;Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun kserialized$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Ljava/lang/Object;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun kserializedList (Ljava/lang/String;Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun kserializedList$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Ljava/util/List;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun kserializedSet (Ljava/lang/String;Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun kserializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Ljava/util/Set;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun long (Ljava/lang/String;J)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun long$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;JILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableBool (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableDouble (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableFloat (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableInt (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableKserialized (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun nullableKserialized$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableKserializedList (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun nullableKserializedList$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableLong (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableSerialized (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableSerializedList (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableString (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableStringList (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableStringSet (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	protected final fun register (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun serialized (Ljava/lang/String;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun serializedList (Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun serializedList$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun serializedSet (Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun serializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun string (Ljava/lang/String;Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun string$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun stringList (Ljava/lang/String;Ljava/util/List;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun stringList$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun stringSet (Ljava/lang/String;Ljava/util/Set;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun stringSet$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Ljava/util/Set;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/batch/PrefBuilderKt {
+	public static final fun prefBatch (Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/PreferenceBatch;
+}
+
+public final class io/github/arthurkun/generic/datastore/preferences/batch/PreferenceBatch : java/util/List, kotlin/jvm/internal/markers/KMappedMarker {
+	public fun add (ILio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)V
+	public synthetic fun add (ILjava/lang/Object;)V
+	public fun add (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)Z
+	public synthetic fun add (Ljava/lang/Object;)Z
+	public fun addAll (ILjava/util/Collection;)Z
+	public fun addAll (Ljava/util/Collection;)Z
+	public fun addFirst (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)V
+	public synthetic fun addFirst (Ljava/lang/Object;)V
+	public fun addLast (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)V
+	public synthetic fun addLast (Ljava/lang/Object;)V
+	public fun clear ()V
+	public fun contains (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)Z
+	public final fun contains (Ljava/lang/Object;)Z
+	public fun containsAll (Ljava/util/Collection;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun get (I)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public synthetic fun get (I)Ljava/lang/Object;
+	public fun getSize ()I
+	public fun hashCode ()I
+	public fun indexOf (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)I
+	public final fun indexOf (Ljava/lang/Object;)I
+	public fun isEmpty ()Z
+	public fun iterator ()Ljava/util/Iterator;
+	public fun lastIndexOf (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)I
+	public final fun lastIndexOf (Ljava/lang/Object;)I
+	public fun listIterator ()Ljava/util/ListIterator;
+	public fun listIterator (I)Ljava/util/ListIterator;
+	public fun remove (I)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public synthetic fun remove (I)Ljava/lang/Object;
+	public fun remove (Ljava/lang/Object;)Z
+	public fun removeAll (Ljava/util/Collection;)Z
+	public fun removeFirst ()Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public synthetic fun removeFirst ()Ljava/lang/Object;
+	public fun removeLast ()Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public synthetic fun removeLast ()Ljava/lang/Object;
+	public fun replaceAll (Ljava/util/function/UnaryOperator;)V
+	public fun retainAll (Ljava/util/Collection;)Z
+	public fun set (ILio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public synthetic fun set (ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun size ()I
+	public fun sort (Ljava/util/Comparator;)V
+	public fun subList (II)Ljava/util/List;
+	public fun toArray ()[Ljava/lang/Object;
+	public fun toArray ([Ljava/lang/Object;)[Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
 }
 
 public abstract interface annotation class io/github/arthurkun/generic/datastore/preferences/batch/PreferencesBatchDsl : java/lang/annotation/Annotation {
