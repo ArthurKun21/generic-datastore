@@ -41,8 +41,10 @@ public class BatchValues internal constructor(
     /**
      * Returns every declared preference mapped to its stored value (or default), in declaration
      * order.
+     *
+     * The returned map is a defensive copy: mutating it does not affect this snapshot.
      */
-    public fun toMap(): Map<BatchPref<*>, Any?> = values
+    public fun toMap(): Map<BatchPref<*>, Any?> = values.toMap()
 
     override fun equals(other: Any?): Boolean = other is BatchValues && other.values == values
 
