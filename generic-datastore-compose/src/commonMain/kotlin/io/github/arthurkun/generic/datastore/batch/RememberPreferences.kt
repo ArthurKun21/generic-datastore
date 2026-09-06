@@ -2,16 +2,36 @@ package io.github.arthurkun.generic.datastore.batch
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SnapshotMutationPolicy
+import androidx.compose.runtime.State
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.structuralEqualityPolicy
 import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchPref
+import io.github.arthurkun.generic.datastore.preferences.batch.BatchValues
 import io.github.arthurkun.generic.datastore.preferences.batch.PreferenceBatch
 import io.github.arthurkun.generic.datastore.preferences.batch.prefBatch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+
+/**
+ * Observes the preferences in [batch] through an inline [rememberBatchRead] declaration,
+ * restarting observation only when the batch itself changes (batches compare by value).
+ */
+@Composable
+internal fun PreferencesDatastore.rememberBatchState(
+    batch: PreferenceBatch,
+    context: CoroutineContext,
+): State<BatchValues?> = key(batch) {
+    rememberBatchRead(context) {
+        batch.forEach { pref ->
+            @Suppress("UNCHECKED_CAST")
+            add(pref as BatchPref<Any?>)
+        }
+    }
+}
 
 /**
  * Remembers a [PreferenceBatch] that contains every given preference, in the given order.
@@ -65,7 +85,7 @@ public fun <T1, T2> PreferencesDatastore.rememberPreferences(
 
     @Suppress("UNCHECKED_CAST")
     val handle2 = batch[1] as BatchPref<T2>
-    val batchState = rememberBatchRead(batch, context)
+    val batchState = rememberBatchState(batch, context)
     val scope = rememberCoroutineScope()
     val datastore = this
     return remember(datastore, pref1, pref2, policy) {
@@ -117,7 +137,7 @@ public fun <T1, T2, T3> PreferencesDatastore.rememberPreferences(
 
     @Suppress("UNCHECKED_CAST")
     val handle3 = batch[2] as BatchPref<T3>
-    val batchState = rememberBatchRead(batch, context)
+    val batchState = rememberBatchState(batch, context)
     val scope = rememberCoroutineScope()
     val datastore = this
     return remember(datastore, pref1, pref2, pref3, policy) {
@@ -175,7 +195,7 @@ public fun <T1, T2, T3, T4> PreferencesDatastore.rememberPreferences(
 
     @Suppress("UNCHECKED_CAST")
     val handle4 = batch[3] as BatchPref<T4>
-    val batchState = rememberBatchRead(batch, context)
+    val batchState = rememberBatchState(batch, context)
     val scope = rememberCoroutineScope()
     val datastore = this
     return remember(datastore, pref1, pref2, pref3, pref4, policy) {
@@ -239,7 +259,7 @@ public fun <T1, T2, T3, T4, T5> PreferencesDatastore.rememberPreferences(
 
     @Suppress("UNCHECKED_CAST")
     val handle5 = batch[4] as BatchPref<T5>
-    val batchState = rememberBatchRead(batch, context)
+    val batchState = rememberBatchState(batch, context)
     val scope = rememberCoroutineScope()
     val datastore = this
     return remember(datastore, pref1, pref2, pref3, pref4, pref5, policy) {

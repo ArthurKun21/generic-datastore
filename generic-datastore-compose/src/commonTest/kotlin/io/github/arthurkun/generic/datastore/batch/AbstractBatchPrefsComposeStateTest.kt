@@ -8,7 +8,6 @@ import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchPref
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchValues
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
-import io.github.arthurkun.generic.datastore.preferences.batch.PreferenceBatch
 import io.github.arthurkun.generic.datastore.preferences.batch.prefBatch
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runCurrent
@@ -29,7 +28,7 @@ abstract class AbstractBatchPrefsComposeStateTest {
     }
 
     private suspend fun <T> currentSnapshot(preference: Preference<T>): BatchValues =
-        preferenceDatastore.batchRead(prefBatch { add(preference) })
+        preferenceDatastore.batchReadValues { add(preference) }
 
     @Test
     fun value_returnsDefaultWhenBatchSnapshotIsUnavailable() = runTest(testDispatcher) {
@@ -187,11 +186,10 @@ private class CountingPreferencesDatastore(
         private set
 
     override suspend fun batchWrite(
-        batch: PreferenceBatch,
         block: BatchWriteScope.() -> Unit,
     ) {
         batchWriteCalls += 1
-        delegate.batchWrite(batch, block)
+        delegate.batchWrite(block)
     }
 }
 
@@ -199,7 +197,6 @@ private class FailingBatchWritePreferencesDatastore(
     private val delegate: PreferencesDatastore,
 ) : PreferencesDatastore by delegate {
     override suspend fun batchWrite(
-        batch: PreferenceBatch,
         block: BatchWriteScope.() -> Unit,
     ) {
         throw IllegalStateException("forced batch write failure")
@@ -212,7 +209,6 @@ private class FailsFirstBatchWritePreferencesDatastore(
     private var writes = 0
 
     override suspend fun batchWrite(
-        batch: PreferenceBatch,
         block: BatchWriteScope.() -> Unit,
     ) {
         writes += 1
@@ -220,6 +216,6 @@ private class FailsFirstBatchWritePreferencesDatastore(
             yield()
             throw IllegalStateException("forced first batch write failure")
         }
-        delegate.batchWrite(batch, block)
+        delegate.batchWrite(block)
     }
 }

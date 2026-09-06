@@ -12,8 +12,6 @@ import androidx.compose.runtime.structuralEqualityPolicy
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchPref
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchValues
-import io.github.arthurkun.generic.datastore.preferences.batch.PreferenceBatch
-import io.github.arthurkun.generic.datastore.preferences.batch.prefBatch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
@@ -46,8 +44,6 @@ internal class BatchPrefsComposeState<T>(
     private val policy: SnapshotMutationPolicy<Any?> = structuralEqualityPolicy(),
 ) : MutableState<T> {
 
-    private val writeBatch: PreferenceBatch = prefBatch { add(handle) }
-
     private var localOverride: Any? by mutableStateOf(Unset)
 
     private val upstreamState = derivedStateOf {
@@ -76,7 +72,7 @@ internal class BatchPrefsComposeState<T>(
                 localOverride = value
                 scope.launch {
                     try {
-                        datastore.batchWrite(writeBatch) {
+                        datastore.batchWrite {
                             this@batchWrite[handle] = value
                         }
                     } catch (e: CancellationException) {

@@ -2,35 +2,38 @@ package io.github.arthurkun.generic.datastore.batch
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchValues
-import io.github.arthurkun.generic.datastore.preferences.batch.PreferenceBatch
+import io.github.arthurkun.generic.datastore.preferences.batch.PrefBuilder
 import kotlin.coroutines.CoroutineContext
 
 /**
  * Android implementation of [PreferencesDatastore.rememberBatchRead] that uses
  * [collectAsStateWithLifecycle] to automatically pause collection when the lifecycle is stopped.
  *
- * @param batch The batch declaration to observe.
  * @param context The [CoroutineContext] to use for collecting the flow.
+ * @param declare A lambda with [PrefBuilder] receiver that declares the batch to observe.
  * @return A [State] containing the latest [BatchValues] snapshot, or `null` until the first
  *   snapshot is available.
  */
 @Composable
 public actual fun PreferencesDatastore.rememberBatchRead(
-    batch: PreferenceBatch,
     context: CoroutineContext,
-): State<BatchValues?> = batchReadFlow(batch)
-    .collectAsStateWithLifecycle(initialValue = null, context = context)
+    declare: PrefBuilder.() -> Unit,
+): State<BatchValues?> {
+    val flow = remember(this) { batchReadFlowValues(declare = declare) }
+    return flow.collectAsStateWithLifecycle(initialValue = null, context = context)
+}
 
 /**
  * Android implementation of [PreferencesDatastore.rememberBatchRead] that uses
  * [collectAsStateWithLifecycle] to automatically pause collection when the lifecycle is stopped.
  *
  * @param R The type of the derived state value.
- * @param batch The batch declaration to observe.
  * @param context The [CoroutineContext] to use for collecting the flow.
+ * @param declare A lambda with [PrefBuilder] receiver that declares the batch to observe.
  * @param block A lambda with receiver on [BatchValues] to derive the desired state from the batch
  *   read snapshot.
  * @return A [State] containing the latest value returned by [block], or `null` until the first
@@ -38,8 +41,10 @@ public actual fun PreferencesDatastore.rememberBatchRead(
  */
 @Composable
 public actual fun <R> PreferencesDatastore.rememberBatchRead(
-    batch: PreferenceBatch,
     context: CoroutineContext,
+    declare: PrefBuilder.() -> Unit,
     block: BatchValues.() -> R,
-): State<R?> = batchReadFlow(batch, block = block)
-    .collectAsStateWithLifecycle(initialValue = null, context = context)
+): State<R?> {
+    val flow = remember(this) { batchReadFlow(declare = declare, block = block) }
+    return flow.collectAsStateWithLifecycle(initialValue = null, context = context)
+}

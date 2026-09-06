@@ -29,7 +29,7 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
         val intPref = preferenceDatastore.int("remember_batch_read_int", 1)
         var stringHandle: BatchPref<String>? = null
         var intHandle: BatchPref<Int>? = null
-        val batch = prefBatch {
+        prefBatch {
             stringHandle = add(stringPref)
             intHandle = add(intPref)
         }
@@ -39,8 +39,11 @@ abstract class AbstractRememberPreferencesAndBatchReadTest {
         harness.setContent {
             PlatformProviders {
                 observedState = preferenceDatastore.rememberBatchRead(
-                    batch = batch,
                     context = testDispatcher,
+                    declare = {
+                        add(stringPref)
+                        add(intPref)
+                    },
                 ) {
                     this[requireNotNull(stringHandle)] to this[requireNotNull(intHandle)]
                 }
