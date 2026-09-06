@@ -76,10 +76,17 @@ preference class does:
 | `BatchCustomPref<T>` | `stringPreferencesKey` + `(T) -> String` / `(String) -> T` | default | default | n/a |
 | `BatchNullableCustomPref<T : Any>` | `stringPreferencesKey` | `null` | `null` | removes key |
 | `BatchSetPref<T>` | `stringSetPreferencesKey` + per-element (de)serializers | default | failing elements skipped | n/a |
-| `BatchNullableSetPref<T>` | same | `null` | failing elements skipped | removes key |
-| `BatchListPref<T>` | `stringPreferencesKey`, JSON array of string-wrapped elements (`JsonArray(list.map { JsonPrimitive(elemSer(it)) }).toString()`) | default | failing elements skipped; malformed array → default | n/a |
-| `BatchNullableListPref<T>` | same | `null` | same | removes key |
 | `PreferenceBatchAdapter<T>` | wraps an existing `Preference<T>`, delegates to internal `PreferencesAccessor`; throws `IllegalStateException("Batch operations only support preferences created by this library")` for foreign implementations | via wrapped pref | via wrapped pref | via wrapped pref |
+
+List declarations (`stringList`, `serializedList`, `kserializedList` and their nullable
+variants) reuse `BatchCustomPref` / `BatchNullableCustomPref`: the list storage format (JSON
+array of string-wrapped elements) is implemented by the serializer/deserializer lambdas passed
+at the `PrefBuilder` call site. There is intentionally no `BatchNullableSetPref` — the
+single-preference API has no nullable custom-set type either, so batch parity stops at
+`serializedSet` / `kserializedSet` plus the nullable list variants.
+
+Equality is on concrete subclass + key + default (lambdas are behavior, not state, and are
+excluded — see `BatchPref` KDoc); `hashCode` additionally folds in the concrete class.
 
 `CancellationException` is always rethrown (matches existing behavior).
 
