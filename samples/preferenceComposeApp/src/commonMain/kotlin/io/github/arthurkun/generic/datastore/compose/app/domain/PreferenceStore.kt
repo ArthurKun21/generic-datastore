@@ -122,7 +122,7 @@ class PreferenceStore(
         datastore.importDataAsString(backupString = backupString, json = json)
 
     suspend fun batchWriteBlock(block: BatchWriteScope.() -> Unit) =
-        datastore.batchWrite(mainBatch, block)
+        datastore.batchWrite(block)
 
     @Suppress("DEPRECATION")
     suspend fun runApiCoverageShowcase(json: Json? = null): String {
@@ -196,38 +196,59 @@ class PreferenceStore(
 
             var floatH: BatchPref<Float>? = null
             var nullableStringH: BatchPref<String?>? = null
-            val extrasBatch = prefBatch {
+            prefBatch {
                 floatH = add(floatPref)
                 nullableStringH = add(nullableStringPref)
             }
             val floatHandle = requireNotNull(floatH)
             val nullableStringHandle = requireNotNull(nullableStringH)
 
-            val batchFlow = datastore.batchReadFlow(mainBatch) {
+            val batchFlow = datastore.batchReadFlow(declare = {
+                add(text)
+                add(num)
+                add(bool)
+            }) {
                 Triple(this[textHandle], this[numHandle], this[boolHandle])
             }
             val batchFlowValue = batchFlow.getFirstForShowcase()
-            val batchReadValue = datastore.batchRead(mainBatch) {
+            val batchReadValue = datastore.batchRead(declare = {
+                add(text)
+                add(num)
+                add(bool)
+            }) {
                 Triple(this[textHandle], this[numHandle], this[boolHandle])
             }
-            datastore.batchUpdate(mainBatch) {
+            val (inlineText: String, inlineNum: Int) = datastore.batchReadValues {
+                string("text", "Hello World!")
+                int("num", 0)
+            }
+            datastore.batchUpdate {
                 set(textHandle, "API Coverage")
                 update(numHandle) { it + 1 }
                 resetToDefault(boolHandle)
             }
-            val blockingValue = datastore.batchReadBlocking(mainBatch) {
+            val blockingValue = datastore.batchReadBlocking(
+                declare = {
+                    add(text)
+                    add(num)
+                    add(bool)
+                },
+            ) {
                 Triple(this[textHandle], this[numHandle], this[boolHandle])
             }
-            datastore.batchWriteBlocking(mainBatch) {
+            datastore.batchWriteBlocking {
                 set(textHandle, batchReadValue.first)
                 set(numHandle, batchReadValue.second)
                 set(boolHandle, batchReadValue.third)
             }
-            datastore.batchUpdateBlocking(mainBatch) {
+            datastore.batchUpdateBlocking {
                 delete(nullableStringHandle)
                 resetToDefault(floatHandle)
             }
-            datastore.batchDelete(extrasBatch)
+            datastore.batchDelete {
+                add(floatPref)
+                add(nullableStringPref)
+            }
 
             val backupData: PreferencesBackup = datastore.exportAsData()
             val backupString = datastore.exportAsString(json = json)
@@ -251,6 +272,7 @@ class PreferenceStore(
             listOf(
                 batchFlowValue,
                 blockingValue,
+                "inline=$inlineText/$inlineNum",
                 "backup=${backupData.preferences.size}",
                 "legacy=${deprecatedExport.size}",
             ).joinToString(prefix = "Preferences APIs covered: ")
