@@ -176,7 +176,8 @@ Current Preferences API surface:
 | Category | APIs |
 |----------|------|
 | Lifecycle | `close()` |
-| Primitives | `string`, `long`, `int`, `float`, `double`, `bool`, `stringSet`, `stringList`, `nullableStringList` |
+| Primitives | `string`, `long`, `int`, `float`, `double`, `bool`, `stringSet` |
+| Lists | `stringList`, `nullableStringList` |
 | Nullable primitives | `nullableString`, `nullableStringSet`, `nullableInt`, `nullableLong`, `nullableFloat`, `nullableDouble`, `nullableBool` |
 | Custom values | `serialized`, `serializedSet`, `serializedList`, `nullableSerialized`, `nullableSerializedList` |
 | Kotlin Serialization | `kserialized`, `kserializedSet`, `kserializedList`, `nullableKserialized`, `nullableKserializedList` |
@@ -538,22 +539,50 @@ A `prefBatch { ... }` block declares the preferences a batch touches — one dec
 per preference type, each returning a typed `BatchPref<T>` handle. Every operation consumes that
 same declaration.
 
+> **Migrating from the scope-based API:** batch operations previously took `Preference<T>`
+> instances inside `BatchReadScope`/`BatchWriteScope`/`BatchUpdateScope` blocks
+> (e.g. `datastore.batchRead { get(myPref) }`). That API is removed. Declare a batch once with
+> `prefBatch { ... }`, capture each declaration's returned `BatchPref<T>` handle, and pass the
+> batch to every operation:
+> ```kotlin
+> // Before
+> val name = datastore.batchRead { get(namePref) }
+> datastore.batchWrite { set(namePref, "Ada") }
+>
+> // After
+> val batch: PreferenceBatch
+> val name: BatchPref<String>
+> init {
+>     var nameH: BatchPref<String>? = null
+>     batch = prefBatch { nameH = string("name", "Guest") }
+>     name = requireNotNull(nameH)
+> }
+> val values = datastore.batchRead(batch)
+> val readName: String = values[name]
+> datastore.batchWrite(batch) { this[name] = "Ada" }
+> ```
+> Existing library-created `Preference` objects can join a batch without re-declaring keys via
+> `add(pref)` (capture its returned `BatchPref<T>` handle). Reads of handles outside the batch
+> throw `IllegalStateException`; writes/updates accept outside handles but the `batch` parameter
+> is still required to anchor the call to an explicit declaration.
+
 #### Declaring a Batch
 
 ```kotlin
 class SettingsStore {
-    lateinit var settingsBatch: PreferenceBatch
-        private set
-    lateinit var userName: BatchPref<String>
-        private set
-    lateinit var darkMode: BatchPref<Boolean>
-        private set
+    val settingsBatch: PreferenceBatch
+    val userName: BatchPref<String>
+    val darkMode: BatchPref<Boolean>
 
     init {
+        var nameH: BatchPref<String>? = null
+        var darkH: BatchPref<Boolean>? = null
         settingsBatch = prefBatch {
-            userName = string("user_name", "Guest")
-            darkMode = bool("dark_mode", false)
+            nameH = string("user_name", "Guest")
+            darkH = bool("dark_mode", false)
         }
+        userName = requireNotNull(nameH)
+        darkMode = requireNotNull(darkH)
     }
 }
 ```
@@ -667,18 +696,19 @@ class GameViewModel(
     private val datastore: PreferencesDatastore,
 ) : ViewModel() {
 
-    lateinit var scoreBatch: PreferenceBatch
-        private set
-    lateinit var userScore: BatchPref<Int>
-        private set
-    lateinit var highScore: BatchPref<Long>
-        private set
+    val scoreBatch: PreferenceBatch
+    val userScore: BatchPref<Int>
+    val highScore: BatchPref<Long>
 
     init {
+        var scoreH: BatchPref<Int>? = null
+        var highH: BatchPref<Long>? = null
         scoreBatch = prefBatch {
-            userScore = int("user_score", 0)
-            highScore = long("high_score", 0L)
+            scoreH = int("user_score", 0)
+            highH = long("high_score", 0L)
         }
+        userScore = requireNotNull(scoreH)
+        highScore = requireNotNull(highH)
     }
 
     fun submitScore(newScore: Int) {
