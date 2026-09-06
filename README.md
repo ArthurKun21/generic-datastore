@@ -183,7 +183,7 @@ Current Preferences API surface:
 | Kotlin Serialization | `kserialized`, `kserializedSet`, `kserializedList`, `nullableKserialized`, `nullableKserializedList` |
 | Enum helpers | `enum`, `enumSet`, `nullableEnum` |
 | Reads and writes | `get`, `set`, `update`, `delete`, `resetToDefault`, `asFlow`, `stateIn`, `stateInCurrent`, blocking variants, property delegation |
-| Batch operations | `prefBatch`, `BatchPref` declarations, `batchReadFlow`, `batchRead`, `batchWrite`, `batchUpdate`, `batchDelete`, blocking variants |
+| Batch operations | `batchReadValues`/`batchReadFlowValues` (+ `batchRead`/`batchReadFlow` projections), `batchWrite`, `batchUpdate`, `batchDelete`, blocking variants |
 | Backup and restore | `exportAsData`, `exportAsString`, `importData`, `importDataAsString`, `clearAll` |
 | Utilities | `map`, `mapIO`, `toggle`, `toJsonElement`, `toJsonMap`, `BasePreference.privateKey`, `BasePreference.appStateKey` |
 | Deprecated compatibility | `GenericPreferenceDatastore`, `export`, `import` |
@@ -535,55 +535,54 @@ Batch operations let you read multiple preferences from one DataStore snapshot o
 or delete multiple preferences in one DataStore transaction, avoiding redundant I/O and keeping
 related values consistent.
 
-A `prefBatch { ... }` block declares the preferences a batch touches — one declaration function
-per preference type, each returning a typed `BatchPref<T>` handle. Every operation consumes that
-same declaration.
+Every batch operation takes an inline declaration block directly on the datastore. Inside the
+block you either **reuse** existing preferences via `add(pref)` or **declare from scratch** with
+`string(…)`, `int(…)`, … — both have the same effect:
+
+```kotlin
+val text = datastore.string("text", defaultValue = "Hello World!")
+val num = datastore.int("num", defaultValue = 0)
+
+// Reuse existing preferences
+val values = datastore.batchReadValues {
+    add(text)
+    add(num)
+}
+
+// …or declare from scratch, without pre-built variables
+val sameValues = datastore.batchReadValues {
+    string("text", defaultValue = "Hello World!")
+    int("num", defaultValue = 0)
+}
+```
 
 > **Migrating from the scope-based API:** batch operations previously took `Preference<T>`
 > instances inside `BatchReadScope`/`BatchWriteScope`/`BatchUpdateScope` blocks
-> (e.g. `datastore.batchRead { get(myPref) }`). That API is removed. Declare a batch once with
-> `prefBatch { ... }`, capture each declaration's returned `BatchPref<T>` handle, and pass the
-> batch to every operation:
+> (e.g. `datastore.batchRead { get(myPref) }`). That API is removed. Declare inline instead:
 > ```kotlin
 > // Before
 > val name = datastore.batchRead { get(namePref) }
 > datastore.batchWrite { set(namePref, "Ada") }
 >
 > // After
-> val batch: PreferenceBatch
-> val name: BatchPref<String>
-> init {
->     var nameH: BatchPref<String>? = null
->     batch = prefBatch { nameH = string("name", "Guest") }
->     name = requireNotNull(nameH)
-> }
-> val values = datastore.batchRead(batch)
-> val readName: String = values[name]
-> datastore.batchWrite(batch) { this[name] = "Ada" }
+> val values = datastore.batchReadValues { add(namePref) }
+> val name: String = values[nameHandle]
+> datastore.batchWrite { set(nameHandle, "Ada") }
 > ```
-> Existing library-created `Preference` objects can join a batch without re-declaring keys via
-> `add(pref)` (capture its returned `BatchPref<T>` handle). Reads of handles outside the batch
-> throw `IllegalStateException`; writes/updates accept outside handles but the `batch` parameter
-> is still required to anchor the call to an explicit declaration.
+> Existing library-created `Preference` objects join a batch via `add(pref)` — capture its
+> returned `BatchPref<T>` handle for typed access.
 
 #### Declaring a Batch
 
-```kotlin
-class SettingsStore {
-    val settingsBatch: PreferenceBatch
-    val userName: BatchPref<String>
-    val darkMode: BatchPref<Boolean>
+Each declaration function creates, registers, and returns a typed `BatchPref<T>` handle — capture
+the returned handles for typed snapshot access:
 
-    init {
-        var nameH: BatchPref<String>? = null
-        var darkH: BatchPref<Boolean>? = null
-        settingsBatch = prefBatch {
-            nameH = string("user_name", "Guest")
-            darkH = bool("dark_mode", false)
-        }
-        userName = requireNotNull(nameH)
-        darkMode = requireNotNull(darkH)
-    }
+```kotlin
+class SettingsStore(
+    private val datastore: PreferencesDatastore,
+) {
+    val userNamePref = datastore.string("user_name", "Guest")
+    val darkModePref = datastore.bool("dark_mode", false)
 }
 ```
 
@@ -591,39 +590,54 @@ Declaration functions exist for every preference type: `int`, `long`, `float`, `
 `string`, `stringSet`, `stringList`, their `nullable*` variants, `serialized`, `serializedSet`,
 `serializedList`, `kserialized`, `kserializedSet`, `kserializedList` (with reified overloads that
 infer the `KSerializer`), their nullable custom variants, and `enum`, `enumSet`, `nullableEnum`.
-Keys must be unique and non-blank inside a batch.
+Keys must be unique and non-blank inside a batch (`IllegalArgumentException` otherwise).
 
-Existing `Preference` objects created through a `PreferencesDatastore` can join a batch with
-`add(pref)`; a previously declared `BatchPref` handle can be reused with `add(handle)`.
+A previously declared `BatchPref` handle can be re-registered with `add(handle)`. Handles compare
+by value (key + default + storage kind), so an equal declaration reads the same entry.
 
 #### Batch Read
 
-`batchRead` maps every declared preference to its stored value (or default) in one DataStore
-emission. Read values with the typed indexing operator on the returned `BatchValues`:
+`batchReadValues` maps every declared preference to its stored value (or default) in one DataStore
+snapshot. Read values with the typed indexing operator and the captured handles, with `toMap()` /
+`toList()`, or by destructuring positionally in declaration order:
 
 ```kotlin
 class SettingsViewModel(
     private val datastore: PreferencesDatastore,
+    private val store: SettingsStore,
 ) : ViewModel() {
-
-    private val store = SettingsStore()
 
     fun loadSettings() {
         viewModelScope.launch {
-            val values = datastore.batchRead(store.settingsBatch)
-            val name: String = values[store.userName]
-            val isDark: Boolean = values[store.darkMode]
+            var nameH: BatchPref<String>? = null
+            var darkH: BatchPref<Boolean>? = null
+            val values = datastore.batchReadValues {
+                nameH = add(store.userNamePref)
+                darkH = add(store.darkModePref)
+            }
+            val name: String = values[requireNotNull(nameH)]
+            val isDark: Boolean = values[requireNotNull(darkH)]
+
+            // …or destructure (order-sensitive, same types as declared):
+            val (plainName: String, plainDark: Boolean) = values
         }
     }
 }
 ```
 
-Pass a block to derive a projection from the whole snapshot, and use `toMap()` when you need the
-raw mapping:
+`batchRead` takes a second block to derive a projection from the whole snapshot
+(`batchRead` is `batchReadFlow(…).first()`):
 
 ```kotlin
-val isConfigured = datastore.batchRead(store.settingsBatch) {
-    this[store.userName].isNotEmpty() || this[store.darkMode]
+var userNameH: BatchPref<String>? = null
+var darkModeH: BatchPref<Boolean>? = null
+val isConfigured = datastore.batchRead(
+    declare = {
+        userNameH = add(store.userNamePref)
+        darkModeH = add(store.darkModePref)
+    },
+) {
+    this[requireNotNull(userNameH)].isNotEmpty() || this[requireNotNull(darkModeH)]
 }
 ```
 
@@ -636,45 +650,58 @@ mapping the whole batch in a single emission. `BatchValues` implements `equals`,
 ```kotlin
 class SettingsViewModel(
     private val datastore: PreferencesDatastore,
+    private val store: SettingsStore,
 ) : ViewModel() {
 
-    private val store = SettingsStore()
+    // Handles cross from the declare block to the projection via captured vars.
+    var userNameH: BatchPref<String>? = null
+    var darkModeH: BatchPref<Boolean>? = null
 
-    val settingsFlow: Flow<Pair<String, Boolean>> = datastore
-        .batchReadFlow(store.settingsBatch, distinctUntilChanged = true) {
-            this[store.userName] to this[store.darkMode]
-        }
+    val settingsFlow: Flow<Pair<String, Boolean>> = datastore.batchReadFlow(
+        distinctUntilChanged = true,
+        declare = {
+            userNameH = add(store.userNamePref)
+            darkModeH = add(store.darkModePref)
+        },
+    ) {
+        this[requireNotNull(userNameH)] to this[requireNotNull(darkModeH)]
+    }
 
     val snapshotFlow: Flow<BatchValues> = datastore
-        .batchReadFlow(store.settingsBatch, distinctUntilChanged = true)
+        .batchReadFlowValues(distinctUntilChanged = true) {
+            add(store.userNamePref)
+            add(store.darkModePref)
+        }
 }
 ```
 
 #### Batch Write
 
-Write multiple preferences in a single atomic transaction:
+The write scope both declares preferences and writes them in a single atomic transaction:
 
 ```kotlin
 class SettingsViewModel(
     private val datastore: PreferencesDatastore,
+    private val store: SettingsStore,
 ) : ViewModel() {
-
-    private val store = SettingsStore()
 
     fun resetSettings() {
         viewModelScope.launch {
-            datastore.batchWrite(store.settingsBatch) {
-                set(store.userName, "Guest")
-                set(store.darkMode, false)
-                // the index operator is equivalent: this[store.userName] = "Guest"
+            datastore.batchWrite {
+                val name = add(store.userNamePref)
+                val dark = add(store.darkModePref)
+                set(name, "Guest")
+                set(dark, false)
+                // the index operator is equivalent: this[name] = "Guest"
             }
         }
     }
 }
 ```
 
-Writing `null` to a nullable declaration removes its key. The write scope also provides
-`delete(pref)` and `resetToDefault(pref)`.
+Batch membership is not enforced, so `batchWrite { set(handle, value) }` also works without
+re-declaring. Writing `null` to a nullable declaration removes its key. The write scope also
+provides `delete(pref)` and `resetToDefault(pref)`.
 
 #### Batch Delete
 
@@ -682,38 +709,28 @@ Remove the key of every declared preference in one transaction. Afterwards, read
 preference's default:
 
 ```kotlin
-datastore.batchDelete(store.settingsBatch)
+datastore.batchDelete {
+    add(store.userNamePref)
+    add(store.darkModePref)
+}
 ```
 
 #### Batch Update
 
-Atomically read current values and write new values in a single transaction, guaranteeing
-consistency when new values depend on current ones. Reads observe writes made earlier in the same
-block:
+The update scope both declares preferences and atomically reads/writes them in a single
+transaction, guaranteeing consistency when new values depend on current ones. Reads observe
+writes made earlier in the same block:
 
 ```kotlin
 class GameViewModel(
     private val datastore: PreferencesDatastore,
 ) : ViewModel() {
 
-    val scoreBatch: PreferenceBatch
-    val userScore: BatchPref<Int>
-    val highScore: BatchPref<Long>
-
-    init {
-        var scoreH: BatchPref<Int>? = null
-        var highH: BatchPref<Long>? = null
-        scoreBatch = prefBatch {
-            scoreH = int("user_score", 0)
-            highH = long("high_score", 0L)
-        }
-        userScore = requireNotNull(scoreH)
-        highScore = requireNotNull(highH)
-    }
-
     fun submitScore(newScore: Int) {
         viewModelScope.launch {
-            datastore.batchUpdate(scoreBatch) {
+            datastore.batchUpdate {
+                val userScore = int("user_score", 0)
+                val highScore = long("high_score", 0L)
                 set(userScore, newScore)
                 val currentHigh = get(highScore)
                 if (newScore > currentHigh) {
@@ -728,8 +745,10 @@ class GameViewModel(
 The `BatchUpdateScope` also provides `update`, `delete`, and `resetToDefault` helpers:
 
 ```kotlin
-datastore.batchUpdate(scoreBatch) {
-    update(userScore) { current -> current + 10 }
+datastore.batchUpdate {
+    val volume = add(volumePref)
+    val nickname = add(nicknamePref)
+    update(volume) { current -> current + 10 }
     delete(nickname)
     resetToDefault(volume)
 }
@@ -741,19 +760,22 @@ Blocking variants are available for non-coroutine contexts. Avoid calling these 
 thread:
 
 ```kotlin
-val values = datastore.batchReadBlocking(store.settingsBatch)
-val name = values[store.userName]
+var blockingNameH: BatchPref<String>? = null
+val values = datastore.batchReadBlockingValues {
+    blockingNameH = add(store.userNamePref)
+}
+val name = values[requireNotNull(blockingNameH)]
 
-datastore.batchWriteBlocking(store.settingsBatch) {
-    set(store.userName, "Guest")
-    set(store.darkMode, false)
+datastore.batchWriteBlocking {
+    set(requireNotNull(blockingNameH), "Guest")
 }
 
-datastore.batchUpdateBlocking(scoreBatch) {
-    update(userScore) { current -> current + 1 }
+datastore.batchUpdateBlocking {
+    val score = int("user_score", 0)
+    update(score) { current -> current + 1 }
 }
 
-datastore.batchDeleteBlocking(store.settingsBatch)
+datastore.batchDeleteBlocking { add(store.userNamePref) }
 ```
 
 ### Mapped Preferences
@@ -1252,18 +1274,29 @@ value without waiting for the DataStore round-trip.
 
 ### `rememberBatchRead()`
 
-Collects a `batchReadFlow` as a Compose `State`, reading a whole declared batch from a single
-DataStore snapshot:
+Collects a `batchReadFlowValues` as a Compose `State`, reading a whole declared batch from a
+single DataStore snapshot:
 
 ```kotlin
 @Composable
-fun SettingsScreen(datastore: PreferencesDatastore) {
-    val store = remember { SettingsStore() }
+fun SettingsScreen(datastore: PreferencesDatastore, store: SettingsStore) {
+    // Handles for typed access, captured once from an equal declaration.
+    var nameH: BatchPref<String>? = null
+    var darkH: BatchPref<Boolean>? = null
+    remember(store) {
+        prefBatch {
+            nameH = add(store.userNamePref)
+            darkH = add(store.darkModePref)
+        }
+    }
 
-    val settings by datastore.rememberBatchRead(store.settingsBatch)
+    val settings by datastore.rememberBatchRead({
+        add(store.userNamePref)
+        add(store.darkModePref)
+    })
 
     settings?.let { values ->
-        Text("User: ${values[store.userName]}, Dark mode: ${values[store.darkMode]}")
+        Text("User: ${values[requireNotNull(nameH)]}, Dark mode: ${values[requireNotNull(darkH)]}")
     }
 }
 ```
@@ -1271,8 +1304,13 @@ fun SettingsScreen(datastore: PreferencesDatastore) {
 A block variant derives a projection from each `BatchValues` snapshot:
 
 ```kotlin
-val nameLength by datastore.rememberBatchRead(store.settingsBatch) {
-    this[store.userName].length
+var lengthH: BatchPref<String>? = null
+val nameLength by datastore.rememberBatchRead(
+    declare = {
+        lengthH = add(store.userNamePref)
+    },
+) {
+    this[requireNotNull(lengthH)].length
 }
 ```
 
