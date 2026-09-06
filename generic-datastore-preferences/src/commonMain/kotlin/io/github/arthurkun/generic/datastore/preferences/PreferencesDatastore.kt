@@ -438,6 +438,10 @@ public interface PreferencesDatastore : AutoCloseable {
      * All [BatchWriteScope.set], [BatchWriteScope.delete], and [BatchWriteScope.resetToDefault]
      * calls share the same mutable transaction state. Batch membership is not enforced: any
      * [io.github.arthurkun.generic.datastore.preferences.batch.BatchPref] handle may be written.
+     * The [batch] parameter is still required so every batch operation is anchored to an explicit
+     * declaration — it documents which keys the call site logically owns, keeps the
+     * read/write/update/delete signatures symmetric, and reserves a hook for future validation —
+     * even though the transaction itself accepts handles from outside [batch].
      *
      * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
      * @param block A lambda with [BatchWriteScope] receiver that writes one or more preferences.
@@ -454,6 +458,10 @@ public interface PreferencesDatastore : AutoCloseable {
      * Reads through [BatchUpdateScope.get] observe earlier writes made through
      * [BatchUpdateScope.set] in the same block. Batch membership is not enforced: any
      * [io.github.arthurkun.generic.datastore.preferences.batch.BatchPref] handle may be updated.
+     * The [batch] parameter is still required so every batch operation is anchored to an explicit
+     * declaration — it documents which keys the call site logically owns, keeps the
+     * read/write/update/delete signatures symmetric, and reserves a hook for future validation —
+     * even though the transaction itself accepts handles from outside [batch].
      *
      * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
      * @param block A lambda with [BatchUpdateScope] receiver that reads and writes preferences.
@@ -496,6 +504,10 @@ public interface PreferencesDatastore : AutoCloseable {
     /**
      * Blocking variant of [batchWrite].
      *
+     * Like [batchWrite], batch membership is not enforced: the [batch] parameter anchors the call
+     * to an explicit declaration while the transaction accepts any
+     * [io.github.arthurkun.generic.datastore.preferences.batch.BatchPref] handle.
+     *
      * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
      * @param block A lambda with [BatchWriteScope] receiver.
      */
@@ -506,6 +518,10 @@ public interface PreferencesDatastore : AutoCloseable {
 
     /**
      * Blocking variant of [batchUpdate].
+     *
+     * Like [batchUpdate], batch membership is not enforced: the [batch] parameter anchors the call
+     * to an explicit declaration while the transaction accepts any
+     * [io.github.arthurkun.generic.datastore.preferences.batch.BatchPref] handle.
      *
      * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
      * @param block A lambda with [BatchUpdateScope] receiver.
