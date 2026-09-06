@@ -9,6 +9,17 @@ abstract class AbstractBatchOperationsBlockingTest {
 
     abstract val preferenceDatastore: GenericPreferencesDatastore
 
+    /**
+     * Bridges a [PreferenceBatch] built by [prefBatch] to an inline `declare` block, so existing
+     * declaration fixtures keep working with the inline batch operations.
+     */
+    protected fun declare(batch: PreferenceBatch): PrefBuilder.() -> Unit = {
+        batch.forEach { pref ->
+            @Suppress("UNCHECKED_CAST")
+            add(pref as BatchPref<Any?>)
+        }
+    }
+
     @Test
     fun batchReadBlocking_readWholeBatch() {
         var stringPref: BatchPref<String>? = null
@@ -18,7 +29,7 @@ abstract class AbstractBatchOperationsBlockingTest {
             intPref = int("batch_b_int", 42)
         }
 
-        val values = preferenceDatastore.batchReadBlocking(batch)
+        val values = preferenceDatastore.batchReadBlockingValues(declare(batch))
 
         assertEquals("hello", values[requireNotNull(stringPref)])
         assertEquals(42, values[requireNotNull(intPref)])
@@ -31,7 +42,7 @@ abstract class AbstractBatchOperationsBlockingTest {
             nullablePref = nullableString("batch_b_nullable")
         }
 
-        val values = preferenceDatastore.batchReadBlocking(batch)
+        val values = preferenceDatastore.batchReadBlockingValues(declare(batch))
 
         assertNull(values[requireNotNull(nullablePref)])
     }
@@ -43,7 +54,7 @@ abstract class AbstractBatchOperationsBlockingTest {
             stringPref = string("batch_b_projection", "value")
         }
 
-        val length = preferenceDatastore.batchReadBlocking(batch) {
+        val length = preferenceDatastore.batchReadBlocking(declare(batch)) {
             this[requireNotNull(stringPref)].length
         }
 
@@ -59,7 +70,7 @@ abstract class AbstractBatchOperationsBlockingTest {
             intPref = int("batch_bw_int", 0)
         }
 
-        preferenceDatastore.batchWriteBlocking(batch) {
+        preferenceDatastore.batchWriteBlocking {
             set(requireNotNull(stringPref), "written")
             set(requireNotNull(intPref), 123)
         }
@@ -77,7 +88,7 @@ abstract class AbstractBatchOperationsBlockingTest {
         val single = preferenceDatastore.string("batch_bw_del", "default")
         single.setBlocking("set_value")
 
-        preferenceDatastore.batchWriteBlocking(batch) {
+        preferenceDatastore.batchWriteBlocking {
             delete(requireNotNull(stringPref))
         }
 
@@ -93,7 +104,7 @@ abstract class AbstractBatchOperationsBlockingTest {
         val single = preferenceDatastore.int("batch_bw_reset", 42)
         single.setBlocking(99)
 
-        preferenceDatastore.batchWriteBlocking(batch) {
+        preferenceDatastore.batchWriteBlocking {
             resetToDefault(requireNotNull(intPref))
         }
 
@@ -109,7 +120,7 @@ abstract class AbstractBatchOperationsBlockingTest {
             label = string("batch_bu_label", "count:")
         }
 
-        preferenceDatastore.batchUpdateBlocking(batch) {
+        preferenceDatastore.batchUpdateBlocking {
             val currentCount = get(requireNotNull(counter))
             set(requireNotNull(counter), currentCount + 5)
             set(requireNotNull(label), "updated")
@@ -126,7 +137,7 @@ abstract class AbstractBatchOperationsBlockingTest {
             intPref = int("batch_bu_transform", 10)
         }
 
-        preferenceDatastore.batchUpdateBlocking(batch) {
+        preferenceDatastore.batchUpdateBlocking {
             update(requireNotNull(intPref)) { it * 2 }
         }
 
@@ -141,7 +152,7 @@ abstract class AbstractBatchOperationsBlockingTest {
         }
         val handle = requireNotNull(intPref)
 
-        preferenceDatastore.batchUpdateBlocking(batch) {
+        preferenceDatastore.batchUpdateBlocking {
             update(handle) { it + 1 }
             update(handle) { it + 1 }
             set(handle, get(handle) + 1)
@@ -162,10 +173,38 @@ abstract class AbstractBatchOperationsBlockingTest {
         preferenceDatastore.int("batch_bd_int", 3).setBlocking(50)
         preferenceDatastore.string("batch_bd_string", "d").setBlocking("stored")
 
-        preferenceDatastore.batchDeleteBlocking(batch)
+        preferenceDatastore.batchDeleteBlocking(declare(batch))
 
-        val values = preferenceDatastore.batchReadBlocking(batch)
+        val values = preferenceDatastore.batchReadBlockingValues(declare(batch))
         assertEquals(3, values[requireNotNull(intPref)])
         assertEquals("d", values[requireNotNull(stringPref)])
+    }
+
+    @Test
+    fun batchReadBlocking_inlineDeclarations() {
+        val single = preferenceDatastore.string("batch_b_inline_str", "hello")
+        single.setBlocking("stored")
+
+        var handle: BatchPref<String>? = null
+        val values = preferenceDatastore.batchReadBlockingValues {
+            handle = add(single)
+        }
+
+        assertEquals("stored", values[requireNotNull(handle)])
+        val (text: String) = values
+        assertEquals("stored", text)
+    }
+
+    @Test
+    fun batchWriteBlocking_inlineDeclarations() {
+        preferenceDatastore.batchWriteBlocking {
+            val handle = string("batch_bw_inline", "default")
+            set(handle, "inline_written")
+        }
+
+        assertEquals(
+            "inline_written",
+            preferenceDatastore.string("batch_bw_inline", "default").getBlocking(),
+        )
     }
 }

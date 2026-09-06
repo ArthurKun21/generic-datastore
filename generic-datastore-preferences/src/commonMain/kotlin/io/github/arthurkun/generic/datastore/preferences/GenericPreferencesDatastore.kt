@@ -22,7 +22,8 @@ import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBacku
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchValues
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
-import io.github.arthurkun.generic.datastore.preferences.batch.PreferenceBatch
+import io.github.arthurkun.generic.datastore.preferences.batch.PrefBuilder
+import io.github.arthurkun.generic.datastore.preferences.batch.buildBatch
 import io.github.arthurkun.generic.datastore.preferences.core.BooleanPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.DoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.FloatPrimitive
@@ -578,24 +579,38 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         ),
     )
 
-    override fun <R> batchReadFlow(
-        batch: PreferenceBatch,
+    override fun batchReadFlowValues(
         distinctUntilChanged: Boolean,
-        block: BatchValues.() -> R,
-    ): Flow<R> {
+        declare: PrefBuilder.() -> Unit,
+    ): Flow<BatchValues> {
+        val batch = buildBatch(declare)
         val flow = datastore.dataOrEmpty.map { mutablePrefs ->
-            BatchValues(mutablePrefs, batch).block()
+            BatchValues(mutablePrefs, batch)
         }
         return if (distinctUntilChanged) flow.distinctUntilChanged() else flow
     }
 
-    override suspend fun <R> batchRead(
-        batch: PreferenceBatch,
+    override fun <R> batchReadFlow(
+        distinctUntilChanged: Boolean,
+        declare: PrefBuilder.() -> Unit,
         block: BatchValues.() -> R,
-    ): R = batchReadFlow(batch, block = block).first()
+    ): Flow<R> {
+        val flow = batchReadFlowValues(declare = declare).map { values ->
+            values.block()
+        }
+        return if (distinctUntilChanged) flow.distinctUntilChanged() else flow
+    }
+
+    override suspend fun batchReadValues(
+        declare: PrefBuilder.() -> Unit,
+    ): BatchValues = batchReadFlowValues(declare = declare).first()
+
+    override suspend fun <R> batchRead(
+        declare: PrefBuilder.() -> Unit,
+        block: BatchValues.() -> R,
+    ): R = batchReadFlow(declare = declare, block = block).first()
 
     override suspend fun batchWrite(
-        batch: PreferenceBatch,
         block: BatchWriteScope.() -> Unit,
     ) {
         datastore.edit { mutablePrefs ->
@@ -604,7 +619,6 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
     }
 
     override suspend fun batchUpdate(
-        batch: PreferenceBatch,
         block: BatchUpdateScope.() -> Unit,
     ) {
         datastore.edit { mutablePrefs ->
@@ -612,7 +626,8 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         }
     }
 
-    override suspend fun batchDelete(batch: PreferenceBatch) {
+    override suspend fun batchDelete(declare: PrefBuilder.() -> Unit) {
+        val batch = buildBatch(declare)
         datastore.edit { mutablePrefs ->
             batch.forEach { pref ->
                 pref.removeFrom(mutablePrefs)
@@ -620,23 +635,25 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         }
     }
 
+    override fun batchReadBlockingValues(
+        declare: PrefBuilder.() -> Unit,
+    ): BatchValues = runBlocking { batchReadValues(declare) }
+
     override fun <R> batchReadBlocking(
-        batch: PreferenceBatch,
+        declare: PrefBuilder.() -> Unit,
         block: BatchValues.() -> R,
-    ): R = runBlocking { batchRead(batch, block) }
+    ): R = runBlocking { batchRead(declare, block) }
 
     override fun batchWriteBlocking(
-        batch: PreferenceBatch,
         block: BatchWriteScope.() -> Unit,
-    ): Unit = runBlocking { batchWrite(batch, block) }
+    ): Unit = runBlocking { batchWrite(block) }
 
     override fun batchUpdateBlocking(
-        batch: PreferenceBatch,
         block: BatchUpdateScope.() -> Unit,
-    ): Unit = runBlocking { batchUpdate(batch, block) }
+    ): Unit = runBlocking { batchUpdate(block) }
 
-    override fun batchDeleteBlocking(batch: PreferenceBatch): Unit =
-        runBlocking { batchDelete(batch) }
+    override fun batchDeleteBlocking(declare: PrefBuilder.() -> Unit): Unit =
+        runBlocking { batchDelete(declare) }
 
     /**
      * Clears all preferences stored in this datastore.

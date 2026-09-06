@@ -45,6 +45,17 @@ abstract class AbstractBatchOperationsTest {
     abstract val dataStore: DataStore<Preferences>
     abstract val testDispatcher: TestDispatcher
 
+    /**
+     * Bridges a [PreferenceBatch] built by [prefBatch] to an inline `declare` block, so existing
+     * declaration fixtures keep working with the inline batch operations.
+     */
+    protected fun declare(batch: PreferenceBatch): PrefBuilder.() -> Unit = {
+        batch.forEach { pref ->
+            @Suppress("UNCHECKED_CAST")
+            add(pref as BatchPref<Any?>)
+        }
+    }
+
     // -- prefBatch builder --
 
     @Test
@@ -155,7 +166,7 @@ abstract class AbstractBatchOperationsTest {
             stringListPref = stringList("read_default_stringList", listOf("x"))
         }
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
 
         assertEquals(7, values[requireNotNull(intPref)])
         assertEquals("gone", values[requireNotNull(stringPref)])
@@ -186,7 +197,7 @@ abstract class AbstractBatchOperationsTest {
         preferenceDatastore.double("read_stored_double", 0.0).set(2.5)
         preferenceDatastore.stringSet("read_stored_stringSet").set(setOf("a", "b"))
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
 
         assertEquals(42, values[requireNotNull(intPref)])
         assertEquals(99L, values[requireNotNull(longPref)])
@@ -209,7 +220,7 @@ abstract class AbstractBatchOperationsTest {
             nullableStringSet = nullableStringSet("read_nullable_stringSet")
         }
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
 
         assertNull(values[requireNotNull(nullableString)])
         assertNull(values[requireNotNull(nullableInt)])
@@ -219,7 +230,7 @@ abstract class AbstractBatchOperationsTest {
         preferenceDatastore.nullableString("read_nullable_string").set("present")
         preferenceDatastore.nullableInt("read_nullable_int").set(9)
 
-        val updated = preferenceDatastore.batchRead(batch)
+        val updated = preferenceDatastore.batchReadValues(declare(batch))
         assertEquals("present", updated[requireNotNull(nullableString)])
         assertEquals(9, updated[requireNotNull(nullableInt)])
     }
@@ -283,7 +294,7 @@ abstract class AbstractBatchOperationsTest {
             BatchTestPayload(0, "none"),
         ).set(BatchTestPayload(4, "four"))
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
 
         assertEquals(BatchTestPayload(3, "three"), values[requireNotNull(payloadPref)])
         assertEquals(BatchTestEnum.SECOND, values[requireNotNull(enumPref)])
@@ -334,7 +345,7 @@ abstract class AbstractBatchOperationsTest {
             prefs[stringPreferencesKey("read_corrupt_stringList")] = "not-json"
         }
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
 
         assertEquals(BatchTestPayload(-1, "fallback"), values[requireNotNull(payloadPref)])
         assertEquals(BatchTestEnum.FIRST, values[requireNotNull(enumPref)])
@@ -368,7 +379,7 @@ abstract class AbstractBatchOperationsTest {
             prefs[stringPreferencesKey("read_corrupt_nullable_stringList")] = "bogus"
         }
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
 
         assertNull(values[requireNotNull(nullablePayload)])
         assertNull(values[requireNotNull(nullableEnumPref)])
@@ -391,7 +402,7 @@ abstract class AbstractBatchOperationsTest {
             prefs[stringPreferencesKey("read_nullable_corrupt_list")] = """["1","bad","2"]"""
         }
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
 
         assertEquals(listOf(1, 2), values[requireNotNull(nullableList)])
     }
@@ -406,7 +417,7 @@ abstract class AbstractBatchOperationsTest {
             stringPref = string("read_map_string", "s")
         }
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
 
         assertEquals(5, values[requireNotNull(intPref)])
         assertEquals("s", values[requireNotNull(stringPref)])
@@ -424,7 +435,7 @@ abstract class AbstractBatchOperationsTest {
             declared = int("read_outside_declared", 0)
         }
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
         val undeclared = prefBatch { int("read_outside_undeclared", 0) }[0]
 
         assertEquals(0, values[requireNotNull(declared)])
@@ -451,7 +462,7 @@ abstract class AbstractBatchOperationsTest {
             mappedHandle = add(mapped)
         }
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
 
         assertEquals("stored", values[requireNotNull(stringHandle)])
         assertEquals("41", values[requireNotNull(mappedHandle)])
@@ -492,12 +503,12 @@ abstract class AbstractBatchOperationsTest {
         }
         val handle = requireNotNull(stringPref)
 
-        val initial = preferenceDatastore.batchReadFlow(batch).first()
+        val initial = preferenceDatastore.batchReadFlowValues(declare = declare(batch)).first()
         assertEquals("before", initial[handle])
 
         preferenceDatastore.string("flow_string", "before").set("after")
 
-        val updated = preferenceDatastore.batchReadFlow(batch).first()
+        val updated = preferenceDatastore.batchReadFlowValues(declare = declare(batch)).first()
         assertEquals("after", updated[handle])
     }
 
@@ -513,7 +524,7 @@ abstract class AbstractBatchOperationsTest {
 
         val collection = backgroundScope.launch(testDispatcher) {
             preferenceDatastore
-                .batchReadFlow(batch, distinctUntilChanged = true) { this[handle] }
+                .batchReadFlow(declare = declare(batch), distinctUntilChanged = true) { this[handle] }
                 .take(2)
                 .toList(emissions)
         }
@@ -541,7 +552,7 @@ abstract class AbstractBatchOperationsTest {
             boolPref = bool("write_bool", false)
         }
 
-        preferenceDatastore.batchWrite(batch) {
+        preferenceDatastore.batchWrite {
             set(requireNotNull(stringPref), "written")
             set(requireNotNull(intPref), 123)
             set(requireNotNull(boolPref), true)
@@ -560,7 +571,7 @@ abstract class AbstractBatchOperationsTest {
         }
         val handle = requireNotNull(stringPref)
 
-        preferenceDatastore.batchWrite(batch) {
+        preferenceDatastore.batchWrite {
             this[handle] = "via_operator"
         }
 
@@ -579,7 +590,7 @@ abstract class AbstractBatchOperationsTest {
         preferenceDatastore.string("write_tx_first", "default1").set("existing1")
         preferenceDatastore.string("write_tx_second", "default2").set("existing2")
 
-        preferenceDatastore.batchWrite(batch) {
+        preferenceDatastore.batchWrite {
             delete(requireNotNull(first))
             set(requireNotNull(second), "new2")
         }
@@ -597,7 +608,7 @@ abstract class AbstractBatchOperationsTest {
         val single = preferenceDatastore.int("write_reset_int", 42)
         single.set(99)
 
-        preferenceDatastore.batchWrite(batch) {
+        preferenceDatastore.batchWrite {
             resetToDefault(requireNotNull(intPref))
         }
 
@@ -613,12 +624,12 @@ abstract class AbstractBatchOperationsTest {
         val handle = requireNotNull(nullableString)
         val single = preferenceDatastore.nullableString("write_nullable_string")
 
-        preferenceDatastore.batchWrite(batch) {
+        preferenceDatastore.batchWrite {
             set(handle, "value")
         }
         assertEquals("value", single.get())
 
-        preferenceDatastore.batchWrite(batch) {
+        preferenceDatastore.batchWrite {
             set(handle, null)
         }
         assertNull(single.get())
@@ -645,7 +656,7 @@ abstract class AbstractBatchOperationsTest {
             kserializedSetPref = kserializedSet("write_kserializedSet")
         }
 
-        preferenceDatastore.batchWrite(batch) {
+        preferenceDatastore.batchWrite {
             set(requireNotNull(stringListPref), listOf("a", "b"))
             set(requireNotNull(nullableStringListPref), listOf("x"))
             set(requireNotNull(serializedSetPref), setOf(1, 2))
@@ -681,7 +692,7 @@ abstract class AbstractBatchOperationsTest {
             undeclared = int("write_outside_undeclared", 0)
         }
 
-        preferenceDatastore.batchWrite(declaredBatch) {
+        preferenceDatastore.batchWrite {
             set(requireNotNull(undeclared), 5)
         }
 
@@ -704,15 +715,15 @@ abstract class AbstractBatchOperationsTest {
             listPref = stringList("delete_stringList")
         }
 
-        preferenceDatastore.batchWrite(batch) {
+        preferenceDatastore.batchWrite {
             set(requireNotNull(intPref), 10)
             set(requireNotNull(stringPref), "stored")
             set(requireNotNull(nullableString), "present")
             set(requireNotNull(listPref), listOf("a"))
         }
-        preferenceDatastore.batchDelete(batch)
+        preferenceDatastore.batchDelete(declare(batch))
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
         assertEquals(1, values[requireNotNull(intPref)])
         assertEquals("d", values[requireNotNull(stringPref)])
         assertNull(values[requireNotNull(nullableString)])
@@ -728,7 +739,7 @@ abstract class AbstractBatchOperationsTest {
         val undeclared = preferenceDatastore.int("delete_partial_undeclared", 0)
         undeclared.set(77)
 
-        preferenceDatastore.batchDelete(batch)
+        preferenceDatastore.batchDelete(declare(batch))
 
         assertEquals(77, undeclared.get())
     }
@@ -744,7 +755,7 @@ abstract class AbstractBatchOperationsTest {
             label = string("update_label", "count:")
         }
 
-        preferenceDatastore.batchUpdate(batch) {
+        preferenceDatastore.batchUpdate {
             val currentCount = get(requireNotNull(counter))
             val currentLabel = get(requireNotNull(label))
             set(requireNotNull(counter), currentCount + 5)
@@ -762,7 +773,7 @@ abstract class AbstractBatchOperationsTest {
             intPref = int("update_transform", 10)
         }
 
-        preferenceDatastore.batchUpdate(batch) {
+        preferenceDatastore.batchUpdate {
             update(requireNotNull(intPref)) { it * 3 }
         }
 
@@ -777,7 +788,7 @@ abstract class AbstractBatchOperationsTest {
         }
         val handle = requireNotNull(intPref)
 
-        preferenceDatastore.batchUpdate(batch) {
+        preferenceDatastore.batchUpdate {
             update(handle) { it + 1 }
             update(handle) { it + 1 }
             set(handle, get(handle) + 1)
@@ -794,7 +805,7 @@ abstract class AbstractBatchOperationsTest {
         }
         val handle = requireNotNull(intPref)
 
-        preferenceDatastore.batchUpdate(batch) {
+        preferenceDatastore.batchUpdate {
             val current = this[handle]
             this[handle] = current * 4
         }
@@ -814,7 +825,7 @@ abstract class AbstractBatchOperationsTest {
         preferenceDatastore.string("update_delete_string", "default_val").set("set_value")
         preferenceDatastore.int("update_reset_int", 42).set(99)
 
-        preferenceDatastore.batchUpdate(batch) {
+        preferenceDatastore.batchUpdate {
             delete(requireNotNull(stringPref))
             resetToDefault(requireNotNull(intPref))
         }
@@ -836,12 +847,12 @@ abstract class AbstractBatchOperationsTest {
         val single = preferenceDatastore.nullableString("update_nullable")
         single.set("present")
 
-        preferenceDatastore.batchUpdate(batch) {
+        preferenceDatastore.batchUpdate {
             update(handle) { current -> current?.uppercase() }
         }
         assertEquals("PRESENT", single.get())
 
-        preferenceDatastore.batchUpdate(batch) {
+        preferenceDatastore.batchUpdate {
             update(handle) { null }
         }
         assertNull(single.get())
@@ -865,7 +876,7 @@ abstract class AbstractBatchOperationsTest {
             kserializedListPref = kserializedList("interop_kserializedList")
         }
 
-        preferenceDatastore.batchWrite(batch) {
+        preferenceDatastore.batchWrite {
             set(requireNotNull(intPref), 8)
             set(requireNotNull(stringSetPref), setOf("x", "y"))
             set(requireNotNull(payloadPref), BatchTestPayload(2, "two"))
@@ -912,7 +923,7 @@ abstract class AbstractBatchOperationsTest {
             enumPref = enum("interop_single_enum", BatchTestEnum.FIRST)
         }
 
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
 
         assertEquals(31, values[requireNotNull(intPref)])
         assertEquals(listOf("m", "n"), values[requireNotNull(stringListPref)])
@@ -930,5 +941,132 @@ abstract class AbstractBatchOperationsTest {
             .value
 
         assertEquals("""["a","b"]""", raw)
+    }
+
+    // -- inline datastore.batchX { … } declarations (unified declare+operate) --
+
+    @Test
+    fun batchRead_reusesExistingSinglePreferences() = runTest(testDispatcher) {
+        val text = preferenceDatastore.string("inline_reuse_text", "Hello World!")
+        val num = preferenceDatastore.int("inline_reuse_num", 0)
+        text.set("stored")
+        num.set(7)
+
+        var textHandle: BatchPref<String>? = null
+        var numHandle: BatchPref<Int>? = null
+        val values = preferenceDatastore.batchReadValues {
+            textHandle = add(text)
+            numHandle = add(num)
+        }
+
+        assertEquals("stored", values[requireNotNull(textHandle)])
+        assertEquals(7, values[requireNotNull(numHandle)])
+    }
+
+    @Test
+    fun batchRead_inlineDeclarationsMatchReuse() = runTest(testDispatcher) {
+        val text = preferenceDatastore.string("inline_scratch_text", "Hello World!")
+        val num = preferenceDatastore.int("inline_scratch_num", 0)
+        text.set("stored")
+        num.set(7)
+
+        val values = preferenceDatastore.batchReadValues {
+            string("inline_scratch_text", "Hello World!")
+            int("inline_scratch_num", 0)
+        }
+
+        assertEquals(listOf("stored", 7), values.toList())
+        val (readText: String, readNum: Int) = values
+        assertEquals("stored", readText)
+        assertEquals(7, readNum)
+    }
+
+    @Test
+    fun batchReadFlow_inlineDeclarationsEmitOnChange() = runTest(testDispatcher) {
+        val text = preferenceDatastore.string("inline_flow_text", "Hello World!")
+        val num = preferenceDatastore.int("inline_flow_num", 0)
+
+        val flow = preferenceDatastore.batchReadFlowValues {
+            add(text)
+            add(num)
+        }
+
+        text.set("updated")
+        num.set(3)
+
+        val (readText: String, readNum: Int) = flow.first()
+        assertEquals("updated", readText)
+        assertEquals(3, readNum)
+    }
+
+    @Test
+    fun batchWrite_declaresInlineAndWrites() = runTest(testDispatcher) {
+        preferenceDatastore.batchWrite {
+            val textHandle = string("inline_write_text", "Hello World!")
+            val numHandle = int("inline_write_num", 0)
+            set(textHandle, "written")
+            set(numHandle, 11)
+        }
+
+        assertEquals(
+            "written",
+            preferenceDatastore.string("inline_write_text", "Hello World!").get(),
+        )
+        assertEquals(11, preferenceDatastore.int("inline_write_num", 0).get())
+    }
+
+    @Test
+    fun batchWrite_mixesReuseAndInlineDeclarations() = runTest(testDispatcher) {
+        val existing = preferenceDatastore.string("inline_mixed_existing", "default")
+
+        preferenceDatastore.batchWrite {
+            val existingHandle = add(existing)
+            val freshHandle = bool("inline_mixed_fresh", false)
+            set(existingHandle, "mixed")
+            set(freshHandle, true)
+        }
+
+        assertEquals("mixed", existing.get())
+        assertEquals(true, preferenceDatastore.bool("inline_mixed_fresh", false).get())
+    }
+
+    @Test
+    fun batchWrite_rejectsDuplicateKeysInline() = runTest(testDispatcher) {
+        val failure = runCatching {
+            preferenceDatastore.batchWrite {
+                int("inline_duplicate", 1)
+                string("inline_duplicate", "x")
+            }
+        }.exceptionOrNull()
+
+        assertTrue(failure is IllegalArgumentException)
+    }
+
+    @Test
+    fun batchUpdate_declaresInlineAndUpdates() = runTest(testDispatcher) {
+        val counterPref = preferenceDatastore.int("inline_update_counter", 10)
+        counterPref.set(10)
+
+        preferenceDatastore.batchUpdate {
+            val counter = add(counterPref)
+            update(counter) { it + 5 }
+        }
+
+        assertEquals(15, counterPref.get())
+    }
+
+    @Test
+    fun batchDelete_removesInlineDeclaredKeys() = runTest(testDispatcher) {
+        val text = preferenceDatastore.string("inline_delete_text", "Hello World!")
+        text.set("stored")
+        preferenceDatastore.int("inline_delete_num", 0).set(5)
+
+        preferenceDatastore.batchDelete {
+            add(text)
+            int("inline_delete_num", 0)
+        }
+
+        assertEquals("Hello World!", text.get())
+        assertEquals(0, preferenceDatastore.int("inline_delete_num", 0).get())
     }
 }

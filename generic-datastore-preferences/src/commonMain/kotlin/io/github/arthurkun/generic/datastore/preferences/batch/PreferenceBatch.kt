@@ -3,15 +3,11 @@ package io.github.arthurkun.generic.datastore.preferences.batch
 /**
  * An immutable, ordered declaration of preferences produced by [prefBatch].
  *
- * The batch is the single source of truth consumed by every batch operation:
- * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchRead] and
- * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchReadFlow] map every
- * declared preference to its value in one emission,
- * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchWrite] and
- * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchUpdate] write the
- * declared keys in one transaction, and
- * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchDelete] removes
- * every declared key in one transaction.
+ * The inline batch operations on
+ * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore] build one of these
+ * internally from their `declare: PrefBuilder.() -> Unit` block: reads map every declared
+ * preference to its value in one emission, writes/updates apply the declared keys in one
+ * transaction, and deletes remove every declared key in one transaction.
  *
  * The class implements [List] in declaration order, so batches can also be iterated directly.
  * Equality is order-sensitive (declaration order matters); the read result

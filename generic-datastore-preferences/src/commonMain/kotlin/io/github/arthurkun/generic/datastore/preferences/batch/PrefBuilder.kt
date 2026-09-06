@@ -42,14 +42,21 @@ import kotlinx.serialization.serializer
  * ```
  *
  * Keys must be unique and non-blank inside one batch; violations throw [IllegalArgumentException].
+ *
+ * This builder is also the declare receiver for the inline batch operations on
+ * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore]
+ * (`batchReadValues`, `batchReadFlowValues`, `batchDelete` take a `PrefBuilder.() -> Unit`
+ * declaration directly). [BatchWriteScope] and [BatchUpdateScope] extend this builder so a
+ * single `datastore.batchWrite { … }` / `datastore.batchUpdate { … }` block both declares
+ * preferences (via `string(…)`, `int(…)`, `add(…)`…) and operates on them.
  */
 @PreferencesBatchDsl
-public class PrefBuilder internal constructor() {
+public open class PrefBuilder internal constructor() {
 
     private val prefs = mutableListOf<BatchPref<*>>()
     private val keys = mutableSetOf<String>()
 
-    private fun <P : BatchPref<*>> register(pref: P): P {
+    protected fun <P : BatchPref<*>> register(pref: P): P {
         require(keys.add(pref.key)) { "Duplicate batch preference key '${pref.key}'." }
         prefs += pref
         return pref
@@ -582,18 +589,16 @@ public class PrefBuilder internal constructor() {
 }
 
 /**
- * Declares a batch of preferences and returns the immutable [PreferenceBatch] that every batch
- * operation consumes.
+ * Declares a batch of preferences and returns the immutable [PreferenceBatch].
+ *
+ * The inline batch operations on
+ * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore] accept the same
+ * declaration block directly, so pre-building is only needed when handles must be shared:
  *
  * ```kotlin
- * val settings = prefBatch {
- *     int("volume", 50)
- *     string("username")
- *     bool("darkMode", false)
- * }
- *
- * datastore.batchWrite(settings) {
- *     this[volumeHandle] = 30
+ * datastore.batchWrite {
+ *     val volume = int("volume", 50)
+ *     set(volume, 30)
  * }
  * ```
  */
@@ -630,3 +635,12 @@ internal inline fun <reified E : Enum<E>> PrefBuilder.internalBatchNullableEnum(
     serializer = { it.name },
     deserializer = { enumValueOf(it) },
 )
+
+/**
+ * Builds the immutable [PreferenceBatch] for an inline batch declaration.
+ *
+ * Backs every `declare: PrefBuilder.() -> Unit` operation on
+ * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore].
+ */
+internal fun buildBatch(declare: PrefBuilder.() -> Unit): PreferenceBatch =
+    PrefBuilder().apply(declare).build()

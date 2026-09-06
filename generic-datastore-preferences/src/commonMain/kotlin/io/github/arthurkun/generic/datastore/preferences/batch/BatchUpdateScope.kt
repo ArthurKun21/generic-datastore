@@ -3,26 +3,30 @@ package io.github.arthurkun.generic.datastore.preferences.batch
 import androidx.datastore.preferences.core.MutablePreferences
 
 /**
- * Scope for atomically reading and writing multiple preferences in a single DataStore transaction.
+ * Unified scope for atomically reading and writing multiple preferences in a single DataStore
+ * transaction.
  *
- * Reads and writes operate on the same [MutablePreferences] transaction state, so reads reflect
- * writes that happened earlier in the same block.
+ * This scope extends [PrefBuilder], so one `datastore.batchUpdate { … }` block both **declares**
+ * preferences and **operates** on them — reusing existing preferences or declaring from scratch:
  *
- * Use [get]/[set] or the indexing operators (`this[pref]`, `this[pref] = value`) to access
- * preferences. Obtain this scope from
- * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchUpdate].
- *
- * Example:
  * ```kotlin
- * datastore.batchUpdate(batch) {
+ * datastore.batchUpdate {
+ *     val counter = add(counterPref) // …or: val counter = int("counter", 0)
  *     this[counter] = this[counter] + 1
  * }
  * ```
+ *
+ * Reads and writes operate on the same [MutablePreferences] transaction state, so reads reflect
+ * writes that happened earlier in the same block. Batch membership is not enforced: any
+ * [BatchPref] handle may be read or written.
+ *
+ * Obtain this scope from
+ * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore.batchUpdate].
  */
 @PreferencesBatchDsl
 public class BatchUpdateScope internal constructor(
     private val mutablePreferences: MutablePreferences,
-) {
+) : PrefBuilder() {
     /**
      * Reads the given preference's current value from the ongoing transaction state.
      *

@@ -16,6 +16,17 @@ abstract class AbstractBatchPerformanceTest {
     abstract val dataStore: DataStore<Preferences>
     abstract val testDispatcher: TestDispatcher
 
+    /**
+     * Bridges a [PreferenceBatch] built by [prefBatch] to an inline `declare` block, so existing
+     * declaration fixtures keep working with the inline batch operations.
+     */
+    protected fun declare(batch: PreferenceBatch): PrefBuilder.() -> Unit = {
+        batch.forEach { pref ->
+            @Suppress("UNCHECKED_CAST")
+            add(pref as BatchPref<Any?>)
+        }
+    }
+
     private data class TimingResult(
         val label: String,
         val duration: Duration,
@@ -53,7 +64,7 @@ abstract class AbstractBatchPerformanceTest {
             repeat(count) { i -> handles += int("perf_batch_write${count}_$i", 0) }
         }
         val batchTime = measureTime {
-            preferenceDatastore.batchWrite(batch) {
+            preferenceDatastore.batchWrite {
                 handles.forEachIndexed { i, handle -> set(handle, i * 10) }
             }
         }
@@ -85,10 +96,10 @@ abstract class AbstractBatchPerformanceTest {
             preferenceDatastore.int(handle.key, 0).set(i * 10)
         }
         val batchTime = measureTime {
-            val values = preferenceDatastore.batchRead(batch)
+            val values = preferenceDatastore.batchReadValues(declare(batch))
             handles.forEach { handle -> values[handle] }
         }
-        val batchValues = preferenceDatastore.batchRead(batch)
+        val batchValues = preferenceDatastore.batchReadValues(declare(batch))
         handles.forEachIndexed { i, handle -> assertEquals(i * 10, batchValues[handle]) }
 
         printComparison(
@@ -114,7 +125,7 @@ abstract class AbstractBatchPerformanceTest {
         }
         handles.forEach { handle -> preferenceDatastore.int(handle.key, 0).set(0) }
         val batchTime = measureTime {
-            preferenceDatastore.batchUpdate(batch) {
+            preferenceDatastore.batchUpdate {
                 handles.forEach { handle -> update(handle) { value -> value + 1 } }
             }
         }
@@ -145,9 +156,9 @@ abstract class AbstractBatchPerformanceTest {
         }
         handles.forEachIndexed { i, handle -> preferenceDatastore.int(handle.key, 0).set(i) }
         val batchTime = measureTime {
-            preferenceDatastore.batchDelete(batch)
+            preferenceDatastore.batchDelete(declare(batch))
         }
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
         handles.forEach { handle -> assertEquals(0, values[handle]) }
 
         printComparison(
@@ -175,7 +186,7 @@ abstract class AbstractBatchPerformanceTest {
             preferenceDatastore.int(handle.key, 7).set(i + 100)
         }
         val batchTime = measureTime {
-            preferenceDatastore.batchWrite(batch) {
+            preferenceDatastore.batchWrite {
                 handles.forEach { handle -> resetToDefault(handle) }
             }
         }
@@ -258,7 +269,7 @@ abstract class AbstractBatchPerformanceTest {
             longHandle = add(longPref)
         }
         val batchTime = measureTime {
-            preferenceDatastore.batchWrite(batch) {
+            preferenceDatastore.batchWrite {
                 set(requireNotNull(stringHandle), "mixed")
                 set(requireNotNull(intHandle), 7)
                 set(requireNotNull(boolHandle), true)
@@ -306,9 +317,9 @@ abstract class AbstractBatchPerformanceTest {
             longHandle = add(longPref)
         }
         val batchTime = measureTime {
-            preferenceDatastore.batchRead(batch).toMap()
+            preferenceDatastore.batchReadValues(declare(batch)).toMap()
         }
-        val values = preferenceDatastore.batchRead(batch)
+        val values = preferenceDatastore.batchReadValues(declare(batch))
         assertEquals("mixed", values[requireNotNull(stringHandle)])
         assertEquals(7, values[requireNotNull(intHandle)])
         assertEquals(true, values[requireNotNull(boolHandle)])

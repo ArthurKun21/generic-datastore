@@ -6,7 +6,7 @@ import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBacku
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchValues
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
-import io.github.arthurkun.generic.datastore.preferences.batch.PreferenceBatch
+import io.github.arthurkun.generic.datastore.preferences.batch.PrefBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
@@ -373,170 +373,169 @@ public interface PreferencesDatastore : AutoCloseable {
     ): Preference<List<T>?>
 
     /**
-     * Returns a [Flow] that maps every preference declared in [batch] to its stored value (or
+     * Returns a [Flow] that maps every preference declared in [declare] to its stored value (or
      * default) on every datastore change, using a single `dataOrEmpty` emission per update.
      *
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
+     * Declarations may reuse existing preferences via `add(pref)` or declare from scratch via
+     * `string(…)`, `int(…)`, …:
+     *
+     * ```kotlin
+     * val flow = datastore.batchReadFlowValues {
+     *     add(textPref)
+     *     string("other", "default")
+     * }
+     * ```
+     *
      * @param distinctUntilChanged Whether to suppress consecutive equal snapshots according to
      *   `equals`.
+     * @param declare A lambda with [PrefBuilder] receiver that declares the batch.
      * @return A [Flow] emitting the whole-batch [BatchValues] on every update.
      */
-    public fun batchReadFlow(
-        batch: PreferenceBatch,
+    public fun batchReadFlowValues(
         distinctUntilChanged: Boolean = false,
-    ): Flow<BatchValues> = batchReadFlow(batch, distinctUntilChanged) { this }
+        declare: PrefBuilder.() -> Unit,
+    ): Flow<BatchValues>
 
     /**
-     * Returns a [Flow] that re-runs [block] against one [BatchValues] snapshot built from [batch]
-     * on every datastore change.
+     * Returns a [Flow] that re-runs [block] against one [BatchValues] snapshot built from
+     * [declare] on every datastore change.
      *
      * All values inside one emission observe the same snapshot, which avoids mixing values from
      * different writes. Set [distinctUntilChanged] to `true` when the result should only emit
      * after it changes according to `equals`.
      *
+     * ```kotlin
+     * val flow = datastore.batchReadFlow(declare = { add(textPref) }) {
+     *     this[textHandle]
+     * }
+     * ```
+     *
      * @param R The return type of the block.
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
      * @param distinctUntilChanged Whether to suppress consecutive equal results.
+     * @param declare A lambda with [PrefBuilder] receiver that declares the batch.
      * @param block A lambda with [BatchValues] receiver that derives a projection from the
      *   whole-batch snapshot.
      * @return A [Flow] emitting the value returned by [block] on every update.
      */
     public fun <R> batchReadFlow(
-        batch: PreferenceBatch,
         distinctUntilChanged: Boolean = false,
+        declare: PrefBuilder.() -> Unit,
         block: BatchValues.() -> R,
     ): Flow<R>
 
     /**
-     * One-shot batch read: maps every preference declared in [batch] to its stored value (or
+     * One-shot batch read: maps every preference declared in [declare] to its stored value (or
      * default) from a single consistent DataStore snapshot.
      *
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
+     * Equivalent to `batchReadFlowValues(declare).first()`.
+     *
+     * @param declare A lambda with [PrefBuilder] receiver that declares the batch.
      * @return The whole-batch [BatchValues] snapshot.
      */
-    public suspend fun batchRead(batch: PreferenceBatch): BatchValues = batchRead(batch) { this }
+    public suspend fun batchReadValues(declare: PrefBuilder.() -> Unit): BatchValues
 
     /**
-     * One-shot batch read: maps every preference declared in [batch] to its stored value (or
+     * One-shot batch read: maps every preference declared in [declare] to its stored value (or
      * default) from a single consistent DataStore snapshot, then derives [block]'s result from it.
      *
+     * Equivalent to `batchReadFlow(declare, block = block).first()`.
+     *
      * @param R The return type of the block.
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
+     * @param declare A lambda with [PrefBuilder] receiver that declares the batch.
      * @param block A lambda with [BatchValues] receiver that derives a projection from the
      *   whole-batch snapshot.
      * @return The value returned by [block].
      */
     public suspend fun <R> batchRead(
-        batch: PreferenceBatch,
+        declare: PrefBuilder.() -> Unit,
         block: BatchValues.() -> R,
     ): R
 
     /**
-     * Executes [block] inside a single DataStore `edit` transaction for the preferences declared
-     * in [batch].
+     * Executes [block] inside a single DataStore `edit` transaction.
      *
-     * All [BatchWriteScope.set], [BatchWriteScope.delete], and [BatchWriteScope.resetToDefault]
-     * calls share the same mutable transaction state. Batch membership is not enforced: any
-     * [io.github.arthurkun.generic.datastore.preferences.batch.BatchPref] handle may be written.
-     * The [batch] parameter is still required so every batch operation is anchored to an explicit
-     * declaration — it documents which keys the call site logically owns, keeps the
-     * read/write/update/delete signatures symmetric, and reserves a hook for future validation —
-     * even though the transaction itself accepts handles from outside [batch].
+     * The [BatchWriteScope] receiver both declares preferences (`string(…)`, `int(…)`,
+     * `add(pref)`…) and operates on them ([BatchWriteScope.set], [BatchWriteScope.delete],
+     * [BatchWriteScope.resetToDefault]). All calls share the same mutable transaction state.
+     * Batch membership is not enforced: any
+     * [io.github.arthurkun.generic.datastore.preferences.batch.BatchPref] handle may be written,
+     * so `batchWrite { set(handle, value) }` works without re-declaring.
      *
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
-     * @param block A lambda with [BatchWriteScope] receiver that writes one or more preferences.
+     * @param block A lambda with [BatchWriteScope] receiver that declares and writes one or more
+     *   preferences.
      */
     public suspend fun batchWrite(
-        batch: PreferenceBatch,
         block: BatchWriteScope.() -> Unit,
     )
 
     /**
-     * Atomically reads and writes the preferences declared in [batch] in a single DataStore
-     * `edit` transaction.
+     * Atomically reads and writes multiple preferences in a single DataStore `edit` transaction.
      *
-     * Reads through [BatchUpdateScope.get] observe earlier writes made through
-     * [BatchUpdateScope.set] in the same block. Batch membership is not enforced: any
+     * The [BatchUpdateScope] receiver both declares preferences and operates on them. Reads
+     * through [BatchUpdateScope.get] observe earlier writes made through [BatchUpdateScope.set]
+     * in the same block. Batch membership is not enforced: any
      * [io.github.arthurkun.generic.datastore.preferences.batch.BatchPref] handle may be updated.
-     * The [batch] parameter is still required so every batch operation is anchored to an explicit
-     * declaration — it documents which keys the call site logically owns, keeps the
-     * read/write/update/delete signatures symmetric, and reserves a hook for future validation —
-     * even though the transaction itself accepts handles from outside [batch].
      *
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
-     * @param block A lambda with [BatchUpdateScope] receiver that reads and writes preferences.
+     * @param block A lambda with [BatchUpdateScope] receiver that declares preferences and reads
+     *   and writes them.
      */
     public suspend fun batchUpdate(
-        batch: PreferenceBatch,
         block: BatchUpdateScope.() -> Unit,
     )
 
     /**
-     * Removes the key of every preference declared in [batch] in a single DataStore `edit`
+     * Removes the key of every preference declared in [declare] in a single DataStore `edit`
      * transaction. Subsequent reads return each preference's default value.
      *
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
+     * @param declare A lambda with [PrefBuilder] receiver that declares the batch to delete.
      */
-    public suspend fun batchDelete(batch: PreferenceBatch)
+    public suspend fun batchDelete(declare: PrefBuilder.() -> Unit)
 
     /**
-     * Blocking variant of [batchRead].
+     * Blocking variant of [batchReadValues].
      *
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
+     * @param declare A lambda with [PrefBuilder] receiver that declares the batch.
      * @return The whole-batch [BatchValues] snapshot.
      */
-    public fun batchReadBlocking(batch: PreferenceBatch): BatchValues =
-        batchReadBlocking(batch) { this }
+    public fun batchReadBlockingValues(declare: PrefBuilder.() -> Unit): BatchValues
 
     /**
      * Blocking variant of [batchRead].
      *
      * @param R The return type of the block.
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
+     * @param declare A lambda with [PrefBuilder] receiver that declares the batch.
      * @param block A lambda with [BatchValues] receiver.
      * @return The value returned by [block].
      */
     public fun <R> batchReadBlocking(
-        batch: PreferenceBatch,
+        declare: PrefBuilder.() -> Unit,
         block: BatchValues.() -> R,
     ): R
 
     /**
      * Blocking variant of [batchWrite].
      *
-     * Like [batchWrite], batch membership is not enforced: the [batch] parameter anchors the call
-     * to an explicit declaration while the transaction accepts any
-     * [io.github.arthurkun.generic.datastore.preferences.batch.BatchPref] handle.
-     *
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
      * @param block A lambda with [BatchWriteScope] receiver.
      */
     public fun batchWriteBlocking(
-        batch: PreferenceBatch,
         block: BatchWriteScope.() -> Unit,
     )
 
     /**
      * Blocking variant of [batchUpdate].
      *
-     * Like [batchUpdate], batch membership is not enforced: the [batch] parameter anchors the call
-     * to an explicit declaration while the transaction accepts any
-     * [io.github.arthurkun.generic.datastore.preferences.batch.BatchPref] handle.
-     *
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
      * @param block A lambda with [BatchUpdateScope] receiver.
      */
     public fun batchUpdateBlocking(
-        batch: PreferenceBatch,
         block: BatchUpdateScope.() -> Unit,
     )
 
     /**
      * Blocking variant of [batchDelete].
      *
-     * @param batch The batch declaration produced by [io.github.arthurkun.generic.datastore.preferences.batch.prefBatch].
+     * @param declare A lambda with [PrefBuilder] receiver that declares the batch to delete.
      */
-    public fun batchDeleteBlocking(batch: PreferenceBatch)
+    public fun batchDeleteBlocking(declare: PrefBuilder.() -> Unit)
 
     /**
      * Clears all preferences stored in this datastore.
