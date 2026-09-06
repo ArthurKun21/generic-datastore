@@ -63,13 +63,23 @@ internal fun <T> serializeList(list: List<T>, elementSerializer: (T) -> String):
 /**
  * Decodes a JSON array string produced by [serializeList], rethrowing [CancellationException].
  *
- * The outer JSON array must parse or the caller sees the exception (and applies its own
- * fallback). Elements that are not JSON strings or that fail to deserialize with
- * [elementDeserializer] are skipped.
+ * The outer value must be a valid JSON array of JSON strings; a malformed outer payload throws
+ * (callers apply their own fallback — [deserializeOrDefault] maps it to the default value,
+ * [deserializeOrNull] maps it to `null`). Elements that are not JSON strings or that fail to
+ * deserialize with [elementDeserializer] are skipped. [CancellationException] from either the
+ * outer parse or an element is always rethrown.
  */
 internal fun <T> deserializeList(value: String, elementDeserializer: (String) -> T): List<T> {
+    // Parse the outer array outside the per-element try so a malformed payload propagates to the
+    // caller's fallback instead of being mistaken for "zero valid elements".
+    val array =
+        try {
+            Json.parseToJsonElement(value).jsonArray
+        } catch (e: CancellationException) {
+            throw e
+        }
     val elements = mutableListOf<T>()
-    Json.parseToJsonElement(value).jsonArray.forEach { element ->
+    array.forEach { element ->
         try {
             elements.add(elementDeserializer(element.jsonPrimitive.content))
         } catch (e: CancellationException) {
