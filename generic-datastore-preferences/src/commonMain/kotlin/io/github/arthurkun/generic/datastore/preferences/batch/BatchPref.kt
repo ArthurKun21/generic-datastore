@@ -17,8 +17,14 @@ import io.github.arthurkun.generic.datastore.preferences.utils.deserializeSet
  * operations on [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore]
  * (`batchRead`, `batchReadFlow`, `batchWrite`, `batchUpdate`, `batchDelete`).
  *
- * Instances use value equality on key, default, and storage strategy, so the same declaration can
- * be safely compared across snapshots.
+ * Instances use value equality on key, default, and storage strategy (the concrete subclass),
+ * so the same declaration can be safely compared across snapshots.
+ *
+ * Note: the (de)serializer lambdas are behavior, not state, and are intentionally excluded from
+ * equality. Two handles with the same key, default, and storage kind compare equal even if they
+ * were built with different serializer functions. Always reuse the declared handle (or an equal
+ * declaration with identical (de)serializers) when reading a snapshot — do not mix different
+ * serializers under the same key.
  *
  * @param T The preference value type (`T?` for nullable declarations).
  * @property key The unique preference key.
@@ -50,7 +56,8 @@ public sealed class BatchPref<T>(
             other.defaultValue == defaultValue
 
     final override fun hashCode(): Int {
-        var result = key.hashCode()
+        var result = this::class.hashCode()
+        result = 31 * result + key.hashCode()
         result = 31 * result + (defaultValue?.hashCode() ?: 0)
         return result
     }
@@ -194,6 +201,7 @@ internal class PreferenceBatchAdapter<T>(
     private val preference: Preference<T>,
 ) : BatchPref<T>(preference.key(), preference.defaultValue) {
 
+    @Suppress("UNCHECKED_CAST")
     private val accessor: PreferencesAccessor<T> = preference as? PreferencesAccessor<T>
         ?: throw IllegalStateException(
             "Batch operations only support preferences created by this library",
