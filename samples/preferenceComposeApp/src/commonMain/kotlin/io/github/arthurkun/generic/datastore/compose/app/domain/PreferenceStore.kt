@@ -91,22 +91,28 @@ class PreferenceStore(
     /**
      * Batch declaration over the primary preferences. Every batch operation on [datastore]
      * consumes this declaration; the handles give typed access to the batch snapshot.
+     *
+     * Handles are captured from `add()`'s return value — the recommended pattern — and the
+     * `val`s are assigned exactly once in `init`, so a failed declaration surfaces immediately
+     * instead of leaving `lateinit` properties uninitialized.
      */
-    lateinit var mainBatch: PreferenceBatch
-        private set
-    lateinit var textHandle: BatchPref<String>
-        private set
-    lateinit var numHandle: BatchPref<Int>
-        private set
-    lateinit var boolHandle: BatchPref<Boolean>
-        private set
+    val mainBatch: PreferenceBatch
+    val textHandle: BatchPref<String>
+    val numHandle: BatchPref<Int>
+    val boolHandle: BatchPref<Boolean>
 
     init {
+        var textH: BatchPref<String>? = null
+        var numH: BatchPref<Int>? = null
+        var boolH: BatchPref<Boolean>? = null
         mainBatch = prefBatch {
-            textHandle = add(text)
-            numHandle = add(num)
-            boolHandle = add(bool)
+            textH = add(this@PreferenceStore.text)
+            numH = add(this@PreferenceStore.num)
+            boolH = add(this@PreferenceStore.bool)
         }
+        textHandle = requireNotNull(textH) { "text handle was not registered in mainBatch" }
+        numHandle = requireNotNull(numH) { "num handle was not registered in mainBatch" }
+        boolHandle = requireNotNull(boolH) { "bool handle was not registered in mainBatch" }
     }
 
     suspend fun exportPreferences(json: Json? = null): String =
@@ -188,16 +194,14 @@ class PreferenceStore(
             bool.toggle()
             bool.toggle()
 
+            var floatH: BatchPref<Float>? = null
+            var nullableStringH: BatchPref<String?>? = null
             val extrasBatch = prefBatch {
-                add(floatPref)
-                add(nullableStringPref)
+                floatH = add(floatPref)
+                nullableStringH = add(nullableStringPref)
             }
-
-            @Suppress("UNCHECKED_CAST")
-            val floatHandle = extrasBatch[0] as BatchPref<Float>
-
-            @Suppress("UNCHECKED_CAST")
-            val nullableStringHandle = extrasBatch[1] as BatchPref<String?>
+            val floatHandle = requireNotNull(floatH)
+            val nullableStringHandle = requireNotNull(nullableStringH)
 
             val batchFlow = datastore.batchReadFlow(mainBatch) {
                 Triple(this[textHandle], this[numHandle], this[boolHandle])
