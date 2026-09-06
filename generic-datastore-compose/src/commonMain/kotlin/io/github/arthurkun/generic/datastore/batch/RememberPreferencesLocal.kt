@@ -27,6 +27,8 @@ import kotlin.coroutines.EmptyCoroutineContext
  *
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @throws IllegalStateException If any preference was not created by this library. Only
+ *   library-created [Preference] instances can join a batch.
  */
 @Composable
 public fun <T1, T2> rememberPreferences(
@@ -67,6 +69,8 @@ public fun <T1, T2> rememberPreferences(
  *
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @throws IllegalStateException If any preference was not created by this library. Only
+ *   library-created [Preference] instances can join a batch.
  */
 @Composable
 public fun <T1, T2, T3> rememberPreferences(
@@ -112,6 +116,8 @@ public fun <T1, T2, T3> rememberPreferences(
  *
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @throws IllegalStateException If any preference was not created by this library. Only
+ *   library-created [Preference] instances can join a batch.
  */
 @Composable
 public fun <T1, T2, T3, T4> rememberPreferences(
@@ -162,6 +168,8 @@ public fun <T1, T2, T3, T4> rememberPreferences(
  *
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @throws IllegalStateException If any preference was not created by this library. Only
+ *   library-created [Preference] instances can join a batch.
  */
 @Composable
 public fun <T1, T2, T3, T4, T5> rememberPreferences(

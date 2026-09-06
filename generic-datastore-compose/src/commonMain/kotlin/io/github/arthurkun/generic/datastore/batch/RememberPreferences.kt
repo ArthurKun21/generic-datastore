@@ -17,6 +17,9 @@ import kotlin.coroutines.EmptyCoroutineContext
  * Remembers a [PreferenceBatch] that contains every given preference, in the given order.
  *
  * The batch is rebuilt only when one of the preferences changes identity.
+ *
+ * @throws IllegalStateException If any preference was not created by this library. The failure
+ *   surfaces during composition (when the batch is remembered), not on first read.
  */
 @Composable
 internal fun rememberBatch(vararg preferences: Preference<*>): PreferenceBatch =
@@ -44,6 +47,8 @@ internal fun rememberBatch(vararg preferences: Preference<*>): PreferenceBatch =
  * @param pref2 The second [Preference] to observe and write.
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @throws IllegalStateException If any preference was not created by this library. Only
+ *   library-created [Preference] instances can join a batch.
  * @return A [PreferencesState2] containing two [MutableState][androidx.compose.runtime.MutableState] values.
  */
 @Composable
@@ -90,6 +95,8 @@ public fun <T1, T2> PreferencesDatastore.rememberPreferences(
  * @param pref3 The third [Preference] to observe and write.
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @throws IllegalStateException If any preference was not created by this library. Only
+ *   library-created [Preference] instances can join a batch.
  * @return A [PreferencesState3] containing three [MutableState][androidx.compose.runtime.MutableState] values.
  */
 @Composable
@@ -142,6 +149,8 @@ public fun <T1, T2, T3> PreferencesDatastore.rememberPreferences(
  * @param pref4 The fourth [Preference] to observe and write.
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @throws IllegalStateException If any preference was not created by this library. Only
+ *   library-created [Preference] instances can join a batch.
  * @return A [PreferencesState4] containing four [MutableState][androidx.compose.runtime.MutableState] values.
  */
 @Composable
@@ -200,6 +209,8 @@ public fun <T1, T2, T3, T4> PreferencesDatastore.rememberPreferences(
  * @param pref5 The fifth [Preference] to observe and write.
  * @param context The [CoroutineContext] to use for collecting the batch read flow.
  * @param policy The [SnapshotMutationPolicy] used to determine value equivalence.
+ * @throws IllegalStateException If any preference was not created by this library. Only
+ *   library-created [Preference] instances can join a batch.
  * @return A [PreferencesState5] containing five [MutableState][androidx.compose.runtime.MutableState] values.
  */
 @Composable
