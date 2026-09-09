@@ -1,0 +1,57 @@
+public abstract interface class io/github/arthurkun/generic/datastore/core/BasePreference {
+	public static final field Companion Lio/github/arthurkun/generic/datastore/core/BasePreference$Companion;
+	public abstract fun asFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun get (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getBlocking ()Ljava/lang/Object;
+	public abstract fun getDefaultValue ()Ljava/lang/Object;
+	public fun getValue ()Ljava/lang/Object;
+	public abstract fun key ()Ljava/lang/String;
+	public abstract fun resetToDefault (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun set (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun setBlocking (Ljava/lang/Object;)V
+	public fun setValue (Ljava/lang/Object;)V
+	public abstract fun stateIn (Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/SharingStarted;)Lkotlinx/coroutines/flow/StateFlow;
+	public static synthetic fun stateIn$default (Lio/github/arthurkun/generic/datastore/core/BasePreference;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/SharingStarted;ILjava/lang/Object;)Lkotlinx/coroutines/flow/StateFlow;
+	public fun stateInCurrent (Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/SharingStarted;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun stateInCurrent$default (Lio/github/arthurkun/generic/datastore/core/BasePreference;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/SharingStarted;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun update (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/arthurkun/generic/datastore/core/BasePreference$Companion {
+	public final fun appStateKey (Ljava/lang/String;)Ljava/lang/String;
+	public final fun isAppState (Ljava/lang/String;)Z
+	public final fun isPrivate (Ljava/lang/String;)Z
+	public final fun privateKey (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class io/github/arthurkun/generic/datastore/core/BasePreference$DefaultImpls {
+	public static fun getValue (Lio/github/arthurkun/generic/datastore/core/BasePreference;)Ljava/lang/Object;
+	public static fun setValue (Lio/github/arthurkun/generic/datastore/core/BasePreference;Ljava/lang/Object;)V
+	public static synthetic fun stateIn$default (Lio/github/arthurkun/generic/datastore/core/BasePreference;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/SharingStarted;ILjava/lang/Object;)Lkotlinx/coroutines/flow/StateFlow;
+	public static fun stateInCurrent (Lio/github/arthurkun/generic/datastore/core/BasePreference;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/SharingStarted;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun stateInCurrent$default (Lio/github/arthurkun/generic/datastore/core/BasePreference;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/SharingStarted;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/arthurkun/generic/datastore/core/DelegatedPreference : io/github/arthurkun/generic/datastore/core/BasePreference, kotlin/properties/ReadWriteProperty {
+	public abstract fun resetToDefaultBlocking ()V
+}
+
+public final class io/github/arthurkun/generic/datastore/core/DelegatedPreference$DefaultImpls {
+	public static fun getValue (Lio/github/arthurkun/generic/datastore/core/DelegatedPreference;)Ljava/lang/Object;
+	public static fun setValue (Lio/github/arthurkun/generic/datastore/core/DelegatedPreference;Ljava/lang/Object;)V
+	public static fun stateInCurrent (Lio/github/arthurkun/generic/datastore/core/DelegatedPreference;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/SharingStarted;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface annotation class io/github/arthurkun/generic/datastore/core/InternalGenericDatastoreApi : java/lang/annotation/Annotation {
+}
+
+public final class io/github/arthurkun/generic/datastore/core/PreferenceDefaults {
+	public static final field INSTANCE Lio/github/arthurkun/generic/datastore/core/PreferenceDefaults;
+	public final fun getDefaultJson ()Lkotlinx/serialization/json/Json;
+}
+
+public final class io/github/arthurkun/generic/datastore/core/PreferenceExtensionKt {
+	public static final fun distinctFlow (Lio/github/arthurkun/generic/datastore/core/DelegatedPreference;)Lkotlinx/coroutines/flow/Flow;
+}
+

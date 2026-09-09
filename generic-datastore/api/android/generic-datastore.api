@@ -1,0 +1,10 @@
+public final class io/github/arthurkun/generic/datastore/MappedPreferenceKt {
+	public static final fun map (Lio/github/arthurkun/generic/datastore/preferences/Preference;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static final fun mapIO (Lio/github/arthurkun/generic/datastore/preferences/Preference;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+}
+
+public final class io/github/arthurkun/generic/datastore/MigrationKt {
+	public static final fun toJsonElement (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+	public static final fun toJsonMap (Ljava/lang/String;)Ljava/util/Map;
+}
+
