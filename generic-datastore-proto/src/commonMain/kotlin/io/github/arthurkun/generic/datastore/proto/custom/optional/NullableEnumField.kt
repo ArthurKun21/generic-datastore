@@ -10,6 +10,7 @@ internal fun <T, F : Enum<F>> nullableEnumFieldInternal(
     getter: (T) -> String?,
     updater: (T, String?) -> T,
     defaultProtoValue: T,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
 ): ProtoSerialFieldPreference<T, F?> = ProtoSerialFieldPreference(
     datastore = datastore,
     key = key,
@@ -22,4 +23,5 @@ internal fun <T, F : Enum<F>> nullableEnumFieldInternal(
         updater(proto, value?.name)
     },
     defaultProtoValue = defaultProtoValue,
+    onDecodeFailure = onDecodeFailure,
 )

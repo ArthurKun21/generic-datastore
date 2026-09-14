@@ -1,5 +1,6 @@
 package io.github.arthurkun.generic.datastore.preferences
 
+import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
@@ -10,7 +11,6 @@ import io.github.arthurkun.generic.datastore.preferences.batch.PrefBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 
 /**
  * Factory and utility contract for Preferences-backed [Preference] instances.
@@ -78,6 +78,15 @@ public interface PreferencesDatastore : AutoCloseable {
      * @return A [DelegatedPreference] instance for the Boolean preference.
      */
     public fun bool(key: String, defaultValue: Boolean = false): Preference<Boolean>
+
+    /**
+     * Creates a ByteArray preference.
+     *
+     * @param key The preference key.
+     * @param defaultValue The default ByteArray value (defaults to an empty array).
+     * @return A [DelegatedPreference] instance for the ByteArray preference.
+     */
+    public fun bytes(key: String, defaultValue: ByteArray = ByteArray(0)): Preference<ByteArray>
 
     /**
      * Creates a nullable String preference.
@@ -162,6 +171,15 @@ public interface PreferencesDatastore : AutoCloseable {
      * @return A [DelegatedPreference] instance for the nullable Boolean preference.
      */
     public fun nullableBool(key: String): Preference<Boolean?>
+
+    /**
+     * Creates a nullable ByteArray preference. Alias of [nullableBytes] kept for naming
+     * symmetry with [bytes]; prefer [nullableBytes].
+     *
+     * @param key The preference key.
+     * @return A [DelegatedPreference] instance for the nullable ByteArray preference.
+     */
+    public fun nullableBytes(key: String): Preference<ByteArray?>
 
     /**
      * Creates a Set<String> preference.
@@ -331,6 +349,47 @@ public interface PreferencesDatastore : AutoCloseable {
         serializer: KSerializer<T>,
         json: Json? = null,
     ): Preference<T?>
+
+    /**
+     * Creates a nullable preference for a [Set] of custom objects that can be serialized
+     * to and deserialized from Strings. The set is stored as a string-set entry.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * Elements that fail to deserialize are skipped.
+     *
+     * @param T The non-null type of each element in the set.
+     * @param key The preference key.
+     * @param serializer A function to serialize each element to a String.
+     * @param deserializer A function to deserialize each String back to an element.
+     * @return A [DelegatedPreference] instance for the nullable custom Set preference.
+     */
+    public fun <T : Any> nullableSerializedSet(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preference<Set<T>?>
+
+    /**
+     * Creates a nullable preference for a [Set] of custom objects using Kotlin Serialization.
+     * Each element is serialized to JSON and stored in a string-set entry.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * Elements that fail to deserialize are skipped.
+     *
+     * @param T The non-null type of each element in the set. Must be serializable using
+     *   kotlinx.serialization.
+     * @param key The preference key.
+     * @param serializer The [KSerializer] for the element type [T].
+     * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
+     * its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
+     * unless it was constructed with a custom default.
+     * @return A [DelegatedPreference] instance for the nullable custom Set preference.
+     */
+    public fun <T : Any> nullableKserializedSet(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json? = null,
+    ): Preference<Set<T>?>
 
     /**
      * Creates a nullable preference for a [List] of custom objects that can be serialized
@@ -544,25 +603,62 @@ public interface PreferencesDatastore : AutoCloseable {
      */
     public suspend fun clearAll()
 
-    @Deprecated(
-        message = "This method is deprecated in favor of exportAsData and exportAsString " +
-            "for better type safety and flexibility.",
-        replaceWith = ReplaceWith("exportAsData(exportPrivate, exportAppState)"),
-        level = DeprecationLevel.WARNING,
-    )
-    public suspend fun export(
-        exportPrivate: Boolean = false,
-        exportAppState: Boolean = false,
-    ): Map<String, JsonElement>
+    /**
+     * Returns the names of all keys currently present in the datastore.
+     *
+     * Only keys that have an explicit stored value are returned; preferences at their default
+     * (unset) state are not materialized.
+     */
+    public suspend fun keys(): Set<String>
 
-    @Deprecated(
-        message = "This method is deprecated in favor of importData and importDataAsString " +
-            "for better type safety and flexibility.",
-        level = DeprecationLevel.WARNING,
-    )
-    public suspend fun import(
-        data: Map<String, Any>,
-    )
+    /**
+     * Returns `true` when a value is currently stored under [key].
+     */
+    public suspend fun contains(key: String): Boolean
+
+    /**
+     * Removes every stored key whose name starts with [prefix], in a single transaction.
+     *
+     * @param prefix The key-name prefix to match.
+     */
+    public suspend fun clear(prefix: String)
+
+    /**
+     * Removes every stored key created with the [BasePreference.privateKey] prefix
+     * (`__PRIVATE_`), in a single transaction. Useful for logout flows.
+     */
+    public suspend fun clearPrivate()
+
+    /**
+     * Removes every stored key created with the [BasePreference.appStateKey] prefix
+     * (`__APP_STATE_`), in a single transaction.
+     */
+    public suspend fun clearAppState()
+
+    /**
+     * Blocking variant of [keys].
+     */
+    public fun keysBlocking(): Set<String>
+
+    /**
+     * Blocking variant of [contains].
+     */
+    public fun containsBlocking(key: String): Boolean
+
+    /**
+     * Blocking variant of [clear].
+     */
+    public fun clearBlocking(prefix: String)
+
+    /**
+     * Blocking variant of [clearPrivate].
+     */
+    public fun clearPrivateBlocking()
+
+    /**
+     * Blocking variant of [clearAppState].
+     */
+    public fun clearAppStateBlocking()
 
     /**
      * Reads current datastore contents and returns a [PreferencesBackup] snapshot.

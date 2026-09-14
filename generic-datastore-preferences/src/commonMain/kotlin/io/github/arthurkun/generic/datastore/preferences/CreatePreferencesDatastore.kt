@@ -35,6 +35,8 @@ import kotlinx.io.files.Path as KotlinxIoPath
  * [GenericPreferencesDatastore] owns a child scope and cancels it from [GenericPreferencesDatastore.close].
  * Pass a custom scope to tie the datastore to a parent lifecycle.
  * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
+ * @param onDecodeFailure Optional callback invoked with the preference key and the error every
+ * time a stored value fails to decode and the library silently falls back to the default.
  * @param producePath A lambda that returns the full file path as a [String].
  * @return A new [GenericPreferencesDatastore] instance.
  */
@@ -43,6 +45,7 @@ public fun createPreferencesDatastore(
     migrations: List<DataMigration<Preferences>> = emptyList(),
     scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     producePath: () -> String,
 ): GenericPreferencesDatastore {
     val datastoreScope = createDatastoreScope(scope)
@@ -55,6 +58,7 @@ public fun createPreferencesDatastore(
     return GenericPreferencesDatastore(
         datastore = datastore,
         defaultJson = defaultJson,
+        onDecodeFailure = onDecodeFailure,
         ownedScope = datastoreScope,
     )
 }
@@ -71,6 +75,8 @@ public fun createPreferencesDatastore(
  * [GenericPreferencesDatastore] owns a child scope and cancels it from [GenericPreferencesDatastore.close].
  * Pass a custom scope to tie the datastore to a parent lifecycle.
  * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
+ * @param onDecodeFailure Optional callback invoked with the preference key and the error every
+ * time a stored value fails to decode and the library silently falls back to the default.
  * @param produceOkioPath A lambda that returns the file path as an [okio.Path].
  * @return A new [GenericPreferencesDatastore] instance.
  */
@@ -80,6 +86,7 @@ public fun createPreferencesDatastore(
     migrations: List<DataMigration<Preferences>> = emptyList(),
     scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     produceOkioPath: () -> okio.Path,
 ): GenericPreferencesDatastore {
     val datastoreScope = createDatastoreScope(scope)
@@ -92,6 +99,7 @@ public fun createPreferencesDatastore(
     return GenericPreferencesDatastore(
         datastore = datastore,
         defaultJson = defaultJson,
+        onDecodeFailure = onDecodeFailure,
         ownedScope = datastoreScope,
     )
 }
@@ -108,6 +116,8 @@ public fun createPreferencesDatastore(
  * [GenericPreferencesDatastore] owns a child scope and cancels it from [GenericPreferencesDatastore.close].
  * Pass a custom scope to tie the datastore to a parent lifecycle.
  * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
+ * @param onDecodeFailure Optional callback invoked with the preference key and the error every
+ * time a stored value fails to decode and the library silently falls back to the default.
  * @param produceKotlinxIoPath A lambda that returns the file path as a [KotlinxIoPath].
  * @return A new [GenericPreferencesDatastore] instance.
  */
@@ -117,6 +127,7 @@ public fun createPreferencesDatastore(
     migrations: List<DataMigration<Preferences>> = emptyList(),
     scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     produceKotlinxIoPath: () -> KotlinxIoPath,
 ): GenericPreferencesDatastore {
     val datastoreScope = createDatastoreScope(scope)
@@ -129,6 +140,7 @@ public fun createPreferencesDatastore(
     return GenericPreferencesDatastore(
         datastore = datastore,
         defaultJson = defaultJson,
+        onDecodeFailure = onDecodeFailure,
         ownedScope = datastoreScope,
     )
 }
@@ -146,6 +158,8 @@ public fun createPreferencesDatastore(
  * [GenericPreferencesDatastore] owns a child scope and cancels it from [GenericPreferencesDatastore.close].
  * Pass a custom scope to tie the datastore to a parent lifecycle.
  * @param defaultJson The fallback [Json] instance for Kotlin-serialization-backed preferences.
+ * @param onDecodeFailure Optional callback invoked with the preference key and the error every
+ * time a stored value fails to decode and the library silently falls back to the default.
  * @param producePath A lambda that returns the directory path as a [String].
  * @return A new [GenericPreferencesDatastore] instance.
  */
@@ -155,6 +169,7 @@ public fun createPreferencesDatastore(
     migrations: List<DataMigration<Preferences>> = emptyList(),
     scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     producePath: () -> String,
 ): GenericPreferencesDatastore {
     val datastoreScope = createDatastoreScope(scope)
@@ -167,6 +182,7 @@ public fun createPreferencesDatastore(
     return GenericPreferencesDatastore(
         datastore = datastore,
         defaultJson = defaultJson,
+        onDecodeFailure = onDecodeFailure,
         ownedScope = datastoreScope,
     )
 }

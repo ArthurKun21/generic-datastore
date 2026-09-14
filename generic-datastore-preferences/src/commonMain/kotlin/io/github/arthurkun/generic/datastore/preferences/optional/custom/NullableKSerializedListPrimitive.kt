@@ -18,6 +18,7 @@ internal class NullableKSerializedListPrimitive<T>(
     key: String,
     serializer: KSerializer<T>,
     json: Json,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     listSerializer: KSerializer<List<T>> = ListSerializer(serializer),
 ) : NullableCustomGenericPreferenceItem<List<T>>(
@@ -25,5 +26,6 @@ internal class NullableKSerializedListPrimitive<T>(
     key = key,
     serializer = { json.encodeToString(listSerializer, it) },
     deserializer = { json.decodeFromString(listSerializer, it) },
+    onDecodeFailure = onDecodeFailure,
     ioDispatcher = ioDispatcher,
 )

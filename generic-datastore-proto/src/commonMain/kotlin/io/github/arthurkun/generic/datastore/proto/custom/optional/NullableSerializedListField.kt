@@ -15,6 +15,7 @@ internal fun <T, F> nullableSerializedListFieldInternal(
     updater: (T, String?) -> T,
     defaultProtoValue: T,
     json: Json,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
 ): ProtoSerialFieldPreference<T, List<F>?> {
     return ProtoSerialFieldPreference(
         datastore = datastore,
@@ -31,7 +32,8 @@ internal fun <T, F> nullableSerializedListFieldInternal(
                             elements.add(elementDeserializer(element))
                         } catch (e: CancellationException) {
                             throw e
-                        } catch (_: Exception) {
+                        } catch (e: Exception) {
+                            onDecodeFailure?.invoke(key, e)
                             // Skip only elements that failed to deserialize.
                         }
                     }

@@ -3,6 +3,7 @@ package io.github.arthurkun.generic.datastore.preferences.backup
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -62,6 +63,9 @@ internal class PreferenceBackupRestorer(private val datastore: DataStore<Prefere
                             backupValue.value
 
                         is StringSetPreferenceValue -> mutablePreferences[stringSetPreferencesKey(backupKey)] =
+                            backupValue.value
+
+                        is ByteArrayPreferenceValue -> mutablePreferences[byteArrayPreferencesKey(backupKey)] =
                             backupValue.value
                     }
                 }

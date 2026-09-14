@@ -1,6 +1,7 @@
 package io.github.arthurkun.generic.datastore.preferences.batch
 
 import androidx.datastore.preferences.core.MutablePreferences
+import kotlinx.serialization.json.Json
 
 /**
  * Unified scope for atomically reading and writing multiple preferences in a single DataStore
@@ -26,7 +27,8 @@ import androidx.datastore.preferences.core.MutablePreferences
 @PreferencesBatchDsl
 public class BatchUpdateScope internal constructor(
     private val mutablePreferences: MutablePreferences,
-) : PrefBuilder() {
+    fallbackJson: Json,
+) : PrefBuilder(fallbackJson) {
     /**
      * Reads the given preference's current value from the ongoing transaction state.
      *

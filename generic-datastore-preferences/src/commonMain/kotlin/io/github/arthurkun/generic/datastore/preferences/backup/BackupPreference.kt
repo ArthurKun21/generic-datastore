@@ -45,6 +45,8 @@ public sealed interface PreferenceValue {
 
                 is Boolean -> BooleanPreferenceValue(value)
 
+                is ByteArray -> ByteArrayPreferenceValue(value)
+
                 is Set<*> -> {
                     if (value.all { it is String }) {
                         @Suppress("UNCHECKED_CAST")
@@ -142,6 +144,23 @@ public data class StringSetPreferenceValue(
     val value: Set<String>,
 ) : PreferenceValue {
     override fun getValue(): Any = value
+}
+
+/**
+ * A [PreferenceValue] holding a [ByteArray], stored Base64-encoded in the backup payload.
+ */
+@Serializable
+@SerialName("bytes")
+public data class ByteArrayPreferenceValue(
+    @SerialName("value")
+    val value: ByteArray,
+) : PreferenceValue {
+    override fun getValue(): Any = value
+
+    override fun equals(other: Any?): Boolean =
+        other is ByteArrayPreferenceValue && value.contentEquals(other.value)
+
+    override fun hashCode(): Int = value.contentHashCode()
 }
 
 /**

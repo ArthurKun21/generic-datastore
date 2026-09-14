@@ -17,11 +17,13 @@ internal class NullableKSerializedPrimitive<T : Any>(
     key: String,
     serializer: KSerializer<T>,
     json: Json,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : NullableCustomGenericPreferenceItem<T>(
     datastore = datastore,
     key = key,
     serializer = { json.encodeToString(serializer, it) },
     deserializer = { json.decodeFromString(serializer, it) },
+    onDecodeFailure = onDecodeFailure,
     ioDispatcher = ioDispatcher,
 )

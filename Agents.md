@@ -6,47 +6,52 @@ Jetpack Compose extensions in `generic-datastore-compose`.
 
 ## Modules
 
-- `:generic-datastore` – core preference and proto datastore wrapper library.
-  - `core/` – shared interfaces and utilities (`BasePreference`, `DelegatedPreference`,
-      `PreferenceDefaults`, `PreferenceExtension`, `SystemFileSystem`).
-  - `preferences/` – DataStore wrapper implementations for `Preference` types
-      (`PreferencesDatastore`, `GenericPreferencesDatastore`, `CreatePreferencesDatastore`,
-      `Preferences`).
-  - `preferences/core/` – DataStore Preferences implementation for primitive types
-      (`BooleanPrimitive`, `DoublePrimitive`, `FloatPrimitive`, `IntPrimitive`, `LongPrimitive`,
-      `StringPrimitive`, `StringSetPrimitive`, `GenericPreferenceItem`).
-    - `preferences/core/custom/` – custom-serializer and enum types (`EnumPreference`,
-        `KSerializedPrimitive`, `KSerializedListPrimitive`, `SerializedListPrimitive`,
-        `ObjectPrimitive`, `CustomGenericPreferenceItem`).
-    - `preferences/core/customSet/` – set-based custom types (`EnumSetPreference`,
-        `KSerializedSetPrimitive`, `SerializedSetPrimitive`, `CustomSetGenericPreferenceItem`).
-  - `preferences/optional/` – nullable preference variants (`NullableBooleanPrimitive`,
-      `NullableDoublePrimitive`, `NullableFloatPrimitive`, `NullableIntPrimitive`,
-      `NullableLongPrimitive`, `NullableStringPrimitive`, `NullableStringSetPrimitive`,
-      `NullableGenericPreferenceItem`).
-    - `preferences/optional/custom/` – nullable custom types (`NullableEnumPreference`,
+- `:generic-datastore-core` – shared interfaces and utilities used by all other modules
+  (`BasePreference`, `DelegatedPreference`, `PreferenceDefaults`, `PreferenceExtension`,
+  `SystemFileSystem`, `InMemoryDataStore`, `createDatastoreScope`).
+- `:generic-datastore-preferences` – DataStore Preferences wrapper (`Preference` types).
+  - `core/` – primitive types (`BooleanPrimitive`, `DoublePrimitive`, `FloatPrimitive`,
+      `IntPrimitive`, `LongPrimitive`, `StringPrimitive`, `StringSetPrimitive`, `BytesPrimitive`,
+      `GenericPreferenceItem`).
+    - `core/custom/` – custom-serializer and enum types (`EnumPreference`, `KSerializedPrimitive`,
+        `KSerializedListPrimitive`, `SerializedListPrimitive`, `ObjectPrimitive`,
+        `CustomGenericPreferenceItem`).
+    - `core/customSet/` – set-based custom types (`EnumSetPreference`, `KSerializedSetPrimitive`,
+        `SerializedSetPrimitive`, `CustomSetGenericPreferenceItem`).
+  - `optional/` – nullable variants of every primitive (`NullableBooleanPrimitive`,
+      `NullableBytesPrimitive`, …, `NullableGenericPreferenceItem`).
+    - `optional/custom/` – nullable custom types (`NullableEnumPreference`,
         `NullableKSerializedPrimitive`, `NullableKSerializedListPrimitive`,
-        `NullableSerializedListPrimitive`, `NullableObjectPrimitive`,
-        `NullableCustomGenericPreferenceItem`).
-  - `preferences/utils/` – preference utility extensions (`MappedPreference`, `Extensions`).
-  - `preferences/backup/` – backup/restore support for preferences datastore
-      (`BackupPreference`, `PreferenceBackupCreator`, `PreferenceBackupRestorer`,
-      `BackupParsingException`, `Migration`).
-  - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
-      `GenericProtoDatastore`, `CreateProtoDatastore`, `ProtoFieldPrefs`).
-    - `proto/core/` – core proto internals (`GenericProtoPreferenceItem`,
-        `ProtoFieldPreference`).
-    - `proto/custom/` – custom-serializer proto field types (`ProtoSerialFieldPreference`).
-      - `proto/custom/core/` – non-nullable custom field implementations (`EnumField`,
-          `KSerializedField`, `KSerializedListField`, `SerializedField`, `SerializedListField`,
-          `DecodeUtils`).
-      - `proto/custom/optional/` – nullable custom field implementations (`NullableEnumField`,
-          `NullableKSerializedField`, `NullableKSerializedListField`, `NullableSerializedField`,
-          `NullableSerializedListField`).
-      - `proto/custom/set/` – set-based custom field implementations (`EnumSetField`,
-          `KSerializedSetField`, `SerializedSetField`).
-  - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
-      `preferences/`, `preferences/core/custom/`, and `preferences/utils/`.
+        `NullableSerializedListPrimitive`, `NullableObjectPrimitive`).
+    - `optional/customSet/` – nullable set-based custom types (`NullableEnumSetPreference`,
+        `NullableKSerializedSetPrimitive`, `NullableSerializedSetPrimitive`,
+        `NullableCustomSetGenericPreferenceItem`).
+  - `batch/` – inline batch DSL (`BatchPref`, `BatchValues`, `PrefBuilder`, `BatchWriteScope`,
+      `BatchUpdateScope`, `PreferenceBatch`).
+  - `backup/` – backup/restore (`BackupPreference`, `PreferenceBackupCreator`,
+      `PreferenceBackupRestorer`, `BackupParsingException`, `PreferencesBackup`).
+  - `migration/` – migration helpers (`KeyRenameMigration`, `preferencesMigration`).
+  - `utils/` – internal mapping/serialization helpers (`MappedPreference`, `Extensions`,
+      `Serialization`).
+  - Datastore factories: `CreatePreferencesDatastore`, `CreateInMemoryDatastore`.
+- `:generic-datastore-proto` – Proto DataStore wrapper (`ProtoPreference` types).
+  - `core/` – proto internals (`GenericProtoPreferenceItem`, `ProtoFieldPreference`).
+  - `custom/` – custom field factories (`ProtoSerialFieldPreference`, `ProtoApi` reified
+      extensions, `DecodeUtils`).
+    - `custom/core/` – non-nullable fields (`EnumField`, `KSerializedField`, `KSerializedListField`,
+        `KSerializedMapField`, `SerializedField`, `SerializedListField`, `SerializedMapField`).
+    - `custom/optional/` – nullable fields (`NullableEnumField`, `NullableKSerializedField`,
+        `NullableKSerializedListField`, `NullableKSerializedMapField`, `NullableSerializedField`,
+        `NullableSerializedListField`, `NullableSerializedMapField`).
+    - `custom/set/` – set-based fields (`EnumSetField`, `KSerializedSetField`,
+        `SerializedSetField`).
+  - `batch/` – multi-field transactional updates (`ProtoWriteScope`, `ProtoUpdateScope`,
+      `ProtoAccessor`).
+  - `backup/` – byte-array backup/restore (`ProtoBackupCreator`, `ProtoBackupRestorer`).
+  - Datastore factories: `CreateProtoDatastore`, `CreateInMemoryProtoDatastore`; field
+      memoization via `ProtoDatastore.cached`.
+- `:generic-datastore` – umbrella/compatibility module re-exporting the public API of the modules
+  above.
 - `:generic-datastore-compose` – Compose helpers built on the core module.
   - `Remember.kt` – `DelegatedPreference<T>.remember()` extension.
   - `PrefsComposeState.kt` – `MutableState` backed by a `DelegatedPreference`.

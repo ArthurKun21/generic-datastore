@@ -14,6 +14,7 @@ internal fun <T, F> kserializedFieldInternal(
     getter: (T) -> String,
     updater: (T, String) -> T,
     defaultProtoValue: T,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
 ): ProtoSerialFieldPreference<T, F> = ProtoSerialFieldPreference(
     datastore = datastore,
     key = key,
@@ -23,11 +24,18 @@ internal fun <T, F> kserializedFieldInternal(
         if (raw.isBlank()) {
             defaultValue
         } else {
-            safeDeserialize(raw, defaultValue) { json.decodeFromString(serializer, it) }
+            safeDeserialize(
+                raw,
+                defaultValue,
+                onDecodeFailure?.let { callback ->
+                    { error: Throwable -> callback(key, error) }
+                },
+            ) { json.decodeFromString(serializer, it) }
         }
     },
     updater = { proto, value ->
         updater(proto, json.encodeToString(serializer, value))
     },
     defaultProtoValue = defaultProtoValue,
+    onDecodeFailure = onDecodeFailure,
 )

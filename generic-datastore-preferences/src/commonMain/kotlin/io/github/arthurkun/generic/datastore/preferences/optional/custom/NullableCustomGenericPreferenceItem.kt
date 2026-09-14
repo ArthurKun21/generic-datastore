@@ -40,6 +40,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
     private val key: String,
     private val serializer: (T) -> String,
     private val deserializer: (String) -> T,
+    private val onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : BasePreference<T?>, PreferencesAccessor<T?> {
 
@@ -118,7 +119,11 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    private fun safeDeserialize(value: String): T? = deserializeOrNull(value, deserializer)
+    private fun safeDeserialize(value: String): T? = deserializeOrNull(
+        value,
+        deserializer,
+        onDecodeFailure?.let { callback -> { error -> callback(key, error) } },
+    )
 
     override fun readFrom(preferences: Preferences): T? =
         preferences[stringPrefKey]?.let { safeDeserialize(it) }

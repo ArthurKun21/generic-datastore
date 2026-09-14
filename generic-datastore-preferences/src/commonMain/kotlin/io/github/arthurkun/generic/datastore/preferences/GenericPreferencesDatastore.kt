@@ -4,14 +4,7 @@ package io.github.arthurkun.generic.datastore.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.floatPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
@@ -25,6 +18,7 @@ import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
 import io.github.arthurkun.generic.datastore.preferences.batch.PrefBuilder
 import io.github.arthurkun.generic.datastore.preferences.batch.buildBatch
 import io.github.arthurkun.generic.datastore.preferences.core.BooleanPrimitive
+import io.github.arthurkun.generic.datastore.preferences.core.BytesPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.DoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.FloatPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.IntPrimitive
@@ -38,6 +32,7 @@ import io.github.arthurkun.generic.datastore.preferences.core.custom.SerializedL
 import io.github.arthurkun.generic.datastore.preferences.core.customSet.KSerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.customSet.SerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableBooleanPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.NullableBytesPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableDoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableFloatPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableIntPrimitive
@@ -48,6 +43,8 @@ import io.github.arthurkun.generic.datastore.preferences.optional.custom.Nullabl
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableKSerializedPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableObjectPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedListPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.customSet.NullableKSerializedSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.customSet.NullableSerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -59,7 +56,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 
 /**
  * Default [PreferencesDatastore] implementation backed by `DataStore<Preferences>`.
@@ -80,6 +76,7 @@ import kotlinx.serialization.json.JsonElement
 public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructor(
     internal val datastore: DataStore<Preferences>,
     private val defaultJson: Json = PreferenceDefaults.defaultJson,
+    private val onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     private val ownedScope: CoroutineScope? = null,
 ) : PreferencesDatastore {
 
@@ -207,6 +204,25 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         )
 
     /**
+     * Creates a ByteArray preference.
+     *
+     * @param key The preference key.
+     * @param defaultValue The default ByteArray value (defaults to an empty array).
+     * @return A [DelegatedPreference] instance for the ByteArray preference.
+     */
+    override fun bytes(
+        key: String,
+        defaultValue: ByteArray,
+    ): Preference<ByteArray> =
+        PreferenceImpl(
+            BytesPrimitive(
+                datastore = datastore,
+                key = key,
+                defaultValue = defaultValue,
+            ),
+        )
+
+    /**
      * Creates a nullable String preference.
      * Returns `null` when the key is not set in DataStore.
      *
@@ -256,6 +272,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
                 defaultValue = defaultValue,
                 elementSerializer = { it },
                 elementDeserializer = { it },
+                onDecodeFailure = onDecodeFailure,
             ),
         )
 
@@ -275,6 +292,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
                 key = key,
                 elementSerializer = { it },
                 elementDeserializer = { it },
+                onDecodeFailure = onDecodeFailure,
             ),
         )
 
@@ -354,6 +372,21 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         )
 
     /**
+     * Creates a nullable ByteArray preference.
+     * Returns `null` when the key is not set in DataStore.
+     *
+     * @param key The preference key.
+     * @return A [DelegatedPreference] instance for the nullable ByteArray preference.
+     */
+    override fun nullableBytes(key: String): Preference<ByteArray?> =
+        PreferenceImpl(
+            NullableBytesPrimitive(
+                datastore = datastore,
+                key = key,
+            ),
+        )
+
+    /**
      * Creates a Set<String> preference.
      *
      * @param key The preference key.
@@ -394,6 +427,8 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             defaultValue = defaultValue,
             serializer = serializer,
             deserializer = deserializer,
+
+            onDecodeFailure = onDecodeFailure,
         ),
     )
 
@@ -420,6 +455,8 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             defaultValue = defaultValue,
             serializer = serializer,
             deserializer = deserializer,
+
+            onDecodeFailure = onDecodeFailure,
         ),
     )
 
@@ -446,12 +483,14 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             defaultValue = defaultValue,
             serializer = serializer,
             json = json ?: defaultJson,
+
+            onDecodeFailure = onDecodeFailure,
         ),
     )
 
     /**
      * Creates a preference for a [Set] of custom objects using Kotlin Serialization.
-     * Each element is serialized to JSON for storage using [stringSetPreferencesKey].
+     * Each element is serialized to JSON and stored in a string-set entry.
      *
      * @param T The type of each element in the set. Must be serializable using kotlinx.serialization.
      * @param key The preference key.
@@ -472,6 +511,8 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             defaultValue = defaultValue,
             serializer = serializer,
             json = json ?: defaultJson,
+
+            onDecodeFailure = onDecodeFailure,
         ),
     )
 
@@ -498,6 +539,8 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             defaultValue = defaultValue,
             elementSerializer = serializer,
             elementDeserializer = deserializer,
+
+            onDecodeFailure = onDecodeFailure,
         ),
     )
 
@@ -524,6 +567,8 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             defaultValue = defaultValue,
             serializer = serializer,
             json = json ?: defaultJson,
+
+            onDecodeFailure = onDecodeFailure,
         ),
     )
 
@@ -537,6 +582,8 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             key = key,
             serializer = serializer,
             deserializer = deserializer,
+
+            onDecodeFailure = onDecodeFailure,
         ),
     )
 
@@ -550,6 +597,52 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             key = key,
             serializer = serializer,
             json = json ?: defaultJson,
+
+            onDecodeFailure = onDecodeFailure,
+        ),
+    )
+
+    /**
+     * Creates a nullable preference for a [Set] of custom objects that can be serialized
+     * to and deserialized from Strings. The set is stored as a string-set entry.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * Elements that fail to deserialize are skipped.
+     */
+    override fun <T : Any> nullableSerializedSet(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preference<Set<T>?> = PreferenceImpl(
+        NullableSerializedSetPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+
+            onDecodeFailure = onDecodeFailure,
+        ),
+    )
+
+    /**
+     * Creates a nullable preference for a [Set] of custom objects using Kotlin Serialization.
+     * Each element is serialized to JSON and stored in a string-set entry.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * Elements that fail to deserialize are skipped.
+     */
+    override fun <T : Any> nullableKserializedSet(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json?,
+    ): Preference<Set<T>?> = PreferenceImpl(
+        NullableKSerializedSetPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            json = json ?: defaultJson,
+
+            onDecodeFailure = onDecodeFailure,
         ),
     )
 
@@ -563,6 +656,8 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             key = key,
             elementSerializer = serializer,
             elementDeserializer = deserializer,
+
+            onDecodeFailure = onDecodeFailure,
         ),
     )
 
@@ -576,6 +671,8 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             key = key,
             serializer = serializer,
             json = json ?: defaultJson,
+
+            onDecodeFailure = onDecodeFailure,
         ),
     )
 
@@ -583,7 +680,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         distinctUntilChanged: Boolean,
         declare: PrefBuilder.() -> Unit,
     ): Flow<BatchValues> {
-        val batch = buildBatch(declare)
+        val batch = buildBatch(declare = declare, fallbackJson = defaultJson)
         val flow = datastore.dataOrEmpty.map { mutablePrefs ->
             BatchValues(mutablePrefs, batch)
         }
@@ -594,11 +691,11 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         distinctUntilChanged: Boolean,
         declare: PrefBuilder.() -> Unit,
         block: BatchValues.() -> R,
-    ): Flow<R> {
-        val flow = batchReadFlowValues(declare = declare).map { values ->
-            values.block()
-        }
-        return if (distinctUntilChanged) flow.distinctUntilChanged() else flow
+    ): Flow<R> = batchReadFlowValues(
+        distinctUntilChanged = distinctUntilChanged,
+        declare = declare,
+    ).map { values ->
+        values.block()
     }
 
     override suspend fun batchReadValues(
@@ -614,7 +711,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         block: BatchWriteScope.() -> Unit,
     ) {
         datastore.edit { mutablePrefs ->
-            BatchWriteScope(mutablePrefs).block()
+            BatchWriteScope(mutablePrefs, defaultJson).block()
         }
     }
 
@@ -622,12 +719,12 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         block: BatchUpdateScope.() -> Unit,
     ) {
         datastore.edit { mutablePrefs ->
-            BatchUpdateScope(mutablePrefs).block()
+            BatchUpdateScope(mutablePrefs, defaultJson).block()
         }
     }
 
     override suspend fun batchDelete(declare: PrefBuilder.() -> Unit) {
-        val batch = buildBatch(declare)
+        val batch = buildBatch(declare = declare, fallbackJson = defaultJson)
         datastore.edit { mutablePrefs ->
             batch.forEach { pref ->
                 pref.removeFrom(mutablePrefs)
@@ -665,86 +762,47 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
     }
 
     /**
-     * Exports all preferences as a map of keys to [JsonElement] values.
-     *
-     * @param exportPrivate Whether to include private preferences in the export.
-     * @param exportAppState Whether to include app state preferences in the export.
-     * @return A map of preference keys to their [JsonElement] representations.
+     * Returns the names of all keys currently present in the datastore.
      */
-    @Deprecated(
-        "This method is deprecated in favor of exportAsData and exportAsString for better type safety and flexibility.",
-        replaceWith = ReplaceWith("exportAsData(exportPrivate, exportAppState)"),
-        level = DeprecationLevel.WARNING,
-    )
-    override suspend fun export(exportPrivate: Boolean, exportAppState: Boolean): Map<String, JsonElement> {
-        return datastore
-            .data
-            .first()
-            .toPreferences()
-            .asMap()
-            .mapNotNull { (key, values) ->
-                if (!exportPrivate && BasePreference.isPrivate(key.name)) {
-                    null
-                } else if (!exportAppState && BasePreference.isAppState(key.name)) {
-                    null
-                } else {
-                    key.name to values.toJsonElement()
-                }
-            }
-            .toMap()
+    override suspend fun keys(): Set<String> = datastore.data.first().asMap().keys.map { it.name }.toSet()
+
+    /**
+     * Returns `true` when a value is currently stored under [key].
+     */
+    override suspend fun contains(key: String): Boolean = datastore.data.first().asMap().keys.any { it.name == key }
+
+    /**
+     * Removes every stored key whose name starts with [prefix], in a single transaction.
+     */
+    override suspend fun clear(prefix: String) {
+        datastore.edit { current ->
+            current.asMap().keys
+                .filter { it.name.startsWith(prefix) }
+                .forEach { current.remove(it) }
+        }
     }
 
     /**
-     * Imports preferences from a map of keys to values, merging them into existing preferences.
-     *
-     * Supported value types: [String], [Long], [Int], [Float], [Double], [Boolean],
-     * and [Collection] of [String]. Other types are stored as their JSON string representation.
-     *
-     * @param data The map of preference keys to values to import.
+     * Removes every stored key created with the [BasePreference.privateKey] prefix
+     * (`__PRIVATE_`), in a single transaction.
      */
-    @Deprecated(
-        "This method is deprecated in favor of importData and importDataAsString for better type safety and flexibility.",
-        level = DeprecationLevel.WARNING,
-    )
-    override suspend fun import(data: Map<String, Any>) {
-        datastore.updateData { currentPreferences ->
-            val mutablePreferences = currentPreferences.toMutablePreferences()
-            data.forEach { (key, value) ->
-                when (value) {
-                    is String -> mutablePreferences[stringPreferencesKey(key)] = value
+    override suspend fun clearPrivate(): Unit = clear(BasePreference.privateKey(""))
 
-                    is Long -> mutablePreferences[longPreferencesKey(key)] = value
+    /**
+     * Removes every stored key created with the [BasePreference.appStateKey] prefix
+     * (`__APP_STATE_`), in a single transaction.
+     */
+    override suspend fun clearAppState(): Unit = clear(BasePreference.appStateKey(""))
 
-                    is Int -> mutablePreferences[intPreferencesKey(key)] = value
+    override fun keysBlocking(): Set<String> = runBlocking { keys() }
 
-                    is Float -> mutablePreferences[floatPreferencesKey(key)] = value
+    override fun containsBlocking(key: String): Boolean = runBlocking { contains(key) }
 
-                    is Double -> mutablePreferences[doublePreferencesKey(key)] = value
+    override fun clearBlocking(prefix: String): Unit = runBlocking { clear(prefix) }
 
-                    is Boolean -> mutablePreferences[booleanPreferencesKey(key)] = value
+    override fun clearPrivateBlocking(): Unit = runBlocking { clearPrivate() }
 
-                    is Collection<*> -> {
-                        if (value.all { it is String }) {
-                            @Suppress("UNCHECKED_CAST")
-                            mutablePreferences[stringSetPreferencesKey(key)] = (value as Collection<String>).toSet()
-                        } else {
-                            val stringValue = value.toJsonElement().toString()
-                            mutablePreferences[stringPreferencesKey(key)] = stringValue
-                        }
-                    }
-
-                    else -> {
-                        val stringValue = when (value) {
-                            is Map<*, *>, is Collection<*> -> value.toJsonElement().toString()
-                            else -> value.toString()
-                        }
-                        mutablePreferences[stringPreferencesKey(key)] = stringValue
-                    }
-                }
-            }
-            mutablePreferences.toPreferences()
-        }
-    }
+    override fun clearAppStateBlocking(): Unit = runBlocking { clearAppState() }
 
     override suspend fun exportAsData(
         exportPrivate: Boolean,

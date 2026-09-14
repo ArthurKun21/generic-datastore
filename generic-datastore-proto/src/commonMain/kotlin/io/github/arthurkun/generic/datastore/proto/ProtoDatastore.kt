@@ -1,6 +1,8 @@
 package io.github.arthurkun.generic.datastore.proto
 
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
+import io.github.arthurkun.generic.datastore.proto.batch.ProtoUpdateScope
+import io.github.arthurkun.generic.datastore.proto.batch.ProtoWriteScope
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
@@ -221,6 +223,50 @@ public interface ProtoDatastore<T> : AutoCloseable {
         updater: (T, Set<String>) -> T,
     ): ProtoPreference<Set<F>>
 
+    /**
+     * Creates a [ProtoPreference] for a [Map] field serialized as a single JSON object using
+     * [KSerializer]s for keys and values. The proto field type is [String].
+     *
+     * @param K The key type.
+     * @param V The value type.
+     * @param defaultValue The default map value.
+     * @param keySerializer The [KSerializer] for the key type.
+     * @param valueSerializer The [KSerializer] for the value type.
+     * @param json Optional [Json] instance; defaults to [io.github.arthurkun.generic.datastore.core.PreferenceDefaults.defaultJson].
+     * @param getter Extracts the raw [String] field from the proto snapshot.
+     * @param updater Returns a new proto with the raw [String] field updated.
+     * @return A [ProtoPreference] for the serialized map field.
+     */
+    public fun <K, V> kserializedMapField(
+        defaultValue: Map<K, V> = emptyMap(),
+        keySerializer: KSerializer<K>,
+        valueSerializer: KSerializer<V>,
+        json: Json? = null,
+        getter: (T) -> String,
+        updater: (T, String) -> T,
+    ): ProtoPreference<Map<K, V>>
+
+    /**
+     * Creates a [ProtoPreference] for a nullable [Map] field serialized as a single JSON object
+     * using [KSerializer]s for keys and values. The proto field type is [String?].
+     *
+     * @param K The key type.
+     * @param V The value type.
+     * @param keySerializer The [KSerializer] for the key type.
+     * @param valueSerializer The [KSerializer] for the value type.
+     * @param json Optional [Json] instance; defaults to [io.github.arthurkun.generic.datastore.core.PreferenceDefaults.defaultJson].
+     * @param getter Extracts the raw [String?] field from the proto snapshot.
+     * @param updater Returns a new proto with the raw [String?] field updated.
+     * @return A [ProtoPreference] for the nullable serialized map field.
+     */
+    public fun <K, V> nullableKserializedMapField(
+        keySerializer: KSerializer<K>,
+        valueSerializer: KSerializer<V>,
+        json: Json? = null,
+        getter: (T) -> String?,
+        updater: (T, String?) -> T,
+    ): ProtoPreference<Map<K, V>?>
+
     // --- Serialized fields (caller-provided functions) ---
 
     /**
@@ -318,4 +364,154 @@ public interface ProtoDatastore<T> : AutoCloseable {
         getter: (T) -> Set<String>,
         updater: (T, Set<String>) -> T,
     ): ProtoPreference<Set<F>>
+
+    /**
+     * Creates a [ProtoPreference] for a [Map] field using caller-provided per-key/value
+     * serialization. The proto field type is [String] (JSON object of individually serialized
+     * keys and values).
+     *
+     * @param K The key type.
+     * @param V The value type.
+     * @param defaultValue The default map value.
+     * @param keySerializer Function to serialize each key to [String].
+     * @param keyDeserializer Function to deserialize each [String] key.
+     * @param valueSerializer Function to serialize each value to [String].
+     * @param valueDeserializer Function to deserialize each [String] value.
+     * @param getter Extracts the raw [String] field from the proto snapshot.
+     * @param updater Returns a new proto with the raw [String] field updated.
+     * @return A [ProtoPreference] for the serialized map field.
+     */
+    public fun <K, V> serializedMapField(
+        defaultValue: Map<K, V> = emptyMap(),
+        keySerializer: (K) -> String,
+        keyDeserializer: (String) -> K,
+        valueSerializer: (V) -> String,
+        valueDeserializer: (String) -> V,
+        getter: (T) -> String,
+        updater: (T, String) -> T,
+    ): ProtoPreference<Map<K, V>>
+
+    /**
+     * Creates a [ProtoPreference] for a nullable [Map] field using caller-provided
+     * per-key/value serialization. The proto field type is [String?].
+     *
+     * @param K The key type.
+     * @param V The value type.
+     * @param keySerializer Function to serialize each key to [String].
+     * @param keyDeserializer Function to deserialize each [String] key.
+     * @param valueSerializer Function to serialize each value to [String].
+     * @param valueDeserializer Function to deserialize each [String] value.
+     * @param getter Extracts the raw [String?] field from the proto snapshot.
+     * @param updater Returns a new proto with the raw [String?] field updated.
+     * @return A [ProtoPreference] for the nullable serialized map field.
+     */
+    public fun <K, V> nullableSerializedMapField(
+        keySerializer: (K) -> String,
+        keyDeserializer: (String) -> K,
+        valueSerializer: (V) -> String,
+        valueDeserializer: (String) -> V,
+        getter: (T) -> String?,
+        updater: (T, String?) -> T,
+    ): ProtoPreference<Map<K, V>?>
+
+    // --- Nullable plain field ---
+
+    /**
+     * Creates a [ProtoPreference] for a nullable field of any type, reading and writing the
+     * field directly on the proto snapshot. Useful for proto messages that model optional
+     * fields with nullable Kotlin types.
+     *
+     * @param F The non-null field type.
+     * @param getter Extracts the nullable field from the proto snapshot.
+     * @param updater Returns a new proto with the nullable field updated; passing `null`
+     *   restores the field's proto default.
+     * @return A [ProtoPreference] for the nullable field.
+     */
+    public fun <F : Any> nullableField(
+        getter: (T) -> F?,
+        updater: (T, F?) -> T,
+    ): ProtoPreference<F?>
+
+    // --- Batch operations ---
+
+    /**
+     * Applies multiple field writes in a single atomic `updateData` transaction, collapsing N
+     * field writes into one disk write:
+     *
+     * ```kotlin
+     * protoDatastore.batchWrite {
+     *     set(nameField, "Alice")
+     *     set(ageField, 30)
+     *     resetToDefault(nicknameField)
+     * }
+     * ```
+     *
+     * Writes are applied in call order. Only preferences created by this datastore are accepted;
+     * setting a `data()` preference replaces the whole proto message with the given value.
+     *
+     * @param block A lambda with [ProtoWriteScope] receiver that performs the writes.
+     * @throws IllegalArgumentException If a preference passed to [ProtoWriteScope.set] was not
+     *   created by this library or belongs to a different datastore.
+     */
+    public suspend fun batchWrite(block: ProtoWriteScope<T>.() -> Unit)
+
+    /**
+     * Blocking variant of [batchWrite].
+     *
+     * @param block A lambda with [ProtoWriteScope] receiver that performs the writes.
+     * @throws IllegalArgumentException If a preference passed to [ProtoWriteScope.set] was not
+     *   created by this library or belongs to a different datastore.
+     */
+    public fun batchWriteBlocking(block: ProtoWriteScope<T>.() -> Unit)
+
+    /**
+     * Applies multiple field reads and writes in a single atomic `updateData` transaction. Reads
+     * observe writes made earlier in the same block:
+     *
+     * ```kotlin
+     * protoDatastore.batchUpdate {
+     *     update(counterField) { it + 1 }
+     *     set(lastChangedField, clock.now())
+     * }
+     * ```
+     *
+     * @param block A lambda with [ProtoUpdateScope] receiver that performs the reads and writes.
+     * @throws IllegalArgumentException If a preference passed to the scope was not created by
+     *   this library or belongs to a different datastore.
+     */
+    public suspend fun batchUpdate(block: ProtoUpdateScope<T>.() -> Unit)
+
+    /**
+     * Blocking variant of [batchUpdate].
+     *
+     * @param block A lambda with [ProtoUpdateScope] receiver that performs the reads and writes.
+     * @throws IllegalArgumentException If a preference passed to the scope was not created by
+     *   this library or belongs to a different datastore.
+     */
+    public fun batchUpdateBlocking(block: ProtoUpdateScope<T>.() -> Unit)
+
+    /**
+     * Returns a memoized [ProtoPreference]: the first call builds the preference with [factory]
+     * and every later call with the same [name] returns that same instance.
+     *
+     * Useful when preferences are created at use sites (inside ViewModels or composables) and
+     * would otherwise be rebuilt — and re-observed from scratch — on every call. The cache is
+     * keyed by [name] only; always use one [name] per field and pass an equivalent [factory]:
+     *
+     * ```kotlin
+     * val ageField = protoDatastore.cached("age") {
+     *     field(0, getter = { it.age }, updater = { p, v -> p.copy(age = v) })
+     * }
+     * ```
+     *
+     * Prefer holding field preferences in `val` properties when practical; [cached] exists for
+     * cases where creation must happen inside a function body.
+     *
+     * @param F The field value type.
+     * @param name The unique cache entry name (must not be blank).
+     * @param factory Builds the preference on the first call.
+     * @return The memoized [ProtoPreference] instance.
+     * @throws IllegalArgumentException If [name] is blank.
+     */
+    public fun <F> cached(name: String, factory: () -> ProtoPreference<F>): ProtoPreference<F>
 }

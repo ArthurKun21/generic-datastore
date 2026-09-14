@@ -119,3 +119,37 @@ public inline fun <T, reified F> ProtoDatastore<T>.kserializedSetField(
     getter = getter,
     updater = updater,
 )
+
+/**
+ * Creates a [ProtoPreference] for a [Map] field serialized as a single JSON object, inferring the
+ * key and value [KSerializer]s from the reified types.
+ */
+public inline fun <T, reified K, reified V> ProtoDatastore<T>.kserializedMapField(
+    defaultValue: Map<K, V> = emptyMap(),
+    json: Json? = null,
+    noinline getter: (T) -> String,
+    noinline updater: (T, String) -> T,
+): ProtoPreference<Map<K, V>> = kserializedMapField(
+    defaultValue = defaultValue,
+    keySerializer = serializer<K>(),
+    valueSerializer = serializer<V>(),
+    json = json,
+    getter = getter,
+    updater = updater,
+)
+
+/**
+ * Creates a [ProtoPreference] for a nullable [Map] field serialized as a single JSON object,
+ * inferring the key and value [KSerializer]s from the reified types.
+ */
+public inline fun <T, reified K, reified V> ProtoDatastore<T>.nullableKserializedMapField(
+    json: Json? = null,
+    noinline getter: (T) -> String?,
+    noinline updater: (T, String?) -> T,
+): ProtoPreference<Map<K, V>?> = nullableKserializedMapField(
+    keySerializer = serializer<K>(),
+    valueSerializer = serializer<V>(),
+    json = json,
+    getter = getter,
+    updater = updater,
+)

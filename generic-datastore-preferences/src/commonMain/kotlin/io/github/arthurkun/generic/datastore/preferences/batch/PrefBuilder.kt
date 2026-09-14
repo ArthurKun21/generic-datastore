@@ -1,6 +1,7 @@
 package io.github.arthurkun.generic.datastore.preferences.batch
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -51,7 +52,9 @@ import kotlinx.serialization.serializer
  * preferences (via `string(…)`, `int(…)`, `add(…)`…) and operates on them.
  */
 @PreferencesBatchDsl
-public open class PrefBuilder internal constructor() {
+public open class PrefBuilder internal constructor(
+    private val fallbackJson: Json = PreferenceDefaults.defaultJson,
+) {
 
     private val prefs = mutableListOf<BatchPref<*>>()
     private val keys = mutableSetOf<String>()
@@ -108,6 +111,24 @@ public open class PrefBuilder internal constructor() {
         register(BatchTypedPref(booleanPreferencesKey(key), key, defaultValue))
 
     /**
+     * Declares a [ByteArray] preference.
+     *
+     * @param key The preference key.
+     * @param defaultValue The value used when the key is absent.
+     */
+    public fun bytes(key: String, defaultValue: ByteArray = ByteArray(0)): BatchPref<ByteArray> =
+        register(BatchTypedPref(byteArrayPreferencesKey(key), key, defaultValue))
+
+    /**
+     * Declares a nullable [ByteArray] preference. Missing keys read back as `null`; writing
+     * `null` removes the key.
+     *
+     * @param key The preference key.
+     */
+    public fun nullableBytes(key: String): BatchPref<ByteArray?> =
+        register(BatchNullableTypedPref(byteArrayPreferencesKey(key), key))
+
+    /**
      * Declares a [String] preference.
      *
      * @param key The preference key.
@@ -140,7 +161,7 @@ public open class PrefBuilder internal constructor() {
             key = key,
             defaultValue = defaultValue,
             serializer = { list -> serializeList(list) { it } },
-            deserializer = { str -> deserializeList(str) { it } },
+            deserializer = { str -> deserializeList(str, elementDeserializer = { it }) },
         ),
     )
 
@@ -201,7 +222,7 @@ public open class PrefBuilder internal constructor() {
         BatchNullableCustomPref(
             key = key,
             serializer = { list -> serializeList(list) { it } },
-            deserializer = { str -> deserializeList(str) { it } },
+            deserializer = { str -> deserializeList(str, elementDeserializer = { it }) },
         ),
     )
 
@@ -277,8 +298,10 @@ public open class PrefBuilder internal constructor() {
      * @param key The preference key.
      * @param defaultValue The value used when the key is absent or deserialization fails.
      * @param serializer The [KSerializer] for [T].
-     * @param json The [Json] configuration to use; `null` falls back to
-     *   [PreferenceDefaults.defaultJson].
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
      */
     public fun <T> kserialized(
         key: String,
@@ -286,7 +309,7 @@ public open class PrefBuilder internal constructor() {
         serializer: KSerializer<T>,
         json: Json? = null,
     ): BatchPref<T> {
-        val jsonInstance = json ?: PreferenceDefaults.defaultJson
+        val jsonInstance = json ?: fallbackJson
         return register(
             BatchCustomPref(
                 key = key,
@@ -304,8 +327,10 @@ public open class PrefBuilder internal constructor() {
      * @param T The type of the custom object.
      * @param key The preference key.
      * @param defaultValue The value used when the key is absent or deserialization fails.
-     * @param json The [Json] configuration to use; `null` falls back to
-     *   [PreferenceDefaults.defaultJson].
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
      */
     public inline fun <reified T> kserialized(
         key: String,
@@ -322,8 +347,10 @@ public open class PrefBuilder internal constructor() {
      * @param key The preference key.
      * @param defaultValue The value used when the key is absent.
      * @param serializer The [KSerializer] for each element.
-     * @param json The [Json] configuration to use; `null` falls back to
-     *   [PreferenceDefaults.defaultJson].
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
      */
     public fun <T> kserializedSet(
         key: String,
@@ -331,7 +358,7 @@ public open class PrefBuilder internal constructor() {
         serializer: KSerializer<T>,
         json: Json? = null,
     ): BatchPref<Set<T>> {
-        val jsonInstance = json ?: PreferenceDefaults.defaultJson
+        val jsonInstance = json ?: fallbackJson
         return register(
             BatchSetPref(
                 key = key,
@@ -350,8 +377,10 @@ public open class PrefBuilder internal constructor() {
      * @param T The type of each element in the set.
      * @param key The preference key.
      * @param defaultValue The value used when the key is absent.
-     * @param json The [Json] configuration to use; `null` falls back to
-     *   [PreferenceDefaults.defaultJson].
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
      */
     public inline fun <reified T> kserializedSet(
         key: String,
@@ -367,8 +396,10 @@ public open class PrefBuilder internal constructor() {
      * @param key The preference key.
      * @param defaultValue The value used when the key is absent or deserialization fails.
      * @param serializer The [KSerializer] for each element.
-     * @param json The [Json] configuration to use; `null` falls back to
-     *   [PreferenceDefaults.defaultJson].
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
      */
     public fun <T> kserializedList(
         key: String,
@@ -376,7 +407,7 @@ public open class PrefBuilder internal constructor() {
         serializer: KSerializer<T>,
         json: Json? = null,
     ): BatchPref<List<T>> {
-        val jsonInstance = json ?: PreferenceDefaults.defaultJson
+        val jsonInstance = json ?: fallbackJson
         val listSerializer = ListSerializer(serializer)
         return register(
             BatchCustomPref(
@@ -396,8 +427,10 @@ public open class PrefBuilder internal constructor() {
      * @param T The type of each element in the list.
      * @param key The preference key.
      * @param defaultValue The value used when the key is absent or deserialization fails.
-     * @param json The [Json] configuration to use; `null` falls back to
-     *   [PreferenceDefaults.defaultJson].
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
      */
     public inline fun <reified T> kserializedList(
         key: String,
@@ -431,15 +464,17 @@ public open class PrefBuilder internal constructor() {
      * @param T The non-null type of the custom object.
      * @param key The preference key.
      * @param serializer The [KSerializer] for [T].
-     * @param json The [Json] configuration to use; `null` falls back to
-     *   [PreferenceDefaults.defaultJson].
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
      */
     public fun <T : Any> nullableKserialized(
         key: String,
         serializer: KSerializer<T>,
         json: Json? = null,
     ): BatchPref<T?> {
-        val jsonInstance = json ?: PreferenceDefaults.defaultJson
+        val jsonInstance = json ?: fallbackJson
         return register(
             BatchNullableCustomPref(
                 key = key,
@@ -456,8 +491,10 @@ public open class PrefBuilder internal constructor() {
      *
      * @param T The non-null type of the custom object.
      * @param key The preference key.
-     * @param json The [Json] configuration to use; `null` falls back to
-     *   [PreferenceDefaults.defaultJson].
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
      */
     public inline fun <reified T : Any> nullableKserialized(
         key: String,
@@ -494,15 +531,17 @@ public open class PrefBuilder internal constructor() {
      * @param T The type of each element in the list.
      * @param key The preference key.
      * @param serializer The [KSerializer] for each element.
-     * @param json The [Json] configuration to use; `null` falls back to
-     *   [PreferenceDefaults.defaultJson].
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
      */
     public fun <T> nullableKserializedList(
         key: String,
         serializer: KSerializer<T>,
         json: Json? = null,
     ): BatchPref<List<T>?> {
-        val jsonInstance = json ?: PreferenceDefaults.defaultJson
+        val jsonInstance = json ?: fallbackJson
         val listSerializer = ListSerializer(serializer)
         return register(
             BatchNullableCustomPref(
@@ -520,13 +559,78 @@ public open class PrefBuilder internal constructor() {
      *
      * @param T The type of each element in the list.
      * @param key The preference key.
-     * @param json The [Json] configuration to use; `null` falls back to
-     *   [PreferenceDefaults.defaultJson].
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
      */
     public inline fun <reified T> nullableKserializedList(
         key: String,
         json: Json? = null,
     ): BatchPref<List<T>?> = nullableKserializedList(key, serializer<T>(), json)
+
+    /**
+     * Declares a nullable preference for a [Set] of custom objects stored in a string-set entry,
+     * where each element is individually converted to and from a [String]. Missing keys read back
+     * as `null`; writing `null` removes the key; elements that fail to deserialize are skipped.
+     *
+     * @param T The non-null type of each element in the set.
+     * @param key The preference key.
+     * @param serializer Converts each element to its stored [String] representation.
+     * @param deserializer Converts each stored [String] back to an element.
+     */
+    public fun <T : Any> nullableSerializedSet(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): BatchPref<Set<T>?> = register(
+        BatchNullableSetPref(key, serializer, deserializer),
+    )
+
+    /**
+     * Declares a nullable preference for a [Set] of custom objects encoded per-element as JSON
+     * and stored in a string-set entry. Missing keys read back as `null`; writing `null` removes
+     * the key; elements that fail to decode are skipped.
+     *
+     * @param T The non-null type of each element in the set.
+     * @param key The preference key.
+     * @param serializer The [KSerializer] for each element.
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
+     */
+    public fun <T : Any> nullableKserializedSet(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json? = null,
+    ): BatchPref<Set<T>?> {
+        val jsonInstance = json ?: fallbackJson
+        return register(
+            BatchNullableSetPref(
+                key = key,
+                elementSerializer = { jsonInstance.encodeToString(serializer, it) },
+                elementDeserializer = { jsonInstance.decodeFromString(serializer, it) },
+            ),
+        )
+    }
+
+    /**
+     * Declares a nullable preference for a [Set] of custom objects encoded per-element as JSON,
+     * inferring the [KSerializer] from [T]. Missing keys read back as `null`; writing `null`
+     * removes the key; elements that fail to decode are skipped.
+     *
+     * @param T The non-null type of each element in the set.
+     * @param key The preference key.
+     * @param json The [Json] configuration to use; `null` falls back to the batch's fallback
+     *   [Json] — the datastore's `defaultJson` for batch operations invoked on a
+     *   [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore], or
+     *   [PreferenceDefaults.defaultJson] for standalone [prefBatch] declarations.
+     */
+    public inline fun <reified T : Any> nullableKserializedSet(
+        key: String,
+        json: Json? = null,
+    ): BatchPref<Set<T>?> = nullableKserializedSet(key, serializer<T>(), json)
 
     /**
      * Declares a preference for storing an enum value by [Enum.name]. Unknown stored names read
@@ -561,6 +665,16 @@ public open class PrefBuilder internal constructor() {
      */
     public inline fun <reified E : Enum<E>> nullableEnum(key: String): BatchPref<E?> =
         internalBatchNullableEnum(key)
+
+    /**
+     * Declares a nullable preference for storing a [Set] of enum values by [Enum.name]. Missing
+     * keys read back as `null`; unknown stored names are skipped.
+     *
+     * @param E The enum type.
+     * @param key The preference key.
+     */
+    public inline fun <reified E : Enum<E>> nullableEnumSet(key: String): BatchPref<Set<E>?> =
+        internalBatchNullableEnumSet(key)
 
     /**
      * Registers an already-declared [BatchPref] handle in this batch.
@@ -636,11 +750,24 @@ internal inline fun <reified E : Enum<E>> PrefBuilder.internalBatchNullableEnum(
     deserializer = { enumValueOf(it) },
 )
 
+@PublishedApi
+internal inline fun <reified E : Enum<E>> PrefBuilder.internalBatchNullableEnumSet(
+    key: String,
+): BatchPref<Set<E>?> = nullableSerializedSet(
+    key = key,
+    serializer = { it.name },
+    deserializer = { enumValueOf(it) },
+)
+
 /**
  * Builds the immutable [PreferenceBatch] for an inline batch declaration.
  *
  * Backs every `declare: PrefBuilder.() -> Unit` operation on
- * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore].
+ * [io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore]. [fallbackJson] is the
+ * invoking datastore's `defaultJson`, keeping batch `kserialized*` encodings identical to the
+ * non-batch factories on that datastore.
  */
-internal fun buildBatch(declare: PrefBuilder.() -> Unit): PreferenceBatch =
-    PrefBuilder().apply(declare).build()
+internal fun buildBatch(
+    declare: PrefBuilder.() -> Unit,
+    fallbackJson: Json = PreferenceDefaults.defaultJson,
+): PreferenceBatch = PrefBuilder(fallbackJson).apply(declare).build()

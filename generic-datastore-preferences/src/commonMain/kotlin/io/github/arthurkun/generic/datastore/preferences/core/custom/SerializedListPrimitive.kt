@@ -20,6 +20,7 @@ internal class SerializedListPrimitive<T>(
     defaultValue: List<T>,
     elementSerializer: (T) -> String,
     elementDeserializer: (String) -> T,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CustomGenericPreferenceItem<List<T>>(
     datastore = datastore,
@@ -27,5 +28,6 @@ internal class SerializedListPrimitive<T>(
     defaultValue = defaultValue,
     serializer = { list -> serializeList(list, elementSerializer) },
     deserializer = { str -> deserializeList(str, elementDeserializer) },
+    onDecodeFailure = onDecodeFailure,
     ioDispatcher = ioDispatcher,
 )

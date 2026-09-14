@@ -15,11 +15,13 @@ internal class NullableObjectPrimitive<T : Any>(
     key: String,
     serializer: (T) -> String,
     deserializer: (String) -> T,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : NullableCustomGenericPreferenceItem<T>(
     datastore = datastore,
     key = key,
     serializer = serializer,
     deserializer = deserializer,
+    onDecodeFailure = onDecodeFailure,
     ioDispatcher = ioDispatcher,
 )

@@ -16,6 +16,7 @@ internal class ObjectPrimitive<T>(
     defaultValue: T,
     serializer: (T) -> String,
     deserializer: (String) -> T,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CustomGenericPreferenceItem<T>(
     datastore = datastore,
@@ -23,5 +24,6 @@ internal class ObjectPrimitive<T>(
     defaultValue = defaultValue,
     serializer = serializer,
     deserializer = deserializer,
+    onDecodeFailure = onDecodeFailure,
     ioDispatcher = ioDispatcher,
 )

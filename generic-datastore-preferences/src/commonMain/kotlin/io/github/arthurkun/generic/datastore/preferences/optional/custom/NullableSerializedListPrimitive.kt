@@ -17,11 +17,13 @@ internal class NullableSerializedListPrimitive<T>(
     key: String,
     elementSerializer: (T) -> String,
     elementDeserializer: (String) -> T,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : NullableCustomGenericPreferenceItem<List<T>>(
     datastore = datastore,
     key = key,
     serializer = { list -> serializeList(list, elementSerializer) },
     deserializer = { str -> deserializeList(str, elementDeserializer) },
+    onDecodeFailure = onDecodeFailure,
     ioDispatcher = ioDispatcher,
 )

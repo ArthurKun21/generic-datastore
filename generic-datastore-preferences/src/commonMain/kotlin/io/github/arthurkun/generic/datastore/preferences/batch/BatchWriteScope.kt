@@ -1,6 +1,7 @@
 package io.github.arthurkun.generic.datastore.preferences.batch
 
 import androidx.datastore.preferences.core.MutablePreferences
+import kotlinx.serialization.json.Json
 
 /**
  * Unified scope for batch-writing multiple preferences in a single DataStore `edit` transaction.
@@ -31,7 +32,8 @@ import androidx.datastore.preferences.core.MutablePreferences
 @PreferencesBatchDsl
 public class BatchWriteScope internal constructor(
     private val mutablePreferences: MutablePreferences,
-) : PrefBuilder() {
+    fallbackJson: Json,
+) : PrefBuilder(fallbackJson) {
     /**
      * Sets the given preference's value in the shared transaction. Writing `null` to a nullable
      * preference removes its key.

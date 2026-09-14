@@ -19,6 +19,7 @@ internal class KSerializedListPrimitive<T>(
     defaultValue: List<T>,
     serializer: KSerializer<T>,
     json: Json,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     listSerializer: KSerializer<List<T>> = ListSerializer(serializer),
 ) : CustomGenericPreferenceItem<List<T>>(
@@ -27,5 +28,6 @@ internal class KSerializedListPrimitive<T>(
     defaultValue = defaultValue,
     serializer = { json.encodeToString(listSerializer, it) },
     deserializer = { json.decodeFromString(listSerializer, it) },
+    onDecodeFailure = onDecodeFailure,
     ioDispatcher = ioDispatcher,
 )

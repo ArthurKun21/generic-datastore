@@ -25,6 +25,7 @@ internal open class ProtoSerialFieldPreference<P, T>(
     internal val getter: (P) -> T,
     internal val updater: (P, T) -> P,
     private val defaultProtoValue: P,
+    private val onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : BasePreference<T> {
 
@@ -61,13 +62,30 @@ internal open class ProtoSerialFieldPreference<P, T>(
 
     override fun asFlow(): Flow<T> = datastore.data
         .catch { e ->
-            if (e is IOException) emit(defaultProtoValue) else throw e
+            if (e is IOException) {
+                onDecodeFailure?.invoke(key, e)
+                emit(defaultProtoValue)
+            } else {
+                throw e
+            }
         }
         .map { getter(it) }
         .distinctUntilChanged()
 
     override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<T> =
         asFlow().stateIn(scope, started, defaultValue)
+
+    override suspend fun stateInCurrent(
+        scope: CoroutineScope,
+        started: SharingStarted,
+    ): StateFlow<T> = withContext(ioDispatcher) {
+        val current = datastore.data
+            .catch { e ->
+                if (e is IOException) emit(defaultProtoValue) else throw e
+            }
+            .first()
+        asFlow().stateIn(scope, started, getter(current))
+    }
 
     override fun getBlocking(): T = runBlocking { get() }
 

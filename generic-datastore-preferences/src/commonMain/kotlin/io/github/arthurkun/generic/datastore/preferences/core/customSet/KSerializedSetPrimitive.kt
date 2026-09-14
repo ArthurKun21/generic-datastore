@@ -19,6 +19,7 @@ internal class KSerializedSetPrimitive<T>(
     defaultValue: Set<T>,
     serializer: KSerializer<T>,
     json: Json,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CustomSetGenericPreferenceItem<T>(
     datastore = datastore,
@@ -26,5 +27,6 @@ internal class KSerializedSetPrimitive<T>(
     defaultValue = defaultValue,
     serializer = { json.encodeToString(serializer, it) },
     deserializer = { json.decodeFromString(serializer, it) },
+    onDecodeFailure = onDecodeFailure,
     ioDispatcher = ioDispatcher,
 )

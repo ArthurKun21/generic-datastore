@@ -3,6 +3,7 @@ package io.github.arthurkun.generic.datastore.proto.core
 import androidx.datastore.core.DataStore
 import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.proto.ProtoPreference
+import io.github.arthurkun.generic.datastore.proto.batch.ProtoAccessor
 import kotlin.reflect.KProperty
 
 /**
@@ -10,6 +11,7 @@ import kotlin.reflect.KProperty
  *
  * Delegates all [BasePreference] operations to a [ProtoFieldPreference] with identity
  * getter/updater, and adds [io.github.arthurkun.generic.datastore.proto.ProtoPreference] (property delegation + resetToDefaultBlocking).
+ * Setting this preference through a batch replaces the whole proto message.
  *
  * @param T The proto message type.
  * @param datastore The [DataStore<T>] instance.
@@ -28,7 +30,14 @@ internal class GenericProtoPreferenceItem<T>(
         getter = { it },
         updater = { _, value -> value },
         defaultProtoValue = defaultValue,
-    ) {
+    ),
+    ProtoAccessor<T, T> {
+
+    override val boundDatastore: DataStore<T> = datastore
+
+    override fun readFrom(proto: T): T = proto
+
+    override fun writeInto(proto: T, value: T): T = value
 
     override fun resetToDefaultBlocking(): Unit = setBlocking(defaultValue)
 

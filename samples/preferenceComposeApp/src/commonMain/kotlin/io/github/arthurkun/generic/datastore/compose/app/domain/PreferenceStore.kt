@@ -16,8 +16,6 @@ import io.github.arthurkun.generic.datastore.preferences.mapIO
 import io.github.arthurkun.generic.datastore.preferences.nullableEnum
 import io.github.arthurkun.generic.datastore.preferences.nullableKserialized
 import io.github.arthurkun.generic.datastore.preferences.nullableKserializedList
-import io.github.arthurkun.generic.datastore.preferences.toJsonElement
-import io.github.arthurkun.generic.datastore.preferences.toJsonMap
 import io.github.arthurkun.generic.datastore.preferences.toggle
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
@@ -255,17 +253,6 @@ class PreferenceStore(
             datastore.importData(backupData)
             datastore.importDataAsString(backupString, json = json)
 
-            val deprecatedExport = datastore.export()
-            datastore.import(
-                mapOf(
-                    "api_legacy_string" to "legacy",
-                    "api_legacy_int" to 1,
-                    "api_legacy_set" to listOf("a", "b"),
-                ),
-            )
-            mapOf("sample" to listOf("value")).toJsonElement()
-            backupString.toJsonMap()
-
             datastore.clearAll()
             datastore.importData(backup)
 
@@ -274,7 +261,6 @@ class PreferenceStore(
                 blockingValue,
                 "inline=$inlineText/$inlineNum",
                 "backup=${backupData.preferences.size}",
-                "legacy=${deprecatedExport.size}",
             ).joinToString(prefix = "Preferences APIs covered: ")
         } catch (failure: Throwable) {
             datastore.clearAll()

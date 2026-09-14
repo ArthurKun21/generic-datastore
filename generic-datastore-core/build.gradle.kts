@@ -11,6 +11,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            api(libs.datastore.core)
             implementation(libs.coroutines.core)
             implementation(libs.okio)
             implementation(libs.kotlinx.serialization.json)

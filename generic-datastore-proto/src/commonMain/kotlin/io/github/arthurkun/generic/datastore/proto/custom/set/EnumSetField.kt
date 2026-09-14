@@ -11,6 +11,7 @@ internal fun <T, F : Enum<F>> enumSetFieldInternal(
     getter: (T) -> Set<String>,
     updater: (T, Set<String>) -> T,
     defaultProtoValue: T,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
 ): ProtoSerialFieldPreference<T, Set<F>> = ProtoSerialFieldPreference(
     datastore = datastore,
     key = key,
@@ -24,4 +25,5 @@ internal fun <T, F : Enum<F>> enumSetFieldInternal(
         updater(proto, value.map { it.name }.toSet())
     },
     defaultProtoValue = defaultProtoValue,
+    onDecodeFailure = onDecodeFailure,
 )

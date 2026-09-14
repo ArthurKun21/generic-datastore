@@ -194,6 +194,35 @@ internal class BatchSetPref<T>(
 }
 
 /**
+ * Nullable set preference stored in a string-set entry, where every element is individually
+ * (de)serialized. Missing keys read back as `null`, writing `null` removes the key, and elements
+ * that fail to deserialize are skipped.
+ */
+internal class BatchNullableSetPref<T : Any>(
+    key: String,
+    private val elementSerializer: (T) -> String,
+    private val elementDeserializer: (String) -> T,
+) : BatchPref<Set<T>?>(key, null) {
+
+    private val stringSetKey = stringSetPreferencesKey(key)
+
+    override fun readFrom(preferences: Preferences): Set<T>? =
+        preferences[stringSetKey]?.let { deserializeSet(it, elementDeserializer) }
+
+    override fun writeTo(mutablePreferences: MutablePreferences, value: Set<T>?) {
+        if (value == null) {
+            mutablePreferences.remove(stringSetKey)
+        } else {
+            mutablePreferences[stringSetKey] = value.map(elementSerializer).toSet()
+        }
+    }
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        mutablePreferences.remove(stringSetKey)
+    }
+}
+
+/**
  * [BatchPref] that forwards raw access to an existing library-created [Preference] through its
  * [PreferencesAccessor] implementation, letting already-built preferences join a batch.
  */

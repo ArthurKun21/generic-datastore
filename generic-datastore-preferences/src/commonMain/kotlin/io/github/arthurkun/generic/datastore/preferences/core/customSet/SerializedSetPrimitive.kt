@@ -17,6 +17,7 @@ internal class SerializedSetPrimitive<T>(
     defaultValue: Set<T>,
     serializer: (T) -> String,
     deserializer: (String) -> T,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CustomSetGenericPreferenceItem<T>(
     datastore = datastore,
@@ -24,5 +25,6 @@ internal class SerializedSetPrimitive<T>(
     defaultValue = defaultValue,
     serializer = serializer,
     deserializer = deserializer,
+    onDecodeFailure = onDecodeFailure,
     ioDispatcher = ioDispatcher,
 )

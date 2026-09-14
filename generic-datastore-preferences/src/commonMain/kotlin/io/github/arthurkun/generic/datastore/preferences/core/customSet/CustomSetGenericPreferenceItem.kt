@@ -42,6 +42,7 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
     override val defaultValue: Set<T>,
     private val serializer: (T) -> String,
     private val deserializer: (String) -> T,
+    private val onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : BasePreference<Set<T>>, PreferencesAccessor<Set<T>> {
 
@@ -103,7 +104,11 @@ internal sealed class CustomSetGenericPreferenceItem<T>(
 
     override fun setBlocking(value: Set<T>): Unit = runBlocking { set(value) }
 
-    private fun safeDeserializeSet(values: Set<String>): Set<T> = deserializeSet(values, deserializer)
+    private fun safeDeserializeSet(values: Set<String>): Set<T> = deserializeSet(
+        values,
+        deserializer,
+        onDecodeFailure?.let { callback -> { error -> callback(key, error) } },
+    )
 
     override fun readFrom(preferences: Preferences): Set<T> =
         preferences[stringSetPrefKey]?.let { safeDeserializeSet(it) } ?: defaultValue

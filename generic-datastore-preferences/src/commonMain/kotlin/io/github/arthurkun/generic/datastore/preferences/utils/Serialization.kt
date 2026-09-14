@@ -15,11 +15,13 @@ internal fun <T> deserializeOrDefault(
     value: String,
     fallback: T,
     deserializer: (String) -> T,
+    onDecodeFailure: ((Throwable) -> Unit)? = null,
 ): T = try {
     deserializer(value)
 } catch (e: CancellationException) {
     throw e
-} catch (_: Exception) {
+} catch (e: Exception) {
+    onDecodeFailure?.invoke(e)
     fallback
 }
 
@@ -27,11 +29,16 @@ internal fun <T> deserializeOrDefault(
  * Deserializes [value] with [deserializer], rethrowing [CancellationException] and mapping every
  * other failure to `null`.
  */
-internal fun <T> deserializeOrNull(value: String, deserializer: (String) -> T): T? = try {
+internal fun <T> deserializeOrNull(
+    value: String,
+    deserializer: (String) -> T,
+    onDecodeFailure: ((Throwable) -> Unit)? = null,
+): T? = try {
     deserializer(value)
 } catch (e: CancellationException) {
     throw e
-} catch (_: Exception) {
+} catch (e: Exception) {
+    onDecodeFailure?.invoke(e)
     null
 }
 
@@ -39,14 +46,19 @@ internal fun <T> deserializeOrNull(value: String, deserializer: (String) -> T): 
  * Deserializes each element of a stored string set with [deserializer], rethrowing
  * [CancellationException] and skipping only elements that fail to deserialize.
  */
-internal fun <T> deserializeSet(values: Set<String>, deserializer: (String) -> T): Set<T> {
+internal fun <T> deserializeSet(
+    values: Set<String>,
+    deserializer: (String) -> T,
+    onDecodeFailure: ((Throwable) -> Unit)? = null,
+): Set<T> {
     val elements = mutableSetOf<T>()
     values.forEach { value ->
         try {
             elements.add(deserializer(value))
         } catch (e: CancellationException) {
             throw e
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            onDecodeFailure?.invoke(e)
             // Skip only elements that failed to deserialize.
         }
     }
@@ -69,7 +81,11 @@ internal fun <T> serializeList(list: List<T>, elementSerializer: (T) -> String):
  * deserialize with [elementDeserializer] are skipped. [CancellationException] from either the
  * outer parse or an element is always rethrown.
  */
-internal fun <T> deserializeList(value: String, elementDeserializer: (String) -> T): List<T> {
+internal fun <T> deserializeList(
+    value: String,
+    elementDeserializer: (String) -> T,
+    onDecodeFailure: ((Throwable) -> Unit)? = null,
+): List<T> {
     // Parse the outer array outside the per-element try so a malformed payload propagates to the
     // caller's fallback instead of being mistaken for "zero valid elements".
     val array =
@@ -84,7 +100,8 @@ internal fun <T> deserializeList(value: String, elementDeserializer: (String) ->
             elements.add(elementDeserializer(element.jsonPrimitive.content))
         } catch (e: CancellationException) {
             throw e
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            onDecodeFailure?.invoke(e)
             // Skip only elements that failed to deserialize.
         }
     }

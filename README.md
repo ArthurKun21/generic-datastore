@@ -176,17 +176,19 @@ Current Preferences API surface:
 | Category | APIs |
 |----------|------|
 | Lifecycle | `close()` |
-| Primitives | `string`, `long`, `int`, `float`, `double`, `bool`, `stringSet` |
+| Primitives | `string`, `long`, `int`, `float`, `double`, `bool`, `bytes`, `stringSet` |
 | Lists | `stringList`, `nullableStringList` |
-| Nullable primitives | `nullableString`, `nullableStringSet`, `nullableInt`, `nullableLong`, `nullableFloat`, `nullableDouble`, `nullableBool` |
-| Custom values | `serialized`, `serializedSet`, `serializedList`, `nullableSerialized`, `nullableSerializedList` |
-| Kotlin Serialization | `kserialized`, `kserializedSet`, `kserializedList`, `nullableKserialized`, `nullableKserializedList` |
-| Enum helpers | `enum`, `enumSet`, `nullableEnum` |
+| Nullable primitives | `nullableString`, `nullableStringSet`, `nullableInt`, `nullableLong`, `nullableFloat`, `nullableDouble`, `nullableBool`, `nullableBytes` |
+| Custom values | `serialized`, `serializedSet`, `serializedList`, `nullableSerialized`, `nullableSerializedSet`, `nullableSerializedList` |
+| Kotlin Serialization | `kserialized`, `kserializedSet`, `kserializedList`, `nullableKserialized`, `nullableKserializedSet`, `nullableKserializedList` |
+| Enum helpers | `enum`, `enumSet`, `nullableEnum`, `nullableEnumSet` |
 | Reads and writes | `get`, `set`, `update`, `delete`, `resetToDefault`, `asFlow`, `stateIn`, `stateInCurrent`, blocking variants, property delegation |
 | Batch operations | `batchReadValues`/`batchReadFlowValues` (+ `batchRead`/`batchReadFlow` projections), `batchWrite`, `batchUpdate`, `batchDelete`, blocking variants |
-| Backup and restore | `exportAsData`, `exportAsString`, `importData`, `importDataAsString`, `clearAll` |
-| Utilities | `map`, `mapIO`, `toggle`, `toJsonElement`, `toJsonMap`, `BasePreference.privateKey`, `BasePreference.appStateKey` |
-| Deprecated compatibility | `GenericPreferenceDatastore`, `export`, `import` |
+| Maintenance | `clearAll`, `keys`, `contains`, `clear(prefix)`, `clearPrivate`, `clearAppState` (+ blocking variants) |
+| Backup and restore | `exportAsData`, `exportAsString`, `importData`, `importDataAsString` |
+| Migrations | `KeyRenameMigration`, `preferencesMigration` |
+| Test factories | `createInMemoryPreferencesDatastore` |
+| Utilities | `map`, `mapIO`, `toggle`, `BasePreference.privateKey`, `BasePreference.appStateKey` |
 
 ### Enum Preferences
 
@@ -348,6 +350,24 @@ val themeSetPref: Preference<Set<Theme>> = datastore.enumSet<Theme>(
 Each enum value is stored by its `name`. Unknown enum values encountered during deserialization are
 skipped.
 
+### ByteArray Preferences
+
+Store raw binary payloads such as image thumbnails, serialized tokens, or cryptographic material
+using the native `byteArrayPreferencesKey`:
+
+```kotlin
+val avatar: Preference<ByteArray> = datastore.bytes("avatar")
+val cachedBytes: Preference<ByteArray?> = datastore.nullableBytes("cached_bytes")
+
+avatar.set(byteArrayOf(0x48, 0x65, 0x6C, 0x6C, 0x6F))
+avatar.toggle() // not available for ByteArray; use set/update
+
+avatar.update { it + byteArrayOf(0x21) }
+```
+
+`ByteArray` values are also backed up and restored: `exportAsData` stores them Base64-encoded and
+`importData` restores the original bytes.
+
 ### Nullable Preferences
 
 Create preferences that return `null` when no value has been set, instead of a default value:
@@ -431,6 +451,29 @@ val profileListPref: Preference<List<UserProfile>?> =
 All nullable variants return `null` when the key is not set. Setting `null` removes the key. If
 deserialization fails, `null` is returned.
 
+### Nullable Custom Sets (`nullableSerializedSet`, `nullableKserializedSet`, `nullableEnumSet`)
+
+Nullable variants of the set-backed custom types. A missing key reads as `null`, writing `null`
+removes the key, and elements that fail to decode are skipped:
+
+```kotlin
+enum class Role { ADMIN, EDITOR, VIEWER }
+
+val roles: Preference<Set<Role>?> = datastore.nullableEnumSet("roles")
+val permissions: Preference<Set<String>?> = datastore.nullableKserializedSet("permissions")
+val customRoles: Preference<Set<Role>?> = datastore.nullableSerializedSet(
+    "custom_roles",
+    serializer = { it.name },
+    deserializer = { enumValueOf<Role>(it) },
+)
+
+roles.set(setOf(Role.ADMIN))
+roles.set(null) // removes the key
+```
+
+The batch DSL declares the same types (`nullableSerializedSet`, `nullableKserializedSet`,
+`nullableEnumSet`) inside `batchWrite`/`batchRead` blocks.
+
 ### Decode Failure Policy
 
 Serializer-backed preferences are intentionally lenient. A non-null serialized preference returns
@@ -438,9 +481,20 @@ its `defaultValue` when the stored payload cannot be decoded. Nullable serialize
 return `null`. Set and list variants skip individual elements that fail to decode when the outer
 collection can still be parsed.
 
-This keeps reads resilient after app downgrades, partial migrations, or user-edited backup data. If
-decode failures must be surfaced, validate the serialized payload in your serializer or migration
-code before exposing it as a preference value.
+This keeps reads resilient after app downgrades, partial migrations, or user-edited backup data.
+
+To observe the silent fallbacks instead of swallowing them, pass `onDecodeFailure` when creating the
+datastore. The callback receives the preference key and the thrown error every time a stored value
+fails to decode:
+
+```kotlin
+val datastore = createPreferencesDatastore(
+    onDecodeFailure = { key, error -> logger.warn("Decode failed for $key", error) },
+) { path }
+```
+
+Batch declarations (`batchWrite`, `batchReadValues`, …) always use the datastore's `defaultJson`
+for their `kserialized*` factories, so batched and non-batched storage stay wire-compatible.
 
 ### Reading & Writing Values
 
@@ -869,6 +923,67 @@ val token = datastore.string(BasePreference.privateKey("auth_token"), "")
 val onboarded = datastore.bool(BasePreference.appStateKey("onboarding_done"), false)
 ```
 
+### Key Inspection & Scoped Clear
+
+Inspect what is currently stored and clear targeted groups of keys in a single transaction — for
+example, wiping user data on logout:
+
+```kotlin
+val allKeys: Set<String> = datastore.keys()
+val hasToken: Boolean = datastore.contains(BasePreference.privateKey("auth_token"))
+
+datastore.clear("session_") // removes every key starting with "session_"
+datastore.clearPrivate()    // removes every __PRIVATE_* key
+datastore.clearAppState()   // removes every __APP_STATE_* key
+```
+
+Blocking variants (`keysBlocking`, `containsBlocking`, `clearBlocking`, `clearPrivateBlocking`,
+`clearAppStateBlocking`) mirror each suspend function. `clearAll` remains available for wiping the
+whole datastore.
+
+### Migrations
+
+Wrap androidx `DataMigration`s with ready-made helpers and pass them to
+`createPreferencesDatastore(migrations = ...)`:
+
+```kotlin
+val datastore = createPreferencesDatastore(
+    migrations = listOf(
+        // Rename a key while keeping its value:
+        KeyRenameMigration("old_username", "user_name"),
+        // Or build a custom step:
+        preferencesMigration(
+            shouldMigrate = { current -> current.asMap().keys.any { it.name == "legacy_score" } },
+            migrate = { current ->
+                current.toMutablePreferences().apply {
+                    val raw = current.asMap()
+                    val old = raw.keys.first { it.name == "legacy_score" }
+                    set(longPreferencesKey("high_score"), raw[old] as Long)
+                    remove(old)
+                }.toPreferences()
+            },
+        ),
+    ),
+) { path }
+```
+
+`KeyRenameMigration` copies the value to the new key (without overwriting an existing value at the
+target) and removes the old key. It supports every stored primitive, `Set<String>`, and
+`ByteArray` values.
+
+### In-Memory Datastore (for tests and previews)
+
+`createInMemoryPreferencesDatastore` builds a fully functional datastore without touching the file
+system — useful for unit tests, Compose previews, and short-lived state:
+
+```kotlin
+val datastore = createInMemoryPreferencesDatastore()
+val theme = datastore.enum("theme", Theme.SYSTEM) // behaves exactly like the file-backed factory
+```
+
+Migrations and file corruption handling do not apply (there is no file), and each instance keeps
+its own isolated state.
+
 ## Proto DataStore
 
 ### Setup Proto DataStore
@@ -1238,8 +1353,107 @@ val profileSetPref: ProtoPreference<Set<UserProfile>> = protoDatastore.kserializ
 )
 ```
 
-Elements that fail deserialization are silently skipped. A custom `Json` instance can be provided
-if needed.
+#### Map Fields (`serializedMapField`, `kserializedMapField`)
+
+Store a `Map` as a single JSON object inside a `String` proto field. Keys and values are
+individually serialized; entries that fail to decode are skipped:
+
+```kotlin
+val agesByUser: ProtoPreference<Map<String, Int>> = protoDatastore.kserializedMapField(
+    defaultValue = emptyMap(),
+    getter = { it.agesJson },
+    updater = { proto, value -> proto.copy(agesJson = value) },
+)
+
+val customMap: ProtoPreference<Map<String, Int>> = protoDatastore.serializedMapField(
+    defaultValue = emptyMap(),
+    keySerializer = { it },
+    keyDeserializer = { it },
+    valueSerializer = { it.toString() },
+    valueDeserializer = { it.toInt() },
+    getter = { it.agesJson },
+    updater = { proto, value -> proto.copy(agesJson = value) },
+)
+```
+
+Nullable variants (`nullableKserializedMapField`, `nullableSerializedMapField`) read `null` when
+the proto field is null and restore it by writing `null`.
+
+#### Nullable Plain Fields (`nullableField`)
+
+For nullable typed fields (for example Wire protos with optional fields), `nullableField` wraps the
+field directly — no serialization step:
+
+```kotlin
+val nickname: ProtoPreference<String?> = protoDatastore.nullableField(
+    getter = { it.nickname },
+    updater = { proto, value -> proto.copy(nickname = value) },
+)
+```
+
+Writing `null` restores the field's proto default.
+
+### Batch Field Updates
+
+`batchWrite` and `batchUpdate` apply several field writes inside one atomic `updateData`
+transaction, so N field writes collapse into a single disk write:
+
+```kotlin
+protoDatastore.batchUpdate {
+    val id = add(idField)
+    val name = add(nameField)
+
+    update(idField) { it + 1 }
+    set(nameField, "user-${get(idField) + 1}")
+    resetToDefault(nicknameField)
+}
+```
+
+Reads inside `batchUpdate` observe writes made earlier in the same block. Only preferences created
+by that datastore are accepted. Suspending and blocking (`batchWriteBlocking`, `batchUpdateBlocking`)
+variants are available.
+
+### Caching Field Preferences
+
+Field preferences are lightweight, but calling `field(...)` on every recomposition or getter
+rebuilds the wrapper each time. Hold field preferences in `val` properties when practical, or use
+`cached` to memoize by name when creation must happen inside a function body:
+
+```kotlin
+val ageField = protoDatastore.cached("age") {
+    protoDatastore.field(0, getter = { it.age }, updater = { p, v -> p.copy(age = v) })
+}
+```
+
+The same instance is returned for the same name; blank names throw.
+
+### In-Memory Proto Datastore
+
+`createInMemoryProtoDatastore` builds a proto datastore without a file — useful for unit tests and
+previews. `importFromByteArray` works (it performs an in-memory update); `exportAsByteArray` is
+unsupported because there is no file to read:
+
+```kotlin
+val datastore = createInMemoryProtoDatastore(
+    serializer = MyMessageSerializer,
+    defaultValue = MyMessage(),
+)
+```
+
+### Decode Failure Observability
+
+Custom field deserialization is lenient: failures fall back to the field default (or `null`), and
+individual list/set/map entries that fail are skipped. Pass `onDecodeFailure` when creating the
+datastore to observe those fallbacks — the callback receives the datastore key and the error, and
+also fires when the underlying file cannot be read:
+
+```kotlin
+val datastore = createProtoDatastore(
+    serializer = MyMessageSerializer,
+    defaultValue = MyMessage(),
+    onDecodeFailure = { key, error -> logger.warn("Decode failed for $key", error) },
+) { path }
+```
 
 ## Compose Extensions (`generic-datastore-compose`)
 

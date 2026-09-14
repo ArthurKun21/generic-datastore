@@ -38,6 +38,8 @@ import kotlinx.io.files.Path as KotlinxIoPath
  *   datastore.close()
  *   ```
  * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based fields in this proto datastore.
+ * @param onDecodeFailure Optional callback invoked with the field key and the error every time a
+ *   stored value fails to decode or the datastore file cannot be read.
  * @param producePath A lambda that returns the full file path as a [String].
  * @return A new [GenericProtoDatastore] instance.
  */
@@ -49,6 +51,7 @@ public fun <T> createProtoDatastore(
     migrations: List<DataMigration<T>> = emptyList(),
     scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     producePath: () -> String,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
@@ -69,6 +72,7 @@ public fun <T> createProtoDatastore(
         defaultValue = defaultValue,
         key = nameKey,
         defaultJson = defaultJson,
+        onDecodeFailure = onDecodeFailure,
         ownedScope = datastoreScope,
         serializer = serializer,
         path = path,
@@ -94,6 +98,8 @@ public fun <T> createProtoDatastore(
  *   datastore.close()
  *   ```
  * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based fields in this proto datastore.
+ * @param onDecodeFailure Optional callback invoked with the field key and the error every time a
+ *   stored value fails to decode or the datastore file cannot be read.
  * @param produceOkioPath A lambda that returns the file path as an [okio.Path].
  * @return A new [GenericProtoDatastore] instance.
  */
@@ -106,6 +112,7 @@ public fun <T> createProtoDatastore(
     migrations: List<DataMigration<T>> = emptyList(),
     scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     produceOkioPath: () -> okio.Path,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
@@ -126,6 +133,7 @@ public fun <T> createProtoDatastore(
         defaultValue = defaultValue,
         key = nameKey,
         defaultJson = defaultJson,
+        onDecodeFailure = onDecodeFailure,
         ownedScope = datastoreScope,
         serializer = serializer,
         path = path,
@@ -152,6 +160,8 @@ public fun <T> createProtoDatastore(
  *   datastore.close()
  *   ```
  * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based fields in this proto datastore.
+ * @param onDecodeFailure Optional callback invoked with the field key and the error every time a
+ *   stored value fails to decode or the datastore file cannot be read.
  * @param produceKotlinxIoPath A lambda that returns the file path as a [kotlinx.io.files.Path].
  * @return A new [GenericProtoDatastore] instance.
  */
@@ -164,6 +174,7 @@ public fun <T> createProtoDatastore(
     migrations: List<DataMigration<T>> = emptyList(),
     scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     produceKotlinxIoPath: () -> KotlinxIoPath,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
@@ -184,6 +195,7 @@ public fun <T> createProtoDatastore(
         defaultValue = defaultValue,
         key = nameKey,
         defaultJson = defaultJson,
+        onDecodeFailure = onDecodeFailure,
         ownedScope = datastoreScope,
         serializer = serializer,
         path = path,
@@ -213,6 +225,8 @@ public fun <T> createProtoDatastore(
  *   datastore.close()
  *   ```
  * @param defaultJson The default [Json] instance to use for Kotlin Serialization-based fields in this proto datastore.
+ * @param onDecodeFailure Optional callback invoked with the field key and the error every time a
+ *   stored value fails to decode or the datastore file cannot be read.
  * @param producePath A lambda that returns the directory path as a [String].
  * @return A new [GenericProtoDatastore] instance.
  */
@@ -225,6 +239,7 @@ public fun <T> createProtoDatastore(
     migrations: List<DataMigration<T>> = emptyList(),
     scope: CoroutineScope? = null,
     defaultJson: Json = PreferenceDefaults.defaultJson,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
     producePath: () -> String,
 ): GenericProtoDatastore<T> {
     val datastoreScope = createDatastoreScope(scope)
@@ -244,6 +259,7 @@ public fun <T> createProtoDatastore(
         defaultValue = defaultValue,
         key = key,
         defaultJson = defaultJson,
+        onDecodeFailure = onDecodeFailure,
         ownedScope = datastoreScope,
         serializer = serializer,
         path = path,

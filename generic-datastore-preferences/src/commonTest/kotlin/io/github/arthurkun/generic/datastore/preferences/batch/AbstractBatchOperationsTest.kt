@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.enum
@@ -27,6 +28,7 @@ import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlin.reflect.KProperty
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -38,6 +40,9 @@ private enum class BatchTestEnum { FIRST, SECOND }
 
 @Serializable
 internal data class BatchTestPayload(val id: Int, val label: String)
+
+@Serializable
+internal data class BatchJsonPayload(val id: Int, val label: String = "default")
 
 abstract class AbstractBatchOperationsTest {
 
@@ -941,6 +946,72 @@ abstract class AbstractBatchOperationsTest {
             .value
 
         assertEquals("""["a","b"]""", raw)
+    }
+
+    @OptIn(InternalGenericDatastoreApi::class)
+    @Test
+    fun batchKserialized_usesDatastoreFallbackJson() = runTest(testDispatcher) {
+        val strictJson = Json { encodeDefaults = false }
+        val customDatastore = GenericPreferencesDatastore(
+            datastore = dataStore,
+            defaultJson = strictJson,
+        )
+
+        customDatastore.batchWrite {
+            val payload = kserialized(
+                "fallback_json_payload",
+                BatchJsonPayload(0),
+                BatchJsonPayload.serializer(),
+            )
+            set(payload, BatchJsonPayload(7))
+        }
+
+        // The datastore's Json omits defaulted properties on write; the global default
+        // (encodeDefaults = true) would have stored {"id":7,"label":"default"} instead.
+        assertEquals(
+            """{"id":7}""",
+            dataStore.data.first()[stringPreferencesKey("fallback_json_payload")],
+        )
+
+        var readBack: BatchPref<BatchJsonPayload>? = null
+        val values = customDatastore.batchReadValues {
+            readBack = kserialized(
+                "fallback_json_payload",
+                BatchJsonPayload(0),
+                BatchJsonPayload.serializer(),
+            )
+        }
+        assertEquals(BatchJsonPayload(7), values[requireNotNull(readBack)])
+        assertEquals(
+            BatchJsonPayload(7),
+            customDatastore
+                .kserialized("fallback_json_payload", BatchJsonPayload(0), BatchJsonPayload.serializer())
+                .get(),
+        )
+    }
+
+    @OptIn(InternalGenericDatastoreApi::class)
+    @Test
+    fun batchKserializedList_usesDatastoreFallbackJson() = runTest(testDispatcher) {
+        val strictJson = Json { encodeDefaults = false }
+        val customDatastore = GenericPreferencesDatastore(
+            datastore = dataStore,
+            defaultJson = strictJson,
+        )
+
+        customDatastore.batchWrite {
+            val list = kserializedList(
+                "fallback_json_list",
+                emptyList<BatchJsonPayload>(),
+                BatchJsonPayload.serializer(),
+            )
+            set(list, listOf(BatchJsonPayload(9)))
+        }
+
+        assertEquals(
+            """[{"id":9}]""",
+            dataStore.data.first()[stringPreferencesKey("fallback_json_list")],
+        )
     }
 
     // -- inline datastore.batchX { … } declarations (unified declare+operate) --

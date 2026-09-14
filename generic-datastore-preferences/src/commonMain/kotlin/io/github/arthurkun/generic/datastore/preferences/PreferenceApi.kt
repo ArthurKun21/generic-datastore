@@ -2,14 +2,12 @@ package io.github.arthurkun.generic.datastore.preferences
 
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
-import io.github.arthurkun.generic.datastore.preferences.backup.internalToJsonElement
-import io.github.arthurkun.generic.datastore.preferences.backup.internalToJsonMap
 import io.github.arthurkun.generic.datastore.preferences.core.custom.internalEnum
 import io.github.arthurkun.generic.datastore.preferences.core.customSet.internalEnumSet
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.internalNullableEnum
+import io.github.arthurkun.generic.datastore.preferences.optional.customSet.internalNullableEnumSet
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.serializer
 import io.github.arthurkun.generic.datastore.preferences.utils.map as internalMap
 import io.github.arthurkun.generic.datastore.preferences.utils.mapIO as internalMapIO
@@ -196,15 +194,25 @@ public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnum(
 ): Preference<T?> = internalNullableEnum(key)
 
 /**
- * Converts this value into a [JsonElement] using the same loose conversion rules as the backup
- * import/export helpers.
+ * Creates a nullable preference for storing a [Set] of enum values by [Enum.name].
+ *
+ * Missing keys produce `null`; unknown stored enum names are skipped.
  */
-public fun Any?.toJsonElement(): JsonElement = internalToJsonElement()
+public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnumSet(
+    key: String,
+): Preference<Set<T>?> = internalNullableEnumSet(key)
 
 /**
- * Parses this JSON object string into a [Map] of [String] keys to Kotlin values.
+ * Creates a nullable preference for a [Set] of custom objects encoded per-element as JSON,
+ * inferring the [KSerializer] from [T].
+ *
+ * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+ * Elements that fail to decode are skipped.
  */
-public fun String.toJsonMap(): Map<String, Any> = internalToJsonMap()
+public inline fun <reified T : Any> PreferencesDatastore.nullableKserializedSet(
+    key: String,
+    json: Json? = null,
+): Preference<Set<T>?> = nullableKserializedSet(key, serializer<T>(), json)
 
 /**
  * Toggles an item in a [Set] preference.

@@ -15,6 +15,7 @@ internal fun <T, F> nullableKserializedListFieldInternal(
     getter: (T) -> String?,
     updater: (T, String?) -> T,
     defaultProtoValue: T,
+    onDecodeFailure: ((String, Throwable) -> Unit)? = null,
 ): ProtoSerialFieldPreference<T, List<F>?> {
     val listSerializer = ListSerializer(serializer)
     return ProtoSerialFieldPreference(
@@ -23,7 +24,15 @@ internal fun <T, F> nullableKserializedListFieldInternal(
         defaultValue = null,
         getter = { proto ->
             val raw = getter(proto)
-            raw?.let { safeDeserialize<List<F>?>(it, null) { s -> json.decodeFromString(listSerializer, s) } }
+            raw?.let {
+                safeDeserialize<List<F>?>(
+                    it,
+                    null,
+                    onDecodeFailure?.let { callback ->
+                        { error: Throwable -> callback(key, error) }
+                    },
+                ) { s -> json.decodeFromString(listSerializer, s) }
+            }
         },
         updater = { proto, value ->
             updater(proto, value?.let { json.encodeToString(listSerializer, it) })

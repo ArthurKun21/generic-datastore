@@ -21,6 +21,8 @@ data class TestCustomFieldProtoData(
     val jsonListRaw: String = "",
     val nullableJsonListRaw: String? = null,
     val jsonSetRaw: Set<String> = emptySet(),
+    val jsonMapRaw: String = "",
+    val nullableJsonMapRaw: String? = null,
 )
 
 object TestCustomFieldProtoDataSerializer : OkioSerializer<TestCustomFieldProtoData> {
