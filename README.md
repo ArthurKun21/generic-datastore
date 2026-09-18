@@ -129,6 +129,15 @@ val datastore = createPreferencesDatastore(
 )
 ```
 
+##### Corruption handling (preferences)
+
+Without a `corruptionHandler`, a corrupted datastore file surfaces as a
+`CorruptionException` from preference reads (`get()`, `asFlow()`, property delegation, ...) so that
+data loss is observable; it is never silently replaced with defaults. Transient `IOException`s
+still fall back to `emptyPreferences()`/default values, preserving the resilience contract for
+temporary I/O failures. Register a `ReplaceFileCorruptionHandler` (as above) to have DataStore
+replace the corrupted file automatically.
+
 `createPreferencesDatastore` creates a DataStore scope owned by the returned datastore wrapper. Call
 `datastore.close()` when the datastore is no longer needed; if you pass `scope`, it is used as a
 parent lifecycle and is not cancelled by `close()`.
@@ -909,6 +918,14 @@ val protoDatastore = createProtoDatastore(
     producePath = { context.filesDir.resolve("my_proto.pb").absolutePath },
 )
 ```
+
+##### Corruption handling (proto)
+
+Without a `corruptionHandler`, **any** read failure — file corruption or a transient `IOException`
+— surfaces as a `CorruptionException` from proto reads (`data()`, `field()`, `get()`, `asFlow()`).
+A proto file is a single opaque serialized blob, so there is no silent fallback to
+`defaultValue`; data loss is always observable. Register a `ReplaceFileCorruptionHandler` (as
+above) to have DataStore replace the corrupted file automatically.
 
 `createProtoDatastore` creates a DataStore scope owned by the returned datastore wrapper. Call
 `protoDatastore.close()` when the datastore is no longer needed; if you pass `scope`, it is used as
