@@ -1,5 +1,6 @@
 package io.github.arthurkun.generic.datastore.proto.custom
 
+import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import io.github.arthurkun.generic.datastore.core.BasePreference
@@ -24,7 +25,6 @@ internal open class ProtoSerialFieldPreference<P, T>(
     override val defaultValue: T,
     internal val getter: (P) -> T,
     internal val updater: (P, T) -> P,
-    private val defaultProtoValue: P,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : BasePreference<T> {
 
@@ -61,7 +61,16 @@ internal open class ProtoSerialFieldPreference<P, T>(
 
     override fun asFlow(): Flow<T> = datastore.data
         .catch { e ->
-            if (e is IOException) emit(defaultProtoValue) else throw e
+            when (e) {
+                is CorruptionException -> throw e
+
+                is IOException -> throw CorruptionException(
+                    message = e.message ?: "Proto datastore read failed",
+                    cause = e,
+                )
+
+                else -> throw e
+            }
         }
         .map { getter(it) }
         .distinctUntilChanged()

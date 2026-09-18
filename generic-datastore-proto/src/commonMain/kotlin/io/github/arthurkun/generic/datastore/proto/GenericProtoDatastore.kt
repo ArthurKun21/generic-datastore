@@ -100,7 +100,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             defaultValue = defaultValue,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 
@@ -119,7 +118,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             enumValues = enumValues,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 
@@ -134,7 +132,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             enumValues = enumValues,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 
@@ -151,7 +148,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             enumValues = enumValues,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 
@@ -172,7 +168,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             json = json ?: defaultJson,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 
@@ -189,7 +184,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             json = json ?: defaultJson,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 
@@ -208,7 +202,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             json = json ?: defaultJson,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 
@@ -225,7 +218,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             json = json ?: defaultJson,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 
@@ -244,7 +236,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             json = json ?: defaultJson,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 
@@ -265,7 +256,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             deserializer = deserializer,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 
@@ -282,7 +272,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             deserializer = deserializer,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 
@@ -301,7 +290,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             elementDeserializer = elementDeserializer,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
             json = defaultJson,
         ),
     )
@@ -319,7 +307,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             elementDeserializer = elementDeserializer,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
             json = defaultJson,
         ),
     )
@@ -339,7 +326,6 @@ public class GenericProtoDatastore<T> @InternalGenericDatastoreApi constructor(
             deserializer = deserializer,
             getter = getter,
             updater = updater,
-            defaultProtoValue = this.defaultValue,
         ),
     )
 }

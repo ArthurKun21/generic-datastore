@@ -14,7 +14,6 @@ internal fun <T, F> kserializedListFieldInternal(
     json: Json,
     getter: (T) -> String,
     updater: (T, String) -> T,
-    defaultProtoValue: T,
 ): ProtoSerialFieldPreference<T, List<F>> {
     val listSerializer = ListSerializer(serializer)
     return ProtoSerialFieldPreference(
@@ -32,6 +31,5 @@ internal fun <T, F> kserializedListFieldInternal(
         updater = { proto, value ->
             updater(proto, json.encodeToString(listSerializer, value))
         },
-        defaultProtoValue = defaultProtoValue,
     )
 }

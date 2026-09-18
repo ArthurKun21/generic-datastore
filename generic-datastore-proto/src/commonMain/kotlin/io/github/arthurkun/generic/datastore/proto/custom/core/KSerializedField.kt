@@ -13,7 +13,6 @@ internal fun <T, F> kserializedFieldInternal(
     json: Json,
     getter: (T) -> String,
     updater: (T, String) -> T,
-    defaultProtoValue: T,
 ): ProtoSerialFieldPreference<T, F> = ProtoSerialFieldPreference(
     datastore = datastore,
     key = key,
@@ -29,5 +28,4 @@ internal fun <T, F> kserializedFieldInternal(
     updater = { proto, value ->
         updater(proto, json.encodeToString(serializer, value))
     },
-    defaultProtoValue = defaultProtoValue,
 )

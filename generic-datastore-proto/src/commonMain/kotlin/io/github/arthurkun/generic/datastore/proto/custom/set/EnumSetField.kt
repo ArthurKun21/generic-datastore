@@ -10,7 +10,6 @@ internal fun <T, F : Enum<F>> enumSetFieldInternal(
     enumValues: Array<F>,
     getter: (T) -> Set<String>,
     updater: (T, Set<String>) -> T,
-    defaultProtoValue: T,
 ): ProtoSerialFieldPreference<T, Set<F>> = ProtoSerialFieldPreference(
     datastore = datastore,
     key = key,
@@ -23,5 +22,4 @@ internal fun <T, F : Enum<F>> enumSetFieldInternal(
     updater = { proto, value ->
         updater(proto, value.map { it.name }.toSet())
     },
-    defaultProtoValue = defaultProtoValue,
 )
