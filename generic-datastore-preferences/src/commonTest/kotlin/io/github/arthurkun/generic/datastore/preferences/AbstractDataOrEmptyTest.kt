@@ -1,5 +1,6 @@
 package io.github.arthurkun.generic.datastore.preferences
 
+import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
@@ -15,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 abstract class AbstractDataOrEmptyTest {
@@ -66,6 +68,47 @@ abstract class AbstractDataOrEmptyTest {
 
         assertFailsWith<IllegalStateException> {
             errorDataStore.dataOrEmpty.first()
+        }
+    }
+
+    @Test
+    fun dataOrEmpty_rethrowsCorruptionExceptionUnchanged() = runTest(testDispatcher) {
+        val corruption = CorruptionException("corrupted preferences file")
+        val errorDataStore = object : DataStore<Preferences> {
+            override val data = flow<Preferences> {
+                throw corruption
+            }
+
+            override suspend fun updateData(
+                transform: suspend (t: Preferences) -> Preferences,
+            ): Preferences {
+                throw UnsupportedOperationException()
+            }
+        }
+
+        val thrown = assertFailsWith<CorruptionException> {
+            errorDataStore.dataOrEmpty.first()
+        }
+        assertSame(corruption, thrown)
+    }
+
+    @Test
+    fun dataOrEmpty_doesNotEmitFallbackOnCorruption() = runTest(testDispatcher) {
+        val errorDataStore = object : DataStore<Preferences> {
+            override val data = flow<Preferences> {
+                throw CorruptionException("corrupted preferences file")
+            }
+
+            override suspend fun updateData(
+                transform: suspend (t: Preferences) -> Preferences,
+            ): Preferences {
+                throw UnsupportedOperationException()
+            }
+        }
+
+        // Collecting fully must fail instead of completing with emptyPreferences().
+        assertFailsWith<CorruptionException> {
+            errorDataStore.dataOrEmpty.toList()
         }
     }
 

@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.datastore.core.CorruptionException
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchPref
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchValues
@@ -77,11 +78,11 @@ internal class BatchPrefsComposeState<T>(
                         }
                     } catch (e: CancellationException) {
                         throw e
+                    } catch (e: CorruptionException) {
+                        clearMatchingOverride(value)
+                        throw e
                     } catch (_: Exception) {
-                        val currentOverride = localOverride
-                        if (currentOverride !== Unset && policy.equivalent(currentOverride, value)) {
-                            localOverride = Unset
-                        }
+                        clearMatchingOverride(value)
                     }
                 }
             }
@@ -90,4 +91,11 @@ internal class BatchPrefsComposeState<T>(
     override fun component1(): T = value
 
     override fun component2(): (T) -> Unit = { value = it }
+
+    private fun clearMatchingOverride(value: T) {
+        val currentOverride = localOverride
+        if (currentOverride !== Unset && policy.equivalent(currentOverride, value)) {
+            localOverride = Unset
+        }
+    }
 }

@@ -27,7 +27,6 @@ internal class GenericProtoPreferenceItem<T>(
         defaultValue = defaultValue,
         getter = { it },
         updater = { _, value -> value },
-        defaultProtoValue = defaultValue,
     ) {
 
     override fun resetToDefaultBlocking(): Unit = setBlocking(defaultValue)

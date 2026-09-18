@@ -9,7 +9,6 @@ internal fun <T, F : Enum<F>> nullableEnumFieldInternal(
     enumValues: Array<F>,
     getter: (T) -> String?,
     updater: (T, String?) -> T,
-    defaultProtoValue: T,
 ): ProtoSerialFieldPreference<T, F?> = ProtoSerialFieldPreference(
     datastore = datastore,
     key = key,
@@ -21,5 +20,4 @@ internal fun <T, F : Enum<F>> nullableEnumFieldInternal(
     updater = { proto, value ->
         updater(proto, value?.name)
     },
-    defaultProtoValue = defaultProtoValue,
 )

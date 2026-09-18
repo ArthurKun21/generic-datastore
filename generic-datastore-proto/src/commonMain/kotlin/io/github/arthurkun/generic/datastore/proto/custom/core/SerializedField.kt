@@ -11,7 +11,6 @@ internal fun <T, F> serializedFieldInternal(
     deserializer: (String) -> F,
     getter: (T) -> String,
     updater: (T, String) -> T,
-    defaultProtoValue: T,
 ): ProtoSerialFieldPreference<T, F> = ProtoSerialFieldPreference(
     datastore = datastore,
     key = key,
@@ -27,5 +26,4 @@ internal fun <T, F> serializedFieldInternal(
     updater = { proto, value ->
         updater(proto, serializer(value))
     },
-    defaultProtoValue = defaultProtoValue,
 )

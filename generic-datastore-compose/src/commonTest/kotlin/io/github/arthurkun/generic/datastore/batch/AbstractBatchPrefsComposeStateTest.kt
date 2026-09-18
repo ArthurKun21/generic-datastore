@@ -2,6 +2,7 @@ package io.github.arthurkun.generic.datastore.batch
 
 import androidx.compose.runtime.SnapshotMutationPolicy
 import androidx.compose.runtime.mutableStateOf
+import androidx.datastore.core.CorruptionException
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
@@ -9,12 +10,18 @@ import io.github.arthurkun.generic.datastore.preferences.batch.BatchPref
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchValues
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchWriteScope
 import io.github.arthurkun.generic.datastore.preferences.batch.prefBatch
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 
 abstract class AbstractBatchPrefsComposeStateTest {
 
@@ -157,6 +164,39 @@ abstract class AbstractBatchPrefsComposeStateTest {
     }
 
     @Test
+    fun set_rethrowsCorruptionExceptionFromBatchWriteToCallerScope() = runTest(testDispatcher) {
+        val corruptingDatastore = CorruptingBatchWritePreferencesDatastore(preferenceDatastore)
+        val preference = corruptingDatastore.string("compose_batch_state_corruption", "fallback")
+        val batchState = mutableStateOf<BatchValues?>(null)
+        val caught = mutableListOf<Throwable>()
+        val handler = CoroutineExceptionHandler { _, throwable -> caught.add(throwable) }
+        val scope = CoroutineScope(
+            SupervisorJob() + StandardTestDispatcher(testDispatcher.scheduler) + handler,
+        )
+
+        try {
+            val state = BatchPrefsComposeState(
+                handle = handleFor(preference),
+                batchState = batchState,
+                datastore = corruptingDatastore,
+                scope = scope,
+            )
+
+            state.value = "local"
+            assertEquals("local", state.value)
+
+            runCurrent()
+
+            assertEquals(1, caught.size)
+            assertIs<CorruptionException>(caught.first())
+            assertEquals("fallback", state.value)
+            assertEquals("fallback", preference.get())
+        } finally {
+            scope.cancel()
+        }
+    }
+
+    @Test
     fun set_olderFailedBatchWriteDoesNotClearNewerOptimisticOverride() = runTest(testDispatcher) {
         val failingDatastore = FailsFirstBatchWritePreferencesDatastore(preferenceDatastore)
         val preference = failingDatastore.string("compose_batch_state_write_race", "fallback")
@@ -200,6 +240,16 @@ private class FailingBatchWritePreferencesDatastore(
         block: BatchWriteScope.() -> Unit,
     ) {
         throw IllegalStateException("forced batch write failure")
+    }
+}
+
+private class CorruptingBatchWritePreferencesDatastore(
+    private val delegate: PreferencesDatastore,
+) : PreferencesDatastore by delegate {
+    override suspend fun batchWrite(
+        block: BatchWriteScope.() -> Unit,
+    ) {
+        throw CorruptionException("corrupted datastore file")
     }
 }
 

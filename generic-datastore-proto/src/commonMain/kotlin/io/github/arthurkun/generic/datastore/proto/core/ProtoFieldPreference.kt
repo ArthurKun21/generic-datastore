@@ -16,7 +16,6 @@ import kotlinx.coroutines.IO
  * @param defaultValue The default value for the field.
  * @param getter A function that extracts the field from the proto snapshot.
  * @param updater A function that returns a new proto with the field updated.
- * @param defaultProtoValue The default proto value, used as fallback on [IOException].
  * @param ioDispatcher The dispatcher for IO operations.
  */
 internal class ProtoFieldPreference<P, T>(
@@ -25,7 +24,6 @@ internal class ProtoFieldPreference<P, T>(
     defaultValue: T,
     getter: (P) -> T,
     updater: (P, T) -> P,
-    defaultProtoValue: P,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ProtoSerialFieldPreference<P, T>(
     datastore = datastore,
@@ -33,6 +31,5 @@ internal class ProtoFieldPreference<P, T>(
     defaultValue = defaultValue,
     getter = getter,
     updater = updater,
-    defaultProtoValue = defaultProtoValue,
     ioDispatcher = ioDispatcher,
 )

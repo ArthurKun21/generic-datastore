@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.datastore.core.CorruptionException
 import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -69,15 +70,11 @@ internal class PrefsComposeState<T>(
                         prefs.set(value)
                     } catch (e: CancellationException) {
                         throw e
+                    } catch (e: CorruptionException) {
+                        clearMatchingOverride(value)
+                        throw e
                     } catch (_: Exception) {
-                        val currentOverride = localOverride
-                        if (currentOverride !== Unset) {
-                            @Suppress("UNCHECKED_CAST")
-                            val override = currentOverride as T
-                            if (policy.equivalent(override, value)) {
-                                localOverride = Unset
-                            }
-                        }
+                        clearMatchingOverride(value)
                     }
                 }
             }
@@ -86,4 +83,15 @@ internal class PrefsComposeState<T>(
     override fun component1(): T = value
 
     override fun component2(): (T) -> Unit = { value = it }
+
+    private fun clearMatchingOverride(value: T) {
+        val currentOverride = localOverride
+        if (currentOverride !== Unset) {
+            @Suppress("UNCHECKED_CAST")
+            val override = currentOverride as T
+            if (policy.equivalent(override, value)) {
+                localOverride = Unset
+            }
+        }
+    }
 }
