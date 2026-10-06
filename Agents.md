@@ -1,39 +1,49 @@
 # Generic Datastore
 
 This repository contains a Kotlin Multiplatform library that provides a thin wrapper around AndroidX
-DataStore Preferences and Proto DataStore. The main module is `generic-datastore`, with optional
-Jetpack Compose extensions in `generic-datastore-compose`.
+DataStore Preferences and Proto DataStore. The preferences implementation lives in
+`generic-datastore-preferences`, with optional Jetpack Compose extensions in
+`generic-datastore-compose`.
 
 ## Modules
 
-- `:generic-datastore` – core preference and proto datastore wrapper library.
-    - `core/` – shared interfaces and utilities (`BasePreference`, `DelegatedPreference`,
-      `PreferenceDefaults`, `PreferenceExtension`, `SystemFileSystem`).
-    - `preferences/` – DataStore wrapper implementations for `Preference` types
-      (`PreferencesDatastore`, `GenericPreferencesDatastore`, `CreatePreferencesDatastore`,
-      `Preferences`).
+- `:generic-datastore-core` – shared primitives used by every other module (`BasePreference`,
+  `DelegatedPreference`, `PreferenceDefaults`, `PreferenceExtension`, `SystemFileSystem`).
+- `:generic-datastore-preferences` – DataStore Preferences wrapper library.
+    - `preferences/` – public contract and factories (`Preference`, `PreferenceApi`,
+      `PreferencesDatastore`, `GenericPreferencesDatastore`, `CreatePreferencesDatastore`,
+      `PreferenceImpl`).
     - `preferences/core/data/` – DataStore Preferences implementation for primitive types
       (`BooleanPrimitive`, `DoublePrimitive`, `FloatPrimitive`, `IntPrimitive`, `LongPrimitive`,
       `StringPrimitive`, `StringSetPrimitive`, `GenericPreferenceItem`).
-        - `preferences/core/data/custom/` – custom-serializer and enum types (`EnumPreference`,
-          `KSerializedPrimitive`, `SerializedPrimitive`, `CustomGenericPreferenceItem`).
-        - `preferences/core/data/customSet/` – set-based custom types (`EnumSetPreference`,
+        - `preferences/core/data/custom/` – custom-serializer and enum types (`EnumPrimitive`,
+          `KSerializedPrimitive`, `KSerializedListPrimitive`, `SerializedPrimitive`,
+          `SerializedListPrimitive`, `CustomGenericPreferenceItem`).
+        - `preferences/core/data/customSet/` – set-based custom types (`EnumSetPrimitive`,
           `KSerializedSetPrimitive`, `SerializedSetPrimitive`, `CustomSetGenericPreferenceItem`).
     - `preferences/optional/data/` – nullable preference variants (`NullableBooleanPrimitive`,
       `NullableDoublePrimitive`, `NullableFloatPrimitive`, `NullableIntPrimitive`,
       `NullableLongPrimitive`, `NullableStringPrimitive`, `NullableStringSetPrimitive`,
       `NullableGenericPreferenceItem`).
-        - `preferences/optional/data/custom/` – nullable custom types (`NullableEnumPreference`,
-          `NullableKSerializedPrimitive`, `NullableSerializedPrimitive`,
+        - `preferences/optional/data/custom/` – nullable custom types (`NullableEnumPrimitive`,
+          `NullableKSerializedPrimitive`, `NullableKSerializedListPrimitive`,
+          `NullableSerializedPrimitive`, `NullableSerializedListPrimitive`,
           `NullableCustomGenericPreferenceItem`).
+        - `preferences/optional/data/customSet/` – nullable custom-set types
+          (`NullableEnumSetPrimitive`, `NullableKSerializedSetPrimitive`,
+          `NullableSerializedSetPrimitive`, `NullableSetGenericPreferenceItem`).
     - `preferences/core/mem/` and `preferences/optional/mem/` – reserved for upcoming in-memory
-      preference implementations. Currently empty; add new in-memory code here rather than under
-      `data/`.
-    - `preferences/utils/` – preference utility extensions (`MappedPreference`, `Extensions`).
+      preference implementations. Currently empty (only `.gitkeep`); add new in-memory code here
+      rather than under `data/`.
+    - `preferences/batch/` – declarative batch DSL (`BatchPref`, `PrefBuilder`, `PreferenceBatch`,
+      `BatchValues`, `BatchWriteScope`, `BatchUpdateScope`, `PreferencesAccessor`).
+    - `preferences/utils/` – preference utilities (`MappedPreference`, `Extensions`, `Serialization`,
+      `Enums`).
     - `preferences/backup/` – backup/restore support for preferences datastore (`BackupPreference`,
-      `PreferenceBackupCreator`, `PreferenceBackupRestorer`,
-      `BackupParsingException`, `Migration`).
-    - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
+      `PreferenceBackupCreator`, `PreferenceBackupRestorer`, `BackupParsingException`,
+      `Migration` — loose JSON conversion helpers, not a migration type).
+- `:generic-datastore-proto` – Proto DataStore support.
+    - `proto/` – public contract and factories (`ProtoPreference`, `ProtoDatastore`, `ProtoApi`,
       `GenericProtoDatastore`, `CreateProtoDatastore`, `ProtoFieldPrefs`).
         - `proto/core/` – core proto internals (`GenericProtoPreferenceItem`,
           `ProtoFieldPreference`).
@@ -46,9 +56,10 @@ Jetpack Compose extensions in `generic-datastore-compose`.
               `NullableSerializedListField`).
             - `proto/custom/set/` – set-based custom field implementations (`EnumSetField`,
               `KSerializedSetField`, `SerializedSetField`).
-    - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
-      `preferences/`, `preferences/core/data/custom/`, and `preferences/utils/`.
-- `:generic-datastore-compose` – Compose helpers built on the core module.
+- `:generic-datastore` – legacy aggregate module kept for binary compatibility; its top-level
+  package contains deprecated aliases that redirect to `generic-datastore-core` and
+  `generic-datastore-preferences`. Do not add new API here.
+- `:generic-datastore-compose` – Compose helpers built on the preferences module.
     - `Remember.kt` – `DelegatedPreference<T>.remember()` extension.
     - `PrefsComposeState.kt` – `MutableState` backed by a `DelegatedPreference`.
     - `batch/` – batch Compose extensions (`RememberBatchRead`, `RememberPreferences`,
@@ -130,9 +141,47 @@ DataStore initialization and teardown.
   abstract properties (`preferenceDatastore`, `dataStore`, `testDispatcher`) and supply
   platform-specific setup/teardown.
 
+`AbstractBatchPerformanceTest` is the one deliberate exception: it is `@Ignore`d and desktop-only, so
+it has a `JvmBatchPerformanceTest` subclass and no Android/iOS shims.
+
 When adding new tests, add them to the abstract class in `commonTest` so they run on all platforms
 automatically. Only add tests directly to a platform source set when the test requires
 platform-specific APIs that cannot be abstracted.
+
+### Enum preference types
+
+`PreferencesDatastore.enum`, `enumSet`, `nullableEnum`, and `nullableEnumSet` are **interface
+members** (not extensions) so a custom `PreferencesDatastore` implementation can override them and
+so they are callable from generic code. They are non-reified and take an explicit
+`enumValues: Array<T>` of all enum constants, because `enumValueOf` requires a reified type
+parameter. Decode uses the internal `decodeEnum` helper in `preferences/utils/Enums.kt`, which
+throws `IllegalArgumentException` on an unknown name; callers apply the per-type fallback (default,
+`null`, or element skipping).
+
+The `reified` `enum`/`enumSet`/`nullableEnum`/`nullableEnumSet` extensions in `PreferenceApi.kt` are
+thin sugar over the members and pass `enumValues()`. Because members shadow extensions, the member
+parameter lists deliberately differ in arity — adding a defaulted `defaultValue` to the member
+`enumSet` would break inference at `enumSet<T>("key")` call sites.
+
+`PrefBuilder.enum`/`enumSet`/`nullableEnum`/`nullableEnumSet` stay `inline reified` because batch
+declaration blocks need type inference (`nullableEnum("key")` with no type argument). They cannot
+touch the internal `BatchPref` constructors directly, so they delegate to the non-inline
+`@PublishedApi internal registerEnum*` helpers on `PrefBuilder`.
+
+`BatchPref` equality folds in the concrete subclass, so an `enum("k", d)` handle is **not** equal to
+a hand-rolled `serialized("k", d, { it.name }, ::enumValueOf)` handle. Each enum storage strategy has
+its own `BatchPref` subclass (`BatchEnumPref`, `BatchEnumSetPref`, `BatchNullableEnumPref`,
+`BatchNullableEnumSetPref`) for this reason.
+
+### Nullable set preference types
+
+`nullableSerializedSet`, `nullableKserializedSet`, and `nullableEnumSet` return `Set<T>?` backed by
+`NullableSetGenericPreferenceItem`. Only a **missing key** reads back as `null`; per-element decode
+failures are skipped, so a stored entry whose elements all fail reads back as an **empty set** — the
+same rule as the non-nullable set preferences. Writing `null` removes the key, and
+`resetToDefault()` is `delete()` for nullable types (key removed) versus `set(defaultValue)` for
+non-nullable ones (key stays present). This asymmetry is intentional and asserted in the tests;
+`exportAsData` only includes keys that are currently set, so the two produce different backups.
 
 ### Separating blocking and suspending tests
 
