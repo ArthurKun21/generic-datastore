@@ -190,7 +190,8 @@ Current Preferences API surface:
 | Nullable primitives | `nullableString`, `nullableStringSet`, `nullableInt`, `nullableLong`, `nullableFloat`, `nullableDouble`, `nullableBool` |
 | Custom values | `serialized`, `serializedSet`, `serializedList`, `nullableSerialized`, `nullableSerializedList` |
 | Kotlin Serialization | `kserialized`, `kserializedSet`, `kserializedList`, `nullableKserialized`, `nullableKserializedList` |
-| Enum helpers | `enum`, `enumSet`, `nullableEnum` |
+| Nullable sets | `nullableSerializedSet`, `nullableKserializedSet`, `nullableEnumSet` |
+| Enum helpers | `enum`, `enumSet`, `nullableEnum`, `nullableEnumSet` |
 | Reads and writes | `get`, `set`, `update`, `delete`, `resetToDefault`, `asFlow`, `stateIn`, `stateInCurrent`, blocking variants, property delegation |
 | Batch operations | `batchReadValues`/`batchReadFlowValues` (+ `batchRead`/`batchReadFlow` projections), `batchWrite`, `batchUpdate`, `batchDelete`, blocking variants |
 | Backup and restore | `exportAsData`, `exportAsString`, `importData`, `importDataAsString`, `clearAll` |
@@ -199,13 +200,27 @@ Current Preferences API surface:
 
 ### Enum Preferences
 
-Store enum values directly using the `enum()` extension:
+Store enum values directly using the `enum()` function:
 
 ```kotlin
 enum class Theme { LIGHT, DARK, SYSTEM }
 
 val themePref: Preference<Theme> = datastore.enum("theme", Theme.SYSTEM)
 ```
+
+Values are stored by `Enum.name`. An unknown stored name falls back to `Theme.SYSTEM`.
+
+`enum`, `enumSet`, `nullableEnum`, and `nullableEnumSet` are members of the `PreferencesDatastore`
+interface and take the enum's constants explicitly, so they can be called from generic code or
+overridden by a custom implementation:
+
+```kotlin
+fun <T : Enum<T>> themePref(datastore: PreferencesDatastore, key: String, fallback: T): Preference<T> =
+    datastore.enum(key, fallback, enumValues())
+```
+
+The reified `enum()` / `enumSet()` / `nullableEnum()` / `nullableEnumSet()` extensions are the
+convenient form and infer the constants for you.
 
 ### Custom Serialized Objects
 
@@ -390,6 +405,35 @@ Store an enum value that returns `null` when not set:
 val themePref: Preference<Theme?> = datastore.nullableEnum<Theme>("theme")
 ```
 
+### Nullable Enum Set
+
+Store a `Set` of enum values that returns `null` when not set:
+
+```kotlin
+val themeSetPref: Preference<Set<Theme>?> = datastore.nullableEnumSet<Theme>("theme_set")
+```
+
+Stored names that no longer match any constant are skipped. `null` is returned only when the key is
+absent — a stored entry whose names were all skipped reads back as an empty set.
+
+### Nullable Custom Serialized Sets
+
+Store a nullable `Set` of custom objects:
+
+```kotlin
+val animalSetPref: Preference<Set<Animal>?> = datastore.nullableSerializedSet(
+    key = "animal_set",
+    serializer = { Animal.to(it) },
+    deserializer = { Animal.from(it) },
+)
+
+val profileSetPref: Preference<Set<UserProfile>?> =
+    datastore.nullableKserializedSet<UserProfile>("profile_set")
+```
+
+Elements are stored in a `stringSetPreferencesKey`, each individually encoded. Elements that fail to
+decode are skipped, so an entry whose elements all fail reads back as an empty set.
+
 ### Nullable Custom Serialized Objects
 
 Store a nullable custom-serialized object:
@@ -439,6 +483,10 @@ val profileListPref: Preference<List<UserProfile>?> =
 
 All nullable variants return `null` when the key is not set. Setting `null` removes the key. If
 deserialization fails, `null` is returned.
+
+> **Set-shaped nullable preferences are the exception:** only a **missing key** reads back as `null`.
+> Per-element decode failures are skipped, so a stored entry whose elements all fail to decode reads
+> back as an **empty set** — the same rule the non-nullable set preferences follow.
 
 ### Decode Failure Policy
 
@@ -598,7 +646,8 @@ class SettingsStore(
 Declaration functions exist for every preference type: `int`, `long`, `float`, `double`, `bool`,
 `string`, `stringSet`, `stringList`, their `nullable*` variants, `serialized`, `serializedSet`,
 `serializedList`, `kserialized`, `kserializedSet`, `kserializedList` (with reified overloads that
-infer the `KSerializer`), their nullable custom variants, and `enum`, `enumSet`, `nullableEnum`.
+infer the `KSerializer`), their nullable custom variants (including `nullableSerializedSet` and
+`nullableKserializedSet`), and `enum`, `enumSet`, `nullableEnum`, `nullableEnumSet`.
 Keys must be unique and non-blank inside a batch (`IllegalArgumentException` otherwise).
 
 A previously declared `BatchPref` handle can be re-registered with `add(handle)`. Handles compare
