@@ -26,6 +26,8 @@ public final class io/github/arthurkun/generic/datastore/preferences/GenericPref
 	public fun clearAll (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun close ()V
 	public fun double (Ljava/lang/String;D)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun enum (Ljava/lang/String;Ljava/lang/Enum;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun enumSet (Ljava/lang/String;Ljava/util/Set;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun export (ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun exportAsData (ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun exportAsString (ZZLkotlinx/serialization/json/Json;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -40,13 +42,17 @@ public final class io/github/arthurkun/generic/datastore/preferences/GenericPref
 	public fun long (Ljava/lang/String;J)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableBool (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableDouble (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableEnum (Ljava/lang/String;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableEnumSet (Ljava/lang/String;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableFloat (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableInt (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableKserialized (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableKserializedList (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableKserializedSet (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableLong (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableSerialized (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableSerializedList (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public fun nullableSerializedSet (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableString (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableStringList (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public fun nullableStringSet (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
@@ -97,6 +103,8 @@ public abstract interface class io/github/arthurkun/generic/datastore/preference
 	public fun close ()V
 	public abstract fun double (Ljava/lang/String;D)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun double$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;DILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun enum (Ljava/lang/String;Ljava/lang/Enum;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun enumSet (Ljava/lang/String;Ljava/util/Set;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun export (ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun export$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;ZZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public abstract fun exportAsData (ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -122,15 +130,20 @@ public abstract interface class io/github/arthurkun/generic/datastore/preference
 	public static synthetic fun long$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;JILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableBool (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableDouble (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableEnum (Ljava/lang/String;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableEnumSet (Ljava/lang/String;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableFloat (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableInt (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableKserialized (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun nullableKserialized$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableKserializedList (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun nullableKserializedList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableKserializedSet (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun nullableKserializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableLong (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableSerialized (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableSerializedList (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public abstract fun nullableSerializedSet (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableString (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableStringList (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public abstract fun nullableStringSet (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
@@ -166,6 +179,7 @@ public final class io/github/arthurkun/generic/datastore/preferences/Preferences
 	public static synthetic fun long$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;JILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun nullableKserialized$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun nullableKserializedList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
+	public static synthetic fun nullableKserializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun serializedList$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun serializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
 	public static synthetic fun string$default (Lio/github/arthurkun/generic/datastore/preferences/PreferencesDatastore;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/Preference;
@@ -510,13 +524,20 @@ public class io/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder
 	public static synthetic fun nullableKserialized$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	public final fun nullableKserializedList (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	public static synthetic fun nullableKserializedList$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableKserializedSet (Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public static synthetic fun nullableKserializedSet$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/json/Json;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	public final fun nullableLong (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	public final fun nullableSerialized (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	public final fun nullableSerializedList (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun nullableSerializedSet (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	public final fun nullableString (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	public final fun nullableStringList (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	public final fun nullableStringSet (Ljava/lang/String;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	protected final fun register (Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun registerEnum (Ljava/lang/String;Ljava/lang/Enum;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun registerEnumSet (Ljava/lang/String;Ljava/util/Set;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun registerNullableEnum (Ljava/lang/String;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
+	public final fun registerNullableEnumSet (Ljava/lang/String;[Ljava/lang/Enum;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	public final fun serialized (Ljava/lang/String;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	public final fun serializedList (Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
 	public static synthetic fun serializedList$default (Lio/github/arthurkun/generic/datastore/preferences/batch/PrefBuilder;Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/arthurkun/generic/datastore/preferences/batch/BatchPref;
