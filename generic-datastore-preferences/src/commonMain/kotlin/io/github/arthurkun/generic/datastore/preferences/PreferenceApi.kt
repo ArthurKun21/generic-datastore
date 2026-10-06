@@ -4,8 +4,8 @@ import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.internalToJsonElement
 import io.github.arthurkun.generic.datastore.preferences.backup.internalToJsonMap
-import io.github.arthurkun.generic.datastore.preferences.core.custom.internalEnum
-import io.github.arthurkun.generic.datastore.preferences.core.customSet.internalEnumSet
+import io.github.arthurkun.generic.datastore.preferences.core.data.custom.internalEnum
+import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.internalEnumSet
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.internalNullableEnum
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json

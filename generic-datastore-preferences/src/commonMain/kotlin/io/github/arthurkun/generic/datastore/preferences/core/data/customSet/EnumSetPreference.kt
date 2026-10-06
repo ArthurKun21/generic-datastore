@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package io.github.arthurkun.generic.datastore.preferences.core.customSet
+package io.github.arthurkun.generic.datastore.preferences.core.data.customSet
 
 import io.github.arthurkun.generic.datastore.preferences.Preference
 import io.github.arthurkun.generic.datastore.preferences.PreferencesDatastore
