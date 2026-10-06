@@ -6,7 +6,7 @@ import io.github.arthurkun.generic.datastore.preferences.backup.internalToJsonEl
 import io.github.arthurkun.generic.datastore.preferences.backup.internalToJsonMap
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.internalEnum
 import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.internalEnumSet
-import io.github.arthurkun.generic.datastore.preferences.optional.custom.internalNullableEnum
+import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.internalNullableEnum
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
