@@ -43,4 +43,3 @@ internal class NullableSerializedListPrimitive<T>(
     deserializer = { str -> deserializeList(str, elementDeserializer) },
     ioDispatcher = ioDispatcher,
 )
-

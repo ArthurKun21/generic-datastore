@@ -10,7 +10,6 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 
-
 /**
  * [NullableGenericPreferenceItem] for a nullable [Boolean] stored with `booleanPreferencesKey`.
  */
@@ -95,5 +94,3 @@ internal class NullableStringSetPrimitive(
     key = key,
     preferences = stringSetPreferencesKey(key),
 )
-
-

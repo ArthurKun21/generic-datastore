@@ -49,4 +49,3 @@ internal class SerializedListPrimitive<T>(
     deserializer = { str -> deserializeList(str, elementDeserializer) },
     ioDispatcher = ioDispatcher,
 )
-

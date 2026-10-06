@@ -80,7 +80,6 @@ internal class LongPrimitive(
     preferences = longPreferencesKey(key),
 )
 
-
 /**
  * [GenericPreferenceItem] for a [String] preference stored with `stringPreferencesKey`.
  */
