@@ -33,8 +33,8 @@ import io.github.arthurkun.generic.datastore.preferences.core.data.StringPrimiti
 import io.github.arthurkun.generic.datastore.preferences.core.data.StringSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerializedPrimitive
-import io.github.arthurkun.generic.datastore.preferences.core.data.custom.ObjectPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.SerializedListPrimitive
+import io.github.arthurkun.generic.datastore.preferences.core.data.custom.SerializedPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.KSerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.SerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.data.NullableBooleanPrimitive
@@ -388,7 +388,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         serializer: (T) -> String,
         deserializer: (String) -> T,
     ): Preference<T> = PreferenceImpl(
-        ObjectPrimitive(
+        SerializedPrimitive(
             datastore = datastore,
             key = key,
             defaultValue = defaultValue,

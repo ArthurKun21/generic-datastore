@@ -7,50 +7,50 @@ Jetpack Compose extensions in `generic-datastore-compose`.
 ## Modules
 
 - `:generic-datastore` – core preference and proto datastore wrapper library.
-  - `core/` – shared interfaces and utilities (`BasePreference`, `DelegatedPreference`,
+    - `core/` – shared interfaces and utilities (`BasePreference`, `DelegatedPreference`,
       `PreferenceDefaults`, `PreferenceExtension`, `SystemFileSystem`).
-  - `preferences/` – DataStore wrapper implementations for `Preference` types
+    - `preferences/` – DataStore wrapper implementations for `Preference` types
       (`PreferencesDatastore`, `GenericPreferencesDatastore`, `CreatePreferencesDatastore`,
       `Preferences`).
-  - `preferences/core/` – DataStore Preferences implementation for primitive types
+    - `preferences/core/` – DataStore Preferences implementation for primitive types
       (`BooleanPrimitive`, `DoublePrimitive`, `FloatPrimitive`, `IntPrimitive`, `LongPrimitive`,
       `StringPrimitive`, `StringSetPrimitive`, `GenericPreferenceItem`).
-    - `preferences/core/custom/` – custom-serializer and enum types (`EnumPreference`,
-        `KSerializedPrimitive`, `KSerializedListPrimitive`, `SerializedListPrimitive`,
-        `ObjectPrimitive`, `CustomGenericPreferenceItem`).
-    - `preferences/core/customSet/` – set-based custom types (`EnumSetPreference`,
-        `KSerializedSetPrimitive`, `SerializedSetPrimitive`, `CustomSetGenericPreferenceItem`).
-  - `preferences/optional/` – nullable preference variants (`NullableBooleanPrimitive`,
+        - `preferences/core/custom/` – custom-serializer and enum types (`EnumPreference`,
+          `KSerializedPrimitive`, `KSerializedListPrimitive`, `SerializedListPrimitive`,
+          `SerializedPrimitive`, `CustomGenericPreferenceItem`).
+        - `preferences/core/customSet/` – set-based custom types (`EnumSetPreference`,
+          `KSerializedSetPrimitive`, `SerializedSetPrimitive`, `CustomSetGenericPreferenceItem`).
+    - `preferences/optional/` – nullable preference variants (`NullableBooleanPrimitive`,
       `NullableDoublePrimitive`, `NullableFloatPrimitive`, `NullableIntPrimitive`,
       `NullableLongPrimitive`, `NullableStringPrimitive`, `NullableStringSetPrimitive`,
       `NullableGenericPreferenceItem`).
-    - `preferences/optional/custom/` – nullable custom types (`NullableEnumPreference`,
-        `NullableKSerializedPrimitive`, `NullableKSerializedListPrimitive`,
-        `NullableSerializedListPrimitive`, `NullableObjectPrimitive`,
-        `NullableCustomGenericPreferenceItem`).
-  - `preferences/utils/` – preference utility extensions (`MappedPreference`, `Extensions`).
-  - `preferences/backup/` – backup/restore support for preferences datastore
-      (`BackupPreference`, `PreferenceBackupCreator`, `PreferenceBackupRestorer`,
+        - `preferences/optional/custom/` – nullable custom types (`NullableEnumPreference`,
+          `NullableKSerializedPrimitive`, `NullableKSerializedListPrimitive`,
+          `NullableSerializedListPrimitive`, `NullableObjectPrimitive`,
+          `NullableCustomGenericPreferenceItem`).
+    - `preferences/utils/` – preference utility extensions (`MappedPreference`, `Extensions`).
+    - `preferences/backup/` – backup/restore support for preferences datastore (`BackupPreference`,
+      `PreferenceBackupCreator`, `PreferenceBackupRestorer`,
       `BackupParsingException`, `Migration`).
-  - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
+    - `proto/` – Proto DataStore support (`ProtoPreference`, `ProtoDatastore`,
       `GenericProtoDatastore`, `CreateProtoDatastore`, `ProtoFieldPrefs`).
-    - `proto/core/` – core proto internals (`GenericProtoPreferenceItem`,
-        `ProtoFieldPreference`).
-    - `proto/custom/` – custom-serializer proto field types (`ProtoSerialFieldPreference`).
-      - `proto/custom/core/` – non-nullable custom field implementations (`EnumField`,
-          `KSerializedField`, `KSerializedListField`, `SerializedField`, `SerializedListField`,
-          `DecodeUtils`).
-      - `proto/custom/optional/` – nullable custom field implementations (`NullableEnumField`,
-          `NullableKSerializedField`, `NullableKSerializedListField`, `NullableSerializedField`,
-          `NullableSerializedListField`).
-      - `proto/custom/set/` – set-based custom field implementations (`EnumSetField`,
-          `KSerializedSetField`, `SerializedSetField`).
-  - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
+        - `proto/core/` – core proto internals (`GenericProtoPreferenceItem`,
+          `ProtoFieldPreference`).
+        - `proto/custom/` – custom-serializer proto field types (`ProtoSerialFieldPreference`).
+            - `proto/custom/core/` – non-nullable custom field implementations (`EnumField`,
+              `KSerializedField`, `KSerializedListField`, `SerializedField`, `SerializedListField`,
+              `DecodeUtils`).
+            - `proto/custom/optional/` – nullable custom field implementations (`NullableEnumField`,
+              `NullableKSerializedField`, `NullableKSerializedListField`, `NullableSerializedField`,
+              `NullableSerializedListField`).
+            - `proto/custom/set/` – set-based custom field implementations (`EnumSetField`,
+              `KSerializedSetField`, `SerializedSetField`).
+    - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
       `preferences/`, `preferences/core/custom/`, and `preferences/utils/`.
 - `:generic-datastore-compose` – Compose helpers built on the core module.
-  - `Remember.kt` – `DelegatedPreference<T>.remember()` extension.
-  - `PrefsComposeState.kt` – `MutableState` backed by a `DelegatedPreference`.
-  - `batch/` – batch Compose extensions (`RememberBatchRead`, `RememberPreferences`,
+    - `Remember.kt` – `DelegatedPreference<T>.remember()` extension.
+    - `PrefsComposeState.kt` – `MutableState` backed by a `DelegatedPreference`.
+    - `batch/` – batch Compose extensions (`RememberBatchRead`, `RememberPreferences`,
       `RememberPreferencesLocal`, `BatchPrefsComposeState`, `PreferencesState`,
       `LocalPreferencesDatastore`).
 - `:samples` – contains sample apps for local development.
@@ -75,7 +75,8 @@ Both library modules target:
 - Follow Spotless + ktlint rules configured in the root `build.gradle.kts`.
 - Keep APIs small, predictable, and documented in README when public behavior changes.
 - Do not use wildcard imports (e.g., import foo.bar.*).
-- Use `kotlinx.coroutines.IO` for CoroutineDispatcher instead of `kotlinx.coroutines.Dispatchers.IO` due to iOS compatibility.
+- Use `kotlinx.coroutines.IO` for CoroutineDispatcher instead of `kotlinx.coroutines.Dispatchers.IO`
+  due to iOS compatibility.
 
 ## Testing and Quality Assurance
 
@@ -87,7 +88,8 @@ Ensure the module compiles by running the appropriate Gradle tasks and resolving
 
 - Compile the Android main source set `./gradlew :<module-name>:compileAndroidMain`
 
-- Compile the Android device (instrumentation test) source set `./gradlew :<module-name>:compileAndroidDeviceTest`
+- Compile the Android device (instrumentation test) source set
+  `./gradlew :<module-name>:compileAndroidDeviceTest`
 
 #### KMP modules targeting JVM Build
 
@@ -117,8 +119,8 @@ source sets:
 
 Tests use an abstract base class pattern to avoid duplicating test logic across platforms. Shared
 test methods live in abstract classes in `commonTest`, while platform source sets
-(`androidDeviceTest`, `jvmTest`, `iosSimulatorArm64Test`) provide thin subclasses that only
-handle DataStore initialization and teardown.
+(`androidDeviceTest`, `jvmTest`, `iosSimulatorArm64Test`) provide thin subclasses that only handle
+DataStore initialization and teardown.
 
 - `commonTest` — Abstract base classes (e.g. `AbstractDatastoreInstrumentedTest`,
   `AbstractDatastoreBlockingTest`) containing all test methods.
@@ -148,11 +150,11 @@ Each platform source set has a corresponding test helper class that encapsulates
 setup/teardown logic for DataStore tests. These helpers reduce boilerplate in individual test files
 and centralize platform-specific initialization code.
 
-| Platform      | Helper Class        | Location                                     |
-|---------------|---------------------|----------------------------------------------|
-| Android       | `AndroidTestHelper` | `androidDeviceTest/.../AndroidTestHelper.kt` |
-| JVM           | `JvmTestHelper`     | `jvmTest/.../JvmTestHelper.kt`               |
-| iOS           | `IosTestHelper`     | `iosSimulatorArm64Test/.../IosTestHelper.kt` |
+| Platform | Helper Class        | Location                                     |
+|----------|---------------------|----------------------------------------------|
+| Android  | `AndroidTestHelper` | `androidDeviceTest/.../AndroidTestHelper.kt` |
+| JVM      | `JvmTestHelper`     | `jvmTest/.../JvmTestHelper.kt`               |
+| iOS      | `IosTestHelper`     | `iosSimulatorArm64Test/.../IosTestHelper.kt` |
 
 Each helper provides two factory methods:
 
@@ -224,7 +226,8 @@ class MyFeatureBlockingTest : AbstractMyFeatureBlockingTest() {
 
 #### KMP modules targeting Android Test
 
-- Run Android instrumentation tests (requires device/emulator) `./gradlew :<module-name>:connectedAndroidDeviceTest`
+- Run Android instrumentation tests (requires device/emulator)
+  `./gradlew :<module-name>:connectedAndroidDeviceTest`
 
 #### KMP modules targeting JVM Test
 
@@ -232,21 +235,22 @@ class MyFeatureBlockingTest : AbstractMyFeatureBlockingTest() {
 
 #### KMP modules targeting iOS Test
 
-- Run iOS simulator tests (requires macOS with Xcode) `./gradlew :<module-name>:iosSimulatorArm64Test`
+- Run iOS simulator tests (requires macOS with Xcode)
+  `./gradlew :<module-name>:iosSimulatorArm64Test`
 
 ### Proto DataStore test helpers
 
 Proto DataStore tests follow the same abstract test class pattern but use separate helpers because
 they wrap `GenericProtoDatastore<T>` instead of `GenericPreferencesDatastore`.
 
-| Platform      | Helper Class                   | Proto Type              |
-|---------------|--------------------------------|-------------------------|
-| Android       | `AndroidProtoTestHelper`       | `TestProtoData`         |
-| JVM           | `JvmProtoTestHelper`           | `TestProtoData`         |
-| iOS           | `IosProtoTestHelper`           | `TestProtoData`         |
-| Android       | `AndroidNullableProtoTestHelper` | `TestNullableProtoData` |
-| JVM           | `JvmNullableProtoTestHelper`     | `TestNullableProtoData` |
-| iOS           | `IosNullableProtoTestHelper`   | `TestNullableProtoData` |
+| Platform | Helper Class                     | Proto Type              |
+|----------|----------------------------------|-------------------------|
+| Android  | `AndroidProtoTestHelper`         | `TestProtoData`         |
+| JVM      | `JvmProtoTestHelper`             | `TestProtoData`         |
+| iOS      | `IosProtoTestHelper`             | `TestProtoData`         |
+| Android  | `AndroidNullableProtoTestHelper` | `TestNullableProtoData` |
+| JVM      | `JvmNullableProtoTestHelper`     | `TestNullableProtoData` |
+| iOS      | `IosNullableProtoTestHelper`     | `TestNullableProtoData` |
 
 Each helper provides `standard(datastoreName)` and `blocking(datastoreName)` factory methods,
 identical in contract to the Preferences DataStore helpers. The proto helpers expose
@@ -258,8 +262,8 @@ identical in contract to the Preferences DataStore helpers. The proto helpers ex
   tests using `TestProtoData`.
 - `AbstractProtoFieldPreferenceTest` / `AbstractProtoFieldPreferenceBlockingTest` — per-field
   `field()` tests using `TestProtoData` (non-nullable, 3-level nesting).
-- `AbstractNullableProtoDatastoreTest` / `AbstractNullableProtoDatastoreBlockingTest` —
-  whole-object `data()` and per-field `field()` tests using `TestNullableProtoData`
+- `AbstractNullableProtoDatastoreTest` / `AbstractNullableProtoDatastoreBlockingTest` — whole-object
+  `data()` and per-field `field()` tests using `TestNullableProtoData`
   (nullable fields at all nesting levels).
 - `AbstractNullableProtoFieldPreferenceTest` / `AbstractNullableProtoFieldPreferenceBlockingTest`
   — per-field `field()` tests focused on nullable field edge cases using `TestNullableProtoData`.
@@ -267,30 +271,34 @@ identical in contract to the Preferences DataStore helpers. The proto helpers ex
 **Proto custom field abstract test classes in `commonTest`:**
 
 - `proto/custom/core/` — non-nullable custom field tests:
-  - `AbstractProtoEnumFieldTest` / `AbstractProtoEnumFieldBlockingTest`
-  - `AbstractProtoSerializedFieldTest` / `AbstractProtoSerializedFieldBlockingTest`
-  - `AbstractProtoKserializedFieldTest` / `AbstractProtoKserializedFieldBlockingTest`
-  - `AbstractProtoSerializedListFieldTest` / `AbstractProtoSerializedListFieldBlockingTest`
-  - `AbstractProtoKserializedListFieldTest` / `AbstractProtoKserializedListFieldBlockingTest`
+    - `AbstractProtoEnumFieldTest` / `AbstractProtoEnumFieldBlockingTest`
+    - `AbstractProtoSerializedFieldTest` / `AbstractProtoSerializedFieldBlockingTest`
+    - `AbstractProtoKserializedFieldTest` / `AbstractProtoKserializedFieldBlockingTest`
+    - `AbstractProtoSerializedListFieldTest` / `AbstractProtoSerializedListFieldBlockingTest`
+    - `AbstractProtoKserializedListFieldTest` / `AbstractProtoKserializedListFieldBlockingTest`
 - `proto/custom/optional/` — nullable custom field tests:
-  - `AbstractProtoNullableEnumFieldTest` / `AbstractProtoNullableEnumFieldBlockingTest`
-  - `AbstractProtoNullableSerializedFieldTest` / `AbstractProtoNullableSerializedFieldBlockingTest`
-  - `AbstractProtoNullableKserializedFieldTest` / `AbstractProtoNullableKserializedFieldBlockingTest`
-  - `AbstractProtoNullableSerializedListFieldTest` / `AbstractProtoNullableSerializedListFieldBlockingTest`
-  - `AbstractProtoNullableKserializedListFieldTest` / `AbstractProtoNullableKserializedListFieldBlockingTest`
+    - `AbstractProtoNullableEnumFieldTest` / `AbstractProtoNullableEnumFieldBlockingTest`
+    - `AbstractProtoNullableSerializedFieldTest` /
+      `AbstractProtoNullableSerializedFieldBlockingTest`
+    - `AbstractProtoNullableKserializedFieldTest` /
+      `AbstractProtoNullableKserializedFieldBlockingTest`
+    - `AbstractProtoNullableSerializedListFieldTest` /
+      `AbstractProtoNullableSerializedListFieldBlockingTest`
+    - `AbstractProtoNullableKserializedListFieldTest` /
+      `AbstractProtoNullableKserializedListFieldBlockingTest`
 - `proto/custom/set/` — set-based custom field tests:
-  - `AbstractProtoEnumSetFieldTest` / `AbstractProtoEnumSetFieldBlockingTest`
-  - `AbstractProtoSerializedSetFieldTest` / `AbstractProtoSerializedSetFieldBlockingTest`
-  - `AbstractProtoKserializedSetFieldTest` / `AbstractProtoKserializedSetFieldBlockingTest`
+    - `AbstractProtoEnumSetFieldTest` / `AbstractProtoEnumSetFieldBlockingTest`
+    - `AbstractProtoSerializedSetFieldTest` / `AbstractProtoSerializedSetFieldBlockingTest`
+    - `AbstractProtoKserializedSetFieldTest` / `AbstractProtoKserializedSetFieldBlockingTest`
 
 ### Proto DataStore architecture
 
 The proto module uses a delegation pattern to avoid code duplication:
 
 - `ProtoFieldPreference<P, T>` — internal class that implements `BasePreference<T>` with all
-  DataStore access logic (get, set, update, delete, asFlow, stateIn, getBlocking, setBlocking).
-  Uses `getter: (P) -> T` and `updater: (P, T) -> P` lambdas to map between the proto message
-  and individual field values.
+  DataStore access logic (get, set, update, delete, asFlow, stateIn, getBlocking, setBlocking). Uses
+  `getter: (P) -> T` and `updater: (P, T) -> P` lambdas to map between the proto message and
+  individual field values.
 - `GenericProtoPreferenceItem<T>` — whole-proto wrapper. Delegates `BasePreference<T>` to a
   `ProtoFieldPreference<T, T>` with identity getter/updater. Adds `DelegatedPreference<T>`
   contract (`resetToDefaultBlocking()`, `getValue()`, `setValue()` for property delegation).
@@ -299,10 +307,9 @@ The proto module uses a delegation pattern to avoid code duplication:
 - `GenericProtoDatastore<T>` — factory that creates `GenericProtoPreferenceItem` via `data()`
   and `ProtoFieldPrefs` via `field()`.
 
-The `delete()` method on field preferences resets only the targeted field to its default value
-(via `resetToDefault()` → `set(defaultValue)` → `updater(current, fieldDefault)`). It does not
-reset the entire proto to its default. There is no concept of removing a single field from a proto
-message.
+The `delete()` method on field preferences resets only the targeted field to its default value (via
+`resetToDefault()` → `set(defaultValue)` → `updater(current, fieldDefault)`). It does not reset the
+entire proto to its default. There is no concept of removing a single field from a proto message.
 
 ## Platform-Specific Notes
 

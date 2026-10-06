@@ -10,7 +10,7 @@ import kotlinx.coroutines.IO
  * [CustomGenericPreferenceItem] for a single string-backed custom value using caller-supplied
  * serializers.
  */
-internal class ObjectPrimitive<T>(
+internal class SerializedPrimitive<T>(
     datastore: DataStore<Preferences>,
     key: String,
     defaultValue: T,
