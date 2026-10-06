@@ -13,7 +13,6 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.BasePreference
-import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupCreator
@@ -31,10 +30,12 @@ import io.github.arthurkun.generic.datastore.preferences.core.data.IntPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.LongPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.StringPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.StringSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.core.data.custom.EnumPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerializedPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.SerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.SerializedPrimitive
+import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.EnumSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.KSerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.SerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.data.NullableBooleanPrimitive
@@ -44,10 +45,14 @@ import io.github.arthurkun.generic.datastore.preferences.optional.data.NullableI
 import io.github.arthurkun.generic.datastore.preferences.optional.data.NullableLongPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.data.NullableStringPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.data.NullableStringSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.NullableEnumPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.NullableKSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.NullableKSerializedPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.NullableSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.NullableSerializedPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.data.customSet.NullableEnumSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.data.customSet.NullableKSerializedSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.data.customSet.NullableSerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -97,7 +102,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default String value.
-     * @return A [DelegatedPreference] instance for the String preference.
+     * @return A [Preference] instance for the String preference.
      */
     override fun string(
         key: String,
@@ -116,7 +121,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Long value.
-     * @return A [DelegatedPreference] instance for the Long preference.
+     * @return A [Preference] instance for the Long preference.
      */
     override fun long(
         key: String,
@@ -135,7 +140,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Int value.
-     * @return A [DelegatedPreference] instance for the Int preference.
+     * @return A [Preference] instance for the Int preference.
      */
     override fun int(
         key: String,
@@ -154,7 +159,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Float value.
-     * @return A [DelegatedPreference] instance for the Float preference.
+     * @return A [Preference] instance for the Float preference.
      */
     override fun float(
         key: String,
@@ -173,7 +178,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Double value.
-     * @return A [DelegatedPreference] instance for the Double preference.
+     * @return A [Preference] instance for the Double preference.
      */
     override fun double(
         key: String,
@@ -192,7 +197,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Boolean value.
-     * @return A [DelegatedPreference] instance for the Boolean preference.
+     * @return A [Preference] instance for the Boolean preference.
      */
     override fun bool(
         key: String,
@@ -211,7 +216,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable String preference.
+     * @return A [Preference] instance for the nullable String preference.
      */
     override fun nullableString(key: String): Preference<String?> =
         PreferenceImpl(
@@ -226,7 +231,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Set<String> preference.
+     * @return A [Preference] instance for the nullable Set<String> preference.
      */
     override fun nullableStringSet(
         key: String,
@@ -243,7 +248,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default List<String> value.
-     * @return A [DelegatedPreference] instance for the List<String> preference.
+     * @return A [Preference] instance for the List<String> preference.
      */
     override fun stringList(
         key: String,
@@ -264,7 +269,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore or the stored payload cannot be decoded.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable List<String> preference.
+     * @return A [Preference] instance for the nullable List<String> preference.
      */
     override fun nullableStringList(
         key: String,
@@ -283,7 +288,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Int preference.
+     * @return A [Preference] instance for the nullable Int preference.
      */
     override fun nullableInt(key: String): Preference<Int?> =
         PreferenceImpl(
@@ -298,7 +303,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Long preference.
+     * @return A [Preference] instance for the nullable Long preference.
      */
     override fun nullableLong(key: String): Preference<Long?> =
         PreferenceImpl(
@@ -313,7 +318,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Float preference.
+     * @return A [Preference] instance for the nullable Float preference.
      */
     override fun nullableFloat(key: String): Preference<Float?> =
         PreferenceImpl(
@@ -328,7 +333,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Double preference.
+     * @return A [Preference] instance for the nullable Double preference.
      */
     override fun nullableDouble(key: String): Preference<Double?> =
         PreferenceImpl(
@@ -343,7 +348,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Boolean preference.
+     * @return A [Preference] instance for the nullable Boolean preference.
      */
     override fun nullableBool(key: String): Preference<Boolean?> =
         PreferenceImpl(
@@ -358,7 +363,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Set<String> value.
-     * @return A [DelegatedPreference] instance for the Set<String> preference.
+     * @return A [Preference] instance for the Set<String> preference.
      */
     override fun stringSet(
         key: String,
@@ -380,7 +385,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the custom object.
      * @param serializer A function to serialize the object to a String.
      * @param deserializer A function to deserialize the String back to the object.
-     * @return A [DelegatedPreference] instance for the custom object preference.
+     * @return A [Preference] instance for the custom object preference.
      */
     override fun <T> serialized(
         key: String,
@@ -406,7 +411,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the set.
      * @param serializer A function to serialize each element to a String.
      * @param deserializer A function to deserialize each String back to an element.
-     * @return A [DelegatedPreference] instance for the Set preference.
+     * @return A [Preference] instance for the Set preference.
      */
     override fun <T> serializedSet(
         key: String,
@@ -432,7 +437,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the custom object.
      * @param serializer The [KSerializer] for the type [T].
      * @param json The [Json] instance to use for serialization/deserialization.
-     * @return A [DelegatedPreference] instance for the custom object preference.
+     * @return A [Preference] instance for the custom object preference.
      */
     override fun <T> kserialized(
         key: String,
@@ -458,7 +463,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the set (defaults to an empty set).
      * @param serializer The [KSerializer] for the type [T].
      * @param json The [Json] instance to use for serialization/deserialization.
-     * @return A [DelegatedPreference] instance for the Set preference.
+     * @return A [Preference] instance for the Set preference.
      */
     override fun <T> kserializedSet(
         key: String,
@@ -484,7 +489,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the list (defaults to an empty list).
      * @param serializer A function to serialize each element to a String.
      * @param deserializer A function to deserialize each String back to an element.
-     * @return A [DelegatedPreference] instance for the List preference.
+     * @return A [Preference] instance for the List preference.
      */
     override fun <T> serializedList(
         key: String,
@@ -510,7 +515,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the list (defaults to an empty list).
      * @param serializer The [KSerializer] for the type [T].
      * @param json The [Json] instance to use for serialization/deserialization.
-     * @return A [DelegatedPreference] instance for the List preference.
+     * @return A [Preference] instance for the List preference.
      */
     override fun <T> kserializedList(
         key: String,
@@ -576,6 +581,80 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             key = key,
             serializer = serializer,
             json = json ?: defaultJson,
+        ),
+    )
+
+    override fun <T : Any> nullableSerializedSet(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preference<Set<T>?> = PreferenceImpl(
+        NullableSerializedSetPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
+    override fun <T : Any> nullableKserializedSet(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json?,
+    ): Preference<Set<T>?> = PreferenceImpl(
+        NullableKSerializedSetPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            json = json ?: defaultJson,
+        ),
+    )
+
+    override fun <T : Enum<T>> enum(
+        key: String,
+        defaultValue: T,
+        enumValues: Array<T>,
+    ): Preference<T> = PreferenceImpl(
+        EnumPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            enumValues = enumValues,
+        ),
+    )
+
+    override fun <T : Enum<T>> enumSet(
+        key: String,
+        defaultValue: Set<T>,
+        enumValues: Array<T>,
+    ): Preference<Set<T>> = PreferenceImpl(
+        EnumSetPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            enumValues = enumValues,
+        ),
+    )
+
+    override fun <T : Enum<T>> nullableEnum(
+        key: String,
+        enumValues: Array<T>,
+    ): Preference<T?> = PreferenceImpl(
+        NullableEnumPrimitive(
+            datastore = datastore,
+            key = key,
+            enumValues = enumValues,
+        ),
+    )
+
+    override fun <T : Enum<T>> nullableEnumSet(
+        key: String,
+        enumValues: Array<T>,
+    ): Preference<Set<T>?> = PreferenceImpl(
+        NullableEnumSetPrimitive(
+            datastore = datastore,
+            key = key,
+            enumValues = enumValues,
         ),
     )
 
@@ -735,7 +814,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
 
                     else -> {
                         val stringValue = when (value) {
-                            is Map<*, *>, is Collection<*> -> value.toJsonElement().toString()
+                            is Map<*, *> -> value.toJsonElement().toString()
                             else -> value.toString()
                         }
                         mutablePreferences[stringPreferencesKey(key)] = stringValue

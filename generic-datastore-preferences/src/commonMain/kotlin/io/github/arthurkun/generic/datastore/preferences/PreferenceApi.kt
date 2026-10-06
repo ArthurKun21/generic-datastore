@@ -1,12 +1,8 @@
 package io.github.arthurkun.generic.datastore.preferences
 
-import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.internalToJsonElement
 import io.github.arthurkun.generic.datastore.preferences.backup.internalToJsonMap
-import io.github.arthurkun.generic.datastore.preferences.core.data.custom.internalEnum
-import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.internalEnumSet
-import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.internalNullableEnum
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -33,7 +29,7 @@ import io.github.arthurkun.generic.datastore.preferences.utils.mapIO as internal
  * @param key The preference key.
  * @param defaultValue The value returned when the key is missing or the stored payload cannot be decoded.
  * @param json The [Json] configuration to use, or `null` to use the datastore default.
- * @return A [DelegatedPreference] instance for the custom object preference.
+ * @return A [Preference] instance for the custom object preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserialized(
     key: String,
@@ -56,7 +52,7 @@ public inline fun <reified T> PreferencesDatastore.kserialized(
  * @param key The preference key.
  * @param defaultValue The default value for the set (defaults to an empty set).
  * @param json The [Json] configuration to use, or `null` to use the datastore default.
- * @return A [DelegatedPreference] instance for the Set preference.
+ * @return A [Preference] instance for the Set preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserializedSet(
     key: String,
@@ -78,7 +74,7 @@ public inline fun <reified T> PreferencesDatastore.kserializedSet(
  * @param key The preference key.
  * @param defaultValue The default value for the list (defaults to an empty list).
  * @param json The [Json] configuration to use, or `null` to use the datastore default.
- * @return A [DelegatedPreference] instance for the List preference.
+ * @return A [Preference] instance for the List preference.
  */
 public inline fun <reified T> PreferencesDatastore.kserializedList(
     key: String,
@@ -107,7 +103,7 @@ public inline fun <reified T> PreferencesDatastore.kserializedList(
  * @param T The non-null type of the custom object.
  * @param key The preference key.
  * @param json The [Json] configuration to use, or `null` to use the datastore default.
- * @return A [DelegatedPreference] instance for the nullable custom object preference.
+ * @return A [Preference] instance for the nullable custom object preference.
  */
 public inline fun <reified T : Any> PreferencesDatastore.nullableKserialized(
     key: String,
@@ -127,7 +123,7 @@ public inline fun <reified T : Any> PreferencesDatastore.nullableKserialized(
  * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
  * @param key The preference key.
  * @param json The [Json] configuration to use, or `null` to use the datastore default.
- * @return A [DelegatedPreference] instance for the nullable List preference.
+ * @return A [Preference] instance for the nullable List preference.
  */
 public inline fun <reified T> PreferencesDatastore.nullableKserializedList(
     key: String,
@@ -173,27 +169,83 @@ public fun <T, R> Preference<T>.map(
 ): Preference<R> = internalMap(defaultValue, convert, reverse)
 
 /**
- * Creates a preference for storing a [Set] of enum values.
+ * Creates a nullable preference for a [Set] of custom objects using Kotlin Serialization,
+ * inferring the [KSerializer] from [T].
  *
- * Each enum constant is stored by [Enum.name]. Stored entries that no longer match any enum
- * constant are skipped when the set is read.
+ * Missing keys surface as `null`; elements that fail to deserialize are skipped. Writing `null`
+ * removes the key.
+ */
+public inline fun <reified T : Any> PreferencesDatastore.nullableKserializedSet(
+    key: String,
+    json: Json? = null,
+): Preference<Set<T>?> = nullableKserializedSet(key = key, serializer = serializer<T>(), json = json)
+
+/**
+ * Creates a preference for storing a single enum constant by [Enum.name], inferring the enum
+ * constants from the reified type.
+ *
+ * If the stored string does not match any constant of [T], [defaultValue] is returned.
+ *
+ * ```kotlin
+ * enum class Theme { LIGHT, DARK, SYSTEM }
+ *
+ * val theme = datastore.enum("theme", Theme.SYSTEM)
+ * ```
+ *
+ * @param T The enum type.
+ * @param key The preference key.
+ * @param defaultValue The enum value to use when the key is missing or cannot be decoded.
+ * @return A [Preference] instance for the enum preference.
+ */
+public inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
+    key: String,
+    defaultValue: T,
+): Preference<T> = enum(key = key, defaultValue = defaultValue, enumValues = enumValues())
+
+/**
+ * Creates a preference for storing a [Set] of enum constants by [Enum.name], inferring the enum
+ * constants from the reified type.
+ *
+ * Stored entries that no longer match any constant of [T] are skipped when the set is read.
+ *
+ * @param T The enum type.
+ * @param key The preference key.
+ * @param defaultValue The default value for the set (defaults to an empty set).
+ * @return A [Preference] instance for the Set preference.
  */
 public inline fun <reified T : Enum<T>> PreferencesDatastore.enumSet(
     key: String,
     defaultValue: Set<T> = emptySet(),
-): Preference<Set<T>> = internalEnumSet(
-    key = key,
-    defaultValue = defaultValue,
-)
+): Preference<Set<T>> = enumSet(key = key, defaultValue = defaultValue, enumValues = enumValues())
 
 /**
- * Creates a nullable preference for storing enum values by [Enum.name].
+ * Creates a nullable preference for storing a single enum constant by [Enum.name], inferring the
+ * enum constants from the reified type.
  *
  * Missing keys and unknown stored enum names both produce `null`.
+ *
+ * @param T The enum type.
+ * @param key The preference key.
+ * @return A [Preference] instance for the nullable enum preference.
  */
 public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnum(
     key: String,
-): Preference<T?> = internalNullableEnum(key)
+): Preference<T?> = nullableEnum(key = key, enumValues = enumValues())
+
+/**
+ * Creates a nullable preference for storing a [Set] of enum constants by [Enum.name], inferring the
+ * enum constants from the reified type.
+ *
+ * Missing keys produce `null`. Stored entries that no longer match any constant of [T] are skipped
+ * when the set is read, so an entry with no surviving constants reads back as an empty set.
+ *
+ * @param T The enum type.
+ * @param key The preference key.
+ * @return A [Preference] instance for the nullable Set preference.
+ */
+public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnumSet(
+    key: String,
+): Preference<Set<T>?> = nullableEnumSet(key = key, enumValues = enumValues())
 
 /**
  * Converts this value into a [JsonElement] using the same loose conversion rules as the backup
@@ -235,21 +287,3 @@ public suspend inline fun <T> Preference<Set<T>>.toggle(item: T) {
 public suspend inline fun Preference<Boolean>.toggle() {
     update { !it }
 }
-
-/**
- * Creates a preference for storing enum values by [Enum.name].
- *
- * If the stored string does not match any enum constant, [defaultValue] is returned.
- *
- * @param T The enum type.
- * @param key The unique string key for the preference.
- * @param defaultValue The enum value to use when the key is missing or cannot be decoded.
- * @return A [Preference] instance backed by [PreferencesDatastore.serialized].
- */
-public inline fun <reified T : Enum<T>> PreferencesDatastore.enum(
-    key: String,
-    defaultValue: T,
-): Preference<T> = internalEnum(
-    key = key,
-    defaultValue = defaultValue,
-)
