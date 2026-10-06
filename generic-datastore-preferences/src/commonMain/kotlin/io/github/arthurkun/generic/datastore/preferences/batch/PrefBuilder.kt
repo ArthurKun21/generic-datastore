@@ -465,6 +465,65 @@ public open class PrefBuilder internal constructor() {
     ): BatchPref<T?> = nullableKserialized(key, serializer<T>(), json)
 
     /**
+     * Declares a nullable preference for a [Set] of custom objects stored in a string-set entry,
+     * where each element is individually converted to and from a [String]. Missing keys read back
+     * as `null`; elements that fail to deserialize are skipped, and writing `null` removes the key.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts each element to its stored [String] representation.
+     * @param deserializer Converts each stored [String] back to an element.
+     */
+    public fun <T : Any> nullableSerializedSet(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): BatchPref<Set<T>?> = register(
+        BatchNullableSetPref(key, serializer, deserializer),
+    )
+
+    /**
+     * Declares a nullable preference for a [Set] of custom objects encoded as JSON via
+     * [kotlinx.serialization] and stored in a string-set entry. Missing keys read back as `null`;
+     * elements that fail to deserialize are skipped, and writing `null` removes the key.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer The [KSerializer] for [T].
+     * @param json The [Json] configuration to use; `null` falls back to
+     *   [PreferenceDefaults.defaultJson].
+     */
+    public fun <T : Any> nullableKserializedSet(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json? = null,
+    ): BatchPref<Set<T>?> {
+        val jsonInstance = json ?: PreferenceDefaults.defaultJson
+        return register(
+            BatchNullableSetPref(
+                key = key,
+                elementSerializer = { jsonInstance.encodeToString(serializer, it) },
+                elementDeserializer = { jsonInstance.decodeFromString(serializer, it) },
+            ),
+        )
+    }
+
+    /**
+     * Declares a nullable preference for a [Set] of custom objects encoded as JSON, inferring the
+     * [KSerializer] from [T]. Missing keys read back as `null`; elements that fail to deserialize
+     * are skipped, and writing `null` removes the key.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param json The [Json] configuration to use; `null` falls back to
+     *   [PreferenceDefaults.defaultJson].
+     */
+    public inline fun <reified T : Any> nullableKserializedSet(
+        key: String,
+        json: Json? = null,
+    ): BatchPref<Set<T>?> = nullableKserializedSet(key, serializer<T>(), json)
+
+    /**
      * Declares a nullable preference for a [List] of custom objects stored as one JSON array
      * string, where each element is individually converted to and from a [String]. Missing keys
      * and malformed arrays read back as `null`; writing `null` removes the key.
@@ -537,7 +596,7 @@ public open class PrefBuilder internal constructor() {
      * @param defaultValue The value used when the key is absent or the stored name is unknown.
      */
     public inline fun <reified E : Enum<E>> enum(key: String, defaultValue: E): BatchPref<E> =
-        internalBatchEnum(key, defaultValue)
+        registerEnum(key, defaultValue, enumValues())
 
     /**
      * Declares a preference for storing a [Set] of enum values by [Enum.name]. Unknown stored
@@ -550,7 +609,7 @@ public open class PrefBuilder internal constructor() {
     public inline fun <reified E : Enum<E>> enumSet(
         key: String,
         defaultValue: Set<E> = emptySet(),
-    ): BatchPref<Set<E>> = internalBatchEnumSet(key, defaultValue)
+    ): BatchPref<Set<E>> = registerEnumSet(key, defaultValue, enumValues())
 
     /**
      * Declares a nullable preference for storing an enum value by [Enum.name]. Missing keys and
@@ -560,7 +619,74 @@ public open class PrefBuilder internal constructor() {
      * @param key The preference key.
      */
     public inline fun <reified E : Enum<E>> nullableEnum(key: String): BatchPref<E?> =
-        internalBatchNullableEnum(key)
+        registerNullableEnum(key, enumValues())
+
+    /**
+     * Declares a nullable preference for storing a [Set] of enum values by [Enum.name]. Missing
+     * keys and fully undecodable entries both read back as `null`; unknown names are skipped.
+     *
+     * @param E The enum type.
+     * @param key The preference key.
+     */
+    public inline fun <reified E : Enum<E>> nullableEnumSet(key: String): BatchPref<Set<E>?> =
+        registerNullableEnumSet(key, enumValues())
+
+    /**
+     * Creates and registers an enum declaration. Non-inline so the reified `enum` overloads can call
+     * it without inlining the internal [BatchEnumPref] constructor.
+     *
+     * @param E The enum type.
+     * @param key The preference key.
+     * @param defaultValue The value used when the key is absent or the stored name is unknown.
+     * @param enumValues All constants of [E], used to decode the stored name.
+     */
+    @PublishedApi
+    internal fun <E : Enum<E>> registerEnum(
+        key: String,
+        defaultValue: E,
+        enumValues: Array<E>,
+    ): BatchPref<E> = register(BatchEnumPref(key, defaultValue, enumValues))
+
+    /**
+     * Creates and registers an enum set declaration.
+     *
+     * @param E The enum type.
+     * @param key The preference key.
+     * @param defaultValue The value used when the key is absent.
+     * @param enumValues All constants of [E], used to decode each stored name.
+     */
+    @PublishedApi
+    internal fun <E : Enum<E>> registerEnumSet(
+        key: String,
+        defaultValue: Set<E>,
+        enumValues: Array<E>,
+    ): BatchPref<Set<E>> = register(BatchEnumSetPref(key, defaultValue, enumValues))
+
+    /**
+     * Creates and registers a nullable enum declaration.
+     *
+     * @param E The enum type.
+     * @param key The preference key.
+     * @param enumValues All constants of [E], used to decode the stored name.
+     */
+    @PublishedApi
+    internal fun <E : Enum<E>> registerNullableEnum(
+        key: String,
+        enumValues: Array<E>,
+    ): BatchPref<E?> = register(BatchNullableEnumPref(key, enumValues))
+
+    /**
+     * Creates and registers a nullable enum set declaration.
+     *
+     * @param E The enum type.
+     * @param key The preference key.
+     * @param enumValues All constants of [E], used to decode each stored name.
+     */
+    @PublishedApi
+    internal fun <E : Enum<E>> registerNullableEnumSet(
+        key: String,
+        enumValues: Array<E>,
+    ): BatchPref<Set<E>?> = register(BatchNullableEnumSetPref(key, enumValues))
 
     /**
      * Registers an already-declared [BatchPref] handle in this batch.
@@ -604,37 +730,6 @@ public open class PrefBuilder internal constructor() {
  */
 public fun prefBatch(block: PrefBuilder.() -> Unit): PreferenceBatch =
     PrefBuilder().apply(block).build()
-
-@PublishedApi
-internal inline fun <reified E : Enum<E>> PrefBuilder.internalBatchEnum(
-    key: String,
-    defaultValue: E,
-): BatchPref<E> = serialized(
-    key = key,
-    defaultValue = defaultValue,
-    serializer = { it.name },
-    deserializer = { enumValueOf(it) },
-)
-
-@PublishedApi
-internal inline fun <reified E : Enum<E>> PrefBuilder.internalBatchEnumSet(
-    key: String,
-    defaultValue: Set<E>,
-): BatchPref<Set<E>> = serializedSet(
-    key = key,
-    defaultValue = defaultValue,
-    serializer = { it.name },
-    deserializer = { enumValueOf(it) },
-)
-
-@PublishedApi
-internal inline fun <reified E : Enum<E>> PrefBuilder.internalBatchNullableEnum(
-    key: String,
-): BatchPref<E?> = nullableSerialized(
-    key = key,
-    serializer = { it.name },
-    deserializer = { enumValueOf(it) },
-)
 
 /**
  * Builds the immutable [PreferenceBatch] for an inline batch declaration.

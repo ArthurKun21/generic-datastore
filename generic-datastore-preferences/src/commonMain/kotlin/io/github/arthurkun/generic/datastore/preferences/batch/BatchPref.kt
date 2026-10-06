@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.preferences.Preference
+import io.github.arthurkun.generic.datastore.preferences.utils.decodeEnum
 import io.github.arthurkun.generic.datastore.preferences.utils.deserializeOrDefault
 import io.github.arthurkun.generic.datastore.preferences.utils.deserializeOrNull
 import io.github.arthurkun.generic.datastore.preferences.utils.deserializeSet
@@ -215,5 +216,139 @@ internal class PreferenceBatchAdapter<T>(
 
     override fun removeFrom(mutablePreferences: MutablePreferences) {
         accessor.removeFrom(mutablePreferences)
+    }
+}
+
+/**
+ * Nullable set preference stored in a string-set entry, where every element is individually
+ * (de)serialized. Missing keys read back as `null`; elements that fail to deserialize are skipped,
+ * so a fully undecodable entry reads back as an empty set. Writing `null` removes the key.
+ */
+internal class BatchNullableSetPref<T : Any>(
+    key: String,
+    private val elementSerializer: (T) -> String,
+    private val elementDeserializer: (String) -> T,
+) : BatchPref<Set<T>?>(key, null) {
+
+    private val stringSetKey = stringSetPreferencesKey(key)
+
+    override fun readFrom(preferences: Preferences): Set<T>? =
+        preferences[stringSetKey]?.let { deserializeSet(it, elementDeserializer) }
+
+    override fun writeTo(mutablePreferences: MutablePreferences, value: Set<T>?) {
+        if (value == null) {
+            mutablePreferences.remove(stringSetKey)
+        } else {
+            mutablePreferences[stringSetKey] = value.map(elementSerializer).toSet()
+        }
+    }
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        mutablePreferences.remove(stringSetKey)
+    }
+}
+
+/**
+ * Enum preference stored in a single string entry holding [Enum.name]. Missing keys and names that
+ * no longer match any constant read back as [BatchPref.defaultValue].
+ */
+internal class BatchEnumPref<T : Enum<T>>(
+    key: String,
+    defaultValue: T,
+    private val enumValues: Array<T>,
+) : BatchPref<T>(key, defaultValue) {
+
+    private val stringKey = stringPreferencesKey(key)
+
+    override fun readFrom(preferences: Preferences): T =
+        preferences[stringKey]?.let { deserializeOrDefault(it, defaultValue) { decodeEnum(enumValues, it) } }
+            ?: defaultValue
+
+    override fun writeTo(mutablePreferences: MutablePreferences, value: T) {
+        mutablePreferences[stringKey] = value.name
+    }
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        mutablePreferences.remove(stringKey)
+    }
+}
+
+/**
+ * Nullable enum preference stored in a single string entry holding [Enum.name]. Missing keys and
+ * names that no longer match any constant both read back as `null`. Writing `null` removes the key.
+ */
+internal class BatchNullableEnumPref<T : Enum<T>>(
+    key: String,
+    private val enumValues: Array<T>,
+) : BatchPref<T?>(key, null) {
+
+    private val stringKey = stringPreferencesKey(key)
+
+    override fun readFrom(preferences: Preferences): T? =
+        preferences[stringKey]?.let { deserializeOrNull(it) { decodeEnum(enumValues, it) } }
+
+    override fun writeTo(mutablePreferences: MutablePreferences, value: T?) {
+        if (value == null) {
+            mutablePreferences.remove(stringKey)
+        } else {
+            mutablePreferences[stringKey] = value.name
+        }
+    }
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        mutablePreferences.remove(stringKey)
+    }
+}
+
+/**
+ * Enum set preference stored in a string-set entry holding [Enum.name] per element. Missing keys
+ * read back as [BatchPref.defaultValue]; names that no longer match any constant are skipped.
+ */
+internal class BatchEnumSetPref<T : Enum<T>>(
+    key: String,
+    defaultValue: Set<T>,
+    private val enumValues: Array<T>,
+) : BatchPref<Set<T>>(key, defaultValue) {
+
+    private val stringSetKey = stringSetPreferencesKey(key)
+
+    override fun readFrom(preferences: Preferences): Set<T> =
+        preferences[stringSetKey]?.let { deserializeSet(it) { decodeEnum(enumValues, it) } }
+            ?: defaultValue
+
+    override fun writeTo(mutablePreferences: MutablePreferences, value: Set<T>) {
+        mutablePreferences[stringSetKey] = value.map { it.name }.toSet()
+    }
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        mutablePreferences.remove(stringSetKey)
+    }
+}
+
+/**
+ * Nullable enum set preference stored in a string-set entry holding [Enum.name] per element.
+ * Missing keys read back as `null`; unknown names are skipped, so a fully unknown entry reads back
+ * as an empty set. Writing `null` removes the key.
+ */
+internal class BatchNullableEnumSetPref<T : Enum<T>>(
+    key: String,
+    private val enumValues: Array<T>,
+) : BatchPref<Set<T>?>(key, null) {
+
+    private val stringSetKey = stringSetPreferencesKey(key)
+
+    override fun readFrom(preferences: Preferences): Set<T>? =
+        preferences[stringSetKey]?.let { deserializeSet(it) { decodeEnum(enumValues, it) } }
+
+    override fun writeTo(mutablePreferences: MutablePreferences, value: Set<T>?) {
+        if (value == null) {
+            mutablePreferences.remove(stringSetKey)
+        } else {
+            mutablePreferences[stringSetKey] = value.map { it.name }.toSet()
+        }
+    }
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        mutablePreferences.remove(stringSetKey)
     }
 }
