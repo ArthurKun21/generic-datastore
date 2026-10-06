@@ -204,7 +204,7 @@ is `internal`. Approach:
 
 Optionally add `jvmTest` integration tests that overwrite a real datastore file with garbage
 bytes and assert the full pipeline against real androidx DataStore. Place next to
-`DesktopPreferencesDatastoreLifecycleTest` / `DesktopProtoDatastoreLifecycleTest`:
+`JvmPreferencesDatastoreLifecycleTest` / `DesktopProtoDatastoreLifecycleTest`:
 
 - **Preferences:** `get()` throws `CorruptionException` with no handler; with a
   `ReplaceFileCorruptionHandler` registered, defaults are returned (documents the opt-out).
