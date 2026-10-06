@@ -12,22 +12,23 @@ Jetpack Compose extensions in `generic-datastore-compose`.
     - `preferences/` – DataStore wrapper implementations for `Preference` types
       (`PreferencesDatastore`, `GenericPreferencesDatastore`, `CreatePreferencesDatastore`,
       `Preferences`).
-    - `preferences/core/` – DataStore Preferences implementation for primitive types
+    - `preferences/core/data/` – DataStore Preferences implementation for primitive types
       (`BooleanPrimitive`, `DoublePrimitive`, `FloatPrimitive`, `IntPrimitive`, `LongPrimitive`,
       `StringPrimitive`, `StringSetPrimitive`, `GenericPreferenceItem`).
-        - `preferences/core/custom/` – custom-serializer and enum types (`EnumPreference`,
-          `KSerializedPrimitive`, `KSerializedListPrimitive`, `SerializedListPrimitive`,
-          `SerializedPrimitive`, `CustomGenericPreferenceItem`).
-        - `preferences/core/customSet/` – set-based custom types (`EnumSetPreference`,
+        - `preferences/core/data/custom/` – custom-serializer and enum types (`EnumPreference`,
+          `KSerializedPrimitive`, `SerializedPrimitive`, `CustomGenericPreferenceItem`).
+        - `preferences/core/data/customSet/` – set-based custom types (`EnumSetPreference`,
           `KSerializedSetPrimitive`, `SerializedSetPrimitive`, `CustomSetGenericPreferenceItem`).
-    - `preferences/optional/` – nullable preference variants (`NullableBooleanPrimitive`,
+    - `preferences/optional/data/` – nullable preference variants (`NullableBooleanPrimitive`,
       `NullableDoublePrimitive`, `NullableFloatPrimitive`, `NullableIntPrimitive`,
       `NullableLongPrimitive`, `NullableStringPrimitive`, `NullableStringSetPrimitive`,
       `NullableGenericPreferenceItem`).
-        - `preferences/optional/custom/` – nullable custom types (`NullableEnumPreference`,
-          `NullableKSerializedPrimitive`, `NullableKSerializedListPrimitive`,
-          `NullableSerializedListPrimitive`, `NullableSerializedPrimitive`,
+        - `preferences/optional/data/custom/` – nullable custom types (`NullableEnumPreference`,
+          `NullableKSerializedPrimitive`, `NullableSerializedPrimitive`,
           `NullableCustomGenericPreferenceItem`).
+    - `preferences/core/mem/` and `preferences/optional/mem/` – reserved for upcoming in-memory
+      preference implementations. Currently empty; add new in-memory code here rather than under
+      `data/`.
     - `preferences/utils/` – preference utility extensions (`MappedPreference`, `Extensions`).
     - `preferences/backup/` – backup/restore support for preferences datastore (`BackupPreference`,
       `PreferenceBackupCreator`, `PreferenceBackupRestorer`,
@@ -46,7 +47,7 @@ Jetpack Compose extensions in `generic-datastore-compose`.
             - `proto/custom/set/` – set-based custom field implementations (`EnumSetField`,
               `KSerializedSetField`, `SerializedSetField`).
     - Top-level package contains deprecated compatibility aliases that redirect to `core/`,
-      `preferences/`, `preferences/core/custom/`, and `preferences/utils/`.
+      `preferences/`, `preferences/core/data/custom/`, and `preferences/utils/`.
 - `:generic-datastore-compose` – Compose helpers built on the core module.
     - `Remember.kt` – `DelegatedPreference<T>.remember()` extension.
     - `PrefsComposeState.kt` – `MutableState` backed by a `DelegatedPreference`.
@@ -123,7 +124,8 @@ test methods live in abstract classes in `commonTest`, while platform source set
 DataStore initialization and teardown.
 
 - `commonTest` — Abstract base classes (e.g. `AbstractDatastoreInstrumentedTest`,
-  `AbstractDatastoreBlockingTest`) containing all test methods.
+  `AbstractDatastoreBlockingTest`, `AbstractPreferencesDatastoreCorruptionTest`) containing all
+  test methods.
 - `androidDeviceTest` / `jvmTest` / `iosSimulatorArm64Test` — Concrete subclasses that override
   abstract properties (`preferenceDatastore`, `dataStore`, `testDispatcher`) and supply
   platform-specific setup/teardown.
@@ -223,6 +225,25 @@ class MyFeatureBlockingTest : AbstractMyFeatureBlockingTest() {
     override val preferenceDatastore get() = helper.preferenceDatastore
 }
 ```
+
+**Corruption test (writes a real file through `systemFileSystem`):**
+
+Corruption tests cannot use a `*TestHelper` because they need a path they can write garbage bytes
+to first. They subclass `AbstractPreferencesDatastoreCorruptionTest` and supply only a writable
+directory, using the public `systemFileSystem` rather than `java.io.File` so the assertions stay in
+`commonTest`.
+
+```kotlin
+class JvmPreferencesDatastoreCorruptionTest : AbstractPreferencesDatastoreCorruptionTest() {
+    @TempDir
+    lateinit var tempFolder: File
+
+    override val tempDirectory: String get() = tempFolder.absolutePath
+}
+```
+
+Android and iOS subclasses instead build a unique directory in `@BeforeTest` and delete it in
+`@AfterTest` (`context.cacheDir` on Android, `NSTemporaryDirectory()` on iOS).
 
 #### KMP modules targeting Android Test
 
