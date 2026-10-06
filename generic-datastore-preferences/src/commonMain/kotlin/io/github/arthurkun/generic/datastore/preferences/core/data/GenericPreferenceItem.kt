@@ -35,7 +35,7 @@ import kotlinx.coroutines.withContext
  * @property preferences The typed [Preferences.Key] used to access this value in DataStore.
  */
 internal sealed class GenericPreferenceItem<T>(
-    internal val datastore: DataStore<Preferences>,
+    private val datastore: DataStore<Preferences>,
     private val key: String,
     override val defaultValue: T,
     private val preferences: Preferences.Key<T>,
