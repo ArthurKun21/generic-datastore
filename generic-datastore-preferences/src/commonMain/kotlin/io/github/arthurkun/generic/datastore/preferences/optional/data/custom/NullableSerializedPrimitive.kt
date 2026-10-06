@@ -10,7 +10,7 @@ import kotlinx.coroutines.IO
  * [NullableCustomGenericPreferenceItem] for a nullable string-backed custom value using
  * caller-supplied serializers.
  */
-internal class NullableObjectPrimitive<T : Any>(
+internal class NullableSerializedPrimitive<T : Any>(
     datastore: DataStore<Preferences>,
     key: String,
     serializer: (T) -> String,

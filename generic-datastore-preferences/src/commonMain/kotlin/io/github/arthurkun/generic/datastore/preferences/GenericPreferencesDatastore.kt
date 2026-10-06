@@ -46,8 +46,8 @@ import io.github.arthurkun.generic.datastore.preferences.optional.data.NullableS
 import io.github.arthurkun.generic.datastore.preferences.optional.data.NullableStringSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.NullableKSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.NullableKSerializedPrimitive
-import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.NullableObjectPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.NullableSerializedListPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.data.custom.NullableSerializedPrimitive
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -532,7 +532,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         serializer: (T) -> String,
         deserializer: (String) -> T,
     ): Preference<T?> = PreferenceImpl(
-        NullableObjectPrimitive(
+        NullableSerializedPrimitive(
             datastore = datastore,
             key = key,
             serializer = serializer,

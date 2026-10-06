@@ -26,7 +26,7 @@ Jetpack Compose extensions in `generic-datastore-compose`.
       `NullableGenericPreferenceItem`).
         - `preferences/optional/custom/` – nullable custom types (`NullableEnumPreference`,
           `NullableKSerializedPrimitive`, `NullableKSerializedListPrimitive`,
-          `NullableSerializedListPrimitive`, `NullableObjectPrimitive`,
+          `NullableSerializedListPrimitive`, `NullableSerializedPrimitive`,
           `NullableCustomGenericPreferenceItem`).
     - `preferences/utils/` – preference utility extensions (`MappedPreference`, `Extensions`).
     - `preferences/backup/` – backup/restore support for preferences datastore (`BackupPreference`,
