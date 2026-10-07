@@ -195,7 +195,7 @@ Current Preferences API surface:
 | Reads and writes | `get`, `set`, `update`, `delete`, `resetToDefault`, `asFlow`, `stateIn`, `stateInCurrent`, blocking variants, property delegation |
 | Batch operations | `batchReadValues`/`batchReadFlowValues` (+ `batchRead`/`batchReadFlow` projections), `batchWrite`, `batchUpdate`, `batchDelete`, blocking variants |
 | Backup and restore | `exportAsData`, `exportAsString`, `importData`, `importDataAsString`, `clearAll` |
-| Utilities | `map`, `mapIO`, `toggle`, `toJsonElement`, `toJsonMap`, `BasePreference.privateKey`, `BasePreference.appStateKey` |
+| Utilities | `toggle`, `toJsonElement`, `toJsonMap`, `BasePreference.privateKey`, `BasePreference.appStateKey` |
 | Deprecated compatibility | `GenericPreferenceDatastore`, `export`, `import` |
 
 ### Enum Preferences
@@ -510,7 +510,7 @@ restart. Behavior to keep in mind:
   store; two instances never share values, and keys never collide with the persisted datastore.
 - **Excluded from batch operations.** `batchRead*`/`batchWrite`/`batchUpdate`/`batchDelete`
   operate on disk snapshots; passing an in-memory preference (including through
-  `add(pref)`, `map`, or `mapIO`) throws `IllegalStateException`.
+  `add(pref)`) throws `IllegalStateException`.
 - **Excluded from backups and `clearAll()`.** `exportAsData`/`exportAsString` never contain
   in-memory keys, `importData`/`importDataAsString` never write them, and `clearAll()` only
   clears persisted preferences.
@@ -862,27 +862,6 @@ datastore.batchUpdateBlocking {
 
 datastore.batchDeleteBlocking { add(store.userNamePref) }
 ```
-
-### Mapped Preferences
-
-Transform a `Preference<T>` into a `Preference<R>` with converter functions:
-
-```kotlin
-val scoreAsString: Preference<String> = userScore.map(
-    defaultValue = "0",
-    convert = { it.toString() },
-    reverse = { it.toIntOrNull() ?: 0 },
-)
-
-// Or infer the default value from the original preference's default:
-val scoreAsString2: Preference<String> = userScore.mapIO(
-    convert = { it.toString() },
-    reverse = { it.toInt() },
-)
-```
-
-`map` catches exceptions in conversions and falls back to defaults. `mapIO` throws if conversion of
-the default value fails.
 
 ### Backup & Restore
 
