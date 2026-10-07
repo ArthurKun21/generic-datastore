@@ -2,7 +2,11 @@ package io.github.arthurkun.generic.datastore.preferences.batch
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
@@ -1247,5 +1251,116 @@ abstract class AbstractBatchOperationsTest {
             setOf("FIRST"),
             dataStore.data.first()[stringSetPreferencesKey("batchEnumSetNames")],
         )
+    }
+
+    // -- primitive-keyed custom serialization declarations --
+
+    @Test
+    fun batchSerializedAsPrimitive_declarationsRoundTrip() = runTest(testDispatcher) {
+        var intHandle: BatchPref<BatchTestPayload>? = null
+        var longHandle: BatchPref<BatchTestPayload>? = null
+        var floatHandle: BatchPref<BatchTestPayload>? = null
+        var doubleHandle: BatchPref<BatchTestPayload>? = null
+
+        preferenceDatastore.batchWrite {
+            intHandle = serializedAsInt(
+                key = "batchSerializedAsInt",
+                defaultValue = BatchTestPayload(0, "default"),
+                serializer = { it.id },
+                deserializer = { BatchTestPayload(it, "value-$it") },
+            )
+            longHandle = serializedAsLong(
+                key = "batchSerializedAsLong",
+                defaultValue = BatchTestPayload(0, "default"),
+                serializer = { it.id.toLong() },
+                deserializer = { BatchTestPayload(it.toInt(), "value-${it.toInt()}") },
+            )
+            floatHandle = serializedAsFloat(
+                key = "batchSerializedAsFloat",
+                defaultValue = BatchTestPayload(0, "default"),
+                serializer = { it.id.toFloat() },
+                deserializer = { BatchTestPayload(it.toInt(), "value-${it.toInt()}") },
+            )
+            doubleHandle = serializedAsDouble(
+                key = "batchSerializedAsDouble",
+                defaultValue = BatchTestPayload(0, "default"),
+                serializer = { it.id.toDouble() },
+                deserializer = { BatchTestPayload(it.toInt(), "value-${it.toInt()}") },
+            )
+            set(requireNotNull(intHandle), BatchTestPayload(1, "ignored"))
+            set(requireNotNull(longHandle), BatchTestPayload(2, "ignored"))
+            set(requireNotNull(floatHandle), BatchTestPayload(3, "ignored"))
+            set(requireNotNull(doubleHandle), BatchTestPayload(4, "ignored"))
+        }
+
+        val values = preferenceDatastore.batchReadValues {
+            add(requireNotNull(intHandle))
+            add(requireNotNull(longHandle))
+            add(requireNotNull(floatHandle))
+            add(requireNotNull(doubleHandle))
+        }
+
+        assertEquals(BatchTestPayload(1, "value-1"), values[requireNotNull(intHandle)])
+        assertEquals(BatchTestPayload(2, "value-2"), values[requireNotNull(longHandle)])
+        assertEquals(BatchTestPayload(3, "value-3"), values[requireNotNull(floatHandle)])
+        assertEquals(BatchTestPayload(4, "value-4"), values[requireNotNull(doubleHandle)])
+
+        val snapshot = dataStore.data.first()
+        assertEquals(1, snapshot[intPreferencesKey("batchSerializedAsInt")])
+        assertEquals(2L, snapshot[longPreferencesKey("batchSerializedAsLong")])
+        assertEquals(3f, snapshot[floatPreferencesKey("batchSerializedAsFloat")])
+        assertEquals(4.0, snapshot[doublePreferencesKey("batchSerializedAsDouble")])
+    }
+
+    @Test
+    fun batchNullableSerializedAsPrimitive_setNullRemovesKey() = runTest(testDispatcher) {
+        preferenceDatastore.batchWrite {
+            val handle = nullableSerializedAsInt(
+                key = "batchNullableSerializedAsInt",
+                serializer = { it.id },
+                deserializer = { BatchTestPayload(it, "value-$it") },
+            )
+            set(handle, BatchTestPayload(5, "ignored"))
+        }
+
+        var readHandle: BatchPref<BatchTestPayload?>? = null
+        val present = preferenceDatastore.batchReadValues {
+            readHandle = nullableSerializedAsInt(
+                key = "batchNullableSerializedAsInt",
+                serializer = { it.id },
+                deserializer = { BatchTestPayload(it, "value-$it") },
+            )
+        }
+        assertEquals(BatchTestPayload(5, "value-5"), present[requireNotNull(readHandle)])
+
+        preferenceDatastore.batchWrite {
+            set(requireNotNull(readHandle), null)
+        }
+        assertNull(dataStore.data.first()[intPreferencesKey("batchNullableSerializedAsInt")])
+    }
+
+    @Test
+    fun batchSerializedAsPrimitive_storageKindsAreDistinct() {
+        var intHandle: BatchPref<BatchTestPayload>? = null
+        var longHandle: BatchPref<BatchTestPayload>? = null
+
+        prefBatch {
+            intHandle = serializedAsInt(
+                key = "batchSerializedAsKind",
+                defaultValue = BatchTestPayload(0, "default"),
+                serializer = { it.id },
+                deserializer = { BatchTestPayload(it, "value-$it") },
+            )
+        }
+        prefBatch {
+            longHandle = serializedAsLong(
+                key = "batchSerializedAsKind",
+                defaultValue = BatchTestPayload(0, "default"),
+                serializer = { it.id.toLong() },
+                deserializer = { BatchTestPayload(it.toInt(), "value-$it") },
+            )
+        }
+
+        assertTrue(requireNotNull(intHandle) != requireNotNull(longHandle))
     }
 }

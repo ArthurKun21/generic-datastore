@@ -1,6 +1,8 @@
 package io.github.arthurkun.generic.datastore.preferences
 
+import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
@@ -296,6 +298,70 @@ abstract class AbstractInMemoryGenericPreferenceDatastoreTest {
         }
 
         assertEquals(SerializableObject(0, "default"), pref.get())
+    }
+
+    @Test
+    fun serializedAsIntInMemory_roundTripStoresUnderIntKey() = runTest(testDispatcher) {
+        val key = "memSerializedAsInt"
+        val pref = preferenceDatastore.serializedAsIntInMemory(
+            key = key,
+            defaultValue = SerializableObject(0, "default"),
+            serializer = { it.id },
+            deserializer = { SerializableObject(it, "value-$it") },
+        )
+
+        pref.set(SerializableObject(3, "ignored"))
+
+        assertEquals(SerializableObject(3, "value-3"), pref.get())
+        assertEquals(3, preferenceDatastore.inMemoryDatastore.data.first()[intPreferencesKey(key)])
+    }
+
+    @Test
+    fun serializedAsDoubleInMemory_decodeFailureReturnsDefault() = runTest(testDispatcher) {
+        val key = "memSerializedAsDoubleBad"
+        val pref = preferenceDatastore.serializedAsDoubleInMemory(
+            key = key,
+            defaultValue = SerializableObject(0, "default"),
+            serializer = { it.id.toDouble() },
+            deserializer = { if (it < 0.0) error("negative") else SerializableObject(it.toInt(), "value-$it") },
+        )
+
+        preferenceDatastore.inMemoryDatastore.edit {
+            it[doublePreferencesKey(key)] = -1.0
+        }
+
+        assertEquals(SerializableObject(0, "default"), pref.get())
+    }
+
+    @Test
+    fun nullableSerializedAsIntInMemory_setNullRemovesKey() = runTest(testDispatcher) {
+        val key = "memNullableSerializedAsInt"
+        val pref = preferenceDatastore.nullableSerializedAsIntInMemory(
+            key = key,
+            serializer = { it.id },
+            deserializer = { SerializableObject(it, "value-$it") },
+        )
+
+        assertNull(pref.get())
+
+        pref.set(SerializableObject(8, "ignored"))
+        assertEquals(SerializableObject(8, "value-8"), pref.get())
+
+        pref.set(null)
+        assertNull(pref.get())
+        assertNull(preferenceDatastore.inMemoryDatastore.data.first()[intPreferencesKey(key)])
+    }
+
+    @Test
+    fun nullableSerializedAsLongInMemory_roundTrip() = runTest(testDispatcher) {
+        val pref = preferenceDatastore.nullableSerializedAsLongInMemory(
+            key = "memNullableSerializedAsLong",
+            serializer = { it.id.toLong() },
+            deserializer = { SerializableObject(it.toInt(), "value-$it") },
+        )
+
+        pref.set(SerializableObject(88, "ignored"))
+        assertEquals(SerializableObject(88, "value-88"), pref.get())
     }
 
     @Test
