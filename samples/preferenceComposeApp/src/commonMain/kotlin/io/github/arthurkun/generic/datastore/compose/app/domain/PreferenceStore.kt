@@ -11,8 +11,6 @@ import io.github.arthurkun.generic.datastore.preferences.enumSet
 import io.github.arthurkun.generic.datastore.preferences.kserialized
 import io.github.arthurkun.generic.datastore.preferences.kserializedList
 import io.github.arthurkun.generic.datastore.preferences.kserializedSet
-import io.github.arthurkun.generic.datastore.preferences.map
-import io.github.arthurkun.generic.datastore.preferences.mapIO
 import io.github.arthurkun.generic.datastore.preferences.nullableEnum
 import io.github.arthurkun.generic.datastore.preferences.nullableKserialized
 import io.github.arthurkun.generic.datastore.preferences.nullableKserializedList
@@ -21,7 +19,6 @@ import io.github.arthurkun.generic.datastore.preferences.toJsonMap
 import io.github.arthurkun.generic.datastore.preferences.toggle
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
-import kotlin.time.Instant
 
 class PreferenceStore(
     val datastore: PreferencesDatastore,
@@ -52,18 +49,6 @@ class PreferenceStore(
         defaultValue = Animal.Dog,
         serializer = { Animal.to(it) },
         deserializer = { Animal.from(it) },
-    )
-
-    val duration = datastore.long(
-        key = "duration",
-        defaultValue = 0L,
-    ).mapIO(
-        convert = {
-            Instant.fromEpochMilliseconds(it)
-        },
-        reverse = {
-            it.toEpochMilliseconds()
-        },
     )
 
     val userProfile = datastore.kserialized(
@@ -165,11 +150,6 @@ class PreferenceStore(
             val nullableKserializedListPref = datastore.nullableKserializedList<UserProfile>(
                 key = "api_nullable_kserialized_list",
             )
-            val mappedNum = num.map(
-                defaultValue = "num=0",
-                convert = { "num=$it" },
-                reverse = { it.removePrefix("num=").toIntOrNull() ?: 0 },
-            )
 
             floatPref.set(3.5f)
             doublePref.set(4.5)
@@ -190,7 +170,7 @@ class PreferenceStore(
             nullableKserializedPref.set(UserProfile("Lin", 31))
             nullableSerializedListPref.set(listOf(Animal.Dog))
             nullableKserializedListPref.set(listOf(UserProfile("Grace", 40)))
-            mappedNum.set("num=12")
+            num.set(12)
             bool.toggle()
             bool.toggle()
 
