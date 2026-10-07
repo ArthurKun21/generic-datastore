@@ -2,6 +2,7 @@ package io.github.arthurkun.generic.datastore.preferences.optional.custom
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.preferences.utils.deserializeList
 import io.github.arthurkun.generic.datastore.preferences.utils.serializeList
 import kotlinx.coroutines.CoroutineDispatcher
@@ -18,9 +19,10 @@ internal class NullableSerializedPrimitive<T : Any>(
     serializer: (T) -> String,
     deserializer: (String) -> T,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : NullableCustomGenericPreferenceItem<T>(
+) : NullableCustomGenericPreferenceItem<T, String>(
     datastore = datastore,
     key = key,
+    preferences = stringPreferencesKey(key),
     serializer = serializer,
     deserializer = deserializer,
     ioDispatcher = ioDispatcher,
@@ -36,9 +38,10 @@ internal class NullableSerializedListPrimitive<T>(
     elementSerializer: (T) -> String,
     elementDeserializer: (String) -> T,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : NullableCustomGenericPreferenceItem<List<T>>(
+) : NullableCustomGenericPreferenceItem<List<T>, String>(
     datastore = datastore,
     key = key,
+    preferences = stringPreferencesKey(key),
     serializer = { list -> serializeList(list, elementSerializer) },
     deserializer = { str -> deserializeList(str, elementDeserializer) },
     ioDispatcher = ioDispatcher,

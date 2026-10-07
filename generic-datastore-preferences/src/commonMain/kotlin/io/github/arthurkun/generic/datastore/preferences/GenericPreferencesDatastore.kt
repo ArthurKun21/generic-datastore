@@ -33,6 +33,10 @@ import io.github.arthurkun.generic.datastore.preferences.core.StringSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.custom.EnumPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.custom.KSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.custom.KSerializedPrimitive
+import io.github.arthurkun.generic.datastore.preferences.core.custom.SerializedAsDoublePrimitive
+import io.github.arthurkun.generic.datastore.preferences.core.custom.SerializedAsFloatPrimitive
+import io.github.arthurkun.generic.datastore.preferences.core.custom.SerializedAsIntPrimitive
+import io.github.arthurkun.generic.datastore.preferences.core.custom.SerializedAsLongPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.custom.SerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.custom.SerializedPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.customSet.EnumSetPrimitive
@@ -48,6 +52,10 @@ import io.github.arthurkun.generic.datastore.preferences.optional.NullableString
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableEnumPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableKSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableKSerializedPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedAsDoublePrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedAsFloatPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedAsIntPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedAsLongPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.customSet.NullableEnumSetPrimitive
@@ -410,6 +418,66 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         ),
     )
 
+    override fun <T> serializedAsInt(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Int,
+        deserializer: (Int) -> T,
+    ): Preference<T> = PreferenceImpl(
+        SerializedAsIntPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
+    override fun <T> serializedAsLong(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Long,
+        deserializer: (Long) -> T,
+    ): Preference<T> = PreferenceImpl(
+        SerializedAsLongPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
+    override fun <T> serializedAsFloat(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Float,
+        deserializer: (Float) -> T,
+    ): Preference<T> = PreferenceImpl(
+        SerializedAsFloatPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
+    override fun <T> serializedAsDouble(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Double,
+        deserializer: (Double) -> T,
+    ): Preference<T> = PreferenceImpl(
+        SerializedAsDoublePrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
     /**
      * Creates a preference for a [Set] of custom objects, stored using a string set preference key.
      * Each element is individually serialized to and deserialized from a String.
@@ -546,6 +614,58 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         deserializer: (String) -> T,
     ): Preference<T?> = PreferenceImpl(
         NullableSerializedPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
+    override fun <T : Any> nullableSerializedAsInt(
+        key: String,
+        serializer: (T) -> Int,
+        deserializer: (Int) -> T,
+    ): Preference<T?> = PreferenceImpl(
+        NullableSerializedAsIntPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
+    override fun <T : Any> nullableSerializedAsLong(
+        key: String,
+        serializer: (T) -> Long,
+        deserializer: (Long) -> T,
+    ): Preference<T?> = PreferenceImpl(
+        NullableSerializedAsLongPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
+    override fun <T : Any> nullableSerializedAsFloat(
+        key: String,
+        serializer: (T) -> Float,
+        deserializer: (Float) -> T,
+    ): Preference<T?> = PreferenceImpl(
+        NullableSerializedAsFloatPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
+    override fun <T : Any> nullableSerializedAsDouble(
+        key: String,
+        serializer: (T) -> Double,
+        deserializer: (Double) -> T,
+    ): Preference<T?> = PreferenceImpl(
+        NullableSerializedAsDoublePrimitive(
             datastore = datastore,
             key = key,
             serializer = serializer,
@@ -1083,6 +1203,70 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         inMemoryStorage = true,
     )
 
+    override fun <T> serializedAsIntInMemory(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Int,
+        deserializer: (Int) -> T,
+    ): Preference<T> = PreferenceImpl(
+        SerializedAsIntPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T> serializedAsLongInMemory(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Long,
+        deserializer: (Long) -> T,
+    ): Preference<T> = PreferenceImpl(
+        SerializedAsLongPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T> serializedAsFloatInMemory(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Float,
+        deserializer: (Float) -> T,
+    ): Preference<T> = PreferenceImpl(
+        SerializedAsFloatPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T> serializedAsDoubleInMemory(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Double,
+        deserializer: (Double) -> T,
+    ): Preference<T> = PreferenceImpl(
+        SerializedAsDoublePrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
     override fun <T> serializedSetInMemory(
         key: String,
         defaultValue: Set<T>,
@@ -1169,6 +1353,62 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         deserializer: (String) -> T,
     ): Preference<T?> = PreferenceImpl(
         NullableSerializedPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Any> nullableSerializedAsIntInMemory(
+        key: String,
+        serializer: (T) -> Int,
+        deserializer: (Int) -> T,
+    ): Preference<T?> = PreferenceImpl(
+        NullableSerializedAsIntPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Any> nullableSerializedAsLongInMemory(
+        key: String,
+        serializer: (T) -> Long,
+        deserializer: (Long) -> T,
+    ): Preference<T?> = PreferenceImpl(
+        NullableSerializedAsLongPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Any> nullableSerializedAsFloatInMemory(
+        key: String,
+        serializer: (T) -> Float,
+        deserializer: (Float) -> T,
+    ): Preference<T?> = PreferenceImpl(
+        NullableSerializedAsFloatPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Any> nullableSerializedAsDoubleInMemory(
+        key: String,
+        serializer: (T) -> Double,
+        deserializer: (Double) -> T,
+    ): Preference<T?> = PreferenceImpl(
+        NullableSerializedAsDoublePrimitive(
             datastore = inMemoryDatastore,
             key = key,
             serializer = serializer,

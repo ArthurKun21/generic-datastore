@@ -2,6 +2,10 @@ package io.github.arthurkun.generic.datastore.preferences.batch
 
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.doublePreferencesKey
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.preferences.Preference
@@ -167,6 +171,125 @@ internal class BatchNullableCustomPref<T : Any>(
         mutablePreferences.remove(stringKey)
     }
 }
+
+/**
+ * Non-null custom preference stored under a native typed [Preferences.Key] (`intPreferencesKey`,
+ * `longPreferencesKey`, ...), where the value is converted to and from the stored primitive by the
+ * supplied functions. Missing keys and decode failures read back as [BatchPref.defaultValue].
+ *
+ * Concrete subclasses bind one storage strategy per primitive type so that two handles with the
+ * same key and default but different storage kinds are never considered equal.
+ */
+internal abstract class BatchCustomPrimitivePref<T, S>(
+    key: String,
+    defaultValue: T,
+    private val typedKey: Preferences.Key<S>,
+    private val serializer: (T) -> S,
+    private val deserializer: (S) -> T,
+) : BatchPref<T>(key, defaultValue) {
+
+    override fun readFrom(preferences: Preferences): T =
+        preferences[typedKey]?.let { deserializeOrDefault(it, defaultValue, deserializer) }
+            ?: defaultValue
+
+    override fun writeTo(mutablePreferences: MutablePreferences, value: T) {
+        mutablePreferences[typedKey] = serializer(value)
+    }
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        mutablePreferences.remove(typedKey)
+    }
+}
+
+/** [BatchCustomPrimitivePref] storing the serialized form as an `Int`. */
+internal class BatchSerializedAsIntPref<T>(
+    key: String,
+    defaultValue: T,
+    serializer: (T) -> Int,
+    deserializer: (Int) -> T,
+) : BatchCustomPrimitivePref<T, Int>(key, defaultValue, intPreferencesKey(key), serializer, deserializer)
+
+/** [BatchCustomPrimitivePref] storing the serialized form as a `Long`. */
+internal class BatchSerializedAsLongPref<T>(
+    key: String,
+    defaultValue: T,
+    serializer: (T) -> Long,
+    deserializer: (Long) -> T,
+) : BatchCustomPrimitivePref<T, Long>(key, defaultValue, longPreferencesKey(key), serializer, deserializer)
+
+/** [BatchCustomPrimitivePref] storing the serialized form as a `Float`. */
+internal class BatchSerializedAsFloatPref<T>(
+    key: String,
+    defaultValue: T,
+    serializer: (T) -> Float,
+    deserializer: (Float) -> T,
+) : BatchCustomPrimitivePref<T, Float>(key, defaultValue, floatPreferencesKey(key), serializer, deserializer)
+
+/** [BatchCustomPrimitivePref] storing the serialized form as a `Double`. */
+internal class BatchSerializedAsDoublePref<T>(
+    key: String,
+    defaultValue: T,
+    serializer: (T) -> Double,
+    deserializer: (Double) -> T,
+) : BatchCustomPrimitivePref<T, Double>(key, defaultValue, doublePreferencesKey(key), serializer, deserializer)
+
+/**
+ * Nullable custom preference stored under a native typed [Preferences.Key]. Missing keys and decode
+ * failures both read back as `null`. Writing `null` removes the key.
+ *
+ * Concrete subclasses bind one storage strategy per primitive type so that two handles with the
+ * same key and default but different storage kinds are never considered equal.
+ */
+internal abstract class BatchNullableCustomPrimitivePref<T : Any, S>(
+    key: String,
+    private val typedKey: Preferences.Key<S>,
+    private val serializer: (T) -> S,
+    private val deserializer: (S) -> T,
+) : BatchPref<T?>(key, null) {
+
+    override fun readFrom(preferences: Preferences): T? =
+        preferences[typedKey]?.let { deserializeOrNull(it, deserializer) }
+
+    override fun writeTo(mutablePreferences: MutablePreferences, value: T?) {
+        if (value == null) {
+            mutablePreferences.remove(typedKey)
+        } else {
+            mutablePreferences[typedKey] = serializer(value)
+        }
+    }
+
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        mutablePreferences.remove(typedKey)
+    }
+}
+
+/** [BatchNullableCustomPrimitivePref] storing the serialized form as an `Int`. */
+internal class BatchNullableSerializedAsIntPref<T : Any>(
+    key: String,
+    serializer: (T) -> Int,
+    deserializer: (Int) -> T,
+) : BatchNullableCustomPrimitivePref<T, Int>(key, intPreferencesKey(key), serializer, deserializer)
+
+/** [BatchNullableCustomPrimitivePref] storing the serialized form as a `Long`. */
+internal class BatchNullableSerializedAsLongPref<T : Any>(
+    key: String,
+    serializer: (T) -> Long,
+    deserializer: (Long) -> T,
+) : BatchNullableCustomPrimitivePref<T, Long>(key, longPreferencesKey(key), serializer, deserializer)
+
+/** [BatchNullableCustomPrimitivePref] storing the serialized form as a `Float`. */
+internal class BatchNullableSerializedAsFloatPref<T : Any>(
+    key: String,
+    serializer: (T) -> Float,
+    deserializer: (Float) -> T,
+) : BatchNullableCustomPrimitivePref<T, Float>(key, floatPreferencesKey(key), serializer, deserializer)
+
+/** [BatchNullableCustomPrimitivePref] storing the serialized form as a `Double`. */
+internal class BatchNullableSerializedAsDoublePref<T : Any>(
+    key: String,
+    serializer: (T) -> Double,
+    deserializer: (Double) -> T,
+) : BatchNullableCustomPrimitivePref<T, Double>(key, doublePreferencesKey(key), serializer, deserializer)
 
 /**
  * Non-null set preference stored in a string-set entry, where every element is individually

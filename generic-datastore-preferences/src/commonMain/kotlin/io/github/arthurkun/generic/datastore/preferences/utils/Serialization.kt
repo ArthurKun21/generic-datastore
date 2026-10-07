@@ -10,11 +10,14 @@ import kotlin.coroutines.cancellation.CancellationException
 /**
  * Deserializes [value] with [deserializer], rethrowing [CancellationException] and mapping every
  * other failure to [fallback].
+ *
+ * [value] and [deserializer] are generic over the stored type [S] (`String`, `Int`, `Long`, …),
+ * so the same policy applies to every custom-serialization storage strategy.
  */
-internal fun <T> deserializeOrDefault(
-    value: String,
+internal fun <S, T> deserializeOrDefault(
+    value: S,
     fallback: T,
-    deserializer: (String) -> T,
+    deserializer: (S) -> T,
 ): T = try {
     deserializer(value)
 } catch (e: CancellationException) {
@@ -26,8 +29,11 @@ internal fun <T> deserializeOrDefault(
 /**
  * Deserializes [value] with [deserializer], rethrowing [CancellationException] and mapping every
  * other failure to `null`.
+ *
+ * [value] and [deserializer] are generic over the stored type [S] (`String`, `Int`, `Long`, …),
+ * so the same policy applies to every custom-serialization storage strategy.
  */
-internal fun <T> deserializeOrNull(value: String, deserializer: (String) -> T): T? = try {
+internal fun <S, T> deserializeOrNull(value: S, deserializer: (S) -> T): T? = try {
     deserializer(value)
 } catch (e: CancellationException) {
     throw e
