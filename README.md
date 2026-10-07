@@ -488,6 +488,33 @@ deserialization fails, `null` is returned.
 > Per-element decode failures are skipped, so a stored entry whose elements all fail to decode reads
 > back as an **empty set** — the same rule the non-nullable set preferences follow.
 
+### In-Memory Preferences (`*InMemory`)
+
+Every factory above has a memory-backed twin named by appending `InMemory`
+(`string` → `stringInMemory`, `nullableEnumSet` → `nullableEnumSetInMemory`, …). The variants
+behave identically — same parameters, defaults, and decode-failure rules — except the value is
+kept in a process-local in-memory store instead of the file-backed datastore:
+
+```kotlin
+val tokenPref = datastore.string("token", "")            // persisted
+val scrollPref = datastore.intInMemory("scroll_pos", 0)  // process-local
+
+scrollPref.update { it + 100 } // never touches disk
+```
+
+Use them for transient UI state, cached values, or anything that should not survive a process
+restart. Behavior to keep in mind:
+
+- **Not persisted.** Values live only as long as the datastore instance.
+- **Scoped to the instance.** Each `GenericPreferencesDatastore` owns an independent in-memory
+  store; two instances never share values, and keys never collide with the persisted datastore.
+- **Excluded from batch operations.** `batchRead*`/`batchWrite`/`batchUpdate`/`batchDelete`
+  operate on disk snapshots; passing an in-memory preference (including through
+  `add(pref)`, `map`, or `mapIO`) throws `IllegalStateException`.
+- **Excluded from backups and `clearAll()`.** `exportAsData`/`exportAsString` never contain
+  in-memory keys, `importData`/`importDataAsString` never write them, and `clearAll()` only
+  clears persisted preferences.
+
 ### Decode Failure Policy
 
 Serializer-backed preferences are intentionally lenient. A non-null serialized preference returns
