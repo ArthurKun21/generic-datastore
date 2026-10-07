@@ -37,14 +37,16 @@ DataStore Preferences and Proto DataStore. The preferences implementation lives 
       `DataStore<Preferences>`). Add new in-memory code here rather than under `data/`.
   - `preferences/optional/mem/` – reserved for nullable-specific in-memory code. Currently empty
     (only `.gitkeep`); add new in-memory code here rather than under `data/`.
-    - `preferences/batch/` – declarative batch DSL (`BatchPref`, `PrefBuilder`, `PreferenceBatch`,
-      `BatchValues`, `BatchWriteScope`, `BatchUpdateScope`, `PreferencesAccessor`).
+      - `preferences/batch/` – declarative batch DSL (`BatchPref`, `PrefBuilder`,
+        `PreferenceBatch`,
+        `BatchValues`, `BatchWriteScope`, `BatchUpdateScope`, `PreferencesAccessor`).
   - `preferences/utils/` – preference utilities (`MappedPreference`, `Extensions`,
     `Serialization`,
       `Enums`).
-    - `preferences/backup/` – backup/restore support for preferences datastore (`BackupPreference`,
-      `PreferenceBackupCreator`, `PreferenceBackupRestorer`, `BackupParsingException`,
-      `Migration` — loose JSON conversion helpers, not a migration type).
+      - `preferences/backup/` – backup/restore support for preferences datastore
+        (`BackupPreference`,
+        `PreferenceBackupCreator`, `PreferenceBackupRestorer`, `BackupParsingException`,
+        `Migration` — loose JSON conversion helpers, not a migration type).
 - `:generic-datastore-proto` – Proto DataStore support.
     - `proto/` – public contract and factories (`ProtoPreference`, `ProtoDatastore`, `ProtoApi`,
       `GenericProtoDatastore`, `CreateProtoDatastore`, `ProtoFieldPrefs`).
