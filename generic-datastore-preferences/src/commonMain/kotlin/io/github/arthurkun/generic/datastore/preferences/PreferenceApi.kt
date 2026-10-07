@@ -7,8 +7,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.serializer
-import io.github.arthurkun.generic.datastore.preferences.utils.map as internalMap
-import io.github.arthurkun.generic.datastore.preferences.utils.mapIO as internalMapIO
 
 /**
  * Creates a Kotlin-serialization-backed preference, inferring the [KSerializer] from [T].
@@ -133,40 +131,6 @@ public inline fun <reified T> PreferencesDatastore.nullableKserializedList(
     serializer = serializer<T>(),
     json = json,
 )
-
-/**
- * Maps a [Preference] to a different value type by deriving the mapped default from the source
- * preference's default value.
- *
- * This is convenient when [convert] is guaranteed to succeed for the original default value.
- * If that assumption is not safe, prefer [map] and supply an explicit mapped default instead.
- */
-public fun <T, R> Preference<T>.mapIO(
-    convert: (T) -> R,
-    reverse: (R) -> T,
-): Preference<R> = internalMapIO(convert, reverse)
-
-/**
- * Maps a [Preference] to a different value type using an explicit mapped default value.
- *
- * Reads use [defaultValue] when [convert] throws. Writes fall back to the source preference's
- * default when [reverse] throws.
- *
- * Example:
- * ```kotlin
- * val temperatureC = datastore.int("temperature_f")
- *     .map(
- *         defaultValue = 0.0,
- *         convert = { fahrenheit -> (fahrenheit - 32) * 5.0 / 9.0 },
- *         reverse = { celsius -> ((celsius * 9.0 / 5.0) + 32).toInt() },
- *     )
- * ```
- */
-public fun <T, R> Preference<T>.map(
-    defaultValue: R,
-    convert: (T) -> R,
-    reverse: (R) -> T,
-): Preference<R> = internalMap(defaultValue, convert, reverse)
 
 /**
  * Creates a nullable preference for a [Set] of custom objects using Kotlin Serialization,

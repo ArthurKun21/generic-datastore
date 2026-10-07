@@ -21,7 +21,6 @@ class MainViewModel(
     val num = preferenceStore.num
     val bool = preferenceStore.bool
     val customObject = preferenceStore.customObject
-    val duration = preferenceStore.duration
     val userProfile = preferenceStore.userProfile
     val animalSet = preferenceStore.animalSet
     val theme = preferenceStore.theme
@@ -50,10 +49,6 @@ class MainViewModel(
 
     fun resetCustomObject() {
         viewModelScope.launch { preferenceStore.customObject.resetToDefault() }
-    }
-
-    fun resetDuration() {
-        viewModelScope.launch { preferenceStore.duration.resetToDefault() }
     }
 
     fun resetUserProfile() {

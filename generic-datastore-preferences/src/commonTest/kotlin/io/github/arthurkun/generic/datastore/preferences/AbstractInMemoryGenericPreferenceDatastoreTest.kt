@@ -645,24 +645,6 @@ abstract class AbstractInMemoryGenericPreferenceDatastoreTest {
         assertEquals("default", memPref.get())
     }
 
-    @Test
-    fun mappedInMemoryPreference_worksAndIsStillBatchRejected() = runTest(testDispatcher) {
-        val memPref = preferenceDatastore.intInMemory("memMapGuard", 0)
-        val mapped = memPref.map(
-            defaultValue = 0.0,
-            convert = { it.toDouble() },
-            reverse = { it.toInt() },
-        )
-
-        mapped.set(2.0)
-        assertEquals(2, memPref.get())
-        assertEquals(2.0, mapped.get())
-
-        assertFailsWith<IllegalStateException> {
-            preferenceDatastore.batchReadValues { add(mapped) }
-        }
-    }
-
     @OptIn(InternalGenericDatastoreApi::class)
     private fun createInMemoryBackedDatastore(): GenericPreferencesDatastore =
         GenericPreferencesDatastore(datastore = InMemoryGenericPreferenceDatastore())

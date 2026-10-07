@@ -38,8 +38,7 @@ DataStore Preferences and Proto DataStore. The preferences implementation lives 
     - `preferences/batch/` – declarative batch DSL (`BatchPref`, `PrefBuilder`,
       `PreferenceBatch`, `BatchValues`, `BatchWriteScope`, `BatchUpdateScope`,
       `PreferencesAccessor`).
-    - `preferences/utils/` – preference utilities (`MappedPreference`, `Extensions`,
-      `Serialization`, `Enums`).
+    - `preferences/utils/` – preference utilities (`Extensions`, `Serialization`, `Enums`).
     - `preferences/backup/` – backup/restore support for preferences datastore
       (`BackupPreference`, `PreferenceBackupCreator`, `PreferenceBackupRestorer`,
       `BackupParsingException`, `Migration` — loose JSON conversion helpers, not a migration
@@ -218,8 +217,7 @@ Semantics to preserve when touching this code:
   `inMemoryStorage = true`, and its `PreferencesAccessor` methods (`readFrom`/`writeInto`/
   `removeFrom`) throw `IllegalStateException`. Batch reads and writes operate on disk
   `Preferences` snapshots, so any new batch path must keep routing through `PreferenceImpl`'s
-  accessors to stay guarded (this also covers `map`/`mapIO` wrappers, which delegate accessor calls
-  to the wrapped preference).
+  accessors to stay guarded.
 - They are equally invisible to `clearAll()`, backup export, and backup import — those operate on
   the disk store only.
 - `PrefBuilder` deliberately has no `*InMemory` declaration functions; `add(pref)` is the only way

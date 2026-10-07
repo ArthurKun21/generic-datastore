@@ -38,8 +38,6 @@ import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
 import io.github.arthurkun.generic.datastore.compose.app.domain.UserProfile
 import io.github.arthurkun.generic.datastore.remember
 import io.github.arthurkun.generic.datastore.utils.collectAsStatePlatform
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 @Composable
 fun MainScreen(
@@ -50,7 +48,6 @@ fun MainScreen(
     var num by viewModel.num.remember()
     var bool by viewModel.bool.remember()
     var animal by viewModel.customObject.remember()
-    var duration by viewModel.duration.remember()
     var userProfile by viewModel.userProfile.remember()
     var userProfileSet by viewModel.userProfileSet.remember()
     var animalSet by viewModel.animalSet.remember()
@@ -144,18 +141,6 @@ fun MainScreen(
                     animal = animal,
                     onAnimalChange = { animal = it },
                     onReset = { viewModel.resetCustomObject() },
-                )
-            }
-            item {
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                )
-            }
-            item {
-                DurationSection(
-                    duration = duration,
-                    onUpdate = { duration = Clock.System.now() },
-                    onReset = { viewModel.resetDuration() },
                 )
             }
             item {
@@ -391,38 +376,6 @@ private fun SerializerSection(
                         selected = entry == animal,
                         onClick = { onAnimalChange(entry) },
                     ),
-            )
-        }
-        TextButton(onClick = onReset) {
-            Text("Reset to Default")
-        }
-    }
-}
-
-@Composable
-private fun DurationSection(
-    duration: Instant,
-    onUpdate: () -> Unit,
-    onReset: () -> Unit,
-) {
-    Column {
-        Text(
-            "Duration",
-            style = MaterialTheme.typography.headlineSmall,
-        )
-        Text(
-            "$duration",
-            style = MaterialTheme.typography.headlineSmall,
-        )
-        Button(
-            onClick = onUpdate,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-        ) {
-            Text(
-                "Update Duration",
-                style = MaterialTheme.typography.headlineSmall,
             )
         }
         TextButton(onClick = onReset) {

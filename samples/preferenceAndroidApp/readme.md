@@ -40,18 +40,6 @@ class PreferenceStore(
         deserializer = { Animal.from(it) },
     )
 
-    val duration = datastore.long(
-        key = "duration",
-        defaultValue = 0L,
-    ).mapIO(
-        convert = {
-            Instant.fromEpochMilliseconds(it)
-        },
-        reverse = {
-            it.toEpochMilliseconds()
-        },
-    )
-
     suspend fun exportPreferences() = datastore.export()
 
     suspend fun importPreferences(data: Map<String, Any>) = datastore.import(data)
