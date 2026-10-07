@@ -3,7 +3,6 @@ package io.github.arthurkun.generic.datastore.preferences
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
-
 /**
  *
  * Memory-backed variants of every factory above. They behave identically except that
