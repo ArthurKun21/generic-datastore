@@ -33,13 +33,14 @@ DataStore Preferences and Proto DataStore. The preferences implementation lives 
           (`NullableEnumSetPrimitive`, `NullableKSerializedSetPrimitive`,
           `NullableSerializedSetPrimitive`, `NullableSetGenericPreferenceItem`).
     - `preferences/core/mem/` – in-memory storage for the `*InMemory` preference factories
-      (`InMemoryPreferencesDataStore`, a `MutableStateFlow` + `Mutex` implementation of
+      (`InMemoryPreferences`, a `MutableStateFlow` + `Mutex` implementation of
       `DataStore<Preferences>`). Add new in-memory code here rather than under `data/`.
-    - `preferences/optional/mem/` – reserved for nullable-specific in-memory code. Currently
-      empty (only `.gitkeep`); add new in-memory code here rather than under `data/`.
+  - `preferences/optional/mem/` – reserved for nullable-specific in-memory code. Currently empty
+    (only `.gitkeep`); add new in-memory code here rather than under `data/`.
     - `preferences/batch/` – declarative batch DSL (`BatchPref`, `PrefBuilder`, `PreferenceBatch`,
       `BatchValues`, `BatchWriteScope`, `BatchUpdateScope`, `PreferencesAccessor`).
-    - `preferences/utils/` – preference utilities (`MappedPreference`, `Extensions`, `Serialization`,
+  - `preferences/utils/` – preference utilities (`MappedPreference`, `Extensions`,
+    `Serialization`,
       `Enums`).
     - `preferences/backup/` – backup/restore support for preferences datastore (`BackupPreference`,
       `PreferenceBackupCreator`, `PreferenceBackupRestorer`, `BackupParsingException`,
@@ -137,14 +138,14 @@ test methods live in abstract classes in `commonTest`, while platform source set
 DataStore initialization and teardown.
 
 - `commonTest` — Abstract base classes (e.g. `AbstractDatastoreInstrumentedTest`,
-  `AbstractDatastoreBlockingTest`, `AbstractPreferencesDatastoreCorruptionTest`) containing all
-  test methods.
+  `AbstractDatastoreBlockingTest`, `AbstractPreferencesDatastoreCorruptionTest`) containing all test
+  methods.
 - `androidDeviceTest` / `jvmTest` / `iosSimulatorArm64Test` — Concrete subclasses that override
   abstract properties (`preferenceDatastore`, `dataStore`, `testDispatcher`) and supply
   platform-specific setup/teardown.
 
-`AbstractBatchPerformanceTest` is the one deliberate exception: it is `@Ignore`d and desktop-only, so
-it has a `JvmBatchPerformanceTest` subclass and no Android/iOS shims.
+`AbstractBatchPerformanceTest` is the one deliberate exception: it is `@Ignore`d and desktop-only,
+so it has a `JvmBatchPerformanceTest` subclass and no Android/iOS shims.
 
 When adding new tests, add them to the abstract class in `commonTest` so they run on all platforms
 automatically. Only add tests directly to a platform source set when the test requires
@@ -171,8 +172,8 @@ touch the internal `BatchPref` constructors directly, so they delegate to the no
 `@PublishedApi internal registerEnum*` helpers on `PrefBuilder`.
 
 `BatchPref` equality folds in the concrete subclass, so an `enum("k", d)` handle is **not** equal to
-a hand-rolled `serialized("k", d, { it.name }, ::enumValueOf)` handle. Each enum storage strategy has
-its own `BatchPref` subclass (`BatchEnumPref`, `BatchEnumSetPref`, `BatchNullableEnumPref`,
+a hand-rolled `serialized("k", d, { it.name }, ::enumValueOf)` handle. Each enum storage strategy
+has its own `BatchPref` subclass (`BatchEnumPref`, `BatchEnumSetPref`, `BatchNullableEnumPref`,
 `BatchNullableEnumSetPref`) for this reason.
 
 ### Nullable set preference types
@@ -190,21 +191,23 @@ non-nullable ones (key stays present). This asymmetry is intentional and asserte
 `PreferencesDatastore` exposes an `InMemory` twin for every factory (`stringInMemory`,
 `nullableEnumSetInMemory`, …). They are interface members, and each constructs the **same internal
 primitive class** as its disk counterpart but passes the wrapper-owned
-`InMemoryPreferencesDataStore` (`preferences/core/mem/`) instead of the file-backed store — there
-are no per-type in-memory classes. `InMemoryPreferencesDataStore` is a `MutableStateFlow<Preferences>`
+`InMemoryPreferences` (`preferences/core/mem/`) instead of the file-backed store — there are no
+per-type in-memory classes. `InMemoryPreferences` is a `MutableStateFlow<Preferences>`
+
 + `Mutex` implementation of `DataStore<Preferences>`; all existing read/write/serialization logic
-operates on it unchanged, so decode-failure and null-handling rules carry over for free.
+  operates on it unchanged, so decode-failure and null-handling rules carry over for free.
 
 Semantics to preserve when touching this code:
 
 - One in-memory store per `GenericPreferencesDatastore` instance (`internal val inMemoryDatastore`);
-  two instances never share values, and in-memory keys never collide with disk keys of the same name.
+  two instances never share values, and in-memory keys never collide with disk keys of the same
+  name.
 - In-memory preferences are excluded from batch operations: `PreferenceImpl` is constructed with
   `inMemoryStorage = true`, and its `PreferencesAccessor` methods (`readFrom`/`writeInto`/
   `removeFrom`) throw `IllegalStateException`. Batch reads and writes operate on disk
   `Preferences` snapshots, so any new batch path must keep routing through `PreferenceImpl`'s
-  accessors to stay guarded (this also covers `map`/`mapIO` wrappers, which delegate accessor
-  calls to the wrapped preference).
+  accessors to stay guarded (this also covers `map`/`mapIO` wrappers, which delegate accessor calls
+  to the wrapped preference).
 - They are equally invisible to `clearAll()`, backup export, and backup import — those operate on
   the disk store only.
 - `PrefBuilder` deliberately has no `*InMemory` declaration functions; `add(pref)` is the only way
@@ -307,8 +310,8 @@ class MyFeatureBlockingTest : AbstractMyFeatureBlockingTest() {
 
 **Corruption test (writes a real file through `systemFileSystem`):**
 
-Corruption tests cannot use a `*TestHelper` because they need a path they can write garbage bytes
-to first. They subclass `AbstractPreferencesDatastoreCorruptionTest` and supply only a writable
+Corruption tests cannot use a `*TestHelper` because they need a path they can write garbage bytes to
+first. They subclass `AbstractPreferencesDatastoreCorruptionTest` and supply only a writable
 directory, using the public `systemFileSystem` rather than `java.io.File` so the assertions stay in
 `commonTest`.
 

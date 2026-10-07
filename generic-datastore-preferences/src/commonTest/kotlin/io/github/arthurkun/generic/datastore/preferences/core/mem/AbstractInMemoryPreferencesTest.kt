@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.InMemoryPreferencesDataStore
+import io.github.arthurkun.generic.datastore.preferences.InMemoryPreferences
 import io.github.arthurkun.generic.datastore.preferences.core.data.SerializableObject
 import io.github.arthurkun.generic.datastore.preferences.core.data.TestEnum
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerAddress
@@ -671,5 +671,5 @@ abstract class AbstractInMemoryPreferencesTest {
 
     @OptIn(InternalGenericDatastoreApi::class)
     private fun createInMemoryBackedDatastore(): GenericPreferencesDatastore =
-        GenericPreferencesDatastore(datastore = InMemoryPreferencesDataStore())
+        GenericPreferencesDatastore(datastore = InMemoryPreferences())
 }
