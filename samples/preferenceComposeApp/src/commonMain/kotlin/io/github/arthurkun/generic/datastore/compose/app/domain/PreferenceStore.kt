@@ -51,6 +51,45 @@ class PreferenceStore(
         deserializer = { Animal.from(it) },
     )
 
+    /**
+     * Numeric-backed custom values. Unlike [customObject], the serialized form is a primitive,
+     * so each entry is stored under `intPreferencesKey`/`longPreferencesKey`/
+     * `floatPreferencesKey`/`doublePreferencesKey` instead of a string entry.
+     */
+    val fontScale = datastore.serializedAsInt(
+        key = "font_scale",
+        defaultValue = FontScale(percent = 100),
+        serializer = { it.percent },
+        deserializer = { FontScale(it) },
+    )
+
+    val sessionTimeout = datastore.serializedAsLong(
+        key = "session_timeout",
+        defaultValue = SessionTimeout(millis = 30_000L),
+        serializer = { it.millis },
+        deserializer = { SessionTimeout(it) },
+    )
+
+    val volume = datastore.serializedAsFloat(
+        key = "volume",
+        defaultValue = Volume(level = 0.5f),
+        serializer = { it.level },
+        deserializer = { Volume(it) },
+    )
+
+    val latitude = datastore.serializedAsDouble(
+        key = "latitude",
+        defaultValue = Latitude(degrees = 0.0),
+        serializer = { it.degrees },
+        deserializer = { Latitude(it) },
+    )
+
+    val nullableSessionTimeout = datastore.nullableSerializedAsLong(
+        key = "nullable_session_timeout",
+        serializer = { it.millis },
+        deserializer = { SessionTimeout(it) },
+    )
+
     val userProfile = datastore.kserialized(
         key = "user_profile",
         defaultValue = UserProfile(name = "John", age = 25),
@@ -150,6 +189,21 @@ class PreferenceStore(
             val nullableKserializedListPref = datastore.nullableKserializedList<UserProfile>(
                 key = "api_nullable_kserialized_list",
             )
+            val nullableSerializedAsIntPref = datastore.nullableSerializedAsInt(
+                key = "api_nullable_serialized_as_int",
+                serializer = { it.percent },
+                deserializer = { FontScale(it) },
+            )
+            val nullableSerializedAsFloatPref = datastore.nullableSerializedAsFloat(
+                key = "api_nullable_serialized_as_float",
+                serializer = { it.level },
+                deserializer = { Volume(it) },
+            )
+            val nullableSerializedAsDoublePref = datastore.nullableSerializedAsDouble(
+                key = "api_nullable_serialized_as_double",
+                serializer = { it.degrees },
+                deserializer = { Latitude(it) },
+            )
 
             floatPref.set(3.5f)
             doublePref.set(4.5)
@@ -170,6 +224,14 @@ class PreferenceStore(
             nullableKserializedPref.set(UserProfile("Lin", 31))
             nullableSerializedListPref.set(listOf(Animal.Dog))
             nullableKserializedListPref.set(listOf(UserProfile("Grace", 40)))
+            fontScale.set(FontScale(120))
+            sessionTimeout.set(SessionTimeout(60_000L))
+            volume.set(Volume(0.8f))
+            latitude.set(Latitude(14.5995))
+            nullableSessionTimeout.set(SessionTimeout(15_000L))
+            nullableSerializedAsIntPref.set(FontScale(90))
+            nullableSerializedAsFloatPref.set(Volume(0.25f))
+            nullableSerializedAsDoublePref.set(Latitude(-33.8688))
             num.set(12)
             bool.toggle()
             bool.toggle()
@@ -179,6 +241,23 @@ class PreferenceStore(
             prefBatch {
                 floatH = add(floatPref)
                 nullableStringH = add(nullableStringPref)
+                serializedAsInt(
+                    key = "api_batch_serialized_as_int",
+                    defaultValue = FontScale(100),
+                    serializer = { it.percent },
+                    deserializer = { FontScale(it) },
+                )
+                serializedAsLong(
+                    key = "api_batch_serialized_as_long",
+                    defaultValue = SessionTimeout(0L),
+                    serializer = { it.millis },
+                    deserializer = { SessionTimeout(it) },
+                )
+                nullableSerializedAsDouble(
+                    key = "api_batch_nullable_serialized_as_double",
+                    serializer = { it.degrees },
+                    deserializer = { Latitude(it) },
+                )
             }
             val floatHandle = requireNotNull(floatH)
             val nullableStringHandle = requireNotNull(nullableStringH)
