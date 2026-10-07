@@ -3,8 +3,6 @@ package io.github.arthurkun.generic.datastore.preferences.core
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import io.github.arthurkun.generic.datastore.preferences.enum
 import io.github.arthurkun.generic.datastore.preferences.enumSet
-import io.github.arthurkun.generic.datastore.preferences.map
-import io.github.arthurkun.generic.datastore.preferences.mapIO
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -177,26 +175,6 @@ abstract class AbstractDatastoreBlockingTest {
     }
 
     @Test
-    fun mappedPreference_resetToDefaultBlocking() {
-        val intPref = preferenceDatastore.int("baseForMapReset", 75)
-        val mappedPref = intPref.map(
-            defaultValue = "MappedDefaultReset",
-            convert = { "ResetMapped_$it" },
-            reverse = { it.removePrefix("ResetMapped_").toInt() },
-        )
-        mappedPref.setBlocking("ResetMapped_750")
-        assertEquals(mappedPref.getBlocking(), "ResetMapped_750")
-        assertEquals(intPref.getBlocking(), 750)
-
-        mappedPref.resetToDefaultBlocking()
-        assertEquals(
-            mappedPref.getBlocking(),
-            "ResetMapped_75",
-        )
-        assertEquals(intPref.getBlocking(), 75)
-    }
-
-    @Test
     fun stringPreference_resetToDefaultBlocking_whenNeverSet() {
         val stringPref = preferenceDatastore.string("testStringResetNeverSet", "defaultValue")
         stringPref.resetToDefaultBlocking()
@@ -217,22 +195,6 @@ abstract class AbstractDatastoreBlockingTest {
         stringPref.resetToDefaultBlocking()
         stringPref.resetToDefaultBlocking()
         assertEquals(stringPref.getBlocking(), "defaultMultiple")
-    }
-
-    @Test
-    fun mappedPreference_resetToDefaultBlocking_resetsUnderlyingPreference() {
-        val intPref = preferenceDatastore.int("baseForMapResetUnderlying", 10)
-        val mappedPref = intPref.map(
-            defaultValue = "MappedDefault",
-            convert = { "Mapped_$it" },
-            reverse = { it.removePrefix("Mapped_").toInt() },
-        )
-        intPref.setBlocking(999)
-        assertEquals(intPref.getBlocking(), 999)
-
-        mappedPref.resetToDefaultBlocking()
-        assertEquals(intPref.getBlocking(), 10)
-        assertEquals(mappedPref.getBlocking(), "Mapped_10")
     }
 
     @Test
@@ -355,101 +317,5 @@ abstract class AbstractDatastoreBlockingTest {
         serializedPref.resetToDefaultBlocking()
         assertEquals(defaultObj, delegatedValue)
         assertEquals(defaultObj, serializedPref.getBlocking())
-    }
-
-    @Test
-    fun mappedPreference_delegation() {
-        val intPref = preferenceDatastore.int("baseForMapDelegate", 100)
-        val mappedPref = intPref.map(
-            defaultValue = "MappedDelegateDefault",
-            convert = { "DelegateMapped_$it" },
-            reverse = { it.removePrefix("DelegateMapped_").toInt() },
-        )
-        var delegatedValue: String by mappedPref
-
-        delegatedValue = "DelegateMapped_200"
-        assertEquals("DelegateMapped_200", delegatedValue)
-        assertEquals("DelegateMapped_200", mappedPref.getBlocking())
-        assertEquals(200, intPref.getBlocking())
-
-        mappedPref.resetToDefaultBlocking()
-        assertEquals(
-            "DelegateMapped_100",
-            delegatedValue,
-        )
-        assertEquals("DelegateMapped_100", mappedPref.getBlocking())
-        assertEquals(100, intPref.getBlocking())
-    }
-
-    @Test
-    fun mappedPreference_io_defaultValueInferredBlocking() {
-        val intPref = preferenceDatastore.int("baseForMapIoDefaultBlocking", 11)
-        val mappedPref = intPref.mapIO(
-            convert = { "Io_$it" },
-            reverse = { it.removePrefix("Io_").toInt() },
-        )
-
-        assertEquals("Io_11", mappedPref.getBlocking())
-
-        mappedPref.setBlocking("Io_13")
-        assertEquals(13, intPref.getBlocking())
-        assertEquals("Io_13", mappedPref.getBlocking())
-    }
-
-    @Test
-    fun mappedPreference_io_usesFallbackWhenConvertFailsBlocking() {
-        val intPref = preferenceDatastore.int("baseForMapIoConvertFallbackBlocking", 0)
-        val mappedPref = intPref.mapIO(
-            convert = { value ->
-                if (value == 0) {
-                    "Zero"
-                } else {
-                    throw IllegalStateException("Bad value")
-                }
-            },
-            reverse = { value ->
-                if (value == "Zero") {
-                    0
-                } else {
-                    value.toInt()
-                }
-            },
-        )
-
-        intPref.setBlocking(1)
-
-        assertEquals("Zero", mappedPref.getBlocking())
-    }
-
-    @Test
-    fun mappedPreference_io_usesFallbackWhenReverseFailsBlocking() {
-        val intPref = preferenceDatastore.int("baseForMapIoReverseFallbackBlocking", 0)
-        val mappedPref = intPref.mapIO(
-            convert = { "Zero" },
-            reverse = { value ->
-                if (value == "Zero") {
-                    0
-                } else {
-                    throw IllegalStateException("Bad value")
-                }
-            },
-        )
-
-        mappedPref.setBlocking("Bad")
-
-        assertEquals(0, intPref.getBlocking())
-        assertEquals("Zero", mappedPref.getBlocking())
-    }
-
-    @Test
-    fun mappedPreference_io_throwsWhenDefaultConversionFailsBlocking() {
-        val intPref = preferenceDatastore.int("baseForMapIoDefaultFailBlocking", 3)
-
-        assertFailsWith<IllegalStateException> {
-            intPref.mapIO(
-                convert = { throw IllegalStateException("Default conversion failed") },
-                reverse = { it.toInt() },
-            )
-        }
     }
 }

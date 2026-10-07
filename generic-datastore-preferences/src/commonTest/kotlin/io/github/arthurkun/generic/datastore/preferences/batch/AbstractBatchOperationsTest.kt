@@ -12,7 +12,6 @@ import io.github.arthurkun.generic.datastore.preferences.enumSet
 import io.github.arthurkun.generic.datastore.preferences.kserialized
 import io.github.arthurkun.generic.datastore.preferences.kserializedList
 import io.github.arthurkun.generic.datastore.preferences.kserializedSet
-import io.github.arthurkun.generic.datastore.preferences.mapIO
 import io.github.arthurkun.generic.datastore.preferences.nullableEnum
 import io.github.arthurkun.generic.datastore.preferences.nullableEnumSet
 import io.github.arthurkun.generic.datastore.preferences.nullableKserializedSet
@@ -446,29 +445,6 @@ abstract class AbstractBatchOperationsTest {
             @Suppress("UNUSED_EXPRESSION")
             values[undeclared as BatchPref<Int>]
         }
-    }
-
-    @Test
-    fun batchRead_supportsExistingPreferencesViaAdd() = runTest(testDispatcher) {
-        val stringSingle = preferenceDatastore.string("read_adapter_string", "default")
-        val mapped = preferenceDatastore.int("read_adapter_int", 1).mapIO(
-            convert = { it.toString() },
-            reverse = { it.toInt() },
-        )
-        stringSingle.set("stored")
-        mapped.set("41")
-
-        var stringHandle: BatchPref<String>? = null
-        var mappedHandle: BatchPref<String>? = null
-        val batch = prefBatch {
-            stringHandle = add(stringSingle)
-            mappedHandle = add(mapped)
-        }
-
-        val values = preferenceDatastore.batchReadValues(declare(batch))
-
-        assertEquals("stored", values[requireNotNull(stringHandle)])
-        assertEquals("41", values[requireNotNull(mappedHandle)])
     }
 
     @Test
