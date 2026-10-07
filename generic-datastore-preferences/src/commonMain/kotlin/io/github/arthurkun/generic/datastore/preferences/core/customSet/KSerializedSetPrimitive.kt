@@ -1,27 +1,29 @@
-package io.github.arthurkun.generic.datastore.preferences.core.data.customSet
+package io.github.arthurkun.generic.datastore.preferences.core.customSet
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
 
 /**
- * [CustomSetGenericPreferenceItem] for a string-set-backed custom [Set] using caller-supplied
- * element serializers.
+ * [CustomSetGenericPreferenceItem] that stores each set element as JSON using
+ * kotlinx.serialization.
  */
-internal class SerializedSetPrimitive<T>(
+internal class KSerializedSetPrimitive<T>(
     datastore: DataStore<Preferences>,
     key: String,
     defaultValue: Set<T>,
-    serializer: (T) -> String,
-    deserializer: (String) -> T,
+    serializer: KSerializer<T>,
+    json: Json,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CustomSetGenericPreferenceItem<T>(
     datastore = datastore,
     key = key,
     defaultValue = defaultValue,
-    serializer = serializer,
-    deserializer = deserializer,
+    serializer = { json.encodeToString(serializer, it) },
+    deserializer = { json.decodeFromString(serializer, it) },
     ioDispatcher = ioDispatcher,
 )

@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.preferences.core.data.customSet
+package io.github.arthurkun.generic.datastore.preferences.core.custom
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -8,24 +8,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
 /**
- * [CustomSetGenericPreferenceItem] storing each enum constant of a [Set] by [Enum.name].
+ * [CustomGenericPreferenceItem] storing a single enum constant by [Enum.name].
  *
- * [enumValues] supplies the constants used to decode stored names; names that no longer match any
- * constant are skipped when the set is read.
+ * [enumValues] supplies the constants used to decode a stored name; names that no longer match any
+ * constant fall back to [defaultValue].
  */
-internal class EnumSetPrimitive<T : Enum<T>>(
+internal class EnumPrimitive<T : Enum<T>>(
     datastore: DataStore<Preferences>,
     key: String,
-    defaultValue: Set<T>,
+    defaultValue: T,
     enumValues: Array<T>,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : CustomSetGenericPreferenceItem<T>(
+) : CustomGenericPreferenceItem<T>(
     datastore = datastore,
     key = key,
     defaultValue = defaultValue,
     serializer = { it.name },
-    deserializer = { name ->
-        decodeEnum(enumValues, name)
-    },
+    deserializer = { name -> decodeEnum(enumValues, name) },
     ioDispatcher = ioDispatcher,
 )
