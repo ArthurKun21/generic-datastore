@@ -248,6 +248,211 @@ public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnumSet(
 ): Preference<Set<T>?> = nullableEnumSet(key = key, enumValues = enumValues())
 
 /**
+ * Creates a memory-backed Kotlin-serialization-backed preference, inferring the [KSerializer]
+ * from [T].
+ *
+ * Behaves exactly like [kserialized] except the value is stored in a process-local in-memory
+ * store: it is never persisted and is excluded from batch operations, backups, and
+ * [PreferencesDatastore.clearAll].
+ *
+ * @param T The type of the custom object.
+ * @param key The preference key.
+ * @param defaultValue The value returned when the key is missing or the stored payload cannot be decoded.
+ * @param json The [Json] configuration to use, or `null` to use the datastore default.
+ * @return A [Preference] instance for the in-memory custom object preference.
+ */
+public inline fun <reified T> PreferencesDatastore.kserializedInMemory(
+    key: String,
+    defaultValue: T,
+    json: Json? = null,
+): Preference<T> = kserializedInMemory(
+    key = key,
+    defaultValue = defaultValue,
+    serializer = serializer<T>(),
+    json = json,
+)
+
+/**
+ * Creates a memory-backed Kotlin-serialization-backed [Set] preference, inferring the
+ * [KSerializer] from [T].
+ *
+ * Behaves exactly like [kserializedSet] except the value is stored in a process-local
+ * in-memory store: it is never persisted and is excluded from batch operations, backups, and
+ * [PreferencesDatastore.clearAll].
+ *
+ * @param T The type of each element in the set.
+ * @param key The preference key.
+ * @param defaultValue The default value for the set (defaults to an empty set).
+ * @param json The [Json] configuration to use, or `null` to use the datastore default.
+ * @return A [Preference] instance for the in-memory Set preference.
+ */
+public inline fun <reified T> PreferencesDatastore.kserializedSetInMemory(
+    key: String,
+    defaultValue: Set<T> = emptySet(),
+    json: Json? = null,
+): Preference<Set<T>> = kserializedSetInMemory(
+    key = key,
+    defaultValue = defaultValue,
+    serializer = serializer<T>(),
+    json = json,
+)
+
+/**
+ * Creates a memory-backed Kotlin-serialization-backed [List] preference, inferring the
+ * [KSerializer] from [T].
+ *
+ * Behaves exactly like [kserializedList] except the value is stored in a process-local
+ * in-memory store: it is never persisted and is excluded from batch operations, backups, and
+ * [PreferencesDatastore.clearAll].
+ *
+ * @param T The type of each element in the list.
+ * @param key The preference key.
+ * @param defaultValue The default value for the list (defaults to an empty list).
+ * @param json The [Json] configuration to use, or `null` to use the datastore default.
+ * @return A [Preference] instance for the in-memory List preference.
+ */
+public inline fun <reified T> PreferencesDatastore.kserializedListInMemory(
+    key: String,
+    defaultValue: List<T> = emptyList(),
+    json: Json? = null,
+): Preference<List<T>> = kserializedListInMemory(
+    key = key,
+    defaultValue = defaultValue,
+    serializer = serializer<T>(),
+    json = json,
+)
+
+/**
+ * Creates a memory-backed nullable Kotlin-serialization-backed preference, inferring the
+ * [KSerializer] from [T].
+ *
+ * Behaves exactly like [nullableKserialized] except the value is stored in a process-local
+ * in-memory store: it is never persisted and is excluded from batch operations, backups, and
+ * [PreferencesDatastore.clearAll].
+ *
+ * @param T The non-null type of the custom object.
+ * @param key The preference key.
+ * @param json The [Json] configuration to use, or `null` to use the datastore default.
+ * @return A [Preference] instance for the in-memory nullable custom object preference.
+ */
+public inline fun <reified T : Any> PreferencesDatastore.nullableKserializedInMemory(
+    key: String,
+    json: Json? = null,
+): Preference<T?> = nullableKserializedInMemory(
+    key = key,
+    serializer = serializer<T>(),
+    json = json,
+)
+
+/**
+ * Creates a memory-backed nullable Kotlin-serialization-backed [List] preference, inferring
+ * the [KSerializer] from [T].
+ *
+ * Behaves exactly like [nullableKserializedList] except the value is stored in a process-local
+ * in-memory store: it is never persisted and is excluded from batch operations, backups, and
+ * [PreferencesDatastore.clearAll].
+ *
+ * @param T The type of each element in the list. Must be serializable using kotlinx.serialization.
+ * @param key The preference key.
+ * @param json The [Json] configuration to use, or `null` to use the datastore default.
+ * @return A [Preference] instance for the in-memory nullable List preference.
+ */
+public inline fun <reified T> PreferencesDatastore.nullableKserializedListInMemory(
+    key: String,
+    json: Json? = null,
+): Preference<List<T>?> = nullableKserializedListInMemory(
+    key = key,
+    serializer = serializer<T>(),
+    json = json,
+)
+
+/**
+ * Creates a memory-backed nullable Kotlin-serialization-backed [Set] preference, inferring the
+ * [KSerializer] from [T].
+ *
+ * Behaves exactly like [nullableKserializedSet] except the value is stored in a process-local
+ * in-memory store: it is never persisted and is excluded from batch operations, backups, and
+ * [PreferencesDatastore.clearAll].
+ *
+ * @param T The non-null type of each element in the set.
+ * @param key The preference key.
+ * @param json The [Json] configuration to use, or `null` to use the datastore default.
+ * @return A [Preference] instance for the in-memory nullable Set preference.
+ */
+public inline fun <reified T : Any> PreferencesDatastore.nullableKserializedSetInMemory(
+    key: String,
+    json: Json? = null,
+): Preference<Set<T>?> = nullableKserializedSetInMemory(key = key, serializer = serializer<T>(), json = json)
+
+/**
+ * Creates a memory-backed preference for storing a single enum constant by [Enum.name],
+ * inferring the enum constants from the reified type.
+ *
+ * Behaves exactly like [enum] except the value is stored in a process-local in-memory store:
+ * it is never persisted and is excluded from batch operations, backups, and
+ * [PreferencesDatastore.clearAll].
+ *
+ * @param T The enum type.
+ * @param key The preference key.
+ * @param defaultValue The enum value to use when the key is missing or cannot be decoded.
+ * @return A [Preference] instance for the in-memory enum preference.
+ */
+public inline fun <reified T : Enum<T>> PreferencesDatastore.enumInMemory(
+    key: String,
+    defaultValue: T,
+): Preference<T> = enumInMemory(key = key, defaultValue = defaultValue, enumValues = enumValues())
+
+/**
+ * Creates a memory-backed preference for storing a [Set] of enum constants by [Enum.name],
+ * inferring the enum constants from the reified type.
+ *
+ * Behaves exactly like [enumSet] except the value is stored in a process-local in-memory
+ * store: it is never persisted and is excluded from batch operations, backups, and
+ * [PreferencesDatastore.clearAll].
+ *
+ * @param T The enum type.
+ * @param key The preference key.
+ * @param defaultValue The default value for the set (defaults to an empty set).
+ * @return A [Preference] instance for the in-memory Set preference.
+ */
+public inline fun <reified T : Enum<T>> PreferencesDatastore.enumSetInMemory(
+    key: String,
+    defaultValue: Set<T> = emptySet(),
+): Preference<Set<T>> = enumSetInMemory(key = key, defaultValue = defaultValue, enumValues = enumValues())
+
+/**
+ * Creates a memory-backed nullable preference for storing a single enum constant by
+ * [Enum.name], inferring the enum constants from the reified type.
+ *
+ * Behaves exactly like [nullableEnum] except the value is stored in a process-local in-memory
+ * store: it is never persisted and is excluded from batch operations, backups, and
+ * [PreferencesDatastore.clearAll].
+ *
+ * @param T The enum type.
+ * @param key The preference key.
+ * @return A [Preference] instance for the in-memory nullable enum preference.
+ */
+public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnumInMemory(
+    key: String,
+): Preference<T?> = nullableEnumInMemory(key = key, enumValues = enumValues())
+
+/**
+ * Creates a memory-backed nullable preference for storing a [Set] of enum constants by
+ * [Enum.name], inferring the enum constants from the reified type.
+ *
+ * Behaves exactly like [nullableEnumSet] except the value is stored in a process-local
+ * in-memory store: it is never persisted and is excluded from batch operations, backups, and
+ * [PreferencesDatastore.clearAll].
+ *
+ * @param T The enum type.
+ * @param key The preference key.
+ * @return A [Preference] instance for the in-memory nullable Set preference.
+ */
+public inline fun <reified T : Enum<T>> PreferencesDatastore.nullableEnumSetInMemory(
+    key: String,
+): Preference<Set<T>?> = nullableEnumSetInMemory(key = key, enumValues = enumValues())
+
+/**
  * Converts this value into a [JsonElement] using the same loose conversion rules as the backup
  * import/export helpers.
  */
