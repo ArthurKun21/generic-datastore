@@ -1,8 +1,8 @@
-package io.github.arthurkun.generic.datastore.preferences.core.data.customSet
+package io.github.arthurkun.generic.datastore.preferences.core.customSet
 
 import io.github.arthurkun.generic.datastore.IosTestHelper
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.AbstractSerializedSetBlockingTest
+import io.github.arthurkun.generic.datastore.preferences.core.customSet.AbstractSerializedSetBlockingTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 

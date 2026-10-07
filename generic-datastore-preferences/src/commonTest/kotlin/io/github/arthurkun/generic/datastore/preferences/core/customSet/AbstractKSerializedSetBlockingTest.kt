@@ -1,8 +1,8 @@
-package io.github.arthurkun.generic.datastore.preferences.core.data.customSet
+package io.github.arthurkun.generic.datastore.preferences.core.customSet
 
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerAddress
-import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerUser
+import io.github.arthurkun.generic.datastore.preferences.core.custom.KSerAddress
+import io.github.arthurkun.generic.datastore.preferences.core.custom.KSerUser
 import io.github.arthurkun.generic.datastore.preferences.kserializedSet
 import kotlin.test.Test
 import kotlin.test.assertEquals

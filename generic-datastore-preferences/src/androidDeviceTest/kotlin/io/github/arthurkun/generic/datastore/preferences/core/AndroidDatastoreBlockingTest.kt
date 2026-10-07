@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.preferences.core.data
+package io.github.arthurkun.generic.datastore.preferences.core
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.arthurkun.generic.datastore.AndroidTestHelper

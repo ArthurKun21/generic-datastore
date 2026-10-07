@@ -1,8 +1,8 @@
-package io.github.arthurkun.generic.datastore.preferences.core.data.custom
+package io.github.arthurkun.generic.datastore.preferences.core.custom
 
 import io.github.arthurkun.generic.datastore.JvmTestHelper
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.core.data.custom.AbstractEnumBlockingTest
+import io.github.arthurkun.generic.datastore.preferences.core.custom.AbstractEnumBlockingTest
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.AfterTest

@@ -1,7 +1,7 @@
-package io.github.arthurkun.generic.datastore.preferences.optional.data.customSet
+package io.github.arthurkun.generic.datastore.preferences.optional.customSet
 
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.core.data.SerializableObject
+import io.github.arthurkun.generic.datastore.preferences.core.SerializableObject
 import io.github.arthurkun.generic.datastore.preferences.nullableEnum
 import io.github.arthurkun.generic.datastore.preferences.nullableEnumSet
 import kotlin.test.Test

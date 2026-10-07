@@ -1,8 +1,8 @@
-package io.github.arthurkun.generic.datastore.preferences.optional.data.customSet
+package io.github.arthurkun.generic.datastore.preferences.optional.customSet
 
 import io.github.arthurkun.generic.datastore.JvmTestHelper
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.optional.data.customSet.AbstractNullableSetBlockingTest
+import io.github.arthurkun.generic.datastore.preferences.optional.customSet.AbstractNullableSetBlockingTest
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.AfterTest

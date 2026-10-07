@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.preferences.optional.data.customSet
+package io.github.arthurkun.generic.datastore.preferences.optional.customSet
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -6,8 +6,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.core.data.SerializableObject
-import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerUser
+import io.github.arthurkun.generic.datastore.preferences.core.SerializableObject
+import io.github.arthurkun.generic.datastore.preferences.core.custom.KSerUser
 import io.github.arthurkun.generic.datastore.preferences.enumSet
 import io.github.arthurkun.generic.datastore.preferences.kserializedSet
 import io.github.arthurkun.generic.datastore.preferences.nullableEnum

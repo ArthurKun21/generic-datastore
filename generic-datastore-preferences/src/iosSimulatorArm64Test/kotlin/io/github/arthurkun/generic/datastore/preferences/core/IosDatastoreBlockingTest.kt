@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.preferences.core.data
+package io.github.arthurkun.generic.datastore.preferences.core
 
 import io.github.arthurkun.generic.datastore.IosTestHelper
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore

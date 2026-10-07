@@ -1,12 +1,12 @@
-package io.github.arthurkun.generic.datastore.preferences.core.data.customSet
+package io.github.arthurkun.generic.datastore.preferences.core.customSet
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerAddress
-import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerUser
+import io.github.arthurkun.generic.datastore.preferences.core.custom.KSerAddress
+import io.github.arthurkun.generic.datastore.preferences.core.custom.KSerUser
 import io.github.arthurkun.generic.datastore.preferences.kserializedSet
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel

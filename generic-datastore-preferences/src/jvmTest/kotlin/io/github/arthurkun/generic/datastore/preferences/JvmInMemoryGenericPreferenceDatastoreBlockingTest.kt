@@ -1,7 +1,6 @@
-package io.github.arthurkun.generic.datastore.preferences.core.mem
+package io.github.arthurkun.generic.datastore.preferences
 
 import io.github.arthurkun.generic.datastore.JvmTestHelper
-import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.AfterTest

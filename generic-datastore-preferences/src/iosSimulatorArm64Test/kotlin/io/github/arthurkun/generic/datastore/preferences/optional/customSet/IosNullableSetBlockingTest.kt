@@ -1,8 +1,8 @@
-package io.github.arthurkun.generic.datastore.preferences.optional.data.customSet
+package io.github.arthurkun.generic.datastore.preferences.optional.customSet
 
 import io.github.arthurkun.generic.datastore.IosTestHelper
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.optional.data.customSet.AbstractNullableSetBlockingTest
+import io.github.arthurkun.generic.datastore.preferences.optional.customSet.AbstractNullableSetBlockingTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 

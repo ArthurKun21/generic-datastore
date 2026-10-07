@@ -1,13 +1,12 @@
-package io.github.arthurkun.generic.datastore.preferences.core.mem
+package io.github.arthurkun.generic.datastore.preferences
 
 import io.github.arthurkun.generic.datastore.IosTestHelper
-import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 private const val TEST_IN_MEMORY_BLOCKING_DATASTORE_NAME = "test_in_memory_blocking"
 
-class IosInMemoryPreferencesBlockingTest : AbstractInMemoryGenericPreferenceDatastoreBlockingTest() {
+class IosInMemoryGenericPreferenceDatastoreBlockingTest : AbstractInMemoryGenericPreferenceDatastoreBlockingTest() {
 
     private val helper = IosTestHelper.blocking(TEST_IN_MEMORY_BLOCKING_DATASTORE_NAME)
 

@@ -1,19 +1,13 @@
-package io.github.arthurkun.generic.datastore.preferences.core.mem
+package io.github.arthurkun.generic.datastore.preferences
 
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
-import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.InMemoryGenericPreferenceDatastore
-import io.github.arthurkun.generic.datastore.preferences.core.data.SerializableObject
-import io.github.arthurkun.generic.datastore.preferences.core.data.TestEnum
-import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerAddress
-import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerUser
-import io.github.arthurkun.generic.datastore.preferences.kserializedInMemory
-import io.github.arthurkun.generic.datastore.preferences.map
-import io.github.arthurkun.generic.datastore.preferences.nullableKserializedInMemory
-import io.github.arthurkun.generic.datastore.preferences.toggle
+import io.github.arthurkun.generic.datastore.preferences.core.SerializableObject
+import io.github.arthurkun.generic.datastore.preferences.core.TestEnum
+import io.github.arthurkun.generic.datastore.preferences.core.custom.KSerAddress
+import io.github.arthurkun.generic.datastore.preferences.core.custom.KSerUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel

@@ -1,8 +1,7 @@
-package io.github.arthurkun.generic.datastore.preferences.core.mem
+package io.github.arthurkun.generic.datastore.preferences
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.arthurkun.generic.datastore.AndroidTestHelper
-import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.runner.RunWith
