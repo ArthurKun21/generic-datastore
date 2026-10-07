@@ -12,41 +12,38 @@ DataStore Preferences and Proto DataStore. The preferences implementation lives 
 - `:generic-datastore-preferences` – DataStore Preferences wrapper library.
     - `preferences/` – public contract and factories (`Preference`, `PreferenceApi`,
       `PreferencesDatastore`, `GenericPreferencesDatastore`, `CreatePreferencesDatastore`,
-      `PreferenceImpl`).
-    - `preferences/core/data/` – DataStore Preferences implementation for primitive types
+      `PreferenceImpl`) plus the in-memory storage for the `*InMemory` preference factories
+      (`InMemoryPreferencesDatastore`, the interface declaring every `*InMemory` factory that
+      `PreferencesDatastore` inherits, and `InMemoryGenericPreferenceDatastore`, a
+      `MutableStateFlow` + `Mutex` implementation of `DataStore<Preferences>`).
+    - `preferences/core/` – DataStore Preferences implementation for primitive types
       (`BooleanPrimitive`, `DoublePrimitive`, `FloatPrimitive`, `IntPrimitive`, `LongPrimitive`,
       `StringPrimitive`, `StringSetPrimitive`, `GenericPreferenceItem`).
-        - `preferences/core/data/custom/` – custom-serializer and enum types (`EnumPrimitive`,
+        - `preferences/core/custom/` – custom-serializer and enum types (`EnumPrimitive`,
           `KSerializedPrimitive`, `KSerializedListPrimitive`, `SerializedPrimitive`,
           `SerializedListPrimitive`, `CustomGenericPreferenceItem`).
-        - `preferences/core/data/customSet/` – set-based custom types (`EnumSetPrimitive`,
+        - `preferences/core/customSet/` – set-based custom types (`EnumSetPrimitive`,
           `KSerializedSetPrimitive`, `SerializedSetPrimitive`, `CustomSetGenericPreferenceItem`).
-    - `preferences/optional/data/` – nullable preference variants (`NullableBooleanPrimitive`,
+    - `preferences/optional/` – nullable preference variants (`NullableBooleanPrimitive`,
       `NullableDoublePrimitive`, `NullableFloatPrimitive`, `NullableIntPrimitive`,
       `NullableLongPrimitive`, `NullableStringPrimitive`, `NullableStringSetPrimitive`,
       `NullableGenericPreferenceItem`).
-        - `preferences/optional/data/custom/` – nullable custom types (`NullableEnumPrimitive`,
+        - `preferences/optional/custom/` – nullable custom types (`NullableEnumPrimitive`,
           `NullableKSerializedPrimitive`, `NullableKSerializedListPrimitive`,
           `NullableSerializedPrimitive`, `NullableSerializedListPrimitive`,
           `NullableCustomGenericPreferenceItem`).
-        - `preferences/optional/data/customSet/` – nullable custom-set types
+        - `preferences/optional/customSet/` – nullable custom-set types
           (`NullableEnumSetPrimitive`, `NullableKSerializedSetPrimitive`,
           `NullableSerializedSetPrimitive`, `NullableSetGenericPreferenceItem`).
-    - `preferences/core/mem/` – in-memory storage for the `*InMemory` preference factories
-      (`InMemoryGenericPreferenceDatastore`, a `MutableStateFlow` + `Mutex` implementation of
-      `DataStore<Preferences>`). Add new in-memory code here rather than under `data/`.
-    - `preferences/optional/mem/` – reserved for nullable-specific in-memory code. Currently empty
-      (only `.gitkeep`); add new in-memory code here rather than under `data/`.
-        - `preferences/batch/` – declarative batch DSL (`BatchPref`, `PrefBuilder`,
-          `PreferenceBatch`,
-          `BatchValues`, `BatchWriteScope`, `BatchUpdateScope`, `PreferencesAccessor`).
+    - `preferences/batch/` – declarative batch DSL (`BatchPref`, `PrefBuilder`,
+      `PreferenceBatch`, `BatchValues`, `BatchWriteScope`, `BatchUpdateScope`,
+      `PreferencesAccessor`).
     - `preferences/utils/` – preference utilities (`MappedPreference`, `Extensions`,
-      `Serialization`,
-      `Enums`).
-        - `preferences/backup/` – backup/restore support for preferences datastore
-          (`BackupPreference`,
-          `PreferenceBackupCreator`, `PreferenceBackupRestorer`, `BackupParsingException`,
-          `Migration` — loose JSON conversion helpers, not a migration type).
+      `Serialization`, `Enums`).
+    - `preferences/backup/` – backup/restore support for preferences datastore
+      (`BackupPreference`, `PreferenceBackupCreator`, `PreferenceBackupRestorer`,
+      `BackupParsingException`, `Migration` — loose JSON conversion helpers, not a migration
+      type).
 - `:generic-datastore-proto` – Proto DataStore support.
     - `proto/` – public contract and factories (`ProtoPreference`, `ProtoDatastore`, `ProtoApi`,
       `GenericProtoDatastore`, `CreateProtoDatastore`, `ProtoFieldPrefs`).
@@ -132,6 +129,18 @@ source sets:
 - `jvmTest` — JVM tests (platform-specific only)
 - `iosSimulatorArm64Test` — iOS simulator tests (platform-specific only, requires macOS)
 
+### Test package layout
+
+Every test source set mirrors the package tree of the `commonMain` source set it tests. A test for
+`commonMain/.../preferences/core/custom/EnumPrimitive.kt` lives in
+`commonTest/.../preferences/core/custom/` (package `…preferences.core.custom`), and the same holds
+for `androidDeviceTest`, `jvmTest`, and `iosSimulatorArm64Test` — the directory tree and the
+`package` declaration must always agree.
+
+The in-memory preference tests are the one place that does not have a `core/` or `optional/`
+sub-package: their subject (`InMemoryPreferencesDatastore`, `InMemoryGenericPreferenceDatastore`)
+lives in the root `preferences` package, so the tests live in `commonTest/.../preferences/`.
+
 ### Abstract test class pattern
 
 Tests use an abstract base class pattern to avoid duplicating test logic across platforms. Shared
@@ -191,14 +200,14 @@ non-nullable ones (key stays present). This asymmetry is intentional and asserte
 ### In-memory preference types
 
 `PreferencesDatastore` exposes an `InMemory` twin for every factory (`stringInMemory`,
-`nullableEnumSetInMemory`, …). They are interface members, and each constructs the **same internal
-primitive class** as its disk counterpart but passes the wrapper-owned
-`InMemoryGenericPreferenceDatastore` (`preferences/core/mem/`) instead of the file-backed store —
-there are no per-type in-memory classes. `InMemoryGenericPreferenceDatastore` is a
-`MutableStateFlow<Preferences>`
-
-+ `Mutex` implementation of `DataStore<Preferences>`; all existing read/write/serialization logic
-  operates on it unchanged, so decode-failure and null-handling rules carry over for free.
+`nullableEnumSetInMemory`, …). They are interface members declared on
+`InMemoryPreferencesDatastore` (root `preferences` package, which `PreferencesDatastore` extends),
+and each constructs the **same internal primitive class** as its disk counterpart but passes the
+wrapper-owned `InMemoryGenericPreferenceDatastore` (also root `preferences` package) instead of the
+file-backed store — there are no per-type in-memory classes. `InMemoryGenericPreferenceDatastore`
+is a `MutableStateFlow<Preferences>` + `Mutex` implementation of `DataStore<Preferences>`; all
+existing read/write/serialization logic operates on it unchanged, so decode-failure and
+null-handling rules carry over for free.
 
 Semantics to preserve when touching this code:
 
@@ -216,10 +225,10 @@ Semantics to preserve when touching this code:
 - `PrefBuilder` deliberately has no `*InMemory` declaration functions; `add(pref)` is the only way
   an existing preference can join a batch, and the guard rejects in-memory preferences there.
 - Tests: `AbstractInMemoryGenericPreferenceDatastoreTest` /
-  `AbstractInMemoryGenericPreferenceDatastoreBlockingTest`
-  in
-  `commonTest/preferences/core/mem/` cover every factory plus the isolation/exclusion rules; raw
-  in-memory values can be seeded in tests via `preferenceDatastore.inMemoryDatastore`.
+  `AbstractInMemoryGenericPreferenceDatastoreBlockingTest` in `commonTest/preferences/`
+  (root package, mirroring the in-memory source location) plus `InMemoryGenericPreferenceDatastoreTest`
+  for the store itself cover every factory plus the isolation/exclusion rules; raw in-memory
+  values can be seeded in tests via `preferenceDatastore.inMemoryDatastore`.
 
 ### Separating blocking and suspending tests
 
