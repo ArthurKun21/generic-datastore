@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.preferences.core.mem
+package io.github.arthurkun.generic.datastore.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -18,7 +18,7 @@ import kotlinx.coroutines.sync.withLock
  * that throws propagates the exception and leaves the stored state unchanged.
  *
  * Nothing is ever persisted: values live for as long as the owning
- * [io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore] instance.
+ * [GenericPreferencesDatastore] instance.
  * Used by the `*InMemory` preference factories; the file-backed primitive classes operate on
  * it unchanged.
  *

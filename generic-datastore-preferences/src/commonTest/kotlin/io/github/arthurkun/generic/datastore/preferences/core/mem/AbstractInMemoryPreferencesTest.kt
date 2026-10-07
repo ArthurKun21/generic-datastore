@@ -1,18 +1,17 @@
 package io.github.arthurkun.generic.datastore.preferences.core.mem
 
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
+import io.github.arthurkun.generic.datastore.preferences.InMemoryPreferencesDataStore
 import io.github.arthurkun.generic.datastore.preferences.core.data.SerializableObject
 import io.github.arthurkun.generic.datastore.preferences.core.data.TestEnum
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerAddress
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerUser
 import io.github.arthurkun.generic.datastore.preferences.kserializedInMemory
 import io.github.arthurkun.generic.datastore.preferences.map
-import io.github.arthurkun.generic.datastore.preferences.nullableEnumInMemory
 import io.github.arthurkun.generic.datastore.preferences.nullableKserializedInMemory
 import io.github.arthurkun.generic.datastore.preferences.toggle
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +26,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 /**
  * Shared suite for the `*InMemory` preference factories. Platform subclasses only supply a

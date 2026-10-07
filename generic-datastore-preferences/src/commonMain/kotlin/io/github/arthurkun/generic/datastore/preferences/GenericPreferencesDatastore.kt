@@ -38,7 +38,6 @@ import io.github.arthurkun.generic.datastore.preferences.core.data.custom.Serial
 import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.EnumSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.KSerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.data.customSet.SerializedSetPrimitive
-import io.github.arthurkun.generic.datastore.preferences.core.mem.InMemoryPreferencesDataStore
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableBooleanPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableDoublePrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableFloatPrimitive
