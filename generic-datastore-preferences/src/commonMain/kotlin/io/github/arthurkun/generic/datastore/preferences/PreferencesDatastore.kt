@@ -190,6 +190,91 @@ public interface PreferencesDatastore : InMemoryPreferencesDatastore, AutoClosea
     ): Preference<T>
 
     /**
+     * Creates a preference for a custom object stored as a single [Int] primitive entry using
+     * caller-supplied serializers.
+     *
+     * Behaves like [serialized] but stores the serialized form under an `intPreferencesKey`
+     * instead of a string entry, avoiding the string round-trip for values that are naturally
+     * numeric. Missing keys and decode failures fall back to [defaultValue].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value returned when the key is missing or the stored value cannot be decoded.
+     * @param serializer Converts the object to its stored [Int] representation.
+     * @param deserializer Converts a stored [Int] back to the object.
+     * @return A [Preference] instance for the custom object preference.
+     */
+    public fun <T> serializedAsInt(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Int,
+        deserializer: (Int) -> T,
+    ): Preference<T>
+
+    /**
+     * Creates a preference for a custom object stored as a single [Long] primitive entry using
+     * caller-supplied serializers.
+     *
+     * Behaves like [serialized] but stores the serialized form under a `longPreferencesKey`
+     * instead of a string entry. Missing keys and decode failures fall back to [defaultValue].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value returned when the key is missing or the stored value cannot be decoded.
+     * @param serializer Converts the object to its stored [Long] representation.
+     * @param deserializer Converts a stored [Long] back to the object.
+     * @return A [Preference] instance for the custom object preference.
+     */
+    public fun <T> serializedAsLong(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Long,
+        deserializer: (Long) -> T,
+    ): Preference<T>
+
+    /**
+     * Creates a preference for a custom object stored as a single [Float] primitive entry using
+     * caller-supplied serializers.
+     *
+     * Behaves like [serialized] but stores the serialized form under a `floatPreferencesKey`
+     * instead of a string entry. Missing keys and decode failures fall back to [defaultValue].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value returned when the key is missing or the stored value cannot be decoded.
+     * @param serializer Converts the object to its stored [Float] representation.
+     * @param deserializer Converts a stored [Float] back to the object.
+     * @return A [Preference] instance for the custom object preference.
+     */
+    public fun <T> serializedAsFloat(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Float,
+        deserializer: (Float) -> T,
+    ): Preference<T>
+
+    /**
+     * Creates a preference for a custom object stored as a single [Double] primitive entry using
+     * caller-supplied serializers.
+     *
+     * Behaves like [serialized] but stores the serialized form under a `doublePreferencesKey`
+     * instead of a string entry. Missing keys and decode failures fall back to [defaultValue].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value returned when the key is missing or the stored value cannot be decoded.
+     * @param serializer Converts the object to its stored [Double] representation.
+     * @param deserializer Converts a stored [Double] back to the object.
+     * @return A [Preference] instance for the custom object preference.
+     */
+    public fun <T> serializedAsDouble(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Double,
+        deserializer: (Double) -> T,
+    ): Preference<T>
+
+    /**
      * Creates a preference for a [Set] of custom objects, stored using a string set preference key.
      * Each element is individually serialized to and deserialized from a String.
      *
@@ -352,6 +437,82 @@ public interface PreferencesDatastore : InMemoryPreferencesDatastore, AutoClosea
         key: String,
         serializer: (T) -> String,
         deserializer: (String) -> T,
+    ): Preference<T?>
+
+    /**
+     * Creates a nullable preference for a custom object stored as a single [Int] primitive entry
+     * using caller-supplied serializers.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key. If
+     * deserialization fails, `null` is returned.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts the object to its stored [Int] representation.
+     * @param deserializer Converts a stored [Int] back to the object.
+     * @return A [Preference] instance for the nullable custom object preference.
+     */
+    public fun <T : Any> nullableSerializedAsInt(
+        key: String,
+        serializer: (T) -> Int,
+        deserializer: (Int) -> T,
+    ): Preference<T?>
+
+    /**
+     * Creates a nullable preference for a custom object stored as a single [Long] primitive entry
+     * using caller-supplied serializers.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key. If
+     * deserialization fails, `null` is returned.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts the object to its stored [Long] representation.
+     * @param deserializer Converts a stored [Long] back to the object.
+     * @return A [Preference] instance for the nullable custom object preference.
+     */
+    public fun <T : Any> nullableSerializedAsLong(
+        key: String,
+        serializer: (T) -> Long,
+        deserializer: (Long) -> T,
+    ): Preference<T?>
+
+    /**
+     * Creates a nullable preference for a custom object stored as a single [Float] primitive entry
+     * using caller-supplied serializers.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key. If
+     * deserialization fails, `null` is returned.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts the object to its stored [Float] representation.
+     * @param deserializer Converts a stored [Float] back to the object.
+     * @return A [Preference] instance for the nullable custom object preference.
+     */
+    public fun <T : Any> nullableSerializedAsFloat(
+        key: String,
+        serializer: (T) -> Float,
+        deserializer: (Float) -> T,
+    ): Preference<T?>
+
+    /**
+     * Creates a nullable preference for a custom object stored as a single [Double] primitive entry
+     * using caller-supplied serializers.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key. If
+     * deserialization fails, `null` is returned.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts the object to its stored [Double] representation.
+     * @param deserializer Converts a stored [Double] back to the object.
+     * @return A [Preference] instance for the nullable custom object preference.
+     */
+    public fun <T : Any> nullableSerializedAsDouble(
+        key: String,
+        serializer: (T) -> Double,
+        deserializer: (Double) -> T,
     ): Preference<T?>
 
     /**

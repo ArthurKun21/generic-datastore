@@ -21,6 +21,11 @@ class MainViewModel(
     val num = preferenceStore.num
     val bool = preferenceStore.bool
     val customObject = preferenceStore.customObject
+    val fontScale = preferenceStore.fontScale
+    val sessionTimeout = preferenceStore.sessionTimeout
+    val volume = preferenceStore.volume
+    val latitude = preferenceStore.latitude
+    val nullableSessionTimeout = preferenceStore.nullableSessionTimeout
     val userProfile = preferenceStore.userProfile
     val animalSet = preferenceStore.animalSet
     val theme = preferenceStore.theme
@@ -53,6 +58,14 @@ class MainViewModel(
 
     fun resetUserProfile() {
         viewModelScope.launch { preferenceStore.userProfile.resetToDefault() }
+    }
+
+    fun resetNumericSettings() = viewModelScope.launch {
+        preferenceStore.fontScale.resetToDefault()
+        preferenceStore.sessionTimeout.resetToDefault()
+        preferenceStore.volume.resetToDefault()
+        preferenceStore.latitude.resetToDefault()
+        preferenceStore.nullableSessionTimeout.resetToDefault()
     }
 
     fun resetUserProfileSet() {

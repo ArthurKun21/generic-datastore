@@ -238,6 +238,94 @@ public interface InMemoryPreferencesDatastore {
     ): Preference<T>
 
     /**
+     * Creates a memory-backed preference for a custom object stored as a single [Int] primitive
+     * entry using caller-supplied serializers.
+     *
+     * Behaves exactly like [PreferencesDatastore.serializedAsInt] except the value is stored in a
+     * process-local in-memory store: it is never persisted and is excluded from batch operations,
+     * backups, and [PreferencesDatastore.clearAll].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value returned when the key is missing or the stored value cannot be decoded.
+     * @param serializer Converts the object to its stored [Int] representation.
+     * @param deserializer Converts a stored [Int] back to the object.
+     * @return A [Preference] instance for the in-memory custom object preference.
+     */
+    public fun <T> serializedAsIntInMemory(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Int,
+        deserializer: (Int) -> T,
+    ): Preference<T>
+
+    /**
+     * Creates a memory-backed preference for a custom object stored as a single [Long] primitive
+     * entry using caller-supplied serializers.
+     *
+     * Behaves exactly like [PreferencesDatastore.serializedAsLong] except the value is stored in a
+     * process-local in-memory store: it is never persisted and is excluded from batch operations,
+     * backups, and [PreferencesDatastore.clearAll].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value returned when the key is missing or the stored value cannot be decoded.
+     * @param serializer Converts the object to its stored [Long] representation.
+     * @param deserializer Converts a stored [Long] back to the object.
+     * @return A [Preference] instance for the in-memory custom object preference.
+     */
+    public fun <T> serializedAsLongInMemory(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Long,
+        deserializer: (Long) -> T,
+    ): Preference<T>
+
+    /**
+     * Creates a memory-backed preference for a custom object stored as a single [Float] primitive
+     * entry using caller-supplied serializers.
+     *
+     * Behaves exactly like [PreferencesDatastore.serializedAsFloat] except the value is stored in a
+     * process-local in-memory store: it is never persisted and is excluded from batch operations,
+     * backups, and [PreferencesDatastore.clearAll].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value returned when the key is missing or the stored value cannot be decoded.
+     * @param serializer Converts the object to its stored [Float] representation.
+     * @param deserializer Converts a stored [Float] back to the object.
+     * @return A [Preference] instance for the in-memory custom object preference.
+     */
+    public fun <T> serializedAsFloatInMemory(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Float,
+        deserializer: (Float) -> T,
+    ): Preference<T>
+
+    /**
+     * Creates a memory-backed preference for a custom object stored as a single [Double] primitive
+     * entry using caller-supplied serializers.
+     *
+     * Behaves exactly like [PreferencesDatastore.serializedAsDouble] except the value is stored in
+     * a process-local in-memory store: it is never persisted and is excluded from batch
+     * operations, backups, and [PreferencesDatastore.clearAll].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value returned when the key is missing or the stored value cannot be decoded.
+     * @param serializer Converts the object to its stored [Double] representation.
+     * @param deserializer Converts a stored [Double] back to the object.
+     * @return A [Preference] instance for the in-memory custom object preference.
+     */
+    public fun <T> serializedAsDoubleInMemory(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Double,
+        deserializer: (Double) -> T,
+    ): Preference<T>
+
+    /**
      * Creates a memory-backed preference for a [Set] of custom objects, stored using a string
      * set preference key.
      *
@@ -368,6 +456,86 @@ public interface InMemoryPreferencesDatastore {
         key: String,
         serializer: (T) -> String,
         deserializer: (String) -> T,
+    ): Preference<T?>
+
+    /**
+     * Creates a memory-backed nullable preference for a custom object stored as a single [Int]
+     * primitive entry using caller-supplied serializers.
+     *
+     * Behaves exactly like [PreferencesDatastore.nullableSerializedAsInt] except the value is
+     * stored in a process-local in-memory store: it is never persisted and is excluded from batch
+     * operations, backups, and [PreferencesDatastore.clearAll].
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts the object to its stored [Int] representation.
+     * @param deserializer Converts a stored [Int] back to the object.
+     * @return A [Preference] instance for the in-memory nullable custom object preference.
+     */
+    public fun <T : Any> nullableSerializedAsIntInMemory(
+        key: String,
+        serializer: (T) -> Int,
+        deserializer: (Int) -> T,
+    ): Preference<T?>
+
+    /**
+     * Creates a memory-backed nullable preference for a custom object stored as a single [Long]
+     * primitive entry using caller-supplied serializers.
+     *
+     * Behaves exactly like [PreferencesDatastore.nullableSerializedAsLong] except the value is
+     * stored in a process-local in-memory store: it is never persisted and is excluded from batch
+     * operations, backups, and [PreferencesDatastore.clearAll].
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts the object to its stored [Long] representation.
+     * @param deserializer Converts a stored [Long] back to the object.
+     * @return A [Preference] instance for the in-memory nullable custom object preference.
+     */
+    public fun <T : Any> nullableSerializedAsLongInMemory(
+        key: String,
+        serializer: (T) -> Long,
+        deserializer: (Long) -> T,
+    ): Preference<T?>
+
+    /**
+     * Creates a memory-backed nullable preference for a custom object stored as a single [Float]
+     * primitive entry using caller-supplied serializers.
+     *
+     * Behaves exactly like [PreferencesDatastore.nullableSerializedAsFloat] except the value is
+     * stored in a process-local in-memory store: it is never persisted and is excluded from batch
+     * operations, backups, and [PreferencesDatastore.clearAll].
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts the object to its stored [Float] representation.
+     * @param deserializer Converts a stored [Float] back to the object.
+     * @return A [Preference] instance for the in-memory nullable custom object preference.
+     */
+    public fun <T : Any> nullableSerializedAsFloatInMemory(
+        key: String,
+        serializer: (T) -> Float,
+        deserializer: (Float) -> T,
+    ): Preference<T?>
+
+    /**
+     * Creates a memory-backed nullable preference for a custom object stored as a single [Double]
+     * primitive entry using caller-supplied serializers.
+     *
+     * Behaves exactly like [PreferencesDatastore.nullableSerializedAsDouble] except the value is
+     * stored in a process-local in-memory store: it is never persisted and is excluded from batch
+     * operations, backups, and [PreferencesDatastore.clearAll].
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts the object to its stored [Double] representation.
+     * @param deserializer Converts a stored [Double] back to the object.
+     * @return A [Preference] instance for the in-memory nullable custom object preference.
+     */
+    public fun <T : Any> nullableSerializedAsDoubleInMemory(
+        key: String,
+        serializer: (T) -> Double,
+        deserializer: (Double) -> T,
     ): Preference<T?>
 
     /**

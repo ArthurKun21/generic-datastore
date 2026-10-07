@@ -2,6 +2,7 @@ package io.github.arthurkun.generic.datastore.preferences.optional.custom
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.preferences.utils.decodeEnum
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -18,9 +19,10 @@ internal class NullableEnumPrimitive<T : Enum<T>>(
     key: String,
     enumValues: Array<T>,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : NullableCustomGenericPreferenceItem<T>(
+) : NullableCustomGenericPreferenceItem<T, String>(
     datastore = datastore,
     key = key,
+    preferences = stringPreferencesKey(key),
     serializer = { it.name },
     deserializer = { name ->
         decodeEnum(enumValues, name)

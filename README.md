@@ -189,6 +189,7 @@ Current Preferences API surface:
 | Lists | `stringList`, `nullableStringList` |
 | Nullable primitives | `nullableString`, `nullableStringSet`, `nullableInt`, `nullableLong`, `nullableFloat`, `nullableDouble`, `nullableBool` |
 | Custom values | `serialized`, `serializedSet`, `serializedList`, `nullableSerialized`, `nullableSerializedList` |
+| Custom values (numeric storage) | `serializedAsInt`, `serializedAsLong`, `serializedAsFloat`, `serializedAsDouble`, `nullableSerializedAsInt`, `nullableSerializedAsLong`, `nullableSerializedAsFloat`, `nullableSerializedAsDouble` |
 | Kotlin Serialization | `kserialized`, `kserializedSet`, `kserializedList`, `nullableKserialized`, `nullableKserializedList` |
 | Nullable sets | `nullableSerializedSet`, `nullableKserializedSet`, `nullableEnumSet` |
 | Enum helpers | `enum`, `enumSet`, `nullableEnum`, `nullableEnumSet` |
@@ -262,6 +263,42 @@ val animalPref = datastore.serialized(
     deserializer = { Animal.from(it) },
 )
 ```
+
+### Numeric-Backed Custom Objects
+
+`serialized` stores the serialized form in a string entry. When the serialized form is naturally
+numeric, use the `serializedAs*` variants to store it under the matching primitive key instead:
+
+```kotlin
+@JvmInline
+value class UserId(val value: Int)
+
+data class Ratio(val value: Double)
+
+val userIdPref: Preference<UserId> = datastore.serializedAsInt(
+    key = "user_id",
+    defaultValue = UserId(0),
+    serializer = { it.value },
+    deserializer = { UserId(it) },
+)
+
+val ratioPref: Preference<Ratio> = datastore.serializedAsDouble(
+    key = "ratio",
+    defaultValue = Ratio(0.0),
+    serializer = { it.value },
+    deserializer = { Ratio(it) },
+)
+```
+
+`serializedAsInt`, `serializedAsLong`, `serializedAsFloat`, and `serializedAsDouble` behave
+exactly like `serialized`, except the serialized value is stored with `intPreferencesKey`,
+`longPreferencesKey`, `floatPreferencesKey`, or `doublePreferencesKey` respectively. Missing keys
+and decode failures fall back to the default value, and the `nullableSerializedAs*` variants
+return `null` when the key is missing or decoding fails (writing `null` removes the key).
+
+> DataStore Preferences matches keys by name, so do not reuse the same key across different
+> storage kinds (for example, a `serialized` string entry and a `serializedAsInt` entry with the
+> same name).
 
 ### Kotlin Serialization (`kserialized`)
 
@@ -672,9 +709,11 @@ class SettingsStore(
 
 Declaration functions exist for every preference type: `int`, `long`, `float`, `double`, `bool`,
 `string`, `stringSet`, `stringList`, their `nullable*` variants, `serialized`, `serializedSet`,
-`serializedList`, `kserialized`, `kserializedSet`, `kserializedList` (with reified overloads that
-infer the `KSerializer`), their nullable custom variants (including `nullableSerializedSet` and
-`nullableKserializedSet`), and `enum`, `enumSet`, `nullableEnum`, `nullableEnumSet`.
+`serializedList`, `serializedAsInt`, `serializedAsLong`, `serializedAsFloat`, `serializedAsDouble`,
+`kserialized`, `kserializedSet`, `kserializedList` (with reified overloads that infer the
+`KSerializer`), their nullable custom variants (including `nullableSerializedSet`,
+`nullableKserializedSet`, and the `nullableSerializedAs*` numeric variants), and `enum`, `enumSet`,
+`nullableEnum`, `nullableEnumSet`.
 Keys must be unique and non-blank inside a batch (`IllegalArgumentException` otherwise).
 
 A previously declared `BatchPref` handle can be re-registered with `add(handle)`. Handles compare

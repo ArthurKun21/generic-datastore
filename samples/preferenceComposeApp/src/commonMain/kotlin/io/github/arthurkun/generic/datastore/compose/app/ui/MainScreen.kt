@@ -34,8 +34,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.arthurkun.generic.datastore.batch.rememberPreferences
 import io.github.arthurkun.generic.datastore.compose.app.domain.Animal
+import io.github.arthurkun.generic.datastore.compose.app.domain.FontScale
+import io.github.arthurkun.generic.datastore.compose.app.domain.Latitude
+import io.github.arthurkun.generic.datastore.compose.app.domain.SessionTimeout
 import io.github.arthurkun.generic.datastore.compose.app.domain.Theme
 import io.github.arthurkun.generic.datastore.compose.app.domain.UserProfile
+import io.github.arthurkun.generic.datastore.compose.app.domain.Volume
 import io.github.arthurkun.generic.datastore.remember
 import io.github.arthurkun.generic.datastore.utils.collectAsStatePlatform
 
@@ -48,6 +52,11 @@ fun MainScreen(
     var num by viewModel.num.remember()
     var bool by viewModel.bool.remember()
     var animal by viewModel.customObject.remember()
+    var fontScale by viewModel.fontScale.remember()
+    var sessionTimeout by viewModel.sessionTimeout.remember()
+    var volume by viewModel.volume.remember()
+    var latitude by viewModel.latitude.remember()
+    var nullableSessionTimeout by viewModel.nullableSessionTimeout.remember()
     var userProfile by viewModel.userProfile.remember()
     var userProfileSet by viewModel.userProfileSet.remember()
     var animalSet by viewModel.animalSet.remember()
@@ -141,6 +150,26 @@ fun MainScreen(
                     animal = animal,
                     onAnimalChange = { animal = it },
                     onReset = { viewModel.resetCustomObject() },
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            item {
+                SerializedAsPrimitivesSection(
+                    fontScale = fontScale,
+                    onFontScaleChange = { fontScale = it },
+                    sessionTimeout = sessionTimeout,
+                    onSessionTimeoutChange = { sessionTimeout = it },
+                    nullableSessionTimeout = nullableSessionTimeout,
+                    onNullableSessionTimeoutChange = { nullableSessionTimeout = it },
+                    volume = volume,
+                    onVolumeChange = { volume = it },
+                    latitude = latitude,
+                    onLatitudeChange = { latitude = it },
+                    onReset = { viewModel.resetNumericSettings() },
                 )
             }
             item {
@@ -424,6 +453,113 @@ private fun KSerializedSection(
         TextButton(onClick = onReset) {
             Text("Reset to Default")
         }
+    }
+}
+
+@Composable
+private fun SerializedAsPrimitivesSection(
+    fontScale: FontScale,
+    onFontScaleChange: (FontScale) -> Unit,
+    sessionTimeout: SessionTimeout,
+    onSessionTimeoutChange: (SessionTimeout) -> Unit,
+    nullableSessionTimeout: SessionTimeout?,
+    onNullableSessionTimeoutChange: (SessionTimeout?) -> Unit,
+    volume: Volume,
+    onVolumeChange: (Volume) -> Unit,
+    latitude: Latitude,
+    onLatitudeChange: (Latitude) -> Unit,
+    onReset: () -> Unit,
+) {
+    Column {
+        Text(
+            "Serialized as Primitives",
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        Text(
+            "Custom values stored under int/long/float/double keys instead of a string entry.",
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+        StepperRow(
+            label = "serializedAsInt · FontScale (%)",
+            value = "${fontScale.percent}",
+            onDecrement = { onFontScaleChange(FontScale(fontScale.percent - 10)) },
+            onIncrement = { onFontScaleChange(FontScale(fontScale.percent + 10)) },
+        )
+        StepperRow(
+            label = "serializedAsLong · SessionTimeout (ms)",
+            value = "${sessionTimeout.millis}",
+            onDecrement = { onSessionTimeoutChange(SessionTimeout(sessionTimeout.millis - 5_000L)) },
+            onIncrement = { onSessionTimeoutChange(SessionTimeout(sessionTimeout.millis + 5_000L)) },
+        )
+        Text(
+            "nullableSerializedAsLong · ${nullableSessionTimeout?.millis ?: "null"}",
+            modifier = Modifier.padding(top = 8.dp),
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Button(
+                onClick = { onNullableSessionTimeoutChange(SessionTimeout(15_000L)) },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text("Set 15000")
+            }
+            Button(
+                onClick = { onNullableSessionTimeoutChange(null) },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text("Clear")
+            }
+        }
+        StepperRow(
+            label = "serializedAsFloat · Volume",
+            value = "${volume.level}",
+            onDecrement = { onVolumeChange(Volume(volume.level - 0.1f)) },
+            onIncrement = { onVolumeChange(Volume(volume.level + 0.1f)) },
+        )
+        StepperRow(
+            label = "serializedAsDouble · Latitude (°)",
+            value = "${latitude.degrees}",
+            onDecrement = { onLatitudeChange(Latitude(latitude.degrees - 0.5)) },
+            onIncrement = { onLatitudeChange(Latitude(latitude.degrees + 0.5)) },
+        )
+        TextButton(onClick = onReset) {
+            Text("Reset to Default")
+        }
+    }
+}
+
+@Composable
+private fun StepperRow(
+    label: String,
+    value: String,
+    onDecrement: () -> Unit,
+    onIncrement: () -> Unit,
+) {
+    Column {
+        Text(label)
+        ListItem(
+            headlineContent = {
+                Text(
+                    value,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                )
+            },
+            leadingContent = {
+                Button(onClick = onDecrement) {
+                    Icon(Icons.Default.Remove, contentDescription = "Decrement $label")
+                }
+            },
+            trailingContent = {
+                Button(onClick = onIncrement) {
+                    Icon(Icons.Default.Add, contentDescription = "Increment $label")
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 

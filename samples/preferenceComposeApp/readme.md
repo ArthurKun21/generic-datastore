@@ -42,9 +42,60 @@ class PreferenceStore(
         deserializer = { Animal.from(it) },
     )
 
+    // Custom values whose serialized form is a primitive are stored under int/long/float/double
+    // keys instead of a string entry.
+    val fontScale = datastore.serializedAsInt(
+        key = "font_scale",
+        defaultValue = FontScale(percent = 100),
+        serializer = { it.percent },
+        deserializer = { FontScale(it) },
+    )
+
+    val sessionTimeout = datastore.serializedAsLong(
+        key = "session_timeout",
+        defaultValue = SessionTimeout(millis = 30_000L),
+        serializer = { it.millis },
+        deserializer = { SessionTimeout(it) },
+    )
+
+    val volume = datastore.serializedAsFloat(
+        key = "volume",
+        defaultValue = Volume(level = 0.5f),
+        serializer = { it.level },
+        deserializer = { Volume(it) },
+    )
+
+    val latitude = datastore.serializedAsDouble(
+        key = "latitude",
+        defaultValue = Latitude(degrees = 0.0),
+        serializer = { it.degrees },
+        deserializer = { Latitude(it) },
+    )
+
+    val nullableSessionTimeout = datastore.nullableSerializedAsLong(
+        key = "nullable_session_timeout",
+        serializer = { it.millis },
+        deserializer = { SessionTimeout(it) },
+    )
+
     suspend fun exportPreferences() = datastore.exportAsString()
 
     suspend fun importPreferences(backupString: String) =
         datastore.importDataAsString(backupString)
 }
 ```
+
+### Numeric-backed custom values
+
+The [`Serialized as Primitives`](./src/commonMain/kotlin/io/github/arthurkun/generic/datastore/compose/app/ui/MainScreen.kt)
+section demonstrates `serializedAsInt`, `serializedAsLong`, `serializedAsFloat`,
+`serializedAsDouble`, and `nullableSerializedAsLong`. The default values are declared in
+[PreferenceStore](./src/commonMain/kotlin/io/github/arthurkun/generic/datastore/compose/app/domain/PreferenceStore.kt)
+and the small value types they wrap live in
+[NumericSettings.kt](./src/commonMain/kotlin/io/github/arthurkun/generic/datastore/compose/app/domain/NumericSettings.kt).
+
+Unlike `serialized` (which stores a string entry), these variants store the serialized form under
+`intPreferencesKey`, `longPreferencesKey`, `floatPreferencesKey`, or `doublePreferencesKey`. Missing
+keys and decode failures fall back to the default value, and the nullable variant returns `null`
+when unset (writing `null` removes the key). Because DataStore matches keys by name, avoid reusing
+one key across different storage kinds.

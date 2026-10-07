@@ -2,6 +2,7 @@ package io.github.arthurkun.generic.datastore.preferences.core.custom
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.preferences.utils.decodeEnum
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -19,10 +20,11 @@ internal class EnumPrimitive<T : Enum<T>>(
     defaultValue: T,
     enumValues: Array<T>,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : CustomGenericPreferenceItem<T>(
+) : CustomGenericPreferenceItem<T, String>(
     datastore = datastore,
     key = key,
     defaultValue = defaultValue,
+    preferences = stringPreferencesKey(key),
     serializer = { it.name },
     deserializer = { name -> decodeEnum(enumValues, name) },
     ioDispatcher = ioDispatcher,

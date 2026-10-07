@@ -225,6 +225,82 @@ public open class PrefBuilder internal constructor() {
     )
 
     /**
+     * Declares a preference for a custom object stored under an [Int] primitive key. Missing keys
+     * and decode failures read back as [defaultValue].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value used when the key is absent or deserialization fails.
+     * @param serializer Converts [T] to its stored [Int] representation.
+     * @param deserializer Converts a stored [Int] back to [T].
+     */
+    public fun <T> serializedAsInt(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Int,
+        deserializer: (Int) -> T,
+    ): BatchPref<T> = register(
+        BatchSerializedAsIntPref(key, defaultValue, serializer, deserializer),
+    )
+
+    /**
+     * Declares a preference for a custom object stored under a [Long] primitive key. Missing keys
+     * and decode failures read back as [defaultValue].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value used when the key is absent or deserialization fails.
+     * @param serializer Converts [T] to its stored [Long] representation.
+     * @param deserializer Converts a stored [Long] back to [T].
+     */
+    public fun <T> serializedAsLong(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Long,
+        deserializer: (Long) -> T,
+    ): BatchPref<T> = register(
+        BatchSerializedAsLongPref(key, defaultValue, serializer, deserializer),
+    )
+
+    /**
+     * Declares a preference for a custom object stored under a [Float] primitive key. Missing keys
+     * and decode failures read back as [defaultValue].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value used when the key is absent or deserialization fails.
+     * @param serializer Converts [T] to its stored [Float] representation.
+     * @param deserializer Converts a stored [Float] back to [T].
+     */
+    public fun <T> serializedAsFloat(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Float,
+        deserializer: (Float) -> T,
+    ): BatchPref<T> = register(
+        BatchSerializedAsFloatPref(key, defaultValue, serializer, deserializer),
+    )
+
+    /**
+     * Declares a preference for a custom object stored under a [Double] primitive key. Missing keys
+     * and decode failures read back as [defaultValue].
+     *
+     * @param T The type of the custom object.
+     * @param key The preference key.
+     * @param defaultValue The value used when the key is absent or deserialization fails.
+     * @param serializer Converts [T] to its stored [Double] representation.
+     * @param deserializer Converts a stored [Double] back to [T].
+     */
+    public fun <T> serializedAsDouble(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> Double,
+        deserializer: (Double) -> T,
+    ): BatchPref<T> = register(
+        BatchSerializedAsDoublePref(key, defaultValue, serializer, deserializer),
+    )
+
+    /**
      * Declares a preference for a [Set] of custom objects stored in a string-set entry, where each
      * element is individually converted to and from a [String]. Missing keys read back as
      * [defaultValue]; elements that fail to deserialize are skipped.
@@ -421,6 +497,74 @@ public open class PrefBuilder internal constructor() {
         deserializer: (String) -> T,
     ): BatchPref<T?> = register(
         BatchNullableCustomPref(key, serializer, deserializer),
+    )
+
+    /**
+     * Declares a nullable preference for a custom object stored under an [Int] primitive key.
+     * Missing keys and decode failures read back as `null`; writing `null` removes the key.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts [T] to its stored [Int] representation.
+     * @param deserializer Converts a stored [Int] back to [T].
+     */
+    public fun <T : Any> nullableSerializedAsInt(
+        key: String,
+        serializer: (T) -> Int,
+        deserializer: (Int) -> T,
+    ): BatchPref<T?> = register(
+        BatchNullableSerializedAsIntPref(key, serializer, deserializer),
+    )
+
+    /**
+     * Declares a nullable preference for a custom object stored under a [Long] primitive key.
+     * Missing keys and decode failures read back as `null`; writing `null` removes the key.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts [T] to its stored [Long] representation.
+     * @param deserializer Converts a stored [Long] back to [T].
+     */
+    public fun <T : Any> nullableSerializedAsLong(
+        key: String,
+        serializer: (T) -> Long,
+        deserializer: (Long) -> T,
+    ): BatchPref<T?> = register(
+        BatchNullableSerializedAsLongPref(key, serializer, deserializer),
+    )
+
+    /**
+     * Declares a nullable preference for a custom object stored under a [Float] primitive key.
+     * Missing keys and decode failures read back as `null`; writing `null` removes the key.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts [T] to its stored [Float] representation.
+     * @param deserializer Converts a stored [Float] back to [T].
+     */
+    public fun <T : Any> nullableSerializedAsFloat(
+        key: String,
+        serializer: (T) -> Float,
+        deserializer: (Float) -> T,
+    ): BatchPref<T?> = register(
+        BatchNullableSerializedAsFloatPref(key, serializer, deserializer),
+    )
+
+    /**
+     * Declares a nullable preference for a custom object stored under a [Double] primitive key.
+     * Missing keys and decode failures read back as `null`; writing `null` removes the key.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer Converts [T] to its stored [Double] representation.
+     * @param deserializer Converts a stored [Double] back to [T].
+     */
+    public fun <T : Any> nullableSerializedAsDouble(
+        key: String,
+        serializer: (T) -> Double,
+        deserializer: (Double) -> T,
+    ): BatchPref<T?> = register(
+        BatchNullableSerializedAsDoublePref(key, serializer, deserializer),
     )
 
     /**
