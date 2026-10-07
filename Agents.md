@@ -32,9 +32,11 @@ DataStore Preferences and Proto DataStore. The preferences implementation lives 
         - `preferences/optional/data/customSet/` – nullable custom-set types
           (`NullableEnumSetPrimitive`, `NullableKSerializedSetPrimitive`,
           `NullableSerializedSetPrimitive`, `NullableSetGenericPreferenceItem`).
-    - `preferences/core/mem/` and `preferences/optional/mem/` – reserved for upcoming in-memory
-      preference implementations. Currently empty (only `.gitkeep`); add new in-memory code here
-      rather than under `data/`.
+    - `preferences/core/mem/` – in-memory storage for the `*InMemory` preference factories
+      (`InMemoryPreferencesDataStore`, a `MutableStateFlow` + `Mutex` implementation of
+      `DataStore<Preferences>`). Add new in-memory code here rather than under `data/`.
+    - `preferences/optional/mem/` – reserved for nullable-specific in-memory code. Currently
+      empty (only `.gitkeep`); add new in-memory code here rather than under `data/`.
     - `preferences/batch/` – declarative batch DSL (`BatchPref`, `PrefBuilder`, `PreferenceBatch`,
       `BatchValues`, `BatchWriteScope`, `BatchUpdateScope`, `PreferencesAccessor`).
     - `preferences/utils/` – preference utilities (`MappedPreference`, `Extensions`, `Serialization`,
@@ -182,6 +184,34 @@ same rule as the non-nullable set preferences. Writing `null` removes the key, a
 `resetToDefault()` is `delete()` for nullable types (key removed) versus `set(defaultValue)` for
 non-nullable ones (key stays present). This asymmetry is intentional and asserted in the tests;
 `exportAsData` only includes keys that are currently set, so the two produce different backups.
+
+### In-memory preference types
+
+`PreferencesDatastore` exposes an `InMemory` twin for every factory (`stringInMemory`,
+`nullableEnumSetInMemory`, …). They are interface members, and each constructs the **same internal
+primitive class** as its disk counterpart but passes the wrapper-owned
+`InMemoryPreferencesDataStore` (`preferences/core/mem/`) instead of the file-backed store — there
+are no per-type in-memory classes. `InMemoryPreferencesDataStore` is a `MutableStateFlow<Preferences>`
++ `Mutex` implementation of `DataStore<Preferences>`; all existing read/write/serialization logic
+operates on it unchanged, so decode-failure and null-handling rules carry over for free.
+
+Semantics to preserve when touching this code:
+
+- One in-memory store per `GenericPreferencesDatastore` instance (`internal val inMemoryDatastore`);
+  two instances never share values, and in-memory keys never collide with disk keys of the same name.
+- In-memory preferences are excluded from batch operations: `PreferenceImpl` is constructed with
+  `inMemoryStorage = true`, and its `PreferencesAccessor` methods (`readFrom`/`writeInto`/
+  `removeFrom`) throw `IllegalStateException`. Batch reads and writes operate on disk
+  `Preferences` snapshots, so any new batch path must keep routing through `PreferenceImpl`'s
+  accessors to stay guarded (this also covers `map`/`mapIO` wrappers, which delegate accessor
+  calls to the wrapped preference).
+- They are equally invisible to `clearAll()`, backup export, and backup import — those operate on
+  the disk store only.
+- `PrefBuilder` deliberately has no `*InMemory` declaration functions; `add(pref)` is the only way
+  an existing preference can join a batch, and the guard rejects in-memory preferences there.
+- Tests: `AbstractInMemoryPreferencesTest` / `AbstractInMemoryPreferencesBlockingTest` in
+  `commonTest/preferences/core/mem/` cover every factory plus the isolation/exclusion rules; raw
+  in-memory values can be seeded in tests via `preferenceDatastore.inMemoryDatastore`.
 
 ### Separating blocking and suspending tests
 
