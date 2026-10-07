@@ -1,14 +1,12 @@
-package io.github.arthurkun.generic.datastore.preferences.optional.data.custom
+package io.github.arthurkun.generic.datastore.preferences.optional
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.arthurkun.generic.datastore.core.BasePreference
 import io.github.arthurkun.generic.datastore.preferences.batch.PreferencesAccessor
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
-import io.github.arthurkun.generic.datastore.preferences.utils.deserializeOrNull
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,23 +21,20 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 /**
- * Base implementation for nullable preferences stored as a single string entry.
+ * Base implementation for nullable Preferences DataStore entries.
  *
- * Missing keys and decode failures both read back as `null`. Writing `null` removes the key from
- * DataStore.
+ * Missing keys read back as `null`, and writing `null` removes the key from DataStore.
+ * Subclasses bind a concrete [Preferences.Key] for each primitive nullable type.
  *
- * @param T The non-null exposed value type.
- * @param datastore The [DataStore] instance used for storing preferences.
- * @param key The unique string key used to identify this preference within the DataStore.
- * @param serializer Converts [T] to its stored [String] representation.
- * @param deserializer Converts a stored [String] back to [T].
- * @param ioDispatcher The [CoroutineDispatcher] to use for I/O operations.
+ * @param T The non-null stored value type.
+ * @property datastore The [DataStore] instance used for storage.
+ * @param key The unique preference key name.
+ * @param preferences The typed [Preferences.Key] used to access this value in DataStore.
  */
-internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
+internal sealed class NullableGenericPreferenceItem<T : Any>(
     private val datastore: DataStore<Preferences>,
     private val key: String,
-    private val serializer: (T) -> String,
-    private val deserializer: (String) -> T,
+    private val preferences: Preferences.Key<T>,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : BasePreference<T?>, PreferencesAccessor<T?> {
 
@@ -48,8 +43,6 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
             "Preference key cannot be blank."
         }
     }
-
-    private val stringPrefKey = stringPreferencesKey(key)
 
     override val defaultValue: T? = null
 
@@ -65,11 +58,11 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         withContext(ioDispatcher) {
             if (value == null) {
                 datastore.edit { ds ->
-                    ds.remove(stringPrefKey)
+                    ds.remove(preferences)
                 }
             } else {
                 datastore.edit { ds ->
-                    ds[stringPrefKey] = serializer(value)
+                    ds[preferences] = value
                 }
             }
         }
@@ -78,12 +71,12 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
     override suspend fun update(transform: (T?) -> T?) {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
-                val current = ds[stringPrefKey]?.let { safeDeserialize(it) }
+                val current = ds[preferences]
                 val newValue = transform(current)
                 if (newValue == null) {
-                    ds.remove(stringPrefKey)
+                    ds.remove(preferences)
                 } else {
-                    ds[stringPrefKey] = serializer(newValue)
+                    ds[preferences] = newValue
                 }
             }
         }
@@ -92,7 +85,7 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
     override suspend fun delete() {
         withContext(ioDispatcher) {
             datastore.edit { ds ->
-                ds.remove(stringPrefKey)
+                ds.remove(preferences)
             }
         }
     }
@@ -100,9 +93,11 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
     override suspend fun resetToDefault(): Unit = delete()
 
     override fun asFlow(): Flow<T?> {
-        return datastore.dataOrEmpty.map { prefs ->
-            prefs[stringPrefKey]?.let { safeDeserialize(it) }
-        }
+        return datastore
+            .dataOrEmpty
+            .map { preferences ->
+                preferences[this.preferences]
+            }
     }
 
     override fun stateIn(scope: CoroutineScope, started: SharingStarted): StateFlow<T?> =
@@ -118,20 +113,18 @@ internal sealed class NullableCustomGenericPreferenceItem<T : Any>(
         }
     }
 
-    private fun safeDeserialize(value: String): T? = deserializeOrNull(value, deserializer)
-
     override fun readFrom(preferences: Preferences): T? =
-        preferences[stringPrefKey]?.let { safeDeserialize(it) }
+        preferences[this.preferences]
 
     override fun writeInto(mutablePreferences: MutablePreferences, value: T?) {
         if (value == null) {
-            mutablePreferences.remove(stringPrefKey)
+            mutablePreferences.remove(this.preferences)
         } else {
-            mutablePreferences[stringPrefKey] = serializer(value)
+            mutablePreferences[this.preferences] = value
         }
     }
 
     override fun removeFrom(mutablePreferences: MutablePreferences) {
-        mutablePreferences.remove(stringPrefKey)
+        mutablePreferences.remove(this.preferences)
     }
 }

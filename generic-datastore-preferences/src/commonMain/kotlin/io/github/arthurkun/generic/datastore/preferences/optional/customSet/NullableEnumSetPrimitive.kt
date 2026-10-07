@@ -1,4 +1,4 @@
-package io.github.arthurkun.generic.datastore.preferences.optional.data.custom
+package io.github.arthurkun.generic.datastore.preferences.optional.customSet
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -8,17 +8,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
 /**
- * [NullableCustomGenericPreferenceItem] storing a single enum constant by [Enum.name].
+ * [NullableSetGenericPreferenceItem] storing each enum constant of a [Set] by [Enum.name].
  *
- * [enumValues] supplies the constants used to decode a stored name; missing keys and names that no
- * longer match any constant both read back as `null`.
+ * [enumValues] supplies the constants used to decode stored names; names that no longer match any
+ * constant are skipped when the set is read, so an entry with no surviving constants reads back as
+ * an empty set. Only a missing key reads back as `null`.
  */
-internal class NullableEnumPrimitive<T : Enum<T>>(
+internal class NullableEnumSetPrimitive<T : Enum<T>>(
     datastore: DataStore<Preferences>,
     key: String,
     enumValues: Array<T>,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : NullableCustomGenericPreferenceItem<T>(
+) : NullableSetGenericPreferenceItem<T>(
     datastore = datastore,
     key = key,
     serializer = { it.name },
