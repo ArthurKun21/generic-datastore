@@ -19,9 +19,9 @@ DataStore Preferences and Proto DataStore. The preferences implementation lives 
     - `preferences/core/` – DataStore Preferences implementation for primitive types
       (`BooleanPrimitive`, `DoublePrimitive`, `FloatPrimitive`, `IntPrimitive`, `LongPrimitive`,
       `StringPrimitive`, `StringSetPrimitive`, `GenericPreferenceItem`).
-        - `preferences/core/custom/` – custom-serializer and enum types (`EnumPrimitive`,
-          `KSerializedPrimitive`, `KSerializedListPrimitive`, `SerializedPrimitive`,
-          `SerializedListPrimitive`, `CustomGenericPreferenceItem`).
+    - `preferences/core/custom/` – custom-serializer and enum types (`EnumPrimitive`,
+      `KSerializedPrimitive`, `KSerializedListPrimitive`, `SerializedPrimitive`,
+      `SerializedListPrimitive`, `SerializedAsPrimitive`, `CustomGenericPreferenceItem`).
         - `preferences/core/customSet/` – set-based custom types (`EnumSetPrimitive`,
           `KSerializedSetPrimitive`, `SerializedSetPrimitive`, `CustomSetGenericPreferenceItem`).
     - `preferences/optional/` – nullable preference variants (`NullableBooleanPrimitive`,
@@ -31,7 +31,7 @@ DataStore Preferences and Proto DataStore. The preferences implementation lives 
         - `preferences/optional/custom/` – nullable custom types (`NullableEnumPrimitive`,
           `NullableKSerializedPrimitive`, `NullableKSerializedListPrimitive`,
           `NullableSerializedPrimitive`, `NullableSerializedListPrimitive`,
-          `NullableCustomGenericPreferenceItem`).
+          `NullableSerializedAsPrimitive`, `NullableCustomGenericPreferenceItem`).
         - `preferences/optional/customSet/` – nullable custom-set types
           (`NullableEnumSetPrimitive`, `NullableKSerializedSetPrimitive`,
           `NullableSerializedSetPrimitive`, `NullableSetGenericPreferenceItem`).
@@ -185,6 +185,24 @@ touch the internal `BatchPref` constructors directly, so they delegate to the no
 a hand-rolled `serialized("k", d, { it.name }, ::enumValueOf)` handle. Each enum storage strategy
 has its own `BatchPref` subclass (`BatchEnumPref`, `BatchEnumSetPref`, `BatchNullableEnumPref`,
 `BatchNullableEnumSetPref`) for this reason.
+
+### Numeric-backed custom serialization
+
+`CustomGenericPreferenceItem<T, S>` and `NullableCustomGenericPreferenceItem<T, S>` are generic
+over the **stored** type `S`, not just the exposed type `T`. Subclasses bind a concrete
+`Preferences.Key<S>`: the string-backed `serialized`/`kserialized`/`enum` types use `S = String`,
+while the numeric-backed factories (`serializedAsInt`, `serializedAsLong`, `serializedAsFloat`,
+`serializedAsDouble`, and their `nullableSerializedAs*` twins plus `*InMemory` variants) use
+`intPreferencesKey`/`longPreferencesKey`/`floatPreferencesKey`/`doublePreferencesKey`. The
+`deserializeOrDefault`/`deserializeOrNull` helpers are likewise generic over the stored type, so
+decode-failure policy is identical across storage kinds.
+
+DataStore Preferences matches keys by **name**, so one key name must not be reused across storage
+kinds (e.g. a string `serialized` entry and an int `serializedAsInt` entry).
+
+Batch declarations mirror the factories: `serializedAsInt`/`serializedAsLong`/`serializedAsFloat`/
+`serializedAsDouble` and the nullable variants each have their own `BatchPref` subclass so handles
+with the same key and default but different storage kinds never compare equal.
 
 ### Nullable set preference types
 
