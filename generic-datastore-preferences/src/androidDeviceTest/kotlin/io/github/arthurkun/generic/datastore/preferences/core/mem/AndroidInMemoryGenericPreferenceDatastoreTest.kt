@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 private const val TEST_IN_MEMORY_DATASTORE_NAME = "test_in_memory"
 
 @RunWith(AndroidJUnit4::class)
-class AndroidInMemoryPreferencesTest : AbstractInMemoryPreferencesTest() {
+class AndroidInMemoryGenericPreferenceDatastoreTest : AbstractInMemoryGenericPreferenceDatastoreTest() {
 
     private val helper = AndroidTestHelper.standard(TEST_IN_MEMORY_DATASTORE_NAME)
 

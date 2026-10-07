@@ -15,7 +15,7 @@ interface, so a single datastore instance can mix disk-backed and memory-backed 
 
 **Decided behavior (user-confirmed):**
 
-- **Reuse, don't duplicate.** One internal `InMemoryPreferences` (a
+- **Reuse, don't duplicate.** One internal `InMemoryGenericPreferenceDatastore` (a
   `MutableStateFlow<Preferences>` + `Mutex` implementation of `DataStore<Preferences>`)
   backs the existing internal primitive classes — no per-type `*InMemory` classes. Every existing
   primitive in `core/data/` and `optional/data/` only touches
@@ -171,8 +171,10 @@ Follow the abstract-test-class pattern (AGENTS.md) — suspending and blocking s
 - README.md — new "In-memory preferences" subsection: usage example, naming rule, per-datastore
   scope, and the exclusion list (persistence, batch, backup, `clearAll`).
 - AGENTS.md — update the `mem/` module descriptions (`core/mem/` now holds
-  `InMemoryPreferences`; `optional/mem/` gets a `.gitkeep` and stays reserved) and add an "In-memory
-  preference types" section documenting the reuse decision, batch guard, and exclusion semantics.
+  `InMemoryGenericPreferenceDatastore`; `optional/mem/` gets a `.gitkeep` and stays reserved) and
+  add an
+  "In-memory preference types" section documenting the reuse decision, batch guard, and exclusion
+  semantics.
 - Regenerate `generic-datastore-preferences/api/*.api` via
   `:generic-datastore-preferences:updateKotlinAbi` (this repo's binary-compat task names; verified
   with `checkKotlinAbi`).

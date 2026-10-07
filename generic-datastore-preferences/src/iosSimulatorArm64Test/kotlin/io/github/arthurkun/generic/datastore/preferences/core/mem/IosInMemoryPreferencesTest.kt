@@ -8,7 +8,7 @@ import kotlin.test.BeforeTest
 
 private const val TEST_IN_MEMORY_DATASTORE_NAME = "test_in_memory"
 
-class IosInMemoryPreferencesTest : AbstractInMemoryPreferencesTest() {
+class IosInMemoryPreferencesTest : AbstractInMemoryGenericPreferenceDatastoreTest() {
 
     private val helper = IosTestHelper.standard(TEST_IN_MEMORY_DATASTORE_NAME)
 

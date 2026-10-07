@@ -9,7 +9,7 @@ import kotlin.test.assertNull
  * Blocking (non-suspending) suite for the `*InMemory` preference factories, following the
  * separate blocking-test pattern: only [preferenceDatastore] is required.
  */
-abstract class AbstractInMemoryPreferencesBlockingTest {
+abstract class AbstractInMemoryGenericPreferenceDatastoreBlockingTest {
 
     abstract val preferenceDatastore: GenericPreferencesDatastore
 

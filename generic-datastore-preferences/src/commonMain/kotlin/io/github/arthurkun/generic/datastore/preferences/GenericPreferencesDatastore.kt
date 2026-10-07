@@ -97,7 +97,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Exposed internally so module tests can seed raw values; each [GenericPreferencesDatastore]
      * owns an independent store, and nothing here ever touches [datastore]'s persistence.
      */
-    internal val inMemoryDatastore = InMemoryPreferences()
+    internal val inMemoryDatastore = InMemoryGenericPreferenceDatastore()
 
     override fun close() {
         runBlocking {

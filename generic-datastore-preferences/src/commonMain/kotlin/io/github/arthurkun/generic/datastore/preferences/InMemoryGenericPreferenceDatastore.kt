@@ -24,7 +24,7 @@ import kotlinx.coroutines.sync.withLock
  *
  * @property initial The [Preferences] snapshot the store starts with.
  */
-internal class InMemoryPreferences(
+internal class InMemoryGenericPreferenceDatastore(
     initial: Preferences = emptyPreferences(),
 ) : DataStore<Preferences> {
 

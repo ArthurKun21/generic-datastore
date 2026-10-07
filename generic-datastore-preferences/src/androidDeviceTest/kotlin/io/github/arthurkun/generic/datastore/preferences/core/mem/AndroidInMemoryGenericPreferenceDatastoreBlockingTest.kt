@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 private const val TEST_IN_MEMORY_BLOCKING_DATASTORE_NAME = "test_in_memory_blocking"
 
 @RunWith(AndroidJUnit4::class)
-class AndroidInMemoryPreferencesBlockingTest : AbstractInMemoryPreferencesBlockingTest() {
+class AndroidInMemoryGenericPreferenceDatastoreBlockingTest : AbstractInMemoryGenericPreferenceDatastoreBlockingTest() {
 
     companion object {
         private val helper = AndroidTestHelper.blocking(TEST_IN_MEMORY_BLOCKING_DATASTORE_NAME)

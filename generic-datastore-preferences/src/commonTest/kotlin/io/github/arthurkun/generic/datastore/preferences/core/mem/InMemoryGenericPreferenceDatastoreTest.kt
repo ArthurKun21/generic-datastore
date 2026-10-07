@@ -4,7 +4,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import io.github.arthurkun.generic.datastore.preferences.InMemoryPreferences
+import io.github.arthurkun.generic.datastore.preferences.InMemoryGenericPreferenceDatastore
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
@@ -16,11 +16,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
-class InMemoryPreferencesTest {
+class InMemoryGenericPreferenceDatastoreTest {
 
     @Test
     fun data_startsEmptyByDefault() = runTest {
-        val store = InMemoryPreferences()
+        val store = InMemoryGenericPreferenceDatastore()
 
         assertTrue(store.data.first().asMap().isEmpty())
     }
@@ -31,14 +31,14 @@ class InMemoryPreferencesTest {
         val initial = emptyPreferences().toMutablePreferences()
             .apply { this[key] = "initial" }
             .toPreferences()
-        val store = InMemoryPreferences(initial)
+        val store = InMemoryGenericPreferenceDatastore(initial)
 
         assertEquals("initial", store.data.first()[key])
     }
 
     @Test
     fun updateData_appliesTransform() = runTest {
-        val store = InMemoryPreferences()
+        val store = InMemoryGenericPreferenceDatastore()
         val key = stringPreferencesKey("greeting")
 
         store.updateData { prefs ->
@@ -50,7 +50,7 @@ class InMemoryPreferencesTest {
 
     @Test
     fun edit_extensionWritesThroughUpdateData() = runTest {
-        val store = InMemoryPreferences()
+        val store = InMemoryGenericPreferenceDatastore()
         val key = stringPreferencesKey("viaEdit")
 
         store.edit { it[key] = "value" }
@@ -60,7 +60,7 @@ class InMemoryPreferencesTest {
 
     @Test
     fun updateData_serializesConcurrentUpdates() = runTest {
-        val store = InMemoryPreferences()
+        val store = InMemoryGenericPreferenceDatastore()
         val key = intPreferencesKey("counter")
 
         coroutineScope {
@@ -80,7 +80,7 @@ class InMemoryPreferencesTest {
 
     @Test
     fun updateData_throwingTransformLeavesStateUnchanged() = runTest {
-        val store = InMemoryPreferences()
+        val store = InMemoryGenericPreferenceDatastore()
         val key = stringPreferencesKey("stable")
 
         store.updateData { prefs ->
@@ -98,7 +98,7 @@ class InMemoryPreferencesTest {
 
     @Test
     fun data_emitsEveryDistinctUpdate() = runTest {
-        val store = InMemoryPreferences()
+        val store = InMemoryGenericPreferenceDatastore()
         val key = stringPreferencesKey("stream")
         val emissions = mutableListOf<String?>()
 

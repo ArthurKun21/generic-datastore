@@ -10,7 +10,7 @@ import kotlin.test.BeforeTest
 
 private const val TEST_IN_MEMORY_DATASTORE_NAME = "test_in_memory"
 
-class JvmInMemoryPreferencesTest : AbstractInMemoryPreferencesTest() {
+class JvmInMemoryGenericPreferenceDatastoreTest : AbstractInMemoryGenericPreferenceDatastoreTest() {
 
     @TempDir
     lateinit var tempFolder: File

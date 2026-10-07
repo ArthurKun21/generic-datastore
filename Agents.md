@@ -33,20 +33,20 @@ DataStore Preferences and Proto DataStore. The preferences implementation lives 
           (`NullableEnumSetPrimitive`, `NullableKSerializedSetPrimitive`,
           `NullableSerializedSetPrimitive`, `NullableSetGenericPreferenceItem`).
     - `preferences/core/mem/` – in-memory storage for the `*InMemory` preference factories
-      (`InMemoryPreferences`, a `MutableStateFlow` + `Mutex` implementation of
+      (`InMemoryGenericPreferenceDatastore`, a `MutableStateFlow` + `Mutex` implementation of
       `DataStore<Preferences>`). Add new in-memory code here rather than under `data/`.
-  - `preferences/optional/mem/` – reserved for nullable-specific in-memory code. Currently empty
-    (only `.gitkeep`); add new in-memory code here rather than under `data/`.
-      - `preferences/batch/` – declarative batch DSL (`BatchPref`, `PrefBuilder`,
-        `PreferenceBatch`,
-        `BatchValues`, `BatchWriteScope`, `BatchUpdateScope`, `PreferencesAccessor`).
-  - `preferences/utils/` – preference utilities (`MappedPreference`, `Extensions`,
-    `Serialization`,
+    - `preferences/optional/mem/` – reserved for nullable-specific in-memory code. Currently empty
+      (only `.gitkeep`); add new in-memory code here rather than under `data/`.
+        - `preferences/batch/` – declarative batch DSL (`BatchPref`, `PrefBuilder`,
+          `PreferenceBatch`,
+          `BatchValues`, `BatchWriteScope`, `BatchUpdateScope`, `PreferencesAccessor`).
+    - `preferences/utils/` – preference utilities (`MappedPreference`, `Extensions`,
+      `Serialization`,
       `Enums`).
-      - `preferences/backup/` – backup/restore support for preferences datastore
-        (`BackupPreference`,
-        `PreferenceBackupCreator`, `PreferenceBackupRestorer`, `BackupParsingException`,
-        `Migration` — loose JSON conversion helpers, not a migration type).
+        - `preferences/backup/` – backup/restore support for preferences datastore
+          (`BackupPreference`,
+          `PreferenceBackupCreator`, `PreferenceBackupRestorer`, `BackupParsingException`,
+          `Migration` — loose JSON conversion helpers, not a migration type).
 - `:generic-datastore-proto` – Proto DataStore support.
     - `proto/` – public contract and factories (`ProtoPreference`, `ProtoDatastore`, `ProtoApi`,
       `GenericProtoDatastore`, `CreateProtoDatastore`, `ProtoFieldPrefs`).
@@ -193,8 +193,9 @@ non-nullable ones (key stays present). This asymmetry is intentional and asserte
 `PreferencesDatastore` exposes an `InMemory` twin for every factory (`stringInMemory`,
 `nullableEnumSetInMemory`, …). They are interface members, and each constructs the **same internal
 primitive class** as its disk counterpart but passes the wrapper-owned
-`InMemoryPreferences` (`preferences/core/mem/`) instead of the file-backed store — there are no
-per-type in-memory classes. `InMemoryPreferences` is a `MutableStateFlow<Preferences>`
+`InMemoryGenericPreferenceDatastore` (`preferences/core/mem/`) instead of the file-backed store —
+there are no per-type in-memory classes. `InMemoryGenericPreferenceDatastore` is a
+`MutableStateFlow<Preferences>`
 
 + `Mutex` implementation of `DataStore<Preferences>`; all existing read/write/serialization logic
   operates on it unchanged, so decode-failure and null-handling rules carry over for free.
@@ -214,7 +215,9 @@ Semantics to preserve when touching this code:
   the disk store only.
 - `PrefBuilder` deliberately has no `*InMemory` declaration functions; `add(pref)` is the only way
   an existing preference can join a batch, and the guard rejects in-memory preferences there.
-- Tests: `AbstractInMemoryPreferencesTest` / `AbstractInMemoryPreferencesBlockingTest` in
+- Tests: `AbstractInMemoryGenericPreferenceDatastoreTest` /
+  `AbstractInMemoryGenericPreferenceDatastoreBlockingTest`
+  in
   `commonTest/preferences/core/mem/` cover every factory plus the isolation/exclusion rules; raw
   in-memory values can be seeded in tests via `preferenceDatastore.inMemoryDatastore`.
 

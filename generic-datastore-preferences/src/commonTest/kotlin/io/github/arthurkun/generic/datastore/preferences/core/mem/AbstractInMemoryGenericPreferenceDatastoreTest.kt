@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
 import io.github.arthurkun.generic.datastore.preferences.GenericPreferencesDatastore
-import io.github.arthurkun.generic.datastore.preferences.InMemoryPreferences
+import io.github.arthurkun.generic.datastore.preferences.InMemoryGenericPreferenceDatastore
 import io.github.arthurkun.generic.datastore.preferences.core.data.SerializableObject
 import io.github.arthurkun.generic.datastore.preferences.core.data.TestEnum
 import io.github.arthurkun.generic.datastore.preferences.core.data.custom.KSerAddress
@@ -32,7 +32,7 @@ import kotlin.test.assertNull
  * datastore instance; the in-memory store is exercised through the public API while the
  * underlying file-backed datastore stays untouched.
  */
-abstract class AbstractInMemoryPreferencesTest {
+abstract class AbstractInMemoryGenericPreferenceDatastoreTest {
 
     abstract val preferenceDatastore: GenericPreferencesDatastore
     abstract val testDispatcher: TestDispatcher
@@ -671,5 +671,5 @@ abstract class AbstractInMemoryPreferencesTest {
 
     @OptIn(InternalGenericDatastoreApi::class)
     private fun createInMemoryBackedDatastore(): GenericPreferencesDatastore =
-        GenericPreferencesDatastore(datastore = InMemoryPreferences())
+        GenericPreferencesDatastore(datastore = InMemoryGenericPreferenceDatastore())
 }

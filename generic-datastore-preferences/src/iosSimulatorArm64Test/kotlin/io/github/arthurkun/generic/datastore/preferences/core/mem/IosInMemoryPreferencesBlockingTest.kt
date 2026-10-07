@@ -7,7 +7,7 @@ import kotlin.test.BeforeTest
 
 private const val TEST_IN_MEMORY_BLOCKING_DATASTORE_NAME = "test_in_memory_blocking"
 
-class IosInMemoryPreferencesBlockingTest : AbstractInMemoryPreferencesBlockingTest() {
+class IosInMemoryPreferencesBlockingTest : AbstractInMemoryGenericPreferenceDatastoreBlockingTest() {
 
     private val helper = IosTestHelper.blocking(TEST_IN_MEMORY_BLOCKING_DATASTORE_NAME)
 
