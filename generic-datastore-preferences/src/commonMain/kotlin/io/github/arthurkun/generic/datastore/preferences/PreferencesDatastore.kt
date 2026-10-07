@@ -1,6 +1,5 @@
 package io.github.arthurkun.generic.datastore.preferences
 
-import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferencesBackup
 import io.github.arthurkun.generic.datastore.preferences.batch.BatchUpdateScope
@@ -21,8 +20,9 @@ import kotlinx.serialization.json.JsonElement
  *
  * The `nullable*` APIs model absence explicitly: when a key is not stored they return `null`,
  * and writing `null` removes the key.
+ *
  */
-public interface PreferencesDatastore : AutoCloseable {
+public interface PreferencesDatastore : InMemoryPreferencesDatastore, AutoCloseable {
     override fun close() {}
 
     /**
@@ -30,7 +30,7 @@ public interface PreferencesDatastore : AutoCloseable {
      *
      * @param key The preference key.
      * @param defaultValue The default String value (defaults to an empty string).
-     * @return A [DelegatedPreference] instance for the String preference.
+     * @return A [Preference] instance for the String preference.
      */
     public fun string(key: String, defaultValue: String = ""): Preference<String>
 
@@ -39,7 +39,7 @@ public interface PreferencesDatastore : AutoCloseable {
      *
      * @param key The preference key.
      * @param defaultValue The default Long value (defaults to 0).
-     * @return A [DelegatedPreference] instance for the Long preference.
+     * @return A [Preference] instance for the Long preference.
      */
     public fun long(key: String, defaultValue: Long = 0): Preference<Long>
 
@@ -48,7 +48,7 @@ public interface PreferencesDatastore : AutoCloseable {
      *
      * @param key The preference key.
      * @param defaultValue The default Int value (defaults to 0).
-     * @return A [DelegatedPreference] instance for the Int preference.
+     * @return A [Preference] instance for the Int preference.
      */
     public fun int(key: String, defaultValue: Int = 0): Preference<Int>
 
@@ -57,7 +57,7 @@ public interface PreferencesDatastore : AutoCloseable {
      *
      * @param key The preference key.
      * @param defaultValue The default Float value (defaults to 0f).
-     * @return A [DelegatedPreference] instance for the Float preference.
+     * @return A [Preference] instance for the Float preference.
      */
     public fun float(key: String, defaultValue: Float = 0f): Preference<Float>
 
@@ -66,7 +66,7 @@ public interface PreferencesDatastore : AutoCloseable {
      *
      * @param key The preference key.
      * @param defaultValue The default Double value (defaults to 0.0).
-     * @return A [DelegatedPreference] instance for the Double preference.
+     * @return A [Preference] instance for the Double preference.
      */
     public fun double(key: String, defaultValue: Double = 0.0): Preference<Double>
 
@@ -75,7 +75,7 @@ public interface PreferencesDatastore : AutoCloseable {
      *
      * @param key The preference key.
      * @param defaultValue The default Boolean value (defaults to false).
-     * @return A [DelegatedPreference] instance for the Boolean preference.
+     * @return A [Preference] instance for the Boolean preference.
      */
     public fun bool(key: String, defaultValue: Boolean = false): Preference<Boolean>
 
@@ -84,7 +84,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable String preference.
+     * @return A [Preference] instance for the nullable String preference.
      */
     public fun nullableString(key: String): Preference<String?>
 
@@ -93,7 +93,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Set<String> preference.
+     * @return A [Preference] instance for the nullable Set<String> preference.
      */
     public fun nullableStringSet(key: String): Preference<Set<String>?>
 
@@ -105,7 +105,7 @@ public interface PreferencesDatastore : AutoCloseable {
      *
      * @param key The preference key.
      * @param defaultValue The default List<String> value (defaults to an empty list).
-     * @return A [DelegatedPreference] instance for the List<String> preference.
+     * @return A [Preference] instance for the List<String> preference.
      */
     public fun stringList(key: String, defaultValue: List<String> = emptyList()): Preference<List<String>>
 
@@ -114,7 +114,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * Returns `null` when the key is not set in DataStore or the stored payload cannot be decoded.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable List<String> preference.
+     * @return A [Preference] instance for the nullable List<String> preference.
      */
     public fun nullableStringList(key: String): Preference<List<String>?>
 
@@ -123,7 +123,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Int preference.
+     * @return A [Preference] instance for the nullable Int preference.
      */
     public fun nullableInt(key: String): Preference<Int?>
 
@@ -132,7 +132,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Long preference.
+     * @return A [Preference] instance for the nullable Long preference.
      */
     public fun nullableLong(key: String): Preference<Long?>
 
@@ -141,7 +141,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Float preference.
+     * @return A [Preference] instance for the nullable Float preference.
      */
     public fun nullableFloat(key: String): Preference<Float?>
 
@@ -150,7 +150,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Double preference.
+     * @return A [Preference] instance for the nullable Double preference.
      */
     public fun nullableDouble(key: String): Preference<Double?>
 
@@ -159,7 +159,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Boolean preference.
+     * @return A [Preference] instance for the nullable Boolean preference.
      */
     public fun nullableBool(key: String): Preference<Boolean?>
 
@@ -168,7 +168,7 @@ public interface PreferencesDatastore : AutoCloseable {
      *
      * @param key The preference key.
      * @param defaultValue The default Set<String> value (defaults to an empty set).
-     * @return A [DelegatedPreference] instance for the Set<String> preference.
+     * @return A [Preference] instance for the Set<String> preference.
      */
     public fun stringSet(key: String, defaultValue: Set<String> = emptySet()): Preference<Set<String>>
 
@@ -180,7 +180,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * @param defaultValue The default value for the custom object.
      * @param serializer A function to serialize the object to a String.
      * @param deserializer A function to deserialize the String back to the object.
-     * @return A [DelegatedPreference] instance for the custom object preference.
+     * @return A [Preference] instance for the custom object preference.
      */
     public fun <T> serialized(
         key: String,
@@ -198,7 +198,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * @param defaultValue The default value for the set (defaults to an empty set).
      * @param serializer A function to serialize each element to a String.
      * @param deserializer A function to deserialize each String back to an element.
-     * @return A [DelegatedPreference] instance for the Set preference.
+     * @return A [Preference] instance for the Set preference.
      */
     public fun <T> serializedSet(
         key: String,
@@ -219,7 +219,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
      * its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
      * unless it was constructed with a custom default.
-     * @return A [DelegatedPreference] instance for the custom object preference.
+     * @return A [Preference] instance for the custom object preference.
      */
     public fun <T> kserialized(
         key: String,
@@ -241,7 +241,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
      * its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
      * unless it was constructed with a custom default.
-     * @return A [DelegatedPreference] instance for the Set preference.
+     * @return A [Preference] instance for the Set preference.
      */
     public fun <T> kserializedSet(
         key: String,
@@ -249,6 +249,49 @@ public interface PreferencesDatastore : AutoCloseable {
         serializer: KSerializer<T>,
         json: Json? = null,
     ): Preference<Set<T>>
+
+    /**
+     * Creates a nullable preference for a [Set] of custom objects that can be serialized to and
+     * deserialized from a String, stored using a string-set preference key.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * Elements that fail to deserialize are skipped, so a stored entry whose elements all fail
+     * reads back as an empty set rather than `null`.
+     *
+     * @param T The non-null type of the custom object.
+     * @param key The preference key.
+     * @param serializer A function to serialize each element to a String.
+     * @param deserializer A function to deserialize each String back to an element.
+     * @return A [Preference] instance for the nullable Set preference.
+     */
+    public fun <T : Any> nullableSerializedSet(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preference<Set<T>?>
+
+    /**
+     * Creates a nullable preference for a [Set] of custom objects using Kotlin Serialization.
+     * Each element is serialized to JSON for storage using a string-set preference key.
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key.
+     * Elements that fail to deserialize are skipped, so a stored entry whose elements all fail
+     * reads back as an empty set rather than `null`.
+     *
+     * @param T The non-null type of the custom object. Must be serializable using
+     *   kotlinx.serialization.
+     * @param key The preference key.
+     * @param serializer The [KSerializer] for the type [T].
+     * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
+     *   its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
+     *   unless it was constructed with a custom default.
+     * @return A [Preference] instance for the nullable Set preference.
+     */
+    public fun <T : Any> nullableKserializedSet(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json? = null,
+    ): Preference<Set<T>?>
 
     /**
      * Creates a preference for a [List] of custom objects that can be serialized to and
@@ -263,7 +306,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * @param defaultValue The default value for the list (defaults to an empty list).
      * @param serializer A function to serialize each element to a String.
      * @param deserializer A function to deserialize each String back to an element.
-     * @return A [DelegatedPreference] instance for the List preference.
+     * @return A [Preference] instance for the List preference.
      */
     public fun <T> serializedList(
         key: String,
@@ -283,7 +326,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
      * its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
      * unless it was constructed with a custom default.
-     * @return A [DelegatedPreference] instance for the List preference.
+     * @return A [Preference] instance for the List preference.
      */
     public fun <T> kserializedList(
         key: String,
@@ -303,7 +346,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * @param key The preference key.
      * @param serializer A function to serialize the object to a String.
      * @param deserializer A function to deserialize the String back to the object.
-     * @return A [DelegatedPreference] instance for the nullable custom object preference.
+     * @return A [Preference] instance for the nullable custom object preference.
      */
     public fun <T : Any> nullableSerialized(
         key: String,
@@ -324,7 +367,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
      * its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
      * unless it was constructed with a custom default.
-     * @return A [DelegatedPreference] instance for the nullable custom object preference.
+     * @return A [Preference] instance for the nullable custom object preference.
      */
     public fun <T : Any> nullableKserialized(
         key: String,
@@ -343,7 +386,7 @@ public interface PreferencesDatastore : AutoCloseable {
      * @param key The preference key.
      * @param serializer A function to serialize each element to a String.
      * @param deserializer A function to deserialize each String back to an element.
-     * @return A [DelegatedPreference] instance for the nullable List preference.
+     * @return A [Preference] instance for the nullable List preference.
      */
     public fun <T> nullableSerializedList(
         key: String,
@@ -364,13 +407,85 @@ public interface PreferencesDatastore : AutoCloseable {
      * @param json The [Json] configuration to use. Passing `null` lets the implementation choose
      * its configured default. [GenericPreferencesDatastore] uses [PreferenceDefaults.defaultJson]
      * unless it was constructed with a custom default.
-     * @return A [DelegatedPreference] instance for the nullable List preference.
+     * @return A [Preference] instance for the nullable List preference.
      */
     public fun <T> nullableKserializedList(
         key: String,
         serializer: KSerializer<T>,
         json: Json? = null,
     ): Preference<List<T>?>
+
+    /**
+     * Creates a preference storing a single enum constant by [Enum.name].
+     *
+     * If the stored string does not match any constant of [T], [defaultValue] is returned.
+     *
+     * Callers that cannot use a reified type parameter pass [enumValues] explicitly. The
+     * `enum<T>(key, defaultValue)` extension in `PreferenceApi.kt` is the shorthand for
+     * `enum(key, defaultValue, enumValues())`.
+     *
+     * @param T The enum type.
+     * @param key The preference key.
+     * @param defaultValue The value returned when the key is missing or the stored name is unknown.
+     * @param enumValues All constants of [T], used to decode the stored name.
+     * @return A [Preference] instance for the enum preference.
+     */
+    public fun <T : Enum<T>> enum(
+        key: String,
+        defaultValue: T,
+        enumValues: Array<T>,
+    ): Preference<T>
+
+    /**
+     * Creates a preference storing a [Set] of enum constants by [Enum.name].
+     *
+     * Each element of the stored string set is decoded independently. Stored entries that no
+     * longer match any constant of [T] are skipped when the set is read.
+     *
+     * @param T The enum type.
+     * @param key The preference key.
+     * @param defaultValue The default value for the set.
+     * @param enumValues All constants of [T], used to decode each stored name.
+     * @return A [Preference] instance for the Set preference.
+     */
+    public fun <T : Enum<T>> enumSet(
+        key: String,
+        defaultValue: Set<T>,
+        enumValues: Array<T>,
+    ): Preference<Set<T>>
+
+    /**
+     * Creates a nullable preference storing a single enum constant by [Enum.name].
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key. If the
+     * stored string does not match any constant of [T], `null` is returned.
+     *
+     * @param T The enum type.
+     * @param key The preference key.
+     * @param enumValues All constants of [T], used to decode the stored name.
+     * @return A [Preference] instance for the nullable enum preference.
+     */
+    public fun <T : Enum<T>> nullableEnum(
+        key: String,
+        enumValues: Array<T>,
+    ): Preference<T?>
+
+    /**
+     * Creates a nullable preference storing a [Set] of enum constants by [Enum.name].
+     *
+     * Returns `null` when the key is not set in DataStore. Setting `null` removes the key. Stored
+     * entries that no longer match any constant of [T] are skipped when the set is read, so a
+     * stored entry with no surviving constants reads back as an empty set.
+     *
+     * @param T The enum type.
+     * @param key The preference key.
+     * @param enumValues All constants of [T], used to decode each stored name.
+     * @return A [Preference] instance for the nullable Set preference.
+     */
+    public fun <T : Enum<T>> nullableEnumSet(
+        key: String,
+        enumValues: Array<T>,
+    ): Preference<Set<T>?>
 
     /**
      * Returns a [Flow] that maps every preference declared in [declare] to its stored value (or

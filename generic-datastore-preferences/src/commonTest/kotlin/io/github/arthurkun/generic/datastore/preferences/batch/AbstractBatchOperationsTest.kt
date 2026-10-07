@@ -13,6 +13,9 @@ import io.github.arthurkun.generic.datastore.preferences.kserialized
 import io.github.arthurkun.generic.datastore.preferences.kserializedList
 import io.github.arthurkun.generic.datastore.preferences.kserializedSet
 import io.github.arthurkun.generic.datastore.preferences.mapIO
+import io.github.arthurkun.generic.datastore.preferences.nullableEnum
+import io.github.arthurkun.generic.datastore.preferences.nullableEnumSet
+import io.github.arthurkun.generic.datastore.preferences.nullableKserializedSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -1068,5 +1071,205 @@ abstract class AbstractBatchOperationsTest {
 
         assertEquals("Hello World!", text.get())
         assertEquals(0, preferenceDatastore.int("inline_delete_num", 0).get())
+    }
+
+    // -- nullable set declarations --
+
+    @Test
+    fun prefBatch_nullableSetDeclarationsReturnNullWhenAbsent() = runTest(testDispatcher) {
+        var serializedSetPref: BatchPref<Set<BatchTestPayload>?>? = null
+        var kserializedSetPref: BatchPref<Set<BatchTestPayload>?>? = null
+        var enumSetPref: BatchPref<Set<BatchTestEnum>?>? = null
+        var enumPref: BatchPref<BatchTestEnum?>? = null
+
+        preferenceDatastore.batchWrite {
+            serializedSetPref = nullableSerializedSet(
+                key = "nullableSetSerialized",
+                serializer = { it.label },
+                deserializer = { BatchTestPayload(0, it) },
+            )
+            kserializedSetPref = nullableKserializedSet("nullableSetKserialized")
+            enumSetPref = nullableEnumSet("nullableSetEnumSet")
+            enumPref = nullableEnum("nullableSetEnum")
+        }
+
+        val values = preferenceDatastore.batchReadValues {
+            add(requireNotNull(serializedSetPref))
+            add(requireNotNull(kserializedSetPref))
+            add(requireNotNull(enumSetPref))
+            add(requireNotNull(enumPref))
+        }
+
+        assertNull(values[requireNotNull(serializedSetPref)])
+        assertNull(values[requireNotNull(kserializedSetPref)])
+        assertNull(values[requireNotNull(enumSetPref)])
+        assertNull(values[requireNotNull(enumPref)])
+    }
+
+    @Test
+    fun batchWrite_nullableSetValuesAreReadableBySinglePreferences() = runTest(testDispatcher) {
+        var serializedSetPref: BatchPref<Set<BatchTestPayload>?>? = null
+        var kserializedSetPref: BatchPref<Set<BatchTestPayload>?>? = null
+        var enumSetPref: BatchPref<Set<BatchTestEnum>?>? = null
+
+        preferenceDatastore.batchWrite {
+            serializedSetPref = nullableSerializedSet(
+                key = "nullableSetInterop_serialized",
+                serializer = { it.label },
+                deserializer = { BatchTestPayload(0, it) },
+            )
+            kserializedSetPref = nullableKserializedSet("nullableSetInterop_kserialized")
+            enumSetPref = nullableEnumSet("nullableSetInterop_enum")
+            set(requireNotNull(serializedSetPref), setOf(BatchTestPayload(1, "one")))
+            set(requireNotNull(kserializedSetPref), setOf(BatchTestPayload(2, "two")))
+            set(requireNotNull(enumSetPref), setOf(BatchTestEnum.SECOND))
+        }
+
+        assertEquals(
+            setOf(BatchTestPayload(0, "one")),
+            preferenceDatastore
+                .nullableSerializedSet<BatchTestPayload>(
+                    key = "nullableSetInterop_serialized",
+                    serializer = { it.label },
+                    deserializer = { BatchTestPayload(0, it) },
+                )
+                .get(),
+        )
+        assertEquals(
+            setOf(BatchTestPayload(2, "two")),
+            preferenceDatastore.nullableKserializedSet<BatchTestPayload>("nullableSetInterop_kserialized")
+                .get(),
+        )
+        assertEquals(
+            setOf(BatchTestEnum.SECOND),
+            preferenceDatastore.nullableEnumSet<BatchTestEnum>("nullableSetInterop_enum").get(),
+        )
+    }
+
+    @Test
+    fun batchWrite_writingNullToNullableSetRemovesKey() = runTest(testDispatcher) {
+        var enumSetPref: BatchPref<Set<BatchTestEnum>?>? = null
+
+        preferenceDatastore.batchWrite {
+            enumSetPref = nullableEnumSet("nullableSetNullWrite")
+            set(requireNotNull(enumSetPref), setOf(BatchTestEnum.FIRST))
+        }
+        preferenceDatastore.batchUpdate {
+            set(requireNotNull(enumSetPref), null)
+        }
+
+        assertNull(dataStore.data.first()[stringSetPreferencesKey("nullableSetNullWrite")])
+        assertNull(
+            preferenceDatastore.nullableEnumSet<BatchTestEnum>("nullableSetNullWrite").get(),
+        )
+    }
+
+    @Test
+    fun batchDelete_nullableSetRemovesDeclaredKeys() = runTest(testDispatcher) {
+        preferenceDatastore.nullableEnumSet<BatchTestEnum>("nullableSetDelete").set(setOf(BatchTestEnum.FIRST))
+
+        preferenceDatastore.batchDelete {
+            nullableEnumSet<BatchTestEnum>("nullableSetDelete")
+        }
+
+        assertNull(
+            preferenceDatastore.nullableEnumSet<BatchTestEnum>("nullableSetDelete").get(),
+        )
+    }
+
+    @Test
+    fun nullableSetDeclaration_rejectsDuplicateKey() = runTest(testDispatcher) {
+        val failure = runCatching {
+            preferenceDatastore.batchReadValues {
+                nullableEnumSet<BatchTestEnum>("nullableSetDuplicate")
+                nullableSerializedSet<BatchTestPayload>(
+                    key = "nullableSetDuplicate",
+                    serializer = { it.label },
+                    deserializer = { BatchTestPayload(0, it) },
+                )
+            }
+        }.exceptionOrNull()
+
+        assertTrue(failure is IllegalArgumentException)
+    }
+
+    // -- enum declaration identity --
+
+    @Test
+    fun enumDeclaration_isNotEqualToEquivalentSerializedDeclaration() = runTest(testDispatcher) {
+        var enumPref: BatchPref<BatchTestEnum>? = null
+        var serializedPref: BatchPref<BatchTestEnum>? = null
+
+        val batch = prefBatch {
+            enumPref = enum("enumIdentity", BatchTestEnum.FIRST)
+            serializedPref = serialized(
+                key = "enumIdentity_other",
+                defaultValue = BatchTestEnum.FIRST,
+                serializer = { it.name },
+                deserializer = { enumValueOf(it) },
+            )
+        }
+
+        val declaredEnum = requireNotNull(enumPref)
+        val declaredSerialized = requireNotNull(serializedPref)
+
+        // Different keys, so never equal.
+        assertTrue(declaredEnum != declaredSerialized)
+        assertEquals(2, batch.size)
+
+        // Two equal enum declarations of the same key are equal, and an enum handle is no longer
+        // interchangeable with a hand-rolled `serialized` declaration of the same key.
+        var firstEnum: BatchPref<BatchTestEnum>? = null
+        var secondEnum: BatchPref<BatchTestEnum>? = null
+        var manualSerialized: BatchPref<BatchTestEnum>? = null
+        prefBatch { firstEnum = enum("enumIdentity_sameKey", BatchTestEnum.FIRST) }
+        prefBatch { secondEnum = enum("enumIdentity_sameKey", BatchTestEnum.FIRST) }
+        prefBatch {
+            manualSerialized = serialized(
+                key = "enumIdentity_sameKey",
+                defaultValue = BatchTestEnum.FIRST,
+                serializer = { it.name },
+                deserializer = { enumValueOf(it) },
+            )
+        }
+        assertEquals(requireNotNull(firstEnum), requireNotNull(secondEnum))
+        assertTrue(requireNotNull(firstEnum) != requireNotNull(manualSerialized))
+
+        // enumSet and nullableEnumSet likewise carry their own storage kind.
+        var setHandle: BatchPref<Set<BatchTestEnum>>? = null
+        var equalSetHandle: BatchPref<Set<BatchTestEnum>>? = null
+        var nullableSetHandle: BatchPref<Set<BatchTestEnum>?>? = null
+        prefBatch { setHandle = enumSet("enumIdentity_set") }
+        prefBatch { equalSetHandle = enumSet("enumIdentity_set") }
+        prefBatch { nullableSetHandle = nullableEnumSet("enumIdentity_set") }
+        assertEquals(requireNotNull(setHandle), requireNotNull(equalSetHandle))
+        assertTrue(requireNotNull(setHandle) != requireNotNull(nullableSetHandle))
+    }
+
+    @Test
+    fun batchEnumDeclaration_matchesSingleEnumPreference() = runTest(testDispatcher) {
+        preferenceDatastore
+            .enum<BatchTestEnum>("batchEnumInterop", BatchTestEnum.FIRST)
+            .set(BatchTestEnum.SECOND)
+
+        var handle: BatchPref<BatchTestEnum>? = null
+        val values = preferenceDatastore.batchReadValues {
+            handle = enum<BatchTestEnum>("batchEnumInterop", BatchTestEnum.FIRST)
+        }
+
+        assertEquals(BatchTestEnum.SECOND, values[requireNotNull(handle)])
+    }
+
+    @Test
+    fun batchEnumSetDeclaration_storesEnumNames() = runTest(testDispatcher) {
+        preferenceDatastore.batchWrite {
+            val handle = enumSet<BatchTestEnum>("batchEnumSetNames")
+            set(handle, setOf(BatchTestEnum.FIRST))
+        }
+
+        assertEquals(
+            setOf("FIRST"),
+            dataStore.data.first()[stringSetPreferencesKey("batchEnumSetNames")],
+        )
     }
 }

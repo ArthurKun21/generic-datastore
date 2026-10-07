@@ -94,18 +94,18 @@ Every batch operation takes an inline `datastore.batchX { … }` declaration (`a
 
 ## How to reproduce
 
-`DesktopBatchPerformanceTest` is `@Ignore`d at class level (benchmark timings are noisy and
+`JvmBatchPerformanceTest` is `@Ignore`d at class level (benchmark timings are noisy and
 machine-dependent), so temporarily remove the `@Ignore` first, then run the performance test
 suite on Desktop/JVM:
 
 ```bash
 ./gradlew :generic-datastore-preferences:jvmTest \
-  --tests "io.github.arthurkun.generic.datastore.preferences.batch.DesktopBatchPerformanceTest"
+  --tests "io.github.arthurkun.generic.datastore.preferences.batch.JvmBatchPerformanceTest"
 ```
 
 Test output is captured in the JUnit XML report:
 
 ```
 generic-datastore-preferences/build/test-results/jvmTest/
-  TEST-io.github.arthurkun.generic.datastore.preferences.batch.DesktopBatchPerformanceTest.xml
+  TEST-io.github.arthurkun.generic.datastore.preferences.batch.JvmBatchPerformanceTest.xml
 ```

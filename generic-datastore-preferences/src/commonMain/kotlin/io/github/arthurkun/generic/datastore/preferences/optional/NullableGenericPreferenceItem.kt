@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
  * @param preferences The typed [Preferences.Key] used to access this value in DataStore.
  */
 internal sealed class NullableGenericPreferenceItem<T : Any>(
-    internal val datastore: DataStore<Preferences>,
+    private val datastore: DataStore<Preferences>,
     private val key: String,
     private val preferences: Preferences.Key<T>,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,

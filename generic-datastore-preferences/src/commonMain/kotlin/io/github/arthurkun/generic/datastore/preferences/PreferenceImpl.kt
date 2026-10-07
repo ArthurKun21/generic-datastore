@@ -14,9 +14,13 @@ import kotlin.reflect.KProperty
  *
  * @param T The exposed value type.
  * @property pref The underlying [BasePreference] implementation.
+ * @property inMemoryStorage Whether [pref] is backed by the in-memory store. In-memory
+ * preferences are excluded from batch operations because batch reads and writes operate on
+ * disk [Preferences] snapshots.
  */
 internal class PreferenceImpl<T>(
     private val pref: BasePreference<T>,
+    internal val inMemoryStorage: Boolean = false,
 ) : Preference<T>,
     BasePreference<T> by pref,
     PreferencesAccessor<T> {
@@ -28,14 +32,26 @@ internal class PreferenceImpl<T>(
     override fun resetToDefaultBlocking(): Unit = pref.setBlocking(pref.defaultValue)
 
     @Suppress("UNCHECKED_CAST")
-    override fun readFrom(preferences: Preferences): T =
-        (pref as PreferencesAccessor<T>).readFrom(preferences)
+    override fun readFrom(preferences: Preferences): T {
+        assertBatchSupported()
+        return (pref as PreferencesAccessor<T>).readFrom(preferences)
+    }
 
     @Suppress("UNCHECKED_CAST")
-    override fun writeInto(mutablePreferences: MutablePreferences, value: T): Unit =
+    override fun writeInto(mutablePreferences: MutablePreferences, value: T) {
+        assertBatchSupported()
         (pref as PreferencesAccessor<T>).writeInto(mutablePreferences, value)
+    }
 
     @Suppress("UNCHECKED_CAST")
-    override fun removeFrom(mutablePreferences: MutablePreferences): Unit =
+    override fun removeFrom(mutablePreferences: MutablePreferences) {
+        assertBatchSupported()
         (pref as PreferencesAccessor<T>).removeFrom(mutablePreferences)
+    }
+
+    private fun assertBatchSupported() {
+        check(!inMemoryStorage) {
+            "In-memory preferences do not participate in batch operations."
+        }
+    }
 }

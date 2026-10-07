@@ -13,7 +13,6 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.arthurkun.generic.datastore.core.BasePreference
-import io.github.arthurkun.generic.datastore.core.DelegatedPreference
 import io.github.arthurkun.generic.datastore.core.InternalGenericDatastoreApi
 import io.github.arthurkun.generic.datastore.core.PreferenceDefaults
 import io.github.arthurkun.generic.datastore.preferences.backup.PreferenceBackupCreator
@@ -31,10 +30,12 @@ import io.github.arthurkun.generic.datastore.preferences.core.IntPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.LongPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.StringPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.StringSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.core.custom.EnumPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.custom.KSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.custom.KSerializedPrimitive
-import io.github.arthurkun.generic.datastore.preferences.core.custom.ObjectPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.custom.SerializedListPrimitive
+import io.github.arthurkun.generic.datastore.preferences.core.custom.SerializedPrimitive
+import io.github.arthurkun.generic.datastore.preferences.core.customSet.EnumSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.customSet.KSerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.core.customSet.SerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableBooleanPrimitive
@@ -44,10 +45,14 @@ import io.github.arthurkun.generic.datastore.preferences.optional.NullableIntPri
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableLongPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableStringPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.NullableStringSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableEnumPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableKSerializedListPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableKSerializedPrimitive
-import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableObjectPrimitive
 import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedListPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.custom.NullableSerializedPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.customSet.NullableEnumSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.customSet.NullableKSerializedSetPrimitive
+import io.github.arthurkun.generic.datastore.preferences.optional.customSet.NullableSerializedSetPrimitive
 import io.github.arthurkun.generic.datastore.preferences.utils.dataOrEmpty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -86,6 +91,14 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
     private val backupCreator = PreferenceBackupCreator(datastore)
     private val backupRestorer = PreferenceBackupRestorer(datastore)
 
+    /**
+     * Process-local in-memory store backing every `*InMemory` factory on this instance.
+     *
+     * Exposed internally so module tests can seed raw values; each [GenericPreferencesDatastore]
+     * owns an independent store, and nothing here ever touches [datastore]'s persistence.
+     */
+    internal val inMemoryDatastore = InMemoryGenericPreferenceDatastore()
+
     override fun close() {
         runBlocking {
             ownedScope?.coroutineContext?.get(Job)?.cancelAndJoin()
@@ -97,7 +110,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default String value.
-     * @return A [DelegatedPreference] instance for the String preference.
+     * @return A [Preference] instance for the String preference.
      */
     override fun string(
         key: String,
@@ -116,7 +129,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Long value.
-     * @return A [DelegatedPreference] instance for the Long preference.
+     * @return A [Preference] instance for the Long preference.
      */
     override fun long(
         key: String,
@@ -135,7 +148,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Int value.
-     * @return A [DelegatedPreference] instance for the Int preference.
+     * @return A [Preference] instance for the Int preference.
      */
     override fun int(
         key: String,
@@ -154,7 +167,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Float value.
-     * @return A [DelegatedPreference] instance for the Float preference.
+     * @return A [Preference] instance for the Float preference.
      */
     override fun float(
         key: String,
@@ -173,7 +186,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Double value.
-     * @return A [DelegatedPreference] instance for the Double preference.
+     * @return A [Preference] instance for the Double preference.
      */
     override fun double(
         key: String,
@@ -192,7 +205,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Boolean value.
-     * @return A [DelegatedPreference] instance for the Boolean preference.
+     * @return A [Preference] instance for the Boolean preference.
      */
     override fun bool(
         key: String,
@@ -211,7 +224,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable String preference.
+     * @return A [Preference] instance for the nullable String preference.
      */
     override fun nullableString(key: String): Preference<String?> =
         PreferenceImpl(
@@ -226,7 +239,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Set<String> preference.
+     * @return A [Preference] instance for the nullable Set<String> preference.
      */
     override fun nullableStringSet(
         key: String,
@@ -243,7 +256,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default List<String> value.
-     * @return A [DelegatedPreference] instance for the List<String> preference.
+     * @return A [Preference] instance for the List<String> preference.
      */
     override fun stringList(
         key: String,
@@ -264,7 +277,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore or the stored payload cannot be decoded.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable List<String> preference.
+     * @return A [Preference] instance for the nullable List<String> preference.
      */
     override fun nullableStringList(
         key: String,
@@ -283,7 +296,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Int preference.
+     * @return A [Preference] instance for the nullable Int preference.
      */
     override fun nullableInt(key: String): Preference<Int?> =
         PreferenceImpl(
@@ -298,7 +311,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Long preference.
+     * @return A [Preference] instance for the nullable Long preference.
      */
     override fun nullableLong(key: String): Preference<Long?> =
         PreferenceImpl(
@@ -313,7 +326,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Float preference.
+     * @return A [Preference] instance for the nullable Float preference.
      */
     override fun nullableFloat(key: String): Preference<Float?> =
         PreferenceImpl(
@@ -328,7 +341,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Double preference.
+     * @return A [Preference] instance for the nullable Double preference.
      */
     override fun nullableDouble(key: String): Preference<Double?> =
         PreferenceImpl(
@@ -343,7 +356,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * Returns `null` when the key is not set in DataStore.
      *
      * @param key The preference key.
-     * @return A [DelegatedPreference] instance for the nullable Boolean preference.
+     * @return A [Preference] instance for the nullable Boolean preference.
      */
     override fun nullableBool(key: String): Preference<Boolean?> =
         PreferenceImpl(
@@ -358,7 +371,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      *
      * @param key The preference key.
      * @param defaultValue The default Set<String> value.
-     * @return A [DelegatedPreference] instance for the Set<String> preference.
+     * @return A [Preference] instance for the Set<String> preference.
      */
     override fun stringSet(
         key: String,
@@ -380,7 +393,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the custom object.
      * @param serializer A function to serialize the object to a String.
      * @param deserializer A function to deserialize the String back to the object.
-     * @return A [DelegatedPreference] instance for the custom object preference.
+     * @return A [Preference] instance for the custom object preference.
      */
     override fun <T> serialized(
         key: String,
@@ -388,7 +401,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         serializer: (T) -> String,
         deserializer: (String) -> T,
     ): Preference<T> = PreferenceImpl(
-        ObjectPrimitive(
+        SerializedPrimitive(
             datastore = datastore,
             key = key,
             defaultValue = defaultValue,
@@ -406,7 +419,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the set.
      * @param serializer A function to serialize each element to a String.
      * @param deserializer A function to deserialize each String back to an element.
-     * @return A [DelegatedPreference] instance for the Set preference.
+     * @return A [Preference] instance for the Set preference.
      */
     override fun <T> serializedSet(
         key: String,
@@ -432,7 +445,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the custom object.
      * @param serializer The [KSerializer] for the type [T].
      * @param json The [Json] instance to use for serialization/deserialization.
-     * @return A [DelegatedPreference] instance for the custom object preference.
+     * @return A [Preference] instance for the custom object preference.
      */
     override fun <T> kserialized(
         key: String,
@@ -458,7 +471,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the set (defaults to an empty set).
      * @param serializer The [KSerializer] for the type [T].
      * @param json The [Json] instance to use for serialization/deserialization.
-     * @return A [DelegatedPreference] instance for the Set preference.
+     * @return A [Preference] instance for the Set preference.
      */
     override fun <T> kserializedSet(
         key: String,
@@ -484,7 +497,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the list (defaults to an empty list).
      * @param serializer A function to serialize each element to a String.
      * @param deserializer A function to deserialize each String back to an element.
-     * @return A [DelegatedPreference] instance for the List preference.
+     * @return A [Preference] instance for the List preference.
      */
     override fun <T> serializedList(
         key: String,
@@ -510,7 +523,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
      * @param defaultValue The default value for the list (defaults to an empty list).
      * @param serializer The [KSerializer] for the type [T].
      * @param json The [Json] instance to use for serialization/deserialization.
-     * @return A [DelegatedPreference] instance for the List preference.
+     * @return A [Preference] instance for the List preference.
      */
     override fun <T> kserializedList(
         key: String,
@@ -532,7 +545,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
         serializer: (T) -> String,
         deserializer: (String) -> T,
     ): Preference<T?> = PreferenceImpl(
-        NullableObjectPrimitive(
+        NullableSerializedPrimitive(
             datastore = datastore,
             key = key,
             serializer = serializer,
@@ -576,6 +589,80 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             key = key,
             serializer = serializer,
             json = json ?: defaultJson,
+        ),
+    )
+
+    override fun <T : Any> nullableSerializedSet(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preference<Set<T>?> = PreferenceImpl(
+        NullableSerializedSetPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+    )
+
+    override fun <T : Any> nullableKserializedSet(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json?,
+    ): Preference<Set<T>?> = PreferenceImpl(
+        NullableKSerializedSetPrimitive(
+            datastore = datastore,
+            key = key,
+            serializer = serializer,
+            json = json ?: defaultJson,
+        ),
+    )
+
+    override fun <T : Enum<T>> enum(
+        key: String,
+        defaultValue: T,
+        enumValues: Array<T>,
+    ): Preference<T> = PreferenceImpl(
+        EnumPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            enumValues = enumValues,
+        ),
+    )
+
+    override fun <T : Enum<T>> enumSet(
+        key: String,
+        defaultValue: Set<T>,
+        enumValues: Array<T>,
+    ): Preference<Set<T>> = PreferenceImpl(
+        EnumSetPrimitive(
+            datastore = datastore,
+            key = key,
+            defaultValue = defaultValue,
+            enumValues = enumValues,
+        ),
+    )
+
+    override fun <T : Enum<T>> nullableEnum(
+        key: String,
+        enumValues: Array<T>,
+    ): Preference<T?> = PreferenceImpl(
+        NullableEnumPrimitive(
+            datastore = datastore,
+            key = key,
+            enumValues = enumValues,
+        ),
+    )
+
+    override fun <T : Enum<T>> nullableEnumSet(
+        key: String,
+        enumValues: Array<T>,
+    ): Preference<Set<T>?> = PreferenceImpl(
+        NullableEnumSetPrimitive(
+            datastore = datastore,
+            key = key,
+            enumValues = enumValues,
         ),
     )
 
@@ -735,7 +822,7 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
 
                     else -> {
                         val stringValue = when (value) {
-                            is Map<*, *>, is Collection<*> -> value.toJsonElement().toString()
+                            is Map<*, *> -> value.toJsonElement().toString()
                             else -> value.toString()
                         }
                         mutablePreferences[stringPreferencesKey(key)] = stringValue
@@ -793,4 +880,424 @@ public class GenericPreferencesDatastore @InternalGenericDatastoreApi constructo
             json = json ?: defaultJson,
         )
     }
+
+    // region In-memory preferences
+
+    override fun stringInMemory(
+        key: String,
+        defaultValue: String,
+    ): Preference<String> =
+        PreferenceImpl(
+            StringPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+                defaultValue = defaultValue,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun longInMemory(
+        key: String,
+        defaultValue: Long,
+    ): Preference<Long> =
+        PreferenceImpl(
+            LongPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+                defaultValue = defaultValue,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun intInMemory(
+        key: String,
+        defaultValue: Int,
+    ): Preference<Int> =
+        PreferenceImpl(
+            IntPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+                defaultValue = defaultValue,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun floatInMemory(
+        key: String,
+        defaultValue: Float,
+    ): Preference<Float> =
+        PreferenceImpl(
+            FloatPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+                defaultValue = defaultValue,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun doubleInMemory(
+        key: String,
+        defaultValue: Double,
+    ): Preference<Double> =
+        PreferenceImpl(
+            DoublePrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+                defaultValue = defaultValue,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun boolInMemory(
+        key: String,
+        defaultValue: Boolean,
+    ): Preference<Boolean> =
+        PreferenceImpl(
+            BooleanPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+                defaultValue = defaultValue,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun nullableStringInMemory(key: String): Preference<String?> =
+        PreferenceImpl(
+            NullableStringPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun nullableStringSetInMemory(
+        key: String,
+    ): Preference<Set<String>?> =
+        PreferenceImpl(
+            NullableStringSetPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun stringListInMemory(
+        key: String,
+        defaultValue: List<String>,
+    ): Preference<List<String>> =
+        PreferenceImpl(
+            SerializedListPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+                defaultValue = defaultValue,
+                elementSerializer = { it },
+                elementDeserializer = { it },
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun nullableStringListInMemory(
+        key: String,
+    ): Preference<List<String>?> =
+        PreferenceImpl(
+            NullableSerializedListPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+                elementSerializer = { it },
+                elementDeserializer = { it },
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun nullableIntInMemory(key: String): Preference<Int?> =
+        PreferenceImpl(
+            NullableIntPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun nullableLongInMemory(key: String): Preference<Long?> =
+        PreferenceImpl(
+            NullableLongPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun nullableFloatInMemory(key: String): Preference<Float?> =
+        PreferenceImpl(
+            NullableFloatPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun nullableDoubleInMemory(key: String): Preference<Double?> =
+        PreferenceImpl(
+            NullableDoublePrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun nullableBoolInMemory(key: String): Preference<Boolean?> =
+        PreferenceImpl(
+            NullableBooleanPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun stringSetInMemory(
+        key: String,
+        defaultValue: Set<String>,
+    ): Preference<Set<String>> =
+        PreferenceImpl(
+            StringSetPrimitive(
+                datastore = inMemoryDatastore,
+                key = key,
+                defaultValue = defaultValue,
+            ),
+            inMemoryStorage = true,
+        )
+
+    override fun <T> serializedInMemory(
+        key: String,
+        defaultValue: T,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preference<T> = PreferenceImpl(
+        SerializedPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T> serializedSetInMemory(
+        key: String,
+        defaultValue: Set<T>,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preference<Set<T>> = PreferenceImpl(
+        SerializedSetPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T> kserializedInMemory(
+        key: String,
+        defaultValue: T,
+        serializer: KSerializer<T>,
+        json: Json?,
+    ): Preference<T> = PreferenceImpl(
+        KSerializedPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            json = json ?: defaultJson,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T> kserializedSetInMemory(
+        key: String,
+        defaultValue: Set<T>,
+        serializer: KSerializer<T>,
+        json: Json?,
+    ): Preference<Set<T>> = PreferenceImpl(
+        KSerializedSetPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            json = json ?: defaultJson,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T> serializedListInMemory(
+        key: String,
+        defaultValue: List<T>,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preference<List<T>> = PreferenceImpl(
+        SerializedListPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            elementSerializer = serializer,
+            elementDeserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T> kserializedListInMemory(
+        key: String,
+        defaultValue: List<T>,
+        serializer: KSerializer<T>,
+        json: Json?,
+    ): Preference<List<T>> = PreferenceImpl(
+        KSerializedListPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            serializer = serializer,
+            json = json ?: defaultJson,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Any> nullableSerializedInMemory(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preference<T?> = PreferenceImpl(
+        NullableSerializedPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Any> nullableKserializedInMemory(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json?,
+    ): Preference<T?> = PreferenceImpl(
+        NullableKSerializedPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            serializer = serializer,
+            json = json ?: defaultJson,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T> nullableSerializedListInMemory(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preference<List<T>?> = PreferenceImpl(
+        NullableSerializedListPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            elementSerializer = serializer,
+            elementDeserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T> nullableKserializedListInMemory(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json?,
+    ): Preference<List<T>?> = PreferenceImpl(
+        NullableKSerializedListPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            serializer = serializer,
+            json = json ?: defaultJson,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Any> nullableSerializedSetInMemory(
+        key: String,
+        serializer: (T) -> String,
+        deserializer: (String) -> T,
+    ): Preference<Set<T>?> = PreferenceImpl(
+        NullableSerializedSetPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            serializer = serializer,
+            deserializer = deserializer,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Any> nullableKserializedSetInMemory(
+        key: String,
+        serializer: KSerializer<T>,
+        json: Json?,
+    ): Preference<Set<T>?> = PreferenceImpl(
+        NullableKSerializedSetPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            serializer = serializer,
+            json = json ?: defaultJson,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Enum<T>> enumInMemory(
+        key: String,
+        defaultValue: T,
+        enumValues: Array<T>,
+    ): Preference<T> = PreferenceImpl(
+        EnumPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            enumValues = enumValues,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Enum<T>> enumSetInMemory(
+        key: String,
+        defaultValue: Set<T>,
+        enumValues: Array<T>,
+    ): Preference<Set<T>> = PreferenceImpl(
+        EnumSetPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            defaultValue = defaultValue,
+            enumValues = enumValues,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Enum<T>> nullableEnumInMemory(
+        key: String,
+        enumValues: Array<T>,
+    ): Preference<T?> = PreferenceImpl(
+        NullableEnumPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            enumValues = enumValues,
+        ),
+        inMemoryStorage = true,
+    )
+
+    override fun <T : Enum<T>> nullableEnumSetInMemory(
+        key: String,
+        enumValues: Array<T>,
+    ): Preference<Set<T>?> = PreferenceImpl(
+        NullableEnumSetPrimitive(
+            datastore = inMemoryDatastore,
+            key = key,
+            enumValues = enumValues,
+        ),
+        inMemoryStorage = true,
+    )
+
+    // endregion
 }

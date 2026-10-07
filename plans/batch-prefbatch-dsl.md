@@ -2,7 +2,8 @@
 
 - **Branch:** `feat/update-batch-read-and-write`
 - **Status:** Approved design (2026-09-06)
-- **Scope:** `:generic-datastore-preferences`, `:generic-datastore-compose`, `:samples:preferenceComposeApp`, README/docs
+- **Scope:** `:generic-datastore-preferences`, `:generic-datastore-compose`,
+  `:samples:preferenceComposeApp`, README/docs
 
 ## 1. Overview
 
@@ -65,24 +66,24 @@ public sealed class BatchPref<T>(
 }
 ```
 
-Internal data-class subclasses (equals/hashCode on key + default so `distinctUntilChanged` and
-map lookups behave) mirror each storage strategy **exactly** as the corresponding single
-preference class does:
+Internal data-class subclasses (equals/hashCode on key + default so `distinctUntilChanged` and map
+lookups behave) mirror each storage strategy **exactly** as the corresponding single preference
+class does:
 
-| Subclass | Backing storage | Absent read | Decode failure | Null write |
-|---|---|---|---|---|
-| `BatchTypedPref<T>` | typed `Preferences.Key<T>` (`intPreferencesKey`, `longPreferencesKey`, `floatPreferencesKey`, `doublePreferencesKey`, `booleanPreferencesKey`, `stringPreferencesKey`, `stringSetPreferencesKey`) | default | n/a | n/a |
-| `BatchNullableTypedPref<T : Any>` | same typed keys | `null` | n/a | removes key |
-| `BatchCustomPref<T>` | `stringPreferencesKey` + `(T) -> String` / `(String) -> T` | default | default | n/a |
-| `BatchNullableCustomPref<T : Any>` | `stringPreferencesKey` | `null` | `null` | removes key |
-| `BatchSetPref<T>` | `stringSetPreferencesKey` + per-element (de)serializers | default | failing elements skipped | n/a |
-| `PreferenceBatchAdapter<T>` | wraps an existing `Preference<T>`, delegates to internal `PreferencesAccessor`; throws `IllegalStateException("Batch operations only support preferences created by this library")` for foreign implementations | via wrapped pref | via wrapped pref | via wrapped pref |
+| Subclass                           | Backing storage                                                                                                                                                                                                 | Absent read      | Decode failure           | Null write       |
+|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|--------------------------|------------------|
+| `BatchTypedPref<T>`                | typed `Preferences.Key<T>` (`intPreferencesKey`, `longPreferencesKey`, `floatPreferencesKey`, `doublePreferencesKey`, `booleanPreferencesKey`, `stringPreferencesKey`, `stringSetPreferencesKey`)               | default          | n/a                      | n/a              |
+| `BatchNullableTypedPref<T : Any>`  | same typed keys                                                                                                                                                                                                 | `null`           | n/a                      | removes key      |
+| `BatchCustomPref<T>`               | `stringPreferencesKey` + `(T) -> String` / `(String) -> T`                                                                                                                                                      | default          | default                  | n/a              |
+| `BatchNullableCustomPref<T : Any>` | `stringPreferencesKey`                                                                                                                                                                                          | `null`           | `null`                   | removes key      |
+| `BatchSetPref<T>`                  | `stringSetPreferencesKey` + per-element (de)serializers                                                                                                                                                         | default          | failing elements skipped | n/a              |
+| `PreferenceBatchAdapter<T>`        | wraps an existing `Preference<T>`, delegates to internal `PreferencesAccessor`; throws `IllegalStateException("Batch operations only support preferences created by this library")` for foreign implementations | via wrapped pref | via wrapped pref         | via wrapped pref |
 
-List declarations (`stringList`, `serializedList`, `kserializedList` and their nullable
-variants) reuse `BatchCustomPref` / `BatchNullableCustomPref`: the list storage format (JSON
-array of string-wrapped elements) is implemented by the serializer/deserializer lambdas passed
-at the `PrefBuilder` call site. There is intentionally no `BatchNullableSetPref` — the
-single-preference API has no nullable custom-set type either, so batch parity stops at
+List declarations (`stringList`, `serializedList`, `kserializedList` and their nullable variants)
+reuse `BatchCustomPref` / `BatchNullableCustomPref`: the list storage format (JSON array of
+string-wrapped elements) is implemented by the serializer/deserializer lambdas passed at the
+`PrefBuilder` call site. There is intentionally no `BatchNullableSetPref` — the single-preference
+API has no nullable custom-set type either, so batch parity stops at
 `serializedSet` / `kserializedSet` plus the nullable list variants.
 
 Equality is on concrete subclass + key + default (lambdas are behavior, not state, and are
@@ -115,15 +116,15 @@ Rules:
 
 #### Types table (complete builder surface)
 
-| Category | Functions | Storage | Absent / failure semantics |
-|---|---|---|---|
-| Primitives | `int(key, default = 0)`, `long(key, default = 0L)`, `float(key, default = 0f)`, `double(key, default = 0.0)`, `bool(key, default = false)`, `string(key, default = "")`, `stringSet(key, default = emptySet())` | native typed keys | default |
-| New primitives | `stringList(key, default = emptyList())`, `nullableStringList(key)` | `stringPreferencesKey`, JSON array of strings | default / null; bad elements skipped |
-| Nullable primitives | `nullableInt`, `nullableLong`, `nullableFloat`, `nullableDouble`, `nullableBool`, `nullableString`, `nullableStringSet` (key-only, default is always `null`) | native typed keys | `null`; writing `null` removes |
-| Custom | `serialized<T>(key, default, serializer, deserializer)`, `serializedSet<T>(key, default = emptySet(), elemSer, elemDeser)`, `serializedList<T>(key, default = emptyList(), elemSer, elemDeser)` | string key / string-set key / string key (JSON array) | default; set & list skip failing elements |
-| Kotlinx serialization | `kserialized<T>(key, default, serializer: KSerializer<T>, json: Json? = null)` + `inline reified` overload; same for `kserializedSet`, `kserializedList` | string key (JSON) / string-set key / string key (JSON array) | default; sets & lists skip failing elements |
-| Nullable custom | `nullableSerialized<T : Any>(key, serializer, deserializer)`, `nullableKserialized<T : Any>(key, serializer, json)` + reified, `nullableSerializedList<T>(key, elemSer, elemDeser)`, `nullableKserializedList<T>(key, serializer: KSerializer<T>, json)` + reified | string key / JSON array | `null`; writing `null` removes |
-| Enums | `enum<E : Enum<E>>(key, default: E)`, `enumSet<E>(key, default: Set<E> = emptySet())`, `nullableEnum<E>(key)` | string key (`Enum.name`) / string-set key / string key | default on unknown name / skipped / `null` |
+| Category              | Functions                                                                                                                                                                                                                                                          | Storage                                                      | Absent / failure semantics                  |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|---------------------------------------------|
+| Primitives            | `int(key, default = 0)`, `long(key, default = 0L)`, `float(key, default = 0f)`, `double(key, default = 0.0)`, `bool(key, default = false)`, `string(key, default = "")`, `stringSet(key, default = emptySet())`                                                    | native typed keys                                            | default                                     |
+| New primitives        | `stringList(key, default = emptyList())`, `nullableStringList(key)`                                                                                                                                                                                                | `stringPreferencesKey`, JSON array of strings                | default / null; bad elements skipped        |
+| Nullable primitives   | `nullableInt`, `nullableLong`, `nullableFloat`, `nullableDouble`, `nullableBool`, `nullableString`, `nullableStringSet` (key-only, default is always `null`)                                                                                                       | native typed keys                                            | `null`; writing `null` removes              |
+| Custom                | `serialized<T>(key, default, serializer, deserializer)`, `serializedSet<T>(key, default = emptySet(), elemSer, elemDeser)`, `serializedList<T>(key, default = emptyList(), elemSer, elemDeser)`                                                                    | string key / string-set key / string key (JSON array)        | default; set & list skip failing elements   |
+| Kotlinx serialization | `kserialized<T>(key, default, serializer: KSerializer<T>, json: Json? = null)` + `inline reified` overload; same for `kserializedSet`, `kserializedList`                                                                                                           | string key (JSON) / string-set key / string key (JSON array) | default; sets & lists skip failing elements |
+| Nullable custom       | `nullableSerialized<T : Any>(key, serializer, deserializer)`, `nullableKserialized<T : Any>(key, serializer, json)` + reified, `nullableSerializedList<T>(key, elemSer, elemDeser)`, `nullableKserializedList<T>(key, serializer: KSerializer<T>, json)` + reified | string key / JSON array                                      | `null`; writing `null` removes              |
+| Enums                 | `enum<E : Enum<E>>(key, default: E)`, `enumSet<E>(key, default: Set<E> = emptySet())`, `nullableEnum<E>(key)`                                                                                                                                                      | string key (`Enum.name`) / string-set key / string key       | default on unknown name / skipped / `null`  |
 
 `kserialized*` with `json = null` resolves at call time the same way single preferences do — the
 batch DSL has no datastore reference, so the default is `PreferenceDefaults.defaultJson` when the
@@ -215,8 +216,8 @@ public fun nullableStringList(key: String): Preference<List<String>?>
 1. **Format parity is critical.** Batch reads/writes must produce byte-identical storage to the
    single-preference classes. Extract the shared logic into
    `preferences/utils/Serialization.kt` (internal top-level helpers): `safeDeserialize`
-   (fallback-to-default and fallback-to-null variants), set-element safe mapping, and the JSON
-   list encode/decode. Refactor `CustomGenericPreferenceItem`, `CustomSetGenericPreferenceItem`,
+   (fallback-to-default and fallback-to-null variants), set-element safe mapping, and the JSON list
+   encode/decode. Refactor `CustomGenericPreferenceItem`, `CustomSetGenericPreferenceItem`,
    `SerializedListPrimitive`, and the nullable custom bases to use them; the new `BatchPref`
    subclasses use the same helpers.
 2. `PreferencesAccessor.kt` keeps the internal `PreferencesAccessor<T>` interface (used by item
@@ -262,9 +263,10 @@ Files removed: `batch/BatchReadScope.kt`. Scope operator signatures on `BatchWri
   working without changes.
 
 - `BatchPrefsComposeState.kt`: holds the `BatchPref<T>` handle resolved from the batch (the value
-  returned by `add(preference)`), reads via `batchState.value?.get(handle) ?: preference.defaultValue`,
-  writes via `scope.launch { datastore.batchWrite(batch) { set(handle, value) } }`. Optimistic
-  override + `SnapshotMutationPolicy` logic unchanged.
+  returned by `add(preference)`), reads via
+  `batchState.value?.get(handle) ?: preference.defaultValue`, writes via
+  `scope.launch { datastore.batchWrite(batch) { set(handle, value) } }`. Optimistic override +
+  `SnapshotMutationPolicy` logic unchanged.
 
 - `PreferencesState.kt`, `LocalPreferencesDatastore.kt` (`ProvidePreferencesDatastore`): unchanged.
 
@@ -279,42 +281,43 @@ Files removed: `batch/BatchReadScope.kt`. Scope operator signatures on `BatchWri
 
 ## 8. Tests
 
-Rewrite the **contents** of the three abstract classes (names kept so the existing platform shims
-in `androidDeviceTest` / `jvmTest` / `iosSimulatorArm64Test` continue to compile unchanged):
+Rewrite the **contents** of the three abstract classes (names kept so the existing platform shims in
+`androidDeviceTest` / `jvmTest` / `iosSimulatorArm64Test` continue to compile unchanged):
 
 - `AbstractBatchOperationsTest.kt` (suspend, `runTest(testDispatcher)`):
-  - Builder: every Types-table function; implicit primitive defaults; explicit defaults;
-    duplicate-key and blank-key `IllegalArgumentException`; `add(BatchPref)` and
-    `add(Preference)` aggregation; declaration order preserved.
-  - Read: defaults when absent / stored values, per storage family; nullable semantics;
-    decode-failure fallbacks (default for customs, `null` for nullable customs, element-skip for
-    sets/lists, malformed array → default); single-emission consistency.
-  - `batchReadFlow`: emits on change; `distinctUntilChanged` suppresses equal `BatchValues`.
-  - Write: multiple `set`s, `delete`, `resetToDefault`, and null-write-removes-key inside one
-    transaction; intra-transaction effects visible to `batchUpdate` reads.
-  - `batchDelete`: every declared key removed; subsequent reads return defaults.
-  - **Storage interop** (key correctness): values written via batch read back through the
-    equivalent single `Preference` (`datastore.int(...)` etc.) and vice versa, for all storage
-    families; raw-format assertion that `stringList` stores a JSON array of strings
-    (via `dataStore.data.first()` / `dataStore.edit`).
-  - Mapped preferences (`mapIO`) work through `add(pref)`.
+    - Builder: every Types-table function; implicit primitive defaults; explicit defaults;
+      duplicate-key and blank-key `IllegalArgumentException`; `add(BatchPref)` and
+      `add(Preference)` aggregation; declaration order preserved.
+    - Read: defaults when absent / stored values, per storage family; nullable semantics;
+      decode-failure fallbacks (default for customs, `null` for nullable customs, element-skip for
+      sets/lists, malformed array → default); single-emission consistency.
+    - `batchReadFlow`: emits on change; `distinctUntilChanged` suppresses equal `BatchValues`.
+    - Write: multiple `set`s, `delete`, `resetToDefault`, and null-write-removes-key inside one
+      transaction; intra-transaction effects visible to `batchUpdate` reads.
+    - `batchDelete`: every declared key removed; subsequent reads return defaults.
+    - **Storage interop** (key correctness): values written via batch read back through the
+      equivalent single `Preference` (`datastore.int(...)` etc.) and vice versa, for all storage
+      families; raw-format assertion that `stringList` stores a JSON array of strings (via
+      `dataStore.data.first()` / `dataStore.edit`).
+    - Mapped preferences (`mapIO`) work through `add(pref)`.
 - `AbstractBatchOperationsBlockingTest.kt`: blocking variants of the above.
-- `AbstractBatchPerformanceTest.kt`: re-port the batch-vs-individual timing comparisons
-  (sizes 5/10/25/50) to the new DSL; remains `@Ignore`d and desktop-only.
+- `AbstractBatchPerformanceTest.kt`: re-port the batch-vs-individual timing comparisons (sizes
+  5/10/25/50) to the new DSL; remains `@Ignore`d and desktop-only.
 
 Compose tests:
 
 - `AbstractBatchPrefsComposeStateTest.kt`: fakes switch from `mutableStateOf<BatchReadScope?>` to
-  `mutableStateOf<BatchValues?>` (snapshots built via `batchRead(prefBatch { add(pref) }) { this }`);
-  the counting/failing datastore delegates override `batchWrite(batch, block)`.
+  `mutableStateOf<BatchValues?>` (snapshots built via
+  `batchRead(prefBatch { add(pref) }) { this }`); the counting/failing datastore delegates override
+  `batchWrite(batch, block)`.
 - `AbstractRememberPreferencesAndBatchReadTest.kt`: `rememberPreferences` tests unchanged in
   structure; `rememberBatchRead` tests use the new `batch` parameter (handles captured from
   `prefBatch { add(...) }` for typed assertions).
 
 ## 9. Docs
 
-- README: rewrite the batch section (~lines 540–690) and the compose batch docs (~1189–1213);
-  update the API table row (~line 185) to the new member list.
+- README: rewrite the batch section (~lines 540–690) and the compose batch docs (~1189–1213); update
+  the API table row (~line 185) to the new member list.
 - `docs/batch-performance-results.md`: refresh terminology after re-running the perf test.
 - This file is the implementation plan of record (`plans/batch-prefbatch-dsl.md`).
 
@@ -364,13 +367,13 @@ Implemented as specified, with two internal simplifications that preserve all se
   `BatchSetPref`, and `PreferenceBatchAdapter`. The list strategies from section 3.1
   (`BatchListPref` / `BatchNullableListPref`) are expressed as `BatchCustomPref<List<T>>` /
   `BatchNullableCustomPref<List<T>>` with `serializeList` / `deserializeList` codecs — the same
-  lambda-based collapse the single-preference classes already use (`ObjectPrimitive` →
-  `CustomGenericPreferenceItem`). `BatchNullableSetPref` was dropped because no nullable set
-  custom exists in the single-preference API (`nullableStringSet` is a typed key).
+  lambda-based collapse the single-preference classes already use (`SerializedPrimitive` →
+  `CustomGenericPreferenceItem`). `BatchNullableSetPref` was dropped because no nullable set custom
+  exists in the single-preference API (`nullableStringSet` is a typed key).
 - The read operations expose two overloads instead of a defaulted block parameter
   (`batchRead(batch)` / `batchRead(batch) { block }`), because a defaulted `block = { this }`
-  cannot drive the generic type parameter's inference. The no-block forms are interface members
-  with default implementations.
+  cannot drive the generic type parameter's inference. The no-block forms are interface members with
+  default implementations.
 
 Verification on this machine: all main/test source sets compile (Android + JVM for both modules),
 394 JVM tests pass with 0 failures (15 `@Ignore`d performance tests skipped), `spotlessCheck`
