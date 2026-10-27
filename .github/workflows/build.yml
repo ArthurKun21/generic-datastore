@@ -32,9 +32,12 @@ concurrency:
   group: ${{ github.ref }}-build
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
+env:
+  GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+UseParallelGC"'
+
 jobs:
   Build-Android:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Setup Project
         uses: $/.github/actions/setup-project

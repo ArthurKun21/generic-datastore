@@ -5,13 +5,12 @@ on:
     types: [ created ]
 
 env:
-  JAVA_VERSION: 17
-  JAVA_DISTRO: 'temurin'
+  GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+UseParallelGC"'
 
 jobs:
   publish:
     name: Publish to GitHub Packages
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
