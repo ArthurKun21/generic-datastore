@@ -2,15 +2,22 @@ name: Run Lint
 
 on:
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - '**.txt'
-      - '.gitignore'
-      - 'LICENSE'
-      - 'docs/**'
-      - '.github/**'
-      - '!.github/workflows/**'
-      - 'renovate.json'
+    paths:
+      - '.github/workflows/**'
+      - 'gradle/**'
+      - 'samples/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'generic-datastore-core/build.gradle.kts'
+      - 'generic-datastore-core/src/**'
+      - 'generic-datastore-preferences/build.gradle.kts'
+      - 'generic-datastore-preferences/src/**'
+      - 'generic-datastore-proto/build.gradle.kts'
+      - 'generic-datastore-proto/src/**'
+      - 'generic-datastore/build.gradle.kts'
+      - 'generic-datastore/src/**'
+      - 'generic-datastore-compose/build.gradle.kts'
+      - 'generic-datastore-compose/src/**'
 
 env:
   GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+UseParallelGC"'

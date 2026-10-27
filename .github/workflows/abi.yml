@@ -4,15 +4,27 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - '.idea/**'
-      - 'jitpack.yml'
-      - '**/.gitignore'
-      - '**/*.md'
-      - '.github/**.md'
+    paths:
+      - '.github/workflows/**'
+      - 'gradle/**'
+      - 'samples/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'generic-datastore-core/build.gradle.kts'
+      - 'generic-datastore-core/src/**'
+      - 'generic-datastore-preferences/build.gradle.kts'
+      - 'generic-datastore-preferences/src/**'
+      - 'generic-datastore-proto/build.gradle.kts'
+      - 'generic-datastore-proto/src/**'
+      - 'generic-datastore/build.gradle.kts'
+      - 'generic-datastore/src/**'
+      - 'generic-datastore-compose/build.gradle.kts'
+      - 'generic-datastore-compose/src/**'
   pull_request:
     paths:
+      - '.github/workflows/**'
       - 'gradle/**'
+      - 'samples/**'
       - 'build.gradle.kts'
       - 'settings.gradle.kts'
       - 'generic-datastore-core/build.gradle.kts'
