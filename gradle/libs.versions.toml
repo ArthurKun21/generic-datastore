@@ -29,7 +29,7 @@ kotlinx-io = "0.9.1"
 okio = "3.18.2"
 
 wire = "7.1.2"
-filekit = "0.16.0"
+filekit = "0.17.0"
 
 spotless = "8.10.4"
 ktlint-core = "1.8.0"
