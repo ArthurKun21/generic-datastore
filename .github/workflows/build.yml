@@ -11,7 +11,7 @@ on:
       - '.github/**.md'
   pull_request:
     paths:
-      - '.github/workflows/**'
+      - '.github/workflows/build.yml'
       - 'gradle/**'
       - 'samples/**'
       - 'build.gradle.kts'
@@ -28,32 +28,19 @@ on:
       - 'generic-datastore-compose/src/**'
   workflow_dispatch:
 
-env:
-  JAVA_VERSION: 17
-  JAVA_DISTRO: 'temurin'
-
 concurrency:
   group: ${{ github.ref }}-build
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
+env:
+  GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+UseParallelGC"'
+
 jobs:
   Build-Android:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7.0.1
-
-      - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v6.4.0
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v6.1.0
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRO }}
-
-      - name: Set up gradle
-        uses: gradle/actions/setup-gradle@v6.4.0
+      - name: Setup Project
+        uses: $/.github/actions/setup-project
 
       - name: Build app
         run: |
@@ -73,20 +60,8 @@ jobs:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7.0.1
-
-      - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v6.4.0
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v6.1.0
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRO }}
-
-      - name: Set up gradle
-        uses: gradle/actions/setup-gradle@v6.4.0
+      - name: Setup Project
+        uses: $/.github/actions/setup-project
 
       - name: Create distributable
         run: |
@@ -96,20 +71,8 @@ jobs:
     timeout-minutes: 60
     runs-on: macos-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7.0.1
-
-      - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v6.4.0
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v6.1.0
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRO }}
-
-      - name: Set up gradle
-        uses: gradle/actions/setup-gradle@v6.4.0
+      - name: Setup Project
+        uses: $/.github/actions/setup-project
 
       - name: Create Release for Generic Datastore
         run: |
