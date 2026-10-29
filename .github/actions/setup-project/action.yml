@@ -1,5 +1,5 @@
 name: Setup Project
-description: Sets up the project environment for GitHub Actions.
+description: Sets up the Java project environment for GitHub Actions.
 
 runs:
   using: "composite"
