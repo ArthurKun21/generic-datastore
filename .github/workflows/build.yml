@@ -11,7 +11,7 @@ on:
       - '.github/**.md'
   pull_request:
     paths:
-      - '.github/workflows/**'
+      - '.github/workflows/build.yml'
       - 'gradle/**'
       - 'samples/**'
       - 'build.gradle.kts'
