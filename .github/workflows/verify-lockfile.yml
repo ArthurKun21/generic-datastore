@@ -5,7 +5,13 @@ name: verify-lockfile
 
 on:
   pull_request:
+    paths:
+      - .github/workflows/**
+      - .github/actions/**
   push:
+    paths:
+      - .github/workflows/**
+      - .github/actions/**
     branches:
       - main
 
@@ -21,7 +27,7 @@ jobs:
       - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-    
+
       - run: gh extension install github/gh-actions-lock
 
       - run: gh actions-lock --verify
