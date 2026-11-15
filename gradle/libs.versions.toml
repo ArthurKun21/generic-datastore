@@ -28,7 +28,7 @@ coroutines = "1.11.0"
 kotlinx-io = "0.9.2"
 okio = "3.18.2"
 
-wire = "7.1.2"
+wire = "7.2.1"
 filekit = "0.17.0"
 
 spotless = "8.11.0"
